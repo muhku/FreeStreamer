@@ -1,0 +1,346 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		631DEA67143BA0560039CCED /* audio_queue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 631DEA61143BA0560039CCED /* audio_queue.cpp */; };
+		631DEA68143BA0560039CCED /* audio_stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 631DEA63143BA0560039CCED /* audio_stream.cpp */; };
+		631DEA69143BA0560039CCED /* http_stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 631DEA65143BA0560039CCED /* http_stream.cpp */; };
+		631DEA78143BA0640039CCED /* FSAudioController.m in Sources */ = {isa = PBXBuildFile; fileRef = 631DEA6B143BA0640039CCED /* FSAudioController.m */; };
+		631DEA79143BA0640039CCED /* FSAudioStream.mm in Sources */ = {isa = PBXBuildFile; fileRef = 631DEA6D143BA0640039CCED /* FSAudioStream.mm */; };
+		631DEA7A143BA0640039CCED /* FSDAO.m in Sources */ = {isa = PBXBuildFile; fileRef = 631DEA6F143BA0640039CCED /* FSDAO.m */; };
+		631DEA7B143BA0640039CCED /* FSMainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 631DEA70143BA0640039CCED /* FSMainWindow.xib */; };
+		631DEA7C143BA0640039CCED /* FSPlayerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 631DEA72143BA0640039CCED /* FSPlayerViewController.m */; };
+		631DEA7D143BA0640039CCED /* FSPlaylistItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 631DEA74143BA0640039CCED /* FSPlaylistItem.m */; };
+		631DEA7E143BA0640039CCED /* FSPlaylistViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 631DEA76143BA0640039CCED /* FSPlaylistViewController.m */; };
+		631DEA7F143BA0640039CCED /* playlists.txt in Resources */ = {isa = PBXBuildFile; fileRef = 631DEA77143BA0640039CCED /* playlists.txt */; };
+		631DEA81143BA07B0039CCED /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 631DEA80143BA07B0039CCED /* AVFoundation.framework */; };
+		631DEA83143BA0850039CCED /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 631DEA82143BA0850039CCED /* CFNetwork.framework */; };
+		631DEA8B143BA0F90039CCED /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 631DEA8A143BA0F90039CCED /* AudioToolbox.framework */; };
+		63DEB77B143B9FDE000AF919 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63DEB77A143B9FDE000AF919 /* UIKit.framework */; };
+		63DEB77D143B9FDE000AF919 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63DEB77C143B9FDE000AF919 /* Foundation.framework */; };
+		63DEB77F143B9FDE000AF919 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63DEB77E143B9FDE000AF919 /* CoreGraphics.framework */; };
+		63DEB785143B9FDE000AF919 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 63DEB783143B9FDE000AF919 /* InfoPlist.strings */; };
+		63DEB787143B9FDE000AF919 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 63DEB786143B9FDE000AF919 /* main.m */; };
+		63DEB78B143B9FDE000AF919 /* FSAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 63DEB78A143B9FDE000AF919 /* FSAppDelegate.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		631DEA61143BA0560039CCED /* audio_queue.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = audio_queue.cpp; sourceTree = "<group>"; };
+		631DEA62143BA0560039CCED /* audio_queue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = audio_queue.h; sourceTree = "<group>"; };
+		631DEA63143BA0560039CCED /* audio_stream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = audio_stream.cpp; sourceTree = "<group>"; };
+		631DEA64143BA0560039CCED /* audio_stream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = audio_stream.h; sourceTree = "<group>"; };
+		631DEA65143BA0560039CCED /* http_stream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = http_stream.cpp; sourceTree = "<group>"; };
+		631DEA66143BA0560039CCED /* http_stream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = http_stream.h; sourceTree = "<group>"; };
+		631DEA6A143BA0640039CCED /* FSAudioController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSAudioController.h; sourceTree = "<group>"; };
+		631DEA6B143BA0640039CCED /* FSAudioController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSAudioController.m; sourceTree = "<group>"; };
+		631DEA6C143BA0640039CCED /* FSAudioStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSAudioStream.h; sourceTree = "<group>"; };
+		631DEA6D143BA0640039CCED /* FSAudioStream.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = FSAudioStream.mm; sourceTree = "<group>"; };
+		631DEA6E143BA0640039CCED /* FSDAO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSDAO.h; sourceTree = "<group>"; };
+		631DEA6F143BA0640039CCED /* FSDAO.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSDAO.m; sourceTree = "<group>"; };
+		631DEA70143BA0640039CCED /* FSMainWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = FSMainWindow.xib; sourceTree = "<group>"; };
+		631DEA71143BA0640039CCED /* FSPlayerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSPlayerViewController.h; sourceTree = "<group>"; };
+		631DEA72143BA0640039CCED /* FSPlayerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSPlayerViewController.m; sourceTree = "<group>"; };
+		631DEA73143BA0640039CCED /* FSPlaylistItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSPlaylistItem.h; sourceTree = "<group>"; };
+		631DEA74143BA0640039CCED /* FSPlaylistItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSPlaylistItem.m; sourceTree = "<group>"; };
+		631DEA75143BA0640039CCED /* FSPlaylistViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSPlaylistViewController.h; sourceTree = "<group>"; };
+		631DEA76143BA0640039CCED /* FSPlaylistViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSPlaylistViewController.m; sourceTree = "<group>"; };
+		631DEA77143BA0640039CCED /* playlists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = playlists.txt; sourceTree = "<group>"; };
+		631DEA80143BA07B0039CCED /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		631DEA82143BA0850039CCED /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
+		631DEA84143BA0890039CCED /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
+		631DEA8A143BA0F90039CCED /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
+		63DEB776143B9FDE000AF919 /* FreeStreamer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FreeStreamer.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		63DEB77A143B9FDE000AF919 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		63DEB77C143B9FDE000AF919 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		63DEB77E143B9FDE000AF919 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		63DEB782143B9FDE000AF919 /* FreeStreamer-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "FreeStreamer-Info.plist"; sourceTree = "<group>"; };
+		63DEB784143B9FDE000AF919 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		63DEB786143B9FDE000AF919 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		63DEB788143B9FDE000AF919 /* FreeStreamer-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FreeStreamer-Prefix.pch"; sourceTree = "<group>"; };
+		63DEB789143B9FDE000AF919 /* FSAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FSAppDelegate.h; sourceTree = "<group>"; };
+		63DEB78A143B9FDE000AF919 /* FSAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FSAppDelegate.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		63DEB773143B9FDE000AF919 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				631DEA8B143BA0F90039CCED /* AudioToolbox.framework in Frameworks */,
+				631DEA83143BA0850039CCED /* CFNetwork.framework in Frameworks */,
+				631DEA81143BA07B0039CCED /* AVFoundation.framework in Frameworks */,
+				63DEB77B143B9FDE000AF919 /* UIKit.framework in Frameworks */,
+				63DEB77D143B9FDE000AF919 /* Foundation.framework in Frameworks */,
+				63DEB77F143B9FDE000AF919 /* CoreGraphics.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		631DEA60143BA0560039CCED /* astreamer */ = {
+			isa = PBXGroup;
+			children = (
+				631DEA61143BA0560039CCED /* audio_queue.cpp */,
+				631DEA62143BA0560039CCED /* audio_queue.h */,
+				631DEA63143BA0560039CCED /* audio_stream.cpp */,
+				631DEA64143BA0560039CCED /* audio_stream.h */,
+				631DEA65143BA0560039CCED /* http_stream.cpp */,
+				631DEA66143BA0560039CCED /* http_stream.h */,
+			);
+			path = astreamer;
+			sourceTree = "<group>";
+		};
+		63DEB76B143B9FDE000AF919 = {
+			isa = PBXGroup;
+			children = (
+				631DEA8A143BA0F90039CCED /* AudioToolbox.framework */,
+				631DEA84143BA0890039CCED /* CoreAudio.framework */,
+				631DEA82143BA0850039CCED /* CFNetwork.framework */,
+				631DEA80143BA07B0039CCED /* AVFoundation.framework */,
+				63DEB780143B9FDE000AF919 /* FreeStreamer */,
+				63DEB779143B9FDE000AF919 /* Frameworks */,
+				63DEB777143B9FDE000AF919 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		63DEB777143B9FDE000AF919 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				63DEB776143B9FDE000AF919 /* FreeStreamer.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		63DEB779143B9FDE000AF919 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				63DEB77A143B9FDE000AF919 /* UIKit.framework */,
+				63DEB77C143B9FDE000AF919 /* Foundation.framework */,
+				63DEB77E143B9FDE000AF919 /* CoreGraphics.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		63DEB780143B9FDE000AF919 /* FreeStreamer */ = {
+			isa = PBXGroup;
+			children = (
+				631DEA6A143BA0640039CCED /* FSAudioController.h */,
+				631DEA6B143BA0640039CCED /* FSAudioController.m */,
+				631DEA6C143BA0640039CCED /* FSAudioStream.h */,
+				631DEA6D143BA0640039CCED /* FSAudioStream.mm */,
+				631DEA6E143BA0640039CCED /* FSDAO.h */,
+				631DEA6F143BA0640039CCED /* FSDAO.m */,
+				631DEA70143BA0640039CCED /* FSMainWindow.xib */,
+				631DEA71143BA0640039CCED /* FSPlayerViewController.h */,
+				631DEA72143BA0640039CCED /* FSPlayerViewController.m */,
+				631DEA73143BA0640039CCED /* FSPlaylistItem.h */,
+				631DEA74143BA0640039CCED /* FSPlaylistItem.m */,
+				631DEA75143BA0640039CCED /* FSPlaylistViewController.h */,
+				631DEA76143BA0640039CCED /* FSPlaylistViewController.m */,
+				631DEA77143BA0640039CCED /* playlists.txt */,
+				631DEA60143BA0560039CCED /* astreamer */,
+				63DEB789143B9FDE000AF919 /* FSAppDelegate.h */,
+				63DEB78A143B9FDE000AF919 /* FSAppDelegate.m */,
+				63DEB781143B9FDE000AF919 /* Supporting Files */,
+			);
+			path = FreeStreamer;
+			sourceTree = "<group>";
+		};
+		63DEB781143B9FDE000AF919 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				63DEB782143B9FDE000AF919 /* FreeStreamer-Info.plist */,
+				63DEB783143B9FDE000AF919 /* InfoPlist.strings */,
+				63DEB786143B9FDE000AF919 /* main.m */,
+				63DEB788143B9FDE000AF919 /* FreeStreamer-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		63DEB775143B9FDE000AF919 /* FreeStreamer */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 63DEB794143B9FDE000AF919 /* Build configuration list for PBXNativeTarget "FreeStreamer" */;
+			buildPhases = (
+				63DEB772143B9FDE000AF919 /* Sources */,
+				63DEB773143B9FDE000AF919 /* Frameworks */,
+				63DEB774143B9FDE000AF919 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = FreeStreamer;
+			productName = FreeStreamer;
+			productReference = 63DEB776143B9FDE000AF919 /* FreeStreamer.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		63DEB76D143B9FDE000AF919 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0420;
+			};
+			buildConfigurationList = 63DEB770143B9FDE000AF919 /* Build configuration list for PBXProject "FreeStreamer" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 63DEB76B143B9FDE000AF919;
+			productRefGroup = 63DEB777143B9FDE000AF919 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				63DEB775143B9FDE000AF919 /* FreeStreamer */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		63DEB774143B9FDE000AF919 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				63DEB785143B9FDE000AF919 /* InfoPlist.strings in Resources */,
+				631DEA7B143BA0640039CCED /* FSMainWindow.xib in Resources */,
+				631DEA7F143BA0640039CCED /* playlists.txt in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		63DEB772143B9FDE000AF919 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				63DEB787143B9FDE000AF919 /* main.m in Sources */,
+				63DEB78B143B9FDE000AF919 /* FSAppDelegate.m in Sources */,
+				631DEA67143BA0560039CCED /* audio_queue.cpp in Sources */,
+				631DEA68143BA0560039CCED /* audio_stream.cpp in Sources */,
+				631DEA69143BA0560039CCED /* http_stream.cpp in Sources */,
+				631DEA78143BA0640039CCED /* FSAudioController.m in Sources */,
+				631DEA79143BA0640039CCED /* FSAudioStream.mm in Sources */,
+				631DEA7A143BA0640039CCED /* FSDAO.m in Sources */,
+				631DEA7C143BA0640039CCED /* FSPlayerViewController.m in Sources */,
+				631DEA7D143BA0640039CCED /* FSPlaylistItem.m in Sources */,
+				631DEA7E143BA0640039CCED /* FSPlaylistViewController.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		63DEB783143B9FDE000AF919 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				63DEB784143B9FDE000AF919 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		63DEB792143B9FDE000AF919 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		63DEB793143B9FDE000AF919 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.0;
+				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		63DEB795143B9FDE000AF919 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "FreeStreamer/FreeStreamer-Prefix.pch";
+				INFOPLIST_FILE = "FreeStreamer/FreeStreamer-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		63DEB796143B9FDE000AF919 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "FreeStreamer/FreeStreamer-Prefix.pch";
+				INFOPLIST_FILE = "FreeStreamer/FreeStreamer-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		63DEB770143B9FDE000AF919 /* Build configuration list for PBXProject "FreeStreamer" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				63DEB792143B9FDE000AF919 /* Debug */,
+				63DEB793143B9FDE000AF919 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		63DEB794143B9FDE000AF919 /* Build configuration list for PBXNativeTarget "FreeStreamer" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				63DEB795143B9FDE000AF919 /* Debug */,
+				63DEB796143B9FDE000AF919 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 63DEB76D143B9FDE000AF919 /* Project object */;
+}
