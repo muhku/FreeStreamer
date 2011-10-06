@@ -8,6 +8,16 @@ a helpful example for using the engine.
 The engine is written in C++ and the FSAudioController Objective-C class wraps
 the implementation.
 
+FreeStreamer has the following features:
+- Fast and low memory footprint (no overhead of Objective-C method calls)
+- Supports ShoutCast and IceCast audio streams + standard HTTP
+- Can detect the stream type based on the content type
+- Supports ShoutCast metadata
+- Supports interruptions (for example a phone call during playing the stream)
+- Supports backgrounding
+
+![](http://www.muhonen.net/project/FreeStreamer/main.png)
+
 Reporting bugs and contributing
 ====================
 
