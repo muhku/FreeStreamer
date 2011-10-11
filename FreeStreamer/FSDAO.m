@@ -45,16 +45,26 @@
     [_playlistItems removeAllObjects];
     
     for (NSString *line in [_data componentsSeparatedByString:@"\n"]) {
+        NSString *data = [line stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        
+        if (!([data length] > 0)) {
+            if (item) {
+                [item release], item = nil;
+            }
+            goto out;
+        }
+        
         if ((titleLine = !titleLine)) {
             item = [[FSPlaylistItem alloc] init];
-            item.title = line;
+            item.title = data;
         } else {
-            item.url = line;
+            item.url = data;
             [_playlistItems addObject:item];
             [item release], item = nil;
         }
     }
     
+out:
     if (item) {
         [_playlistItems addObject:item];
         [item release], item = nil;        
