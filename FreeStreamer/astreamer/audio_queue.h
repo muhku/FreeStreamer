@@ -43,6 +43,9 @@ public:
 	
 private:
     
+    Audio_Queue(const Audio_Queue&);
+    Audio_Queue& operator=(const Audio_Queue&);
+    
     State m_state;
     
     AudioQueueRef m_outAQ;                                           // the audio queue

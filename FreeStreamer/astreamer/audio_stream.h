@@ -52,6 +52,10 @@ public:
     void streamMetaDataAvailable(std::string metaData);
 
 private:
+    
+    Audio_Stream(const Audio_Stream&);
+    Audio_Stream& operator=(const Audio_Stream&);
+    
     bool m_httpStreamRunning;
     bool m_audioStreamParserRunning;
     
