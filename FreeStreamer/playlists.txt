@@ -4,9 +4,3 @@ BassDrive AAC
 http://www.bassdrive.com/v2/streams/BassDrive3.pls
 BassDrive 128
 http://www.bassdrive.com/v2/streams/BassDrive.pls
-Radio Swiss Jazz
-http://dir.xiph.org/listen/3922663/listen.m3u
-Radio Swiss Classic AAC+
-http://dir.xiph.org/listen/3955702/listen.m3u
-ABCDANCE
-http://dir.xiph.org/listen/3909691/listen.m3u
