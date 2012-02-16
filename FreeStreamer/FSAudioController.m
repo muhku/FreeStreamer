@@ -81,15 +81,15 @@ typedef enum {
     size_t i = 0;
 
     for (NSString *line in [playlist componentsSeparatedByString:@"\n"]) {
-        if (i == 0 && ![line hasPrefix:@"[playlist]"]) {
+        if (i == 0 && ![[line lowercaseString] hasPrefix:@"[playlist]"]) {
             // Invalid playlist 
             return;
         }
-        if (i == 1 && ![line hasPrefix:@"numberofentries="]) {
+        if (i == 1 && ![[line lowercaseString] hasPrefix:@"numberofentries="]) {
             // Invalid playlist 
             return;
         }
-        if ([line hasPrefix:@"File"]) {
+        if ([[line lowercaseString] hasPrefix:@"file"]) {
             NSString *file = [line substringFromIndex:[line rangeOfString:@"="].location + 1];
             if ([file hasPrefix:@"http://"] ||
                 [file hasPrefix:@"https://"]) {
@@ -100,7 +100,7 @@ typedef enum {
                 [item release];
             }
         }
-        if ([line hasPrefix:@"Title"]) {
+        if ([[line lowercaseString] hasPrefix:@"title"]) {
             FSPlaylistItem *item = [_playlistItems lastObject];
             if (item) {
                 NSString *title = [[line substringFromIndex:[line rangeOfString:@"="].location + 1] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
