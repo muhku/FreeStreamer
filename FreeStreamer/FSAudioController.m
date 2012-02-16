@@ -245,6 +245,14 @@ typedef enum {
             _playlistPrivate.format = kFSPlaylistFormatM3U;
         } else if ([contentType isEqualToString:@"audio/x-scpls"]) {
             _playlistPrivate.format = kFSPlaylistFormatPLS;
+        } else if ([contentType isEqualToString:@"text/plain"]) {
+            NSString *absoluteUrl = [_url absoluteString];
+            
+            if ([absoluteUrl hasSuffix:@".m3u"]) {
+                _playlistPrivate.format = kFSPlaylistFormatM3U;
+            } else if ([absoluteUrl hasSuffix:@".pls"]) {
+                _playlistPrivate.format = kFSPlaylistFormatPLS;
+            }            
         } else {
             _playlistPrivate.format = kFSPlaylistFormatNone;
         }
