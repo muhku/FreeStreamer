@@ -21,6 +21,7 @@
 		631DEA81143BA07B0039CCED /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 631DEA80143BA07B0039CCED /* AVFoundation.framework */; };
 		631DEA83143BA0850039CCED /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 631DEA82143BA0850039CCED /* CFNetwork.framework */; };
 		631DEA8B143BA0F90039CCED /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 631DEA8A143BA0F90039CCED /* AudioToolbox.framework */; };
+		63B6C48A15054E85002654A9 /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63B6C48915054E85002654A9 /* MediaPlayer.framework */; };
 		63DEB77B143B9FDE000AF919 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63DEB77A143B9FDE000AF919 /* UIKit.framework */; };
 		63DEB77D143B9FDE000AF919 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63DEB77C143B9FDE000AF919 /* Foundation.framework */; };
 		63DEB77F143B9FDE000AF919 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63DEB77E143B9FDE000AF919 /* CoreGraphics.framework */; };
@@ -54,6 +55,7 @@
 		631DEA82143BA0850039CCED /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		631DEA84143BA0890039CCED /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
 		631DEA8A143BA0F90039CCED /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
+		63B6C48915054E85002654A9 /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
 		63DEB776143B9FDE000AF919 /* FreeStreamer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FreeStreamer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		63DEB77A143B9FDE000AF919 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		63DEB77C143B9FDE000AF919 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -71,6 +73,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				63B6C48A15054E85002654A9 /* MediaPlayer.framework in Frameworks */,
 				631DEA8B143BA0F90039CCED /* AudioToolbox.framework in Frameworks */,
 				631DEA83143BA0850039CCED /* CFNetwork.framework in Frameworks */,
 				631DEA81143BA07B0039CCED /* AVFoundation.framework in Frameworks */,
@@ -99,10 +102,6 @@
 		63DEB76B143B9FDE000AF919 = {
 			isa = PBXGroup;
 			children = (
-				631DEA8A143BA0F90039CCED /* AudioToolbox.framework */,
-				631DEA84143BA0890039CCED /* CoreAudio.framework */,
-				631DEA82143BA0850039CCED /* CFNetwork.framework */,
-				631DEA80143BA07B0039CCED /* AVFoundation.framework */,
 				63DEB780143B9FDE000AF919 /* FreeStreamer */,
 				63DEB779143B9FDE000AF919 /* Frameworks */,
 				63DEB777143B9FDE000AF919 /* Products */,
@@ -120,6 +119,11 @@
 		63DEB779143B9FDE000AF919 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				63B6C48915054E85002654A9 /* MediaPlayer.framework */,
+				631DEA8A143BA0F90039CCED /* AudioToolbox.framework */,
+				631DEA84143BA0890039CCED /* CoreAudio.framework */,
+				631DEA82143BA0850039CCED /* CFNetwork.framework */,
+				631DEA80143BA07B0039CCED /* AVFoundation.framework */,
 				63DEB77A143B9FDE000AF919 /* UIKit.framework */,
 				63DEB77C143B9FDE000AF919 /* Foundation.framework */,
 				63DEB77E143B9FDE000AF919 /* CoreGraphics.framework */,
