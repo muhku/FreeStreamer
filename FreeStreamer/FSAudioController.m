@@ -42,6 +42,7 @@ typedef enum {
 
 - (void)dealloc {
     [_playlistItems release], _playlistItems = nil;
+    [super dealloc];
 }
 
 - (void)parsePlaylistFromData:(NSData *)data {
