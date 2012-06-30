@@ -8,6 +8,14 @@
 #import "FSAudioStream.h"
 #import "FSPlaylistItem.h"
 
+//#define AC_DEBUG 1
+
+#if !defined (AC_DEBUG)
+#define AC_TRACE(...) do {} while (0)
+#else
+#define AC_TRACE(...) NSLog(__VA_ARGS__)
+#endif
+
 typedef enum {
     kFSPlaylistFormatNone,
     kFSPlaylistFormatM3U,
@@ -298,12 +306,16 @@ typedef enum {
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
     if (_contentTypeConnection) {
+        AC_TRACE(@"Error when checking content type: %@", [error localizedDescription]);
+        
         [_contentTypeConnection release], _contentTypeConnection = nil;
         /* Failed to read the stream's content type, try playing
-           the stream anyway */
+         the stream anyway */
         _streamContentTypeChecked = YES;
         [_audioStream play];
     } else if (_playlistRetrieveConnection) {
+        AC_TRACE(@"Error when retrieving playlist: %@", [error localizedDescription]);
+        
         [_playlistRetrieveConnection release], _playlistRetrieveConnection = nil;
         [_receivedPlaylistData release], _receivedPlaylistData = nil;
         /* Failed to read the playlist, try playing the stream anyway */
