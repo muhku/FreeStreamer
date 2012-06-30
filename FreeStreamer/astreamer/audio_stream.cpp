@@ -118,7 +118,7 @@ AudioFileTypeID Audio_Stream::audioStreamTypeFromContentType(std::string content
         fileTypeHint = kAudioFileAAC_ADTSType;
         AS_TRACE("kAudioFileAAC_ADTSType detected\n");
     } else {
-        AS_TRACE("***** Unable to detect the audio stream type! *****\n");
+        AS_TRACE("***** Unable to detect the audio stream type from content-type %s *****\n", contentType.c_str());
     }
     
 out:
