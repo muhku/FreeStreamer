@@ -55,7 +55,7 @@ Audio_Queue::~Audio_Queue()
     
     if (m_audioQueueStarted) {
         if (AudioQueueDispose(m_outAQ, false) != 0) {
-            AQ_TRACE("Audio_Queue::~Audio_Queue(): AudioQueueDispose failed!\n");
+            AQ_TRACE("%s: AudioQueueDispose failed!\n", __PRETTY_FUNCTION__);
         }
     }
     m_state = IDLE;
@@ -76,7 +76,7 @@ void Audio_Queue::pause()
 {
     if (m_state == RUNNING) {
         if (AudioQueuePause(m_outAQ) != 0) {
-            AQ_TRACE("Audio_Queue::pause(): AudioQueuePause failed!\n");
+            AQ_TRACE("%s: AudioQueuePause failed!\n", __PRETTY_FUNCTION__);
         }
         setState(PAUSED);
     } else if (m_state == PAUSED) {
@@ -91,19 +91,19 @@ void Audio_Queue::stop()
         return;
     }
     
-    AQ_TRACE("Audio_Queue::stop(): enter\n");
+    AQ_TRACE("%s: enter\n", __PRETTY_FUNCTION__);
 
     if (AudioQueueFlush(m_outAQ) != 0) {
-        AQ_TRACE("Audio_Queue::stop(): AudioQueueFlush failed!\n");
+        AQ_TRACE("%s: AudioQueueFlush failed!\n", __PRETTY_FUNCTION__);
     }
     
     if (AudioQueueStop(m_outAQ, true) != 0) {
-        AQ_TRACE("Audio_Queue::stop(): AudioQueueStop failed!\n");
+        AQ_TRACE("%s: AudioQueueStop failed!\n", __PRETTY_FUNCTION__);
     }
     
     m_audioQueueStarted = false;
     
-    AQ_TRACE("Audio_Queue::stop(): leave\n");
+    AQ_TRACE("%s: leave\n", __PRETTY_FUNCTION__);
 }
 
 void Audio_Queue::handlePropertyChange(AudioFileStreamID inAudioFileStream, AudioFileStreamPropertyID inPropertyID, UInt32 *ioFlags)
