@@ -106,6 +106,7 @@
             [_statusLabel setHidden:NO];
             break;
         case kFsAudioStreamStopped:
+            [_activityIndicator stopAnimating];
             self.statusLabel.text = statusEmpty;
             break;
         case kFsAudioStreamBuffering:
