@@ -44,17 +44,17 @@ Audio_Stream::~Audio_Stream()
 void Audio_Stream::open()
 {
     if (m_httpStreamRunning) {
-        AS_TRACE("Audio_Stream::open(): already running: return\n");
+        AS_TRACE("%s: already running: return\n", __PRETTY_FUNCTION__);
         /* Already running */
         return;
     }
     
     if (m_httpStream->open()) {
-        AS_TRACE("Audio_Stream::open(): HTTP stream opened, buffering...\n");
+        AS_TRACE("%s: HTTP stream opened, buffering...\n", __PRETTY_FUNCTION__);
         m_httpStreamRunning = true;
         setState(BUFFERING);
     } else {
-        AS_TRACE("Audio_Stream::open(): failed to open the HTTP stream\n");
+        AS_TRACE("%s: failed to open the HTTP stream\n", __PRETTY_FUNCTION__);
         setState(FAILED);
     }
 }
@@ -70,7 +70,7 @@ void Audio_Stream::close()
     
     if (m_audioStreamParserRunning) {
         if (AudioFileStreamClose(m_audioFileStream) != 0) {
-            AS_TRACE("Audio_Stream::close(): AudioFileStreamClose failed\n");
+            AS_TRACE("%s: AudioFileStreamClose failed\n", __PRETTY_FUNCTION__);
         }
         m_audioStreamParserRunning = false;
     }
@@ -137,7 +137,7 @@ void Audio_Stream::audioQueueStateChanged(Audio_Queue::State state)
 void Audio_Stream::streamIsReadyRead()
 {
     if (m_audioStreamParserRunning) {
-        AS_TRACE("Audio_Stream::streamIsReadyRead: parser already running!\n");
+        AS_TRACE("%s: parser already running!\n", __PRETTY_FUNCTION__);
         return;
     }
     
@@ -160,7 +160,7 @@ void Audio_Stream::streamIsReadyRead()
                                           &m_audioFileStream);
     
     if (result == 0) {
-        AS_TRACE("Audio_Stream::streamIsReadyRead: audio file stream opened.\n");
+        AS_TRACE("%s: audio file stream opened.\n", __PRETTY_FUNCTION__);
         m_audioStreamParserRunning = true;
     } else {
         closeAndSignalError(AS_ERR_OPEN);
@@ -169,17 +169,17 @@ void Audio_Stream::streamIsReadyRead()
 	
 void Audio_Stream::streamHasBytesAvailable(UInt8 *data, CFIndex numBytes)
 {
-    AS_TRACE("Audio_Stream::streamHasBytesAvailable: %lu bytes\n", numBytes);
+    AS_TRACE("%s: %lu bytes\n", __FUNCTION__, numBytes);
     
     if (!m_httpStreamRunning) {
-        AS_TRACE("Audio_Stream::streamHasBytesAvailable: stray callback detected!\n");
+        AS_TRACE("%s: stray callback detected!\n", __PRETTY_FUNCTION__);
         return;
     }
 	
     if (m_audioStreamParserRunning) {
         OSStatus result = AudioFileStreamParseBytes(m_audioFileStream, numBytes, data, 0);
         if (result != 0) {
-            AS_TRACE("Audio_Stream::streamHasBytesAvailable: AudioFileStreamParseBytes error %d\n", (int)result);
+            AS_TRACE("%s: AudioFileStreamParseBytes error %d\n", __PRETTY_FUNCTION__, (int)result);
             closeAndSignalError(AS_ERR_STREAM_PARSE);
         }
     }
@@ -187,10 +187,10 @@ void Audio_Stream::streamHasBytesAvailable(UInt8 *data, CFIndex numBytes)
 
 void Audio_Stream::streamEndEncountered()
 {
-    AS_TRACE("Audio_Stream::streamEndEncountered\n");
+    AS_TRACE("%s\n", __PRETTY_FUNCTION__);
     
     if (!m_httpStreamRunning) {
-        AS_TRACE("Audio_Stream::streamEndEncountered: stray callback detected!\n");
+        AS_TRACE("%s: stray callback detected!\n", __PRETTY_FUNCTION__);
         return;
     }
     
@@ -200,10 +200,10 @@ void Audio_Stream::streamEndEncountered()
 
 void Audio_Stream::streamErrorOccurred()
 {
-    AS_TRACE("Audio_Stream::streamErrorOccurred\n");
+    AS_TRACE("%s\n", __PRETTY_FUNCTION__);
     
     if (!m_httpStreamRunning) {
-        AS_TRACE("Audio_Stream::streamErrorOccurred: stray callback detected!\n");
+        AS_TRACE("%s: stray callback detected!\n", __PRETTY_FUNCTION__);
         return;
     }
     
@@ -221,7 +221,7 @@ void Audio_Stream::streamMetaDataAvailable(std::string metaData)
 
 void Audio_Stream::closeAndSignalError(int errorCode)
 {
-    AS_TRACE("Audio_Stream::closeAndSignalError(): error %i\n", errorCode);
+    AS_TRACE("%s: error %i\n", __PRETTY_FUNCTION__, errorCode);
     
     setState(FAILED);
     close();
@@ -247,11 +247,11 @@ void Audio_Stream::setState(State state)
 /* This is called by audio file stream parser when it finds property values */
 void Audio_Stream::propertyValueCallback(void *inClientData, AudioFileStreamID inAudioFileStream, AudioFileStreamPropertyID inPropertyID, UInt32 *ioFlags)
 {
-    AS_TRACE("Audio_Stream::propertyValueCallback\n");
+    AS_TRACE("%s\n", __PRETTY_FUNCTION__);
     Audio_Stream *THIS = static_cast<Audio_Stream*>(inClientData);
     
     if (!THIS->m_audioStreamParserRunning) {
-        AS_TRACE("Audio_Stream::propertyValueCallback: stray callback detected!\n");
+        AS_TRACE("%s: stray callback detected!\n", __PRETTY_FUNCTION__);
         return;
     }
     
@@ -261,11 +261,11 @@ void Audio_Stream::propertyValueCallback(void *inClientData, AudioFileStreamID i
 /* This is called by audio file stream parser when it finds packets of audio */
 void Audio_Stream::streamDataCallback(void *inClientData, UInt32 inNumberBytes, UInt32 inNumberPackets, const void *inInputData, AudioStreamPacketDescription *inPacketDescriptions)
 {    
-    AS_TRACE("Audio_Stream::streamDataCallback: inNumberBytes %lu, inNumberPackets %lu\n", inNumberBytes, inNumberPackets);
+    AS_TRACE("%s: inNumberBytes %lu, inNumberPackets %lu\n", __FUNCTION__, inNumberBytes, inNumberPackets);
     Audio_Stream *THIS = static_cast<Audio_Stream*>(inClientData);
     
     if (!THIS->m_audioStreamParserRunning) {
-        AS_TRACE("Audio_Stream::streamDataCallback: stray callback detected!\n");
+        AS_TRACE("%s: stray callback detected!\n", __PRETTY_FUNCTION__);
         return;
     }
     
