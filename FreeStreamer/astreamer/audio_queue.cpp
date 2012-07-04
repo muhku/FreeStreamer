@@ -54,6 +54,17 @@ Audio_Queue::~Audio_Queue()
     stop();
     
     if (m_audioQueueStarted) {
+        for (unsigned int i = 0; i < AQ_BUFFERS; ++i) {
+            if (!m_audioQueueBuffer[i]) {
+                continue;
+            }
+            if (AudioQueueFreeBuffer(m_outAQ, m_audioQueueBuffer[i]) == 0) {
+                m_audioQueueBuffer[i] = 0;
+            } else {
+                AQ_TRACE("%s: AudioQueueFreeBuffer failed!\n", __PRETTY_FUNCTION__);
+            }
+        }
+        
         if (AudioQueueDispose(m_outAQ, false) != 0) {
             AQ_TRACE("%s: AudioQueueDispose failed!\n", __PRETTY_FUNCTION__);
         }
