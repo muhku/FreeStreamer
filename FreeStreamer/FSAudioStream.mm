@@ -44,7 +44,7 @@ static void interruptionListener(void *	inClientData,
 	[[self class]
         performSelectorOnMainThread:@selector(postNotificationInternal:)
         withObject:notification
-        waitUntilDone:YES];
+        waitUntilDone:NO]; // Don't wait, or we have a possibility of a deadlock
 }
 
 + (void)postNotificationInternal:(NSNotification *)notification {
