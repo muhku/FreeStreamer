@@ -31,7 +31,8 @@ public:
         STOPPED,
         BUFFERING,
         PLAYING,
-        FAILED
+        FAILED,
+        END_OF_FILE
     };
     
     Audio_Stream(CFURLRef url);

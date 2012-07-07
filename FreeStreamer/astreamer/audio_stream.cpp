@@ -194,7 +194,7 @@ void Audio_Stream::streamEndEncountered()
         return;
     }
     
-    setState(STOPPED);
+    setState(END_OF_FILE);
     close();
 }
 
