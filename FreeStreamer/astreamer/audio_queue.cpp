@@ -103,6 +103,9 @@ void Audio_Queue::stop()
     }
     
     AQ_TRACE("%s: enter\n", __PRETTY_FUNCTION__);
+    
+    // enqueue last buffer
+    enqueueBuffer();
 
     if (AudioQueueFlush(m_outAQ) != 0) {
         AQ_TRACE("%s: AudioQueueFlush failed!\n", __PRETTY_FUNCTION__);
