@@ -167,6 +167,9 @@ public:
 - (void)audioPlaybackRunloop;
 - (BOOL)isPlaying;
 - (void)pause;
+
+- (void)audioStreamStateDidChange:(NSNotification *)notification;
+- (void)audioStreamErrorOccurred:(NSNotification *)notification;
 @end
 
 @implementation FSAudioStreamPrivate
@@ -178,6 +181,16 @@ public:
         _url = nil;
         _playbackThread = nil;
         _wasInterrupted = NO;
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(audioStreamStateDidChange:)
+                                                     name:FSAudioStreamStateChangeNotification
+                                                   object:nil];
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(audioStreamErrorOccurred:)
+                                                     name:FSAudioStreamErrorNotification
+                                                   object:nil];
 
 #ifdef TARGET_OS_IPHONE        
         OSStatus result = AudioSessionInitialize(NULL,
@@ -195,6 +208,8 @@ public:
 }
 
 - (void)dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    
     [_url release], _url = nil;
     
     if (_playbackThread) {
@@ -333,6 +348,36 @@ public:
              @"Pause must be called from the main thread.");
     
     _audioStream->pause();
+}
+
+- (void)audioStreamStateDidChange:(NSNotification *)notification {
+    NSDictionary *dict = [notification userInfo];
+    int state = [[dict valueForKey:FSAudioStreamNotificationKey_State] intValue];
+    astreamer::Audio_Stream *audioStream = static_cast<astreamer::Audio_Stream *>([[dict valueForKey:FSAudioStreamNotificationKey_Stream] pointerValue]);
+    
+    if (!(audioStream == _audioStream)) {
+        return;
+    }
+    
+    switch (state) {
+        case kFsAudioStreamStopped: /* FALLTHROUGH */
+        case kFsAudioStreamFailed: {
+            [self stop];
+            
+            break;
+        }
+    }
+}
+
+- (void)audioStreamErrorOccurred:(NSNotification *)notification {
+    NSDictionary *dict = [notification userInfo];
+    astreamer::Audio_Stream *audioStream = static_cast<astreamer::Audio_Stream *>([[dict valueForKey:FSAudioStreamNotificationKey_Stream] pointerValue]);
+    
+    if (!(audioStream == _audioStream)) {
+        return;
+    }
+    
+    [self stop];
 }
 
 @end
