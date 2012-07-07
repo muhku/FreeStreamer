@@ -129,7 +129,7 @@ void Audio_Stream::audioQueueStateChanged(Audio_Queue::State state)
 {
     if (state == Audio_Queue::RUNNING) {
         setState(PLAYING);
-    } else {
+    } else if (state == Audio_Queue::IDLE) {
         setState(STOPPED);
     }
 }
