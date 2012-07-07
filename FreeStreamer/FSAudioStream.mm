@@ -84,6 +84,8 @@ public:
     {
         NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
         NSNumber *fsAudioState;
+        NSDictionary *userInfo;
+        NSNotification *notification;
         
         switch (state) {
             case astreamer::Audio_Stream::STOPPED:
@@ -109,16 +111,19 @@ public:
                 break;
             default:
                 /* unknown state */
+                goto done;
+                
                 break;
         }
         
-        NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
-                                  fsAudioState, FSAudioStreamNotificationKey_State,
-                                  [NSValue valueWithPointer:source], FSAudioStreamNotificationKey_Stream, nil];
-        NSNotification *notification = [NSNotification notificationWithName:FSAudioStreamStateChangeNotification object:nil userInfo:userInfo];
+        userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+                        fsAudioState, FSAudioStreamNotificationKey_State,
+                        [NSValue valueWithPointer:source], FSAudioStreamNotificationKey_Stream, nil];
+        notification = [NSNotification notificationWithName:FSAudioStreamStateChangeNotification object:nil userInfo:userInfo];
         
         [AudioStreamNotificationProxy postNotificationOnMainThread:notification];
         
+    done:
         [pool release];
     }
     
