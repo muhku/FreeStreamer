@@ -12,7 +12,8 @@
 #import <AudioToolbox/AudioToolbox.h>
 #endif
 
-NSString* const FSAudioStreamStateChangeNotification = @"FSAudioStreamStateChangeNotification";  
+NSString* const FSAudioStreamStateChangeNotification = @"FSAudioStreamStateChangeNotification";
+NSString* const FSAudioStreamNotificationKey_Stream = @"stream";
 NSString* const FSAudioStreamNotificationKey_State = @"state";
 
 NSString* const FSAudioStreamErrorNotification = @"FSAudioStreamErrorNotification";
@@ -63,11 +64,15 @@ static void interruptionListener(void *	inClientData,
 class AudioStreamStateObserver : public astreamer::Audio_Stream_Delegate
 {
 public:
+    astreamer::Audio_Stream *source;
+    
     void audioStreamErrorOccurred(int errorCode)
     {
         NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
         
-        NSDictionary *userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:errorCode] forKey:FSAudioStreamNotificationKey_Error];
+        NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+                                  [NSNumber numberWithInt:errorCode], FSAudioStreamNotificationKey_Error,
+                                  [NSValue valueWithPointer:source], FSAudioStreamNotificationKey_Stream, nil];
         NSNotification *notification = [NSNotification notificationWithName:FSAudioStreamErrorNotification object:nil userInfo:userInfo];
         
         [AudioStreamNotificationProxy postNotificationOnMainThread:notification];
@@ -107,7 +112,9 @@ public:
                 break;
         }
         
-        NSDictionary *userInfo = [NSDictionary dictionaryWithObject:fsAudioState forKey:FSAudioStreamNotificationKey_State];
+        NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+                                  fsAudioState, FSAudioStreamNotificationKey_State,
+                                  [NSValue valueWithPointer:source], FSAudioStreamNotificationKey_Stream, nil];
         NSNotification *notification = [NSNotification notificationWithName:FSAudioStreamStateChangeNotification object:nil userInfo:userInfo];
         
         [AudioStreamNotificationProxy postNotificationOnMainThread:notification];
@@ -121,7 +128,9 @@ public:
         
         NSString *s = [NSString stringWithUTF8String:metaData.c_str()];
         
-        NSDictionary *userInfo = [NSDictionary dictionaryWithObject:s forKey:FSAudioStreamNotificationKey_MetaData];
+        NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+                                  s, FSAudioStreamNotificationKey_MetaData,
+                                  [NSValue valueWithPointer:source], FSAudioStreamNotificationKey_Stream, nil];
         NSNotification *notification = [NSNotification notificationWithName:FSAudioStreamMetaDataNotification object:nil userInfo:userInfo];
         
         [AudioStreamNotificationProxy postNotificationOnMainThread:notification];
@@ -231,6 +240,7 @@ public:
     
     _observer = new AudioStreamStateObserver();
     _audioStream = new astreamer::Audio_Stream((CFURLRef)_url);
+    _observer->source = _audioStream;
     _audioStream->m_delegate = _observer;
 #ifdef TARGET_OS_IPHONE      
     _backgroundTask = UIBackgroundTaskInvalid;
