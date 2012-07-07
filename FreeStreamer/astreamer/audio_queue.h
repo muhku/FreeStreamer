@@ -56,6 +56,7 @@ private:
     size_t m_fillBufferIndex;                                        // the index of the audioQueueBuffer that is being filled
     size_t m_bytesFilled;                                            // how many bytes have been filled
     size_t m_packetsFilled;                                          // how many packets have been filled
+    size_t m_buffersUsed;                                            // how many buffers are used
     
     bool m_audioQueueStarted;                                        // flag to indicate that the queue has been started
     bool m_bufferInUse[AQ_BUFFERS];                                  // flags to indicate that a buffer is still in use
@@ -78,6 +79,7 @@ private:
 class Audio_Queue_Delegate {
 public:
     virtual void audioQueueStateChanged(Audio_Queue::State state) = 0;
+    virtual void audioQueueBuffersEmpty() = 0;
 };
 
 } // namespace astreamer

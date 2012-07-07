@@ -68,14 +68,8 @@ void Audio_Stream::close()
         m_httpStreamRunning = false;
     }
     
-    if (m_audioStreamParserRunning) {
-        if (AudioFileStreamClose(m_audioFileStream) != 0) {
-            AS_TRACE("%s: AudioFileStreamClose failed\n", __PRETTY_FUNCTION__);
-        }
-        m_audioStreamParserRunning = false;
-    }
-    
-    m_audioQueue->stop();
+    /* Now, the audio queue will eventually get empty and will close
+       when there is no more audio to play */
 }
     
 void Audio_Stream::pause()
@@ -132,6 +126,24 @@ void Audio_Stream::audioQueueStateChanged(Audio_Queue::State state)
     } else if (state == Audio_Queue::IDLE) {
         setState(STOPPED);
     }
+}
+    
+void Audio_Stream::audioQueueBuffersEmpty()
+{
+    if (m_httpStreamRunning) {
+        /* Still feeding the audio queue with data,
+           don't stop yet */
+        return;
+    }
+    
+    if (m_audioStreamParserRunning) {
+        if (AudioFileStreamClose(m_audioFileStream) != 0) {
+            AS_TRACE("%s: AudioFileStreamClose failed\n", __PRETTY_FUNCTION__);
+        }
+        m_audioStreamParserRunning = false;
+    }
+    
+    m_audioQueue->stop();
 }
     
 void Audio_Stream::streamIsReadyRead()

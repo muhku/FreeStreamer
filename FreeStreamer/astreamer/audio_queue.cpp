@@ -31,6 +31,7 @@ Audio_Queue::Audio_Queue()
     m_fillBufferIndex(0),
     m_bytesFilled(0),
     m_packetsFilled(0),
+    m_buffersUsed(0),
     m_audioQueueStarted(false),
     m_bufferInUseMutex(new pthread_mutex_t),
     m_bufferFreeCondition(new pthread_cond_t),
@@ -290,6 +291,7 @@ void Audio_Queue::startQueueIfNeeded()
 void Audio_Queue::enqueueBuffer()
 {
     m_bufferInUse[m_fillBufferIndex] = true;
+    m_buffersUsed++;
     
     // enqueue buffer
     AudioQueueBufferRef fillBuf = m_audioQueueBuffer[m_fillBufferIndex];
@@ -350,8 +352,13 @@ void Audio_Queue::audioQueueOutputCallback(void *inClientData, AudioQueueRef inA
     // signal waiting thread that the buffer is free.
     pthread_mutex_lock(audioQueue->m_bufferInUseMutex);
     audioQueue->m_bufferInUse[bufIndex] = false;
+    audioQueue->m_buffersUsed--;
     pthread_cond_signal(audioQueue->m_bufferFreeCondition);
     pthread_mutex_unlock(audioQueue->m_bufferInUseMutex);
+    
+    if (audioQueue->m_buffersUsed == 0 && audioQueue->m_delegate) {
+        audioQueue->m_delegate->audioQueueBuffersEmpty();
+    }
     
     AQ_TRACE("signal sent!\n");
 }

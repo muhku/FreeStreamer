@@ -44,6 +44,7 @@ public:
     
     /* Audio_Queue_Delegate */
     void audioQueueStateChanged(Audio_Queue::State state);
+    void audioQueueBuffersEmpty();
     
     /* HTTP_Stream_Delegate */
     void streamIsReadyRead();
