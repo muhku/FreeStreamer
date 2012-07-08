@@ -35,16 +35,20 @@ public:
         END_OF_FILE
     };
     
-    Audio_Stream(CFURLRef url);
+    Audio_Stream();
     virtual ~Audio_Stream();
     
     void open();
     void close();
     void pause();
     
+    void setUrl(CFURLRef url);
+    
     /* Audio_Queue_Delegate */
     void audioQueueStateChanged(Audio_Queue::State state);
     void audioQueueBuffersEmpty();
+    void audioQueueOverflow();
+    void audioQueueUnderflow();
     
     /* HTTP_Stream_Delegate */
     void streamIsReadyRead();

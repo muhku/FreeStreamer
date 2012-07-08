@@ -214,6 +214,8 @@ out:
     
     self.navigationItem.title = self.selectedPlaylistItem.title;
     
+    [delegate.audioController stop];
+    
     delegate.audioController.url = self.selectedPlaylistItem.nsURL;
 }
 

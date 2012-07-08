@@ -19,14 +19,15 @@
 namespace astreamer {
 	
 /* Create HTTP stream as Audio_Stream (this) as the delegate */
-Audio_Stream::Audio_Stream(CFURLRef url) :
+Audio_Stream::Audio_Stream() :
     m_delegate(0),
     m_httpStreamRunning(false),
     m_audioStreamParserRunning(false),
     m_state(STOPPED),
-    m_httpStream(new HTTP_Stream(url, this)),
+    m_httpStream(new HTTP_Stream()),
     m_audioQueue(new Audio_Queue())
 {
+    m_httpStream->m_delegate = this;
     m_audioQueue->m_delegate = this;
 }
 
@@ -45,7 +46,6 @@ void Audio_Stream::open()
 {
     if (m_httpStreamRunning) {
         AS_TRACE("%s: already running: return\n", __PRETTY_FUNCTION__);
-        /* Already running */
         return;
     }
     
@@ -61,6 +61,8 @@ void Audio_Stream::open()
     
 void Audio_Stream::close()
 {
+    AS_TRACE("%s: enter\n", __PRETTY_FUNCTION__);
+    
     /* Close the HTTP stream first so that the audio stream parser
        isn't fed with more data to parse */
     if (m_httpStreamRunning) {
@@ -68,13 +70,26 @@ void Audio_Stream::close()
         m_httpStreamRunning = false;
     }
     
-    /* Now, the audio queue will eventually get empty and will close
-       when there is no more audio to play */
+    if (m_audioStreamParserRunning) {
+        if (AudioFileStreamClose(m_audioFileStream) != 0) {
+            AS_TRACE("%s: AudioFileStreamClose failed\n", __PRETTY_FUNCTION__);
+        }
+        m_audioStreamParserRunning = false;
+    }
+    
+    m_audioQueue->stop();
+    
+    AS_TRACE("%s: leave\n", __PRETTY_FUNCTION__);
 }
     
 void Audio_Stream::pause()
 {
     m_audioQueue->pause();
+}
+    
+void Audio_Stream::setUrl(CFURLRef url)
+{
+    m_httpStream->setUrl(url);
 }
     
 AudioFileTypeID Audio_Stream::audioStreamTypeFromContentType(std::string contentType)
@@ -130,11 +145,15 @@ void Audio_Stream::audioQueueStateChanged(Audio_Queue::State state)
     
 void Audio_Stream::audioQueueBuffersEmpty()
 {
+    AS_TRACE("%s: enter\n", __PRETTY_FUNCTION__);
+    
     if (m_httpStreamRunning) {
         /* Still feeding the audio queue with data,
            don't stop yet */
         return;
     }
+    
+    AS_TRACE("%s: closing the audio queue\n", __PRETTY_FUNCTION__);
     
     if (m_audioStreamParserRunning) {
         if (AudioFileStreamClose(m_audioFileStream) != 0) {
@@ -144,6 +163,18 @@ void Audio_Stream::audioQueueBuffersEmpty()
     }
     
     m_audioQueue->stop();
+    
+    AS_TRACE("%s: leave\n", __PRETTY_FUNCTION__);
+}
+    
+void Audio_Stream::audioQueueOverflow()
+{
+    m_httpStream->setScheduledInRunLoop(false);
+}
+    
+void Audio_Stream::audioQueueUnderflow()
+{
+    m_httpStream->setScheduledInRunLoop(true);
 }
     
 void Audio_Stream::streamIsReadyRead()
@@ -207,7 +238,9 @@ void Audio_Stream::streamEndEncountered()
     }
     
     setState(END_OF_FILE);
-    close();
+    
+    m_httpStream->close();
+    m_httpStreamRunning = false;
 }
 
 void Audio_Stream::streamErrorOccurred()

@@ -19,10 +19,11 @@ CFStringRef HTTP_Stream::icyMetaDataValue  = CFSTR("1"); /* always request ICY m
 
     
 /* HTTP_Stream: public */
-HTTP_Stream::HTTP_Stream(CFURLRef url, HTTP_Stream_Delegate *delegate) :
+HTTP_Stream::HTTP_Stream() :
     m_readStream(0),
-    m_delegate(delegate),
-    m_url((CFURLRef)CFRetain(url)),
+    m_scheduledInRunLoop(false),
+    m_delegate(0),
+    m_url(0),
     m_httpHeadersParsed(false),
     
     m_icyStream(false),
@@ -49,8 +50,9 @@ HTTP_Stream::~HTTP_Stream()
     if (m_icyReadBuffer) {
         delete m_icyReadBuffer, m_icyReadBuffer = 0;
     }
-    
-    CFRelease(m_url), m_url = 0;
+    if (m_url) {
+        CFRelease(m_url), m_url = 0;
+    }
 }
     
 std::string HTTP_Stream::contentType()
@@ -95,13 +97,12 @@ bool HTTP_Stream::open()
         goto out;
     }
     
-    /* Add to the run loop */
-    CFReadStreamScheduleWithRunLoop(m_readStream, CFRunLoopGetCurrent(), kCFRunLoopCommonModes);
+    setScheduledInRunLoop(true);
     
     if (!CFReadStreamOpen(m_readStream)) {
         /* Open failed: clean */
         CFReadStreamSetClient(m_readStream, 0, NULL, NULL);
-        CFReadStreamUnscheduleFromRunLoop(m_readStream, CFRunLoopGetCurrent(), kCFRunLoopCommonModes);
+        setScheduledInRunLoop(false);
         CFRelease(m_readStream), m_readStream = 0;
         goto out;
     }
@@ -114,12 +115,44 @@ out:
 
 void HTTP_Stream::close()
 {
-    if (m_readStream) {
-        CFReadStreamSetClient(m_readStream, 0, NULL, NULL);
-        CFReadStreamUnscheduleFromRunLoop(m_readStream, CFRunLoopGetCurrent(), kCFRunLoopCommonModes);
-        CFReadStreamClose(m_readStream);
-        CFRelease(m_readStream), m_readStream = 0;
+    /* The stream has been already closed */
+    if (!m_readStream) {
+        return;
     }
+    
+    CFReadStreamSetClient(m_readStream, 0, NULL, NULL);
+    setScheduledInRunLoop(false);
+    CFReadStreamClose(m_readStream);
+    CFRelease(m_readStream), m_readStream = 0;
+}
+    
+void HTTP_Stream::setScheduledInRunLoop(bool scheduledInRunLoop)
+{
+    /* The stream has not been opened, or it has been already closed */
+    if (!m_readStream) {
+        return;
+    }
+    
+    /* The state doesn't change */
+    if (m_scheduledInRunLoop == scheduledInRunLoop) {
+        return;
+    }
+    
+    if (m_scheduledInRunLoop) {
+        CFReadStreamUnscheduleFromRunLoop(m_readStream, CFRunLoopGetCurrent(), kCFRunLoopCommonModes);
+    } else {
+        CFReadStreamScheduleWithRunLoop(m_readStream, CFRunLoopGetCurrent(), kCFRunLoopCommonModes);
+    }
+    
+    m_scheduledInRunLoop = scheduledInRunLoop;
+}
+    
+void HTTP_Stream::setUrl(CFURLRef url)
+{
+    if (m_url) {
+        CFRelease(m_url);
+    }
+    m_url = (CFURLRef)CFRetain(url);
 }
     
 /* private */

@@ -31,6 +31,7 @@ private:
     
     CFURLRef m_url;
     CFReadStreamRef m_readStream;
+    bool m_scheduledInRunLoop;
     
     /* HTTP headers */
     bool m_httpHeadersParsed;
@@ -63,13 +64,17 @@ public:
     
     HTTP_Stream_Delegate *m_delegate;
     
-    HTTP_Stream(CFURLRef url, HTTP_Stream_Delegate *delegate);
+    HTTP_Stream();
     virtual ~HTTP_Stream();
     
     std::string contentType();
     
     bool open();
     void close();
+    
+    void setScheduledInRunLoop(bool scheduledInRunLoop);
+    
+    void setUrl(CFURLRef url);
 };
 
 class HTTP_Stream_Delegate {

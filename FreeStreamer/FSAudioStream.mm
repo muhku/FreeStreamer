@@ -29,34 +29,6 @@ static void interruptionListener(void *	inClientData,
 
 /*
  * ===============================================================
- * The notification proxy pumps messages from
- * the audio stream thread to the main thread.
- * ===============================================================
- */
-
-@interface AudioStreamNotificationProxy : NSObject {}
-+ (void)postNotificationOnMainThread:(NSNotification *)notification;
-+ (void)postNotificationInternal:(NSNotification *)notification;
-@end
-
-@implementation AudioStreamNotificationProxy
-
-+ (void)postNotificationOnMainThread:(NSNotification *)notification {
-	[[self class]
-        performSelectorOnMainThread:@selector(postNotificationInternal:)
-        withObject:notification
-        waitUntilDone:NO]; // Don't wait, or we have a possibility of a deadlock
-}
-
-+ (void)postNotificationInternal:(NSNotification *)notification {
-    NSAssert([[NSThread currentThread] isEqual:[NSThread mainThread]],
-             @"Notification must be posted on the main thread.");
-    [[NSNotificationCenter defaultCenter] postNotification:notification];
-}
-@end
-
-/*
- * ===============================================================
  * Listens to the state from the audio stream.
  * ===============================================================
  */
@@ -68,24 +40,17 @@ public:
     
     void audioStreamErrorOccurred(int errorCode)
     {
-        NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-        
         NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
                                   [NSNumber numberWithInt:errorCode], FSAudioStreamNotificationKey_Error,
                                   [NSValue valueWithPointer:source], FSAudioStreamNotificationKey_Stream, nil];
         NSNotification *notification = [NSNotification notificationWithName:FSAudioStreamErrorNotification object:nil userInfo:userInfo];
         
-        [AudioStreamNotificationProxy postNotificationOnMainThread:notification];
-        
-        [pool release];
+        [[NSNotificationCenter defaultCenter] postNotification:notification];
     }
     
     void audioStreamStateChanged(astreamer::Audio_Stream::State state)
     {
-        NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
         NSNumber *fsAudioState;
-        NSDictionary *userInfo;
-        NSNotification *notification;
         
         switch (state) {
             case astreamer::Audio_Stream::STOPPED:
@@ -111,26 +76,21 @@ public:
                 break;
             default:
                 /* unknown state */
-                goto done;
+                return;
                 
                 break;
         }
         
-        userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
+        NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
                         fsAudioState, FSAudioStreamNotificationKey_State,
                         [NSValue valueWithPointer:source], FSAudioStreamNotificationKey_Stream, nil];
-        notification = [NSNotification notificationWithName:FSAudioStreamStateChangeNotification object:nil userInfo:userInfo];
+        NSNotification *notification = [NSNotification notificationWithName:FSAudioStreamStateChangeNotification object:nil userInfo:userInfo];
         
-        [AudioStreamNotificationProxy postNotificationOnMainThread:notification];
-        
-    done:
-        [pool release];
+        [[NSNotificationCenter defaultCenter] postNotification:notification];
     }
     
     void audioStreamMetaDataAvailable(std::string metaData)
     {
-        NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-        
         NSString *s = [NSString stringWithUTF8String:metaData.c_str()];
         
         NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -138,9 +98,7 @@ public:
                                   [NSValue valueWithPointer:source], FSAudioStreamNotificationKey_Stream, nil];
         NSNotification *notification = [NSNotification notificationWithName:FSAudioStreamMetaDataNotification object:nil userInfo:userInfo];
         
-        [AudioStreamNotificationProxy postNotificationOnMainThread:notification];
-        
-        [pool release];
+        [[NSNotificationCenter defaultCenter] postNotification:notification];
     }
 };
 
@@ -152,11 +110,9 @@ public:
 
 @interface FSAudioStreamPrivate : NSObject {
     astreamer::Audio_Stream *_audioStream;
-    NSThread *_playbackThread;
     NSURL *_url;
-    BOOL _shouldStart;
-    BOOL _shouldExit;
 	AudioStreamStateObserver *_observer;
+    BOOL _currentlyPlaying;
     BOOL _wasInterrupted;
 #ifdef TARGET_OS_IPHONE    
     UIBackgroundTaskIdentifier _backgroundTask;
@@ -169,12 +125,8 @@ public:
 - (void)play;
 - (void)playFromURL:(NSURL*)url;
 - (void)stop;
-- (void)audioPlaybackRunloop;
 - (BOOL)isPlaying;
 - (void)pause;
-
-- (void)audioStreamStateDidChange:(NSNotification *)notification;
-- (void)audioStreamErrorOccurred:(NSNotification *)notification;
 @end
 
 @implementation FSAudioStreamPrivate
@@ -184,18 +136,12 @@ public:
 -(id)init {
     if (self = [super init]) {
         _url = nil;
-        _playbackThread = nil;
         _wasInterrupted = NO;
         
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(audioStreamStateDidChange:)
-                                                     name:FSAudioStreamStateChangeNotification
-                                                   object:nil];
-        
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(audioStreamErrorOccurred:)
-                                                     name:FSAudioStreamErrorNotification
-                                                   object:nil];
+        _observer = new AudioStreamStateObserver();
+        _audioStream = new astreamer::Audio_Stream();
+        _observer->source = _audioStream;
+        _audioStream->m_delegate = _observer;
 
 #ifdef TARGET_OS_IPHONE        
         OSStatus result = AudioSessionInitialize(NULL,
@@ -213,20 +159,18 @@ public:
 }
 
 - (void)dealloc {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
-    
     [_url release], _url = nil;
     
-    if (_playbackThread) {
-        _shouldExit = YES;
-    }
+    _audioStream->close();
+    
+    delete _audioStream, _audioStream = nil;
+    delete _observer, _observer = nil;
+
 	[super dealloc];
 }
 
 - (void)setUrl:(NSURL *)url {
-    BOOL currentlyPlaying = (_playbackThread != nil);
-    
-    if (currentlyPlaying) {
+    if (_currentlyPlaying) {
         [self stop];
     }
     
@@ -236,9 +180,11 @@ public:
         }
         
         [_url release], _url = [url copy];
+        
+        _audioStream->setUrl((CFURLRef)_url);
     }
     
-    if (currentlyPlaying) {
+    if (_currentlyPlaying) {
         [self play];
     }
 }
@@ -252,42 +198,19 @@ public:
     return copyOfURL;
 }
 
-- (void)audioPlaybackRunloop {    
-    NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
-    
-    NSAssert([[NSThread currentThread] isEqual:_playbackThread],
-             @"Playback must happen in the playback thread.");
-    
-    _observer = new AudioStreamStateObserver();
-    _audioStream = new astreamer::Audio_Stream((CFURLRef)_url);
-    _observer->source = _audioStream;
-    _audioStream->m_delegate = _observer;
-#ifdef TARGET_OS_IPHONE      
-    _backgroundTask = UIBackgroundTaskInvalid;
-#endif    
-    
-	do {
-        if (_shouldStart) {
-            _shouldStart = NO;
-            _audioStream->open();
-        }
-#ifdef TARGET_OS_IPHONE          
-        if (_backgroundTask == UIBackgroundTaskInvalid) {
-            _backgroundTask = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
-                [[UIApplication sharedApplication] endBackgroundTask:_backgroundTask];
-                _backgroundTask = UIBackgroundTaskInvalid;
-            }];
-        }
-#endif
-		[[NSRunLoop currentRunLoop]
-         runMode:NSDefaultRunLoopMode
-         beforeDate:[NSDate dateWithTimeIntervalSinceNow:0.25]];
-	} while (!_shouldExit);
-    
+- (void)playFromURL:(NSURL*)url {
+    [self setUrl:url];
+    [self play];
+}
+
+- (void)play
+{
+    _audioStream->open();
+}
+
+- (void)stop {
     _audioStream->close();
-    
-    delete _audioStream, _audioStream = nil;
-    delete _observer, _observer = nil;
+    _currentlyPlaying = NO;
     
 #ifdef TARGET_OS_IPHONE    
     if (_backgroundTask != UIBackgroundTaskInvalid) {
@@ -295,94 +218,15 @@ public:
         _backgroundTask = UIBackgroundTaskInvalid;
     }
 #endif
-    
-    [_playbackThread release], _playbackThread = nil;
-    
-    [pool release];
-}
 
-- (void)play {
-    NSAssert([[NSThread currentThread] isEqual:[NSThread mainThread]],
-             @"Playback must be started from the main thread.");
-    
-    @synchronized (self) {
-        if (!_url) {
-            return;
-        }
-        
-        _shouldStart = YES;
-        
-        if (!_playbackThread) {
-            _playbackThread = [[NSThread alloc] initWithTarget:self selector:@selector(audioPlaybackRunloop) object:nil];
-            [_playbackThread start];
-        }
-    }    
-}
-
-- (void)playFromURL:(NSURL*)url {
-    [self setUrl:url];
-    [self play];
-}
-
-- (void)stop {
-    NSAssert([[NSThread currentThread] isEqual:[NSThread mainThread]],
-             @"Stop must be called from the main thread.");
-    
-    @synchronized (self) {
-        _shouldExit = YES;
-        
-        while (_playbackThread) {
-            [[NSRunLoop currentRunLoop]
-             runMode:NSDefaultRunLoopMode
-             beforeDate:[NSDate dateWithTimeIntervalSinceNow:0.25]];
-        }
-        
-        _shouldExit = NO;
-    }
 }
 
 - (BOOL)isPlaying {
-    NSAssert([[NSThread currentThread] isEqual:[NSThread mainThread]],
-             @"Stop must be called from the main thread.");
-    
-    return (_playbackThread != nil);
+    return _currentlyPlaying;
 }
 
 - (void)pause {
-    NSAssert([[NSThread currentThread] isEqual:[NSThread mainThread]],
-             @"Pause must be called from the main thread.");
-    
     _audioStream->pause();
-}
-
-- (void)audioStreamStateDidChange:(NSNotification *)notification {
-    NSDictionary *dict = [notification userInfo];
-    int state = [[dict valueForKey:FSAudioStreamNotificationKey_State] intValue];
-    astreamer::Audio_Stream *audioStream = static_cast<astreamer::Audio_Stream *>([[dict valueForKey:FSAudioStreamNotificationKey_Stream] pointerValue]);
-    
-    if (!(audioStream == _audioStream)) {
-        return;
-    }
-    
-    switch (state) {
-        case kFsAudioStreamStopped: /* FALLTHROUGH */
-        case kFsAudioStreamFailed: {
-            [self stop];
-            
-            break;
-        }
-    }
-}
-
-- (void)audioStreamErrorOccurred:(NSNotification *)notification {
-    NSDictionary *dict = [notification userInfo];
-    astreamer::Audio_Stream *audioStream = static_cast<astreamer::Audio_Stream *>([[dict valueForKey:FSAudioStreamNotificationKey_Stream] pointerValue]);
-    
-    if (!(audioStream == _audioStream)) {
-        return;
-    }
-    
-    [self stop];
 }
 
 @end

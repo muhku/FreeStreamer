@@ -17,6 +17,7 @@
 namespace astreamer {
     
 class Audio_Queue_Delegate;
+struct queued_packet;
 	
 class Audio_Queue {
 public:
@@ -37,7 +38,9 @@ public:
     
     void handlePropertyChange(AudioFileStreamID inAudioFileStream, AudioFileStreamPropertyID inPropertyID, UInt32 *ioFlags);
     void handleAudioPackets(UInt32 inNumberBytes, UInt32 inNumberPackets, const void *inInputData, AudioStreamPacketDescription *inPacketDescriptions);
+    int handlePacket(const void *data, AudioStreamPacketDescription *desc);
     
+    void start();
     void pause();
     void stop();
 	
@@ -60,17 +63,18 @@ private:
     
     bool m_audioQueueStarted;                                        // flag to indicate that the queue has been started
     bool m_bufferInUse[AQ_BUFFERS];                                  // flags to indicate that a buffer is still in use
-    pthread_mutex_t *m_bufferInUseMutex;                             // a mutex to protect the inuse flags
-    pthread_cond_t *m_bufferFreeCondition;                           // a condition varable for handling the inuse flags
+    bool m_waitingOnBuffer;
+    
+    struct queued_packet *m_queuedHead;
+    struct queued_packet *m_queuedTail;
     
     OSStatus m_lastError;
 
     void setCookiesForStream(AudioFileStreamID inAudioFileStream);
     void setState(State state);
-    void startQueueIfNeeded();
-    void enqueueBuffer();
-    void waitForFreeBuffer();
+    int enqueueBuffer();
     int findQueueBuffer(AudioQueueBufferRef inBuffer);
+    void enqueueCachedData();
     
     static void audioQueueOutputCallback(void *inClientData, AudioQueueRef inAQ, AudioQueueBufferRef inBuffer);
     static void audioQueueIsRunningCallback(void *inClientData, AudioQueueRef inAQ, AudioQueuePropertyID inID);
@@ -80,6 +84,8 @@ class Audio_Queue_Delegate {
 public:
     virtual void audioQueueStateChanged(Audio_Queue::State state) = 0;
     virtual void audioQueueBuffersEmpty() = 0;
+    virtual void audioQueueOverflow() = 0;
+    virtual void audioQueueUnderflow() = 0;
 };
 
 } // namespace astreamer
