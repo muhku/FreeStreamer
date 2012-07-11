@@ -284,22 +284,12 @@ public:
 static void interruptionListener(void *	inClientData,
                                 UInt32	inInterruptionState)
 {
-    /*
-     * Note that the interruption listener will be called on the main
-     * thread.
-     */
 	FSAudioStreamPrivate *THIS = (FSAudioStreamPrivate*)inClientData;
     
 	if (inInterruptionState == kAudioSessionBeginInterruption) {
         if ([THIS isPlaying]) {
             THIS.wasInterrupted = YES;
             
-            /* Internally, this will call AudioQueuePause(), which is safe
-             *  to call from other than the audio playback thread.
-             *
-             * Don't try to call stop, it won't terminate the audio queue
-             * correctly when called from the main thread.
-             */
             [THIS pause];
         }
 	} else if (inInterruptionState == kAudioSessionEndInterruption) {
