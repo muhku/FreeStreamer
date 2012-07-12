@@ -296,6 +296,8 @@ static void interruptionListener(void *	inClientData,
         if (THIS.wasInterrupted) {
             THIS.wasInterrupted = NO;
             
+            AudioSessionSetActive(true);
+            
             /*
              * Resume playing.
              */
