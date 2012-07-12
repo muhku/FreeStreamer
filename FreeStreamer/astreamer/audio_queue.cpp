@@ -203,7 +203,7 @@ void Audio_Queue::handleAudioPackets(UInt32 inNumberBytes, UInt32 inNumberPacket
     for (; i < inNumberPackets; i++) {
         /* Allocate the packet */
         UInt32 size = inPacketDescriptions[i].mDataByteSize;
-        queued_packet_t *packet = new queued_packet_t[sizeof(queued_packet_t) + size];
+        queued_packet_t *packet = (queued_packet_t *)malloc(sizeof(queued_packet_t) + size);
         
         /* Prepare the packet */
         packet->next = NULL;
@@ -380,7 +380,7 @@ void Audio_Queue::enqueueCachedData()
            break; 
         }
         queued_packet_t *next = cur->next;
-        delete[] cur;
+        free(cur);
         cur = next;
     }
     m_queuedHead = cur;
