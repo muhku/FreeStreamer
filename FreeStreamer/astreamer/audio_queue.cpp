@@ -128,6 +128,24 @@ void Audio_Queue::stop()
     
     AQ_TRACE("%s: leave\n", __PRETTY_FUNCTION__);
 }
+    
+unsigned Audio_Queue::timePlayedInSeconds()
+{
+    unsigned timePlayed = 0;
+    
+    AudioTimeStamp queueTime;
+    Boolean discontinuity;
+    
+    OSStatus err = AudioQueueGetCurrentTime(m_outAQ, NULL, &queueTime, &discontinuity);
+    if (err) {
+        goto out;
+    }
+    
+    timePlayed = queueTime.mSampleTime / m_streamDesc.mSampleRate;
+    
+out:
+    return timePlayed;
+}
 
 void Audio_Queue::handlePropertyChange(AudioFileStreamID inAudioFileStream, AudioFileStreamPropertyID inPropertyID, UInt32 *ioFlags)
 {
@@ -140,10 +158,9 @@ void Audio_Queue::handlePropertyChange(AudioFileStreamID inAudioFileStream, Audi
         {
             // the file stream parser is now ready to produce audio packets.
             // get the stream format.
-            AudioStreamBasicDescription asbd;
-            memset(&asbd, 0, sizeof(asbd));
-            UInt32 asbdSize = sizeof(asbd);
-            err = AudioFileStreamGetProperty(inAudioFileStream, kAudioFileStreamProperty_DataFormat, &asbdSize, &asbd);
+            memset(&m_streamDesc, 0, sizeof(m_streamDesc));
+            UInt32 asbdSize = sizeof(m_streamDesc);
+            err = AudioFileStreamGetProperty(inAudioFileStream, kAudioFileStreamProperty_DataFormat, &asbdSize, &m_streamDesc);
             if (err) {
                 AQ_TRACE("%s: error in kAudioFileStreamProperty_DataFormat\n", __PRETTY_FUNCTION__);
                 m_lastError = err;
@@ -151,7 +168,7 @@ void Audio_Queue::handlePropertyChange(AudioFileStreamID inAudioFileStream, Audi
             }
             
             // create the audio queue
-            err = AudioQueueNewOutput(&asbd, audioQueueOutputCallback, this, CFRunLoopGetCurrent(), NULL, 0, &m_outAQ);
+            err = AudioQueueNewOutput(&m_streamDesc, audioQueueOutputCallback, this, CFRunLoopGetCurrent(), NULL, 0, &m_outAQ);
             if (err) {
                 AQ_TRACE("%s: error in AudioQueueNewOutput\n", __PRETTY_FUNCTION__);
                 m_lastError = err;

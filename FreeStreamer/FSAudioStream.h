@@ -31,6 +31,11 @@ typedef enum {
 
 @class FSAudioStreamPrivate;
 
+typedef struct {
+    unsigned minute;
+    unsigned second;
+} FSPlaybackTime;
+
 @interface FSAudioStream : NSObject {
     FSAudioStreamPrivate *_private;
 }
@@ -41,5 +46,6 @@ typedef enum {
 - (void)pause;
 
 @property (nonatomic,assign) NSURL *url;
+@property (nonatomic,readonly) FSPlaybackTime currentTimePlayed;
 
 @end

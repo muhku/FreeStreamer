@@ -87,6 +87,11 @@ void Audio_Stream::pause()
     m_audioQueue->pause();
 }
     
+unsigned Audio_Stream::timePlayedInSeconds()
+{
+    return m_audioQueue->timePlayedInSeconds();
+}
+    
 void Audio_Stream::setUrl(CFURLRef url)
 {
     m_httpStream->setUrl(url);

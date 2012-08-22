@@ -42,6 +42,8 @@ public:
     void start();
     void pause();
     void stop();
+    
+    unsigned timePlayedInSeconds();
 	
 private:
     
@@ -50,6 +52,7 @@ private:
     
     State m_state;
     
+    AudioStreamBasicDescription m_streamDesc;
     AudioQueueRef m_outAQ;                                           // the audio queue
     
     AudioQueueBufferRef m_audioQueueBuffer[AQ_BUFFERS];              // audio queue buffers	

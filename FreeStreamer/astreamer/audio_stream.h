@@ -42,6 +42,8 @@ public:
     void close();
     void pause();
     
+    unsigned timePlayedInSeconds();
+    
     void setUrl(CFURLRef url);
     
     /* Audio_Queue_Delegate */
