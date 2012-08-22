@@ -92,6 +92,21 @@ unsigned Audio_Stream::timePlayedInSeconds()
     return m_audioQueue->timePlayedInSeconds();
 }
     
+unsigned Audio_Stream::durationInSeconds()
+{
+    unsigned duration = 0;
+    unsigned bitrate = m_audioQueue->bitrate();
+    
+    if (bitrate == 0) {
+        goto out;
+    }
+    
+    duration = m_httpStream->contentLength() / (bitrate * 0.125);
+    
+out:
+    return duration;
+}
+    
 void Audio_Stream::setUrl(CFURLRef url)
 {
     m_httpStream->setUrl(url);

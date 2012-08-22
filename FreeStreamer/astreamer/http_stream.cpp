@@ -25,6 +25,7 @@ HTTP_Stream::HTTP_Stream() :
     m_delegate(0),
     m_url(0),
     m_httpHeadersParsed(false),
+    m_contentLength(0),
     
     m_icyStream(false),
     m_icyHeaderCR(false),
@@ -58,6 +59,11 @@ HTTP_Stream::~HTTP_Stream()
 std::string HTTP_Stream::contentType()
 {
     return m_contentType;
+}
+    
+size_t HTTP_Stream::contentLength()
+{
+    return m_contentLength;
 }
 
 bool HTTP_Stream::open()
@@ -246,6 +252,14 @@ void HTTP_Stream::parseHttpHeadersIfNeeded(UInt8 *buf, CFIndex bufSize)
         
             CFRelease(contentTypeString);
         }
+        
+        CFStringRef contentLengthString = CFHTTPMessageCopyHeaderFieldValue(response, CFSTR("Content-Length"));
+        if (contentLengthString) {
+            m_contentLength = CFStringGetIntValue(contentLengthString);
+            
+            CFRelease(contentLengthString);
+        }
+        
         CFRelease(response);
     }
        

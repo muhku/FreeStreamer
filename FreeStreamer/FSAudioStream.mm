@@ -128,6 +128,7 @@ public:
 - (BOOL)isPlaying;
 - (void)pause;
 - (unsigned)timePlayedInSeconds;
+- (unsigned)durationInSeconds;
 @end
 
 @implementation FSAudioStreamPrivate
@@ -234,6 +235,10 @@ public:
     return _audioStream->timePlayedInSeconds();
 }
 
+- (unsigned)durationInSeconds {
+    return _audioStream->durationInSeconds();
+}
+
 @end
 
 /*
@@ -281,7 +286,7 @@ public:
     [_private pause];
 }
 
-- (FSPlaybackTime)currentTimePlayed {
+- (FSStreamPosition)currentTimePlayed {
     unsigned u = [_private timePlayedInSeconds];
     
     unsigned s,m;
@@ -289,8 +294,20 @@ public:
     s = u % 60, u /= 60;
     m = u % 60, u /= 60;
     
-    FSPlaybackTime time = {.minute = m, .second = s};
-    return time;
+    FSStreamPosition pos = {.minute = m, .second = s};
+    return pos;
+}
+
+- (FSStreamPosition)duration {
+    unsigned u = [_private durationInSeconds];
+    
+    unsigned s,m;
+    
+    s = u % 60, u /= 60;
+    m = u % 60, u /= 60;
+    
+    FSStreamPosition pos = {.minute = m, .second = s};
+    return pos;
 }
 
 @end

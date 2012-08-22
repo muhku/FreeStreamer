@@ -41,6 +41,8 @@ Audio_Queue::Audio_Queue()
     m_bytesFilled(0),
     m_packetsFilled(0),
     m_buffersUsed(0),
+    m_processedPacketsSizeTotal(0),
+    m_processedPacketsCount(0),
     m_audioQueueStarted(false),
     m_waitingOnBuffer(false),
     m_queuedHead(0),
@@ -109,7 +111,7 @@ void Audio_Queue::stop()
         AQ_TRACE("%s: AudioQueueDispose failed!\n", __PRETTY_FUNCTION__);
     }
     m_outAQ = 0;
-    m_fillBufferIndex = m_bytesFilled = m_packetsFilled = m_buffersUsed = 0;
+    m_fillBufferIndex = m_bytesFilled = m_packetsFilled = m_buffersUsed = m_processedPacketsSizeTotal = m_processedPacketsCount = 0;
     
     for (size_t i=0; i < AQ_BUFFERS; i++) {
         m_bufferInUse[i] = false;
@@ -118,7 +120,7 @@ void Audio_Queue::stop()
     queued_packet_t *cur = m_queuedHead;
     while (cur) {
         queued_packet_t *tmp = cur->next;
-        delete[] cur;
+        free(cur);
         cur = tmp;
     }
     m_queuedHead = m_queuedHead = 0;
@@ -145,6 +147,20 @@ unsigned Audio_Queue::timePlayedInSeconds()
     
 out:
     return timePlayed;
+}
+    
+unsigned Audio_Queue::bitrate()
+{
+    unsigned bitrate = 0;
+    
+    double packetDuration = m_streamDesc.mFramesPerPacket / m_streamDesc.mSampleRate;
+    
+    if (packetDuration > 0 && m_processedPacketsCount > 50) {
+        double averagePacketByteSize = m_processedPacketsSizeTotal / m_processedPacketsCount;
+        bitrate = 8 * averagePacketByteSize / packetDuration;
+    }
+    
+    return bitrate;
 }
 
 void Audio_Queue::handlePropertyChange(AudioFileStreamID inAudioFileStream, AudioFileStreamPropertyID inPropertyID, UInt32 *ioFlags)
@@ -255,6 +271,9 @@ int Audio_Queue::handlePacket(const void *data, AudioStreamPacketDescription *de
             return hasFreeBuffer;
         }
     }
+    
+    m_processedPacketsSizeTotal += packetSize;
+    m_processedPacketsCount++;
     
     // copy data to the audio queue buffer
     AudioQueueBufferRef buf = m_audioQueueBuffer[m_fillBufferIndex];

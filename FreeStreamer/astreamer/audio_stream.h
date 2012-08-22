@@ -43,6 +43,7 @@ public:
     void pause();
     
     unsigned timePlayedInSeconds();
+    unsigned durationInSeconds();
     
     void setUrl(CFURLRef url);
     

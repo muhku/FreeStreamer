@@ -44,6 +44,7 @@ public:
     void stop();
     
     unsigned timePlayedInSeconds();
+    unsigned bitrate();
 	
 private:
     
@@ -62,6 +63,9 @@ private:
     size_t m_bytesFilled;                                            // how many bytes have been filled
     size_t m_packetsFilled;                                          // how many packets have been filled
     size_t m_buffersUsed;                                            // how many buffers are used
+    
+    size_t m_processedPacketsSizeTotal;                              // global packet statistics: total size
+    size_t m_processedPacketsCount;                                  // global packet statistics: count
     
     bool m_audioQueueStarted;                                        // flag to indicate that the queue has been started
     bool m_bufferInUse[AQ_BUFFERS];                                  // flags to indicate that a buffer is still in use

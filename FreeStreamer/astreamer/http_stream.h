@@ -36,6 +36,7 @@ private:
     /* HTTP headers */
     bool m_httpHeadersParsed;
     std::string m_contentType;
+    size_t m_contentLength;
     
     /* ICY protocol */
     bool m_icyStream;
@@ -68,6 +69,7 @@ public:
     virtual ~HTTP_Stream();
     
     std::string contentType();
+    size_t contentLength();
     
     bool open();
     void close();
