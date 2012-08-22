@@ -68,6 +68,9 @@ public:
                 AudioSessionSetActive(true);
 #endif                
                 break;
+            case astreamer::Audio_Stream::END_OF_FILE:
+                fsAudioState = [NSNumber numberWithInt:kFSAudioStreamEndOfFile];
+                break;
             case astreamer::Audio_Stream::FAILED:
                 fsAudioState = [NSNumber numberWithInt:kFsAudioStreamFailed];
 #ifdef TARGET_OS_IPHONE         
@@ -290,7 +293,7 @@ public:
     unsigned u = [_private timePlayedInSeconds];
     
     unsigned s,m;
-
+    
     s = u % 60, u /= 60;
     m = u % 60, u /= 60;
     
