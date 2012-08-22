@@ -182,7 +182,8 @@ void Audio_Stream::audioQueueBuffersEmpty()
         m_audioStreamParserRunning = false;
     }
     
-    m_audioQueue->stop();
+    // Keep the audio queue running until it has finished playing
+    m_audioQueue->stop(false);
     
     AS_TRACE("%s: leave\n", __PRETTY_FUNCTION__);
 }

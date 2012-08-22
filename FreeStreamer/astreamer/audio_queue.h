@@ -41,6 +41,7 @@ public:
     
     void start();
     void pause();
+    void stop(bool stopImmediately);
     void stop();
     
     unsigned timePlayedInSeconds();
@@ -76,6 +77,7 @@ private:
     
     OSStatus m_lastError;
 
+    void cleanup();
     void setCookiesForStream(AudioFileStreamID inAudioFileStream);
     void setState(State state);
     int enqueueBuffer();

@@ -88,8 +88,13 @@ void Audio_Queue::pause()
         setState(RUNNING);
     }
 }
-
+    
 void Audio_Queue::stop()
+{
+    stop(true);
+}
+
+void Audio_Queue::stop(bool stopImmediately)
 {
     if (!m_audioQueueStarted) {
         AQ_TRACE("%s: audio queue already stopped, return!\n", __PRETTY_FUNCTION__);
@@ -103,30 +108,14 @@ void Audio_Queue::stop()
         AQ_TRACE("%s: AudioQueueFlush failed!\n", __PRETTY_FUNCTION__);
     }
     
-    if (AudioQueueStop(m_outAQ, true) != 0) {
+    if (AudioQueueStop(m_outAQ, stopImmediately) != 0) {
         AQ_TRACE("%s: AudioQueueStop failed!\n", __PRETTY_FUNCTION__);
     }
     
-    if (AudioQueueDispose(m_outAQ, false) != 0) {
-        AQ_TRACE("%s: AudioQueueDispose failed!\n", __PRETTY_FUNCTION__);
-    }
-    m_outAQ = 0;
-    m_fillBufferIndex = m_bytesFilled = m_packetsFilled = m_buffersUsed = m_processedPacketsSizeTotal = m_processedPacketsCount = 0;
-    
-    for (size_t i=0; i < AQ_BUFFERS; i++) {
-        m_bufferInUse[i] = false;
-    }
-    
-    queued_packet_t *cur = m_queuedHead;
-    while (cur) {
-        queued_packet_t *tmp = cur->next;
-        free(cur);
-        cur = tmp;
-    }
-    m_queuedHead = m_queuedHead = 0;
-    
-    m_waitingOnBuffer = false;
-    m_lastError = noErr;
+    // Note that if we dispose the audio queue right after stopping it,
+    // we won't get an audio queue notification callback that the queue
+    // has been stopped. Therefore we do the cleanup in the notification
+    // callback.
     
     AQ_TRACE("%s: leave\n", __PRETTY_FUNCTION__);
 }
@@ -299,6 +288,30 @@ int Audio_Queue::handlePacket(const void *data, AudioStreamPacketDescription *de
 
 /* private */
     
+void Audio_Queue::cleanup()
+{
+    if (AudioQueueDispose(m_outAQ, false) != 0) {
+        AQ_TRACE("%s: AudioQueueDispose failed!\n", __PRETTY_FUNCTION__);
+    }
+    m_outAQ = 0;
+    m_fillBufferIndex = m_bytesFilled = m_packetsFilled = m_buffersUsed = m_processedPacketsSizeTotal = m_processedPacketsCount = 0;
+    
+    for (size_t i=0; i < AQ_BUFFERS; i++) {
+        m_bufferInUse[i] = false;
+    }
+    
+    queued_packet_t *cur = m_queuedHead;
+    while (cur) {
+        queued_packet_t *tmp = cur->next;
+        free(cur);
+        cur = tmp;
+    }
+    m_queuedHead = m_queuedHead = 0;
+    
+    m_waitingOnBuffer = false;
+    m_lastError = noErr;
+}
+    
 void Audio_Queue::setCookiesForStream(AudioFileStreamID inAudioFileStream)
 {
     OSStatus err;
@@ -455,19 +468,22 @@ void Audio_Queue::audioQueueIsRunningCallback(void *inClientData, AudioQueueRef 
 {
     Audio_Queue *audioQueue = static_cast<Audio_Queue*>(inClientData);
     
+    AQ_TRACE("%s: enter\n", __PRETTY_FUNCTION__);
+    
     UInt32 running;
     UInt32 size;
     OSStatus err = AudioQueueGetProperty(inAQ, kAudioQueueProperty_IsRunning, &running, &size);
     if (err) {
         AQ_TRACE("%s: error in kAudioQueueProperty_IsRunning\n", __PRETTY_FUNCTION__);
+        audioQueue->cleanup();
         audioQueue->setState(IDLE);
-        audioQueue->m_lastError = err;
         return;
     }
     if (running) {
         AQ_TRACE("audio queue running!\n");
         audioQueue->setState(RUNNING);
     } else {
+        audioQueue->cleanup();
         audioQueue->setState(IDLE);
     }
 }    
