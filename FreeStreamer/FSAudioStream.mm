@@ -289,7 +289,8 @@ public:
     s = u % 60, u /= 60;
     m = u % 60, u /= 60;
     
-    return {.minute = m, .second = s};
+    FSPlaybackTime time = {.minute = m, .second = s};
+    return time;
 }
 
 @end
