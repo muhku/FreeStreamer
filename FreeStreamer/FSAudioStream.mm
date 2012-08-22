@@ -272,6 +272,10 @@ public:
     [_private stop];
 }
 
+- (void)pause {
+    [_private pause];
+}
+
 @end
 
 /*

@@ -38,6 +38,7 @@ typedef enum {
 - (void)play;
 - (void)playFromURL:(NSURL*)url;
 - (void)stop;
+- (void)pause;
 
 @property (nonatomic,assign) NSURL *url;
 
