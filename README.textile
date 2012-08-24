@@ -20,7 +20,7 @@ Please follow the following steps to use the player in your own project:
 
 1. Make sure you have the following frameworks linked to your project:
 * _AVFoundation.framework_
-* _MediaPlayer.framework__
+* _MediaPlayer.framework_
 * _CFNetwork.framework_
 * _AudioToolbox.framework_
 
