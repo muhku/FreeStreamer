@@ -26,7 +26,7 @@ Please follow the following steps to use the player in your own project:
 
 2. If you want to support background audio, add *App plays audio* to the target's *Required background modes*. You can find the property by clicking on the target on Xcode and opening the Info tab.
 
-3. Copy "FSAudioStream.h":https://github.com/muhku/FreeStreamer/blob/master/FreeStreamer/FSAudioStream.h, "FSAudioStream.mm":https://github.com/muhku/FreeStreamer/blob/master/FreeStreamer/FSAudioStream.h, and everything in the "astreamer":https://github.com/muhku/FreeStreamer/tree/master/FreeStreamer/astreamer directory to your project. Try building the project now and it should compile successfully.
+3. Copy "FSAudioStream.h":https://github.com/muhku/FreeStreamer/blob/master/FreeStreamer/FSAudioStream.h, "FSAudioStream.mm":https://github.com/muhku/FreeStreamer/blob/master/FreeStreamer/FSAudioStream.mm, and everything in the "astreamer":https://github.com/muhku/FreeStreamer/tree/master/FreeStreamer/astreamer directory to your project. Try building the project now and it should compile successfully.
 
 You can now stream an audio file like this:
 
