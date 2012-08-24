@@ -19,12 +19,12 @@ h1. Using the player in your own project
 Please follow the following steps to use the player in your own project:
 
 1. Make sure you have the following frameworks linked to your project:
-* AVFoundation.framework
-* MediaPlayer.framework
-* CFNetwork.framework
-* AudioToolbox.framework
+* _AVFoundation.framework_
+* _MediaPlayer.framework__
+* _CFNetwork.framework_
+* _AudioToolbox.framework_
 
-2. If you want to support background audio, add _App plays audio_ to the target's _Required background modes_. You can find the property by clicking on the target on Xcode and opening the _Info_ tab.
+2. If you want to support background audio, add *App plays audio* to the target's *Required background modes*. You can find the property by clicking on the target on Xcode and opening the Info tab.
 
 3. Copy _FSAudioStream.h_, _FSAudioStream.m_, and everything in the _astreamer_ directory to your project. Try building the project now and it should compile successfully.
 
@@ -34,6 +34,7 @@ bc.. #import "FSAudioStream.h"
 
 FSAudioStream *audioStream = [[FSAudioStream alloc] init];
 [audioStream playFromURL:[NSURL URLWithString:@"http://www.example.com/audio_file.mp3"]];
+
 
 That's it! For more examples, please take a look at the example project. For instance, you may want to observe notifications on the audio stream state.
 
