@@ -30,12 +30,12 @@ Please follow the following steps to use the player in your own project:
 
 You can now stream an audio file like this:
 
-<code>
+<pre>
 #import "FSAudioStream.h"
 
 FSAudioStream *audioStream = [[FSAudioStream alloc] init];
 [audioStream playFromURL:[NSURL URLWithString:@"http://www.example.com/audio_file.mp3"]];
-</code>
+</pre>
 
 That's it! For more examples, please take a look at the example project. For instance, you may want to observe notifications on the audio stream state.
 
