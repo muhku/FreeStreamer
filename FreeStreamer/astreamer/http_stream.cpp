@@ -243,12 +243,12 @@ void HTTP_Stream::parseHttpHeadersIfNeeded(UInt8 *buf, CFIndex bufSize)
         
         CFStringRef contentTypeString = CFHTTPMessageCopyHeaderFieldValue(response, CFSTR("Content-Type"));
         if (contentTypeString) {
-            char s[256] = {0};
-            CFStringGetCString(contentTypeString, s, sizeof s, kCFStringEncodingUTF8);
-        
-            if (s) {
-                m_contentType.append(s);
+            CFIndex len = CFStringGetMaximumSizeForEncoding(CFStringGetLength(contentTypeString), kCFStringEncodingUTF8) + 1;
+            char *buf = new char[len];
+            if (CFStringGetCString(contentTypeString, buf, len, kCFStringEncodingUTF8)) {
+                m_contentType.append(buf);
             }
+            delete[] buf;
         
             CFRelease(contentTypeString);
         }
