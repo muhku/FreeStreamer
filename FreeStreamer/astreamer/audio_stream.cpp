@@ -6,8 +6,6 @@
 
 #include "audio_stream.h"
 
-#include <pthread.h>
-
 //#define AS_DEBUG 1
 
 #if !defined (AS_DEBUG)
