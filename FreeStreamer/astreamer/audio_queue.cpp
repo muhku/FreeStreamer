@@ -475,8 +475,6 @@ void Audio_Queue::audioQueueIsRunningCallback(void *inClientData, AudioQueueRef 
     OSStatus err = AudioQueueGetProperty(inAQ, kAudioQueueProperty_IsRunning, &running, &size);
     if (err) {
         AQ_TRACE("%s: error in kAudioQueueProperty_IsRunning\n", __PRETTY_FUNCTION__);
-        audioQueue->cleanup();
-        audioQueue->setState(IDLE);
         return;
     }
     if (running) {
