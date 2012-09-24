@@ -471,8 +471,8 @@ void Audio_Queue::audioQueueIsRunningCallback(void *inClientData, AudioQueueRef 
     AQ_TRACE("%s: enter\n", __PRETTY_FUNCTION__);
     
     UInt32 running;
-    UInt32 size;
-    OSStatus err = AudioQueueGetProperty(inAQ, kAudioQueueProperty_IsRunning, &running, &size);
+    UInt32 output = sizeof(running);
+    OSStatus err = AudioQueueGetProperty(inAQ, kAudioQueueProperty_IsRunning, &running, &output);
     if (err) {
         AQ_TRACE("%s: error in kAudioQueueProperty_IsRunning\n", __PRETTY_FUNCTION__);
         return;
