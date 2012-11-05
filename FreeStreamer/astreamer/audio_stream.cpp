@@ -21,9 +21,11 @@ Audio_Stream::Audio_Stream() :
     m_delegate(0),
     m_httpStreamRunning(false),
     m_audioStreamParserRunning(false),
+    m_contentLength(0),
     m_state(STOPPED),
     m_httpStream(new HTTP_Stream()),
-    m_audioQueue(new Audio_Queue())
+    m_audioQueue(new Audio_Queue()),
+    m_dataOffset(0)
 {
     m_httpStream->m_delegate = this;
     m_audioQueue->m_delegate = this;
@@ -46,6 +48,8 @@ void Audio_Stream::open()
         AS_TRACE("%s: already running: return\n", __PRETTY_FUNCTION__);
         return;
     }
+    
+    m_contentLength = 0;
     
     if (m_httpStream->open()) {
         AS_TRACE("%s: HTTP stream opened, buffering...\n", __PRETTY_FUNCTION__);
@@ -77,6 +81,8 @@ void Audio_Stream::close()
     
     m_audioQueue->stop();
     
+    m_dataOffset = 0;
+    
     AS_TRACE("%s: leave\n", __PRETTY_FUNCTION__);
 }
     
@@ -99,10 +105,45 @@ unsigned Audio_Stream::durationInSeconds()
         goto out;
     }
     
-    duration = m_httpStream->contentLength() / (bitrate * 0.125);
+    duration = contentLength() / (bitrate * 0.125);
     
 out:
     return duration;
+}
+    
+void Audio_Stream::seekToTime(unsigned newSeekTime)
+{
+    unsigned duration = durationInSeconds();
+    if (!(duration > 0)) {
+        return;
+    }
+    
+    if (m_httpStreamRunning) {
+        m_httpStream->close();
+        m_httpStreamRunning = false;
+    }
+    
+    UInt32 ioFlags = 0;
+    SInt64 packetAlignedByteOffset;
+    SInt64 seekPacket = floor(newSeekTime / m_audioQueue->packetDuration());
+    
+    OSStatus result = AudioFileStreamSeek(m_audioFileStream, seekPacket, &packetAlignedByteOffset, &ioFlags);
+    if (result != 0) {
+        AS_TRACE("AudioFileStreamSeek failed");
+    }
+    
+    double offset = (double)newSeekTime / (double)duration;
+    HTTP_Stream_Position position;
+    position.start = m_dataOffset + offset * (contentLength() - m_dataOffset);
+    position.end = contentLength();
+    
+    if (m_httpStream->open(position)) {
+        AS_TRACE("%s: HTTP stream opened, buffering...\n", __PRETTY_FUNCTION__);
+        m_httpStreamRunning = true;
+    } else {
+        AS_TRACE("%s: failed to open the HTTP stream\n", __PRETTY_FUNCTION__);
+        setState(FAILED);
+    }
 }
     
 void Audio_Stream::setUrl(CFURLRef url)
@@ -282,6 +323,14 @@ void Audio_Stream::streamMetaDataAvailable(std::string metaData)
 }
     
 /* private */
+    
+size_t Audio_Stream::contentLength()
+{
+    if (m_contentLength == 0) {
+        m_contentLength = m_httpStream->contentLength();
+    }
+    return m_contentLength;
+}
 
 void Audio_Stream::closeAndSignalError(int errorCode)
 {
@@ -319,7 +368,24 @@ void Audio_Stream::propertyValueCallback(void *inClientData, AudioFileStreamID i
         return;
     }
     
-    THIS->m_audioQueue->handlePropertyChange(inAudioFileStream, inPropertyID, ioFlags);
+    switch (inPropertyID) {
+        case kAudioFileStreamProperty_DataOffset: {
+            SInt64 offset;
+            UInt32 offsetSize = sizeof(offset);
+            OSStatus result = AudioFileStreamGetProperty(inAudioFileStream, kAudioFileStreamProperty_DataOffset, &offsetSize, &offset);
+            if (result == 0) {
+                THIS->m_dataOffset = offset;
+            } else {
+                AS_TRACE("%s: reading kAudioFileStreamProperty_DataOffset property failed\n", __PRETTY_FUNCTION__);
+            }
+            
+            break;
+        }
+        default: {
+            THIS->m_audioQueue->handlePropertyChange(inAudioFileStream, inPropertyID, ioFlags);
+            break;
+        }
+    }
 }
 
 /* This is called by audio file stream parser when it finds packets of audio */

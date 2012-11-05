@@ -44,6 +44,7 @@ public:
     void stop(bool stopImmediately);
     void stop();
     
+    double packetDuration();
     unsigned timePlayedInSeconds();
     unsigned bitrate();
 	

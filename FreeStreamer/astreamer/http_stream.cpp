@@ -14,6 +14,7 @@ const size_t HTTP_Stream::STREAM_BUFSIZ = Audio_Queue::AQ_BUFSIZ;
 CFStringRef HTTP_Stream::httpRequestMethod   = CFSTR("GET");
 CFStringRef HTTP_Stream::httpUserAgentHeader = CFSTR("User-Agent");
 CFStringRef HTTP_Stream::httpUserAgentValue  = CFSTR("aStreamer/1.0");
+CFStringRef HTTP_Stream::httpRangeHeader     = CFSTR("Range");
 CFStringRef HTTP_Stream::icyMetaDataHeader = CFSTR("Icy-MetaData");
 CFStringRef HTTP_Stream::icyMetaDataValue  = CFSTR("1"); /* always request ICY metadata, if available */
 
@@ -56,6 +57,11 @@ HTTP_Stream::~HTTP_Stream()
     }
 }
     
+HTTP_Stream_Position HTTP_Stream::position()
+{
+    return m_position;
+}
+    
 std::string HTTP_Stream::contentType()
 {
     return m_contentType;
@@ -65,8 +71,17 @@ size_t HTTP_Stream::contentLength()
 {
     return m_contentLength;
 }
-
+    
 bool HTTP_Stream::open()
+{
+    HTTP_Stream_Position position;
+    position.start = 0;
+    position.end = 0;
+    
+    return open(position);
+}
+
+bool HTTP_Stream::open(const HTTP_Stream_Position& position)
 {
     bool success = false;
     CFStreamClientContext CTX = { 0, this, NULL, NULL, NULL };
@@ -77,6 +92,8 @@ bool HTTP_Stream::open()
     }
     
     /* Reset state */
+    m_position = position;
+    
     m_httpHeadersParsed = false;
     m_contentType = "";
     
@@ -175,6 +192,17 @@ CFReadStreamRef HTTP_Stream::createReadStream(CFURLRef url)
     
     CFHTTPMessageSetHeaderFieldValue(request, httpUserAgentHeader, httpUserAgentValue);
     CFHTTPMessageSetHeaderFieldValue(request, icyMetaDataHeader, icyMetaDataValue);
+    
+    if (m_position.start > 0 && m_position.end > m_position.start) {
+        CFStringRef rangeHeaderValue = CFStringCreateWithFormat(NULL,
+                                                                NULL,
+                                                                CFSTR("bytes=%lu-%lu"),
+                                                                m_position.start,
+                                                                m_position.end);
+        
+        CFHTTPMessageSetHeaderFieldValue(request, httpRangeHeader, rangeHeaderValue);
+        CFRelease(rangeHeaderValue);
+    }
     
     if (!(readStream = CFReadStreamCreateForStreamedHTTPRequest(kCFAllocatorDefault, request, 0))) {
         goto out;

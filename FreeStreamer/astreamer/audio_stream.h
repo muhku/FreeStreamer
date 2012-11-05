@@ -44,6 +44,7 @@ public:
     
     unsigned timePlayedInSeconds();
     unsigned durationInSeconds();
+    void seekToTime(unsigned newSeekTime);
     
     void setUrl(CFURLRef url);
     
@@ -68,12 +69,17 @@ private:
     bool m_httpStreamRunning;
     bool m_audioStreamParserRunning;
     
+    size_t m_contentLength;
+    
     State m_state;
     HTTP_Stream *m_httpStream;
     Audio_Queue *m_audioQueue;
     
     AudioFileStreamID m_audioFileStream;	// the audio file stream parser
     
+    SInt64 m_dataOffset;
+    
+    size_t contentLength();
     void closeAndSignalError(int error);
     void setState(State state);
     

@@ -14,6 +14,11 @@
 namespace astreamer {
 
 class HTTP_Stream_Delegate;
+    
+struct HTTP_Stream_Position {
+    size_t start;
+    size_t end;
+};
 
 class HTTP_Stream {
 private:
@@ -26,12 +31,14 @@ private:
     static CFStringRef httpRequestMethod;
     static CFStringRef httpUserAgentHeader;
     static CFStringRef httpUserAgentValue;
+    static CFStringRef httpRangeHeader;
     static CFStringRef icyMetaDataHeader;
     static CFStringRef icyMetaDataValue;
     
     CFURLRef m_url;
     CFReadStreamRef m_readStream;
     bool m_scheduledInRunLoop;
+    HTTP_Stream_Position m_position;
     
     /* HTTP headers */
     bool m_httpHeadersParsed;
@@ -68,10 +75,13 @@ public:
     HTTP_Stream();
     virtual ~HTTP_Stream();
     
+    HTTP_Stream_Position position();
+    
     std::string contentType();
     size_t contentLength();
     
     bool open();
+    bool open(const HTTP_Stream_Position& position);
     void close();
     
     void setScheduledInRunLoop(bool scheduledInRunLoop);

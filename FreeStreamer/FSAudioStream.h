@@ -45,6 +45,7 @@ typedef struct {
 - (void)playFromURL:(NSURL*)url;
 - (void)stop;
 - (void)pause;
+- (void)seekToPosition:(FSStreamPosition)position;
 
 @property (nonatomic,assign) NSURL *url;
 @property (nonatomic,readonly) FSStreamPosition currentTimePlayed;

@@ -120,6 +120,11 @@ void Audio_Queue::stop(bool stopImmediately)
     AQ_TRACE("%s: leave\n", __PRETTY_FUNCTION__);
 }
     
+double Audio_Queue::packetDuration()
+{
+    return m_streamDesc.mFramesPerPacket / m_streamDesc.mSampleRate;
+}
+    
 unsigned Audio_Queue::timePlayedInSeconds()
 {
     unsigned timePlayed = 0;
@@ -142,7 +147,7 @@ unsigned Audio_Queue::bitrate()
 {
     unsigned bitrate = 0;
     
-    double packetDuration = m_streamDesc.mFramesPerPacket / m_streamDesc.mSampleRate;
+    double packetDuration = this->packetDuration();
     
     if (packetDuration > 0 && m_processedPacketsCount > 50) {
         double averagePacketByteSize = m_processedPacketsSizeTotal / m_processedPacketsCount;

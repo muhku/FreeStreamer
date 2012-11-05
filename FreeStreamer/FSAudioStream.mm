@@ -130,6 +130,7 @@ public:
 - (void)stop;
 - (BOOL)isPlaying;
 - (void)pause;
+- (void)seekToTime:(unsigned)newSeekTime;
 - (unsigned)timePlayedInSeconds;
 - (unsigned)durationInSeconds;
 @end
@@ -234,6 +235,10 @@ public:
     _audioStream->pause();
 }
 
+- (void)seekToTime:(unsigned)newSeekTime {
+    _audioStream->seekToTime(newSeekTime);
+}
+
 - (unsigned)timePlayedInSeconds {
     return _audioStream->timePlayedInSeconds();
 }
@@ -287,6 +292,12 @@ public:
 
 - (void)pause {
     [_private pause];
+}
+
+- (void)seekToPosition:(FSStreamPosition)position {
+    unsigned seekTime = position.minute * 60 + position.second;
+    
+    [_private seekToTime:seekTime];
 }
 
 - (FSStreamPosition)currentTimePlayed {
