@@ -13,18 +13,6 @@
 @synthesize window=_window;
 @synthesize navigationController=_navigationController;
 
-- (void)dealloc
-{
-    
-    if (_dao) {
-        _dao = nil;
-    }
-    if (_audioController) {
-        _audioController = nil;
-    }
-    
-}
-
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     [self.window addSubview:self.navigationController.view];
@@ -69,25 +57,6 @@
      Save data if appropriate.
      See also applicationDidEnterBackground:.
      */
-    
-    if (_audioController) {
-        [_audioController stop];
-    }
-}
-
-/* Properties */
-- (FSDAO *)dao {
-    if (!_dao) {
-        _dao = [[FSDAO alloc] init];
-    }
-    return _dao;
-}
-
-- (FSAudioController *)audioController {
-    if (!_audioController) {
-        _audioController = [[FSAudioController alloc] init];
-    }
-    return _audioController;
 }
 
 @end

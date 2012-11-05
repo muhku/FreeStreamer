@@ -7,6 +7,7 @@
 #import <UIKit/UIKit.h>
 
 @class FSPlaylistItem;
+@class FSAudioController;
 
 @interface FSPlayerViewController : UIViewController {
     FSPlaylistItem *_selectedPlaylistItem;
@@ -22,6 +23,8 @@
 
 @property (nonatomic,strong) IBOutlet UIActivityIndicatorView *activityIndicator;
 @property (nonatomic,strong) IBOutlet UILabel *statusLabel;
+
+@property (nonatomic,strong) IBOutlet FSAudioController *audioController;
 
 - (void)audioStreamStateDidChange:(NSNotification *)notification;  
 - (IBAction)play:(id)sender;

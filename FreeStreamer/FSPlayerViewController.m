@@ -6,7 +6,6 @@
 
 #import "FSPlayerViewController.h"
 
-#import "FSAppDelegate.h"
 #import "FSAudioStream.h"
 #import "FSAudioController.h"
 #import "FSPlaylistItem.h"
@@ -16,6 +15,7 @@
 @synthesize shouldStartPlaying=_shouldStartPlaying;
 @synthesize activityIndicator=_activityIndicator;
 @synthesize statusLabel=_statusLabel;
+@synthesize audioController;
 
 /*
  * =======================================
@@ -182,19 +182,15 @@ out:
  */
 
 - (IBAction)play:(id)sender {
-    FSAppDelegate *delegate = [[UIApplication sharedApplication] delegate];
-    
-    if (!delegate.audioController.url) {
+    if (!self.audioController.url) {
         return;
     }
     
-    [delegate.audioController play];
+    [self.audioController play];
 }
 
 - (IBAction)stop:(id)sender {
-    FSAppDelegate *delegate = [[UIApplication sharedApplication] delegate];
-    
-    [delegate.audioController stop];
+    [self.audioController stop];
 }
 
 /*
@@ -208,15 +204,13 @@ out:
         return;
     }
     
-    FSAppDelegate *delegate = [[UIApplication sharedApplication] delegate];
-    
     _selectedPlaylistItem = selectedPlaylistItem;
     
     self.navigationItem.title = self.selectedPlaylistItem.title;
     
-    [delegate.audioController stop];
+    [self.audioController stop];
     
-    delegate.audioController.url = self.selectedPlaylistItem.nsURL;
+    self.audioController.url = self.selectedPlaylistItem.nsURL;
 }
 
 - (FSPlaylistItem *)selectedPlaylistItem {

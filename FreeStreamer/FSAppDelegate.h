@@ -12,13 +12,9 @@
 @interface FSAppDelegate : UIResponder <UIApplicationDelegate> {
     UIWindow *_window;
     UINavigationController *_navigationController;
-    FSDAO *_dao;
-    FSAudioController *_audioController;
 }
 
 @property (nonatomic,strong) IBOutlet UIWindow *window;
 @property (nonatomic,strong) IBOutlet UINavigationController *navigationController;
-@property (weak, nonatomic,readonly) FSDAO *dao;
-@property (weak, nonatomic,readonly) FSAudioController *audioController;
 
 @end

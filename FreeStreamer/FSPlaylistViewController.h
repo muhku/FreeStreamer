@@ -7,6 +7,7 @@
 #import <UIKit/UIKit.h>
 
 @class FSPlayerViewController;
+@class FSDAO;
 
 @interface FSPlaylistViewController : UITableViewController<UITableViewDataSource,UITableViewDelegate> {
     NSMutableArray *_playlistItems;
@@ -17,5 +18,6 @@
 @property (weak, readonly) NSMutableArray *playlistItems;
 @property (nonatomic,strong) IBOutlet UINavigationController *navigationController;
 @property (nonatomic,strong) IBOutlet FSPlayerViewController *playerViewController;
+@property (nonatomic,strong) IBOutlet FSDAO *dao;
 
 @end

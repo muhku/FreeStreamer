@@ -5,7 +5,6 @@
  */
 
 #import "FSPlaylistViewController.h"
-#import "FSAppDelegate.h"
 #import "FSDAO.h"
 #import "FSPlaylistItem.h"
 #import "FSPlayerViewController.h"
@@ -14,6 +13,7 @@
 
 @synthesize navigationController=_navigationController;
 @synthesize playerViewController=_playerViewContoller;
+@synthesize dao;
 
 /*
  * =======================================
@@ -72,10 +72,8 @@
  */
 
 - (NSMutableArray *)playlistItems {
-    FSAppDelegate *delegate = [[UIApplication sharedApplication] delegate];
-    
     if (!_playlistItems) {
-        _playlistItems = [delegate.dao playlistItems];
+        _playlistItems = [self.dao playlistItems];
     }
     return _playlistItems;
 }
