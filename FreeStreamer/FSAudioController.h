@@ -26,5 +26,6 @@
 - (void)stop;
 
 @property (nonatomic,weak) NSURL *url;
+@property (nonatomic,weak,readonly) FSAudioStream *stream;
 
 @end

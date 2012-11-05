@@ -10,11 +10,18 @@
 #import "FSAudioController.h"
 #import "FSPlaylistItem.h"
 
+@interface FSPlayerViewController (PrivateMethods)
+
+- (void)updatePlaybackProgress;
+
+@end
+
 @implementation FSPlayerViewController
 
 @synthesize shouldStartPlaying=_shouldStartPlaying;
 @synthesize activityIndicator=_activityIndicator;
 @synthesize statusLabel=_statusLabel;
+@synthesize currentPlaybackTime=_currentPlaybackTime;
 @synthesize audioController;
 
 /*
@@ -22,14 +29,6 @@
  * View control
  * =======================================
  */
-
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-        // Custom initialization
-    }
-    return self;
-}
 
 - (void)didReceiveMemoryWarning {
     // Releases the view if it doesn't have a superview.
@@ -45,6 +44,12 @@
         _shouldStartPlaying = NO;
         [self play:self];
     }
+    
+    _progressUpdateTimer = [NSTimer scheduledTimerWithTimeInterval:1.0
+                                                            target:self
+                                                          selector:@selector(updatePlaybackProgress)
+                                                          userInfo:nil
+                                                           repeats:YES];
 }
 
 - (void)viewDidLoad {
@@ -83,6 +88,15 @@
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
     // Return YES for supported orientations
     return (interfaceOrientation == UIInterfaceOrientationPortrait);
+}
+
+- (void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    
+    if (_progressUpdateTimer) {
+        [_progressUpdateTimer invalidate];
+    }
 }
 
 /*
@@ -215,6 +229,22 @@ out:
 
 - (FSPlaylistItem *)selectedPlaylistItem {
     return _selectedPlaylistItem;
+}
+
+/*
+ * =======================================
+ * Private
+ * =======================================
+ */
+
+- (void)updatePlaybackProgress
+{
+    FSStreamPosition cur = self.audioController.stream.currentTimePlayed;
+    FSStreamPosition end = self.audioController.stream.duration;
+    
+    self.currentPlaybackTime.text = [NSString stringWithFormat:@"%i:%02i / %i:%02i",
+                                     cur.minute, cur.second,
+                                     end.minute, end.second];
 }
 
 @end

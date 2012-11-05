@@ -14,8 +14,10 @@
     BOOL _shouldStartPlaying;
     
     // UI
+    NSTimer *_progressUpdateTimer;
     UIActivityIndicatorView *_activityIndicator;
     UILabel *_statusLabel;
+    UILabel *_currentPlaybackTime;
 }
 
 @property (nonatomic,assign) BOOL shouldStartPlaying;
@@ -23,6 +25,7 @@
 
 @property (nonatomic,strong) IBOutlet UIActivityIndicatorView *activityIndicator;
 @property (nonatomic,strong) IBOutlet UILabel *statusLabel;
+@property (nonatomic,strong) IBOutlet UILabel *currentPlaybackTime;
 
 @property (nonatomic,strong) IBOutlet FSAudioController *audioController;
 

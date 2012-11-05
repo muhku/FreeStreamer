@@ -48,10 +48,6 @@ typedef enum {
     return self;
 }
 
-- (void)dealloc {
-    _playlistItems = nil;
-}
-
 - (void)parsePlaylistFromData:(NSData *)data {
     NSString *playlistData = [[NSString alloc] initWithData:data encoding:NSASCIIStringEncoding];
 
@@ -233,6 +229,10 @@ typedef enum {
     
     NSURL *copyOfURL = [_url copy];
     return copyOfURL;
+}
+
+- (FSAudioStream *)stream {
+    return _audioStream;
 }
 
 /*

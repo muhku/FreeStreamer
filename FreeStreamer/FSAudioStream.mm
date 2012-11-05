@@ -306,7 +306,7 @@ public:
     unsigned s,m;
     
     s = u % 60, u /= 60;
-    m = u % 60, u /= 60;
+    m = u;
     
     FSStreamPosition pos = {.minute = m, .second = s};
     return pos;
@@ -318,7 +318,7 @@ public:
     unsigned s,m;
     
     s = u % 60, u /= 60;
-    m = u % 60, u /= 60;
+    m = u;
     
     FSStreamPosition pos = {.minute = m, .second = s};
     return pos;
