@@ -18,10 +18,10 @@
 }
 
 @property (nonatomic,assign) BOOL shouldStartPlaying;
-@property (nonatomic,retain) FSPlaylistItem *selectedPlaylistItem;
+@property (nonatomic,strong) FSPlaylistItem *selectedPlaylistItem;
 
-@property (nonatomic,retain) IBOutlet UIActivityIndicatorView *activityIndicator;
-@property (nonatomic,retain) IBOutlet UILabel *statusLabel;
+@property (nonatomic,strong) IBOutlet UIActivityIndicatorView *activityIndicator;
+@property (nonatomic,strong) IBOutlet UILabel *statusLabel;
 
 - (void)audioStreamStateDidChange:(NSNotification *)notification;  
 - (IBAction)play:(id)sender;

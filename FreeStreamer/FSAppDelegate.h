@@ -16,9 +16,9 @@
     FSAudioController *_audioController;
 }
 
-@property (nonatomic,retain) IBOutlet UIWindow *window;
-@property (nonatomic,retain) IBOutlet UINavigationController *navigationController;
-@property (nonatomic,readonly) FSDAO *dao;
-@property (nonatomic,readonly) FSAudioController *audioController;
+@property (nonatomic,strong) IBOutlet UIWindow *window;
+@property (nonatomic,strong) IBOutlet UINavigationController *navigationController;
+@property (weak, nonatomic,readonly) FSDAO *dao;
+@property (weak, nonatomic,readonly) FSAudioController *audioController;
 
 @end

@@ -14,8 +14,8 @@
     FSPlayerViewController *_playerViewController;
 }
 
-@property (readonly) NSMutableArray *playlistItems;
-@property (nonatomic,retain) IBOutlet UINavigationController *navigationController;
-@property (nonatomic,retain) IBOutlet FSPlayerViewController *playerViewController;
+@property (weak, readonly) NSMutableArray *playlistItems;
+@property (nonatomic,strong) IBOutlet UINavigationController *navigationController;
+@property (nonatomic,strong) IBOutlet FSPlayerViewController *playerViewController;
 
 @end

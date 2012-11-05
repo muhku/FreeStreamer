@@ -210,7 +210,7 @@ out:
     
     FSAppDelegate *delegate = [[UIApplication sharedApplication] delegate];
     
-    [_selectedPlaylistItem release], _selectedPlaylistItem = [selectedPlaylistItem retain];
+    _selectedPlaylistItem = selectedPlaylistItem;
     
     self.navigationItem.title = self.selectedPlaylistItem.title;
     

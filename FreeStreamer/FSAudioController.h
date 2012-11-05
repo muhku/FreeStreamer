@@ -25,6 +25,6 @@
 - (void)playFromURL:(NSURL*)url;
 - (void)stop;
 
-@property (nonatomic,assign) NSURL *url;
+@property (nonatomic,weak) NSURL *url;
 
 @end

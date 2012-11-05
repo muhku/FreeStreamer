@@ -20,11 +20,6 @@
     return self;
 }
 
-- (void)dealloc {
-    self.title = nil;
-    self.url = nil;
-    [super dealloc];
-}
 
 - (NSURL *)nsURL {
     return [NSURL URLWithString:_url];

@@ -33,9 +33,8 @@
 }
 
 - (void)dealloc {
-    [_data release], _data = nil;
-    [_playlistItems release], _playlistItems = nil;
-    [super dealloc];
+    _data = nil;
+    _playlistItems = nil;
 }
 
 - (void)parseData {
@@ -49,7 +48,7 @@
         
         if (!([data length] > 0)) {
             if (item) {
-                [item release], item = nil;
+                item = nil;
             }
             goto out;
         }
@@ -60,14 +59,14 @@
         } else {
             item.url = data;
             [_playlistItems addObject:item];
-            [item release], item = nil;
+            item = nil;
         }
     }
     
 out:
     if (item) {
         [_playlistItems addObject:item];
-        [item release], item = nil;        
+        item = nil;        
     }
 }
 
@@ -75,9 +74,8 @@ out:
 	NSMutableArray *items = [[NSMutableArray alloc] init];
 	
     [items addObjectsFromArray:_playlistItems];
-    [_playlistItems release];
     
-	return [items autorelease];
+	return items;
 }
 
 @end

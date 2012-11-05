@@ -13,6 +13,6 @@
 
 @property (nonatomic,copy) NSString *title;
 @property (nonatomic,copy) NSString *url;
-@property (readonly) NSURL *nsURL;
+@property (weak, readonly) NSURL *nsURL;
 
 @end

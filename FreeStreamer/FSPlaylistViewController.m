@@ -47,7 +47,7 @@
     
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (cell == nil) {
-        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier] autorelease];
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
     }
     
     FSPlaylistItem *item = [[self playlistItems] objectAtIndex:indexPath.row];
@@ -75,7 +75,7 @@
     FSAppDelegate *delegate = [[UIApplication sharedApplication] delegate];
     
     if (!_playlistItems) {
-        _playlistItems = [[delegate.dao playlistItems] retain];
+        _playlistItems = [delegate.dao playlistItems];
     }
     return _playlistItems;
 }

@@ -15,17 +15,14 @@
 
 - (void)dealloc
 {
-    self.window = nil;
-    self.navigationController = nil;
     
     if (_dao) {
-        [_dao release], _dao = nil;
+        _dao = nil;
     }
     if (_audioController) {
-        [_audioController release], _audioController = nil;
+        _audioController = nil;
     }
     
-    [super dealloc];
 }
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions

@@ -49,8 +49,7 @@ typedef enum {
 }
 
 - (void)dealloc {
-    [_playlistItems release], _playlistItems = nil;
-    [super dealloc];
+    _playlistItems = nil;
 }
 
 - (void)parsePlaylistFromData:(NSData *)data {
@@ -62,7 +61,6 @@ typedef enum {
         [self parsePlaylistPLS:playlistData];
     }
     
-    [playlistData release];
 }
 
 - (void)parsePlaylistM3U:(NSString *)playlist {
@@ -79,7 +77,6 @@ typedef enum {
             item.url = [line stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
             
             [_playlistItems addObject:item];
-            [item release];
         }
     }
 }
@@ -106,7 +103,6 @@ typedef enum {
                 item.url = [file stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
                 
                 [_playlistItems addObject:item];
-                [item release];
             }
         }
         if ([[line lowercaseString] hasPrefix:@"title"]) {
@@ -145,19 +141,18 @@ typedef enum {
 }
 
 - (void)dealloc {
-    [_url release], _url = nil;
-    [_audioStream release], _audioStream = nil;
-    [_receivedPlaylistData release], _receivedPlaylistData = nil;
-    [_playlistPrivate release], _playlistPrivate = nil;
+    _url = nil;
+    _audioStream = nil;
+    _receivedPlaylistData = nil;
+    _playlistPrivate = nil;
     if (_contentTypeConnection) {
         [_contentTypeConnection cancel];
-        [_contentTypeConnection release], _contentTypeConnection = nil;
+        _contentTypeConnection = nil;
     }
     if (_playlistRetrieveConnection) {
         [_playlistRetrieveConnection cancel];
-        [_playlistRetrieveConnection release], _playlistRetrieveConnection = nil;
+        _playlistRetrieveConnection = nil;
     }
-	[super dealloc];
 }
 
 /*
@@ -216,7 +211,7 @@ typedef enum {
 
 - (void)setUrl:(NSURL *)url {
     @synchronized (self) {
-        [_url release], _url = nil;
+        _url = nil;
     
         if (url && ![url isEqual:_url]) {
             NSURL *copyOfURL = [url copy];
@@ -236,7 +231,7 @@ typedef enum {
         return nil;
     }
     
-    NSURL *copyOfURL = [[_url copy] autorelease];
+    NSURL *copyOfURL = [_url copy];
     return copyOfURL;
 }
 
@@ -267,7 +262,7 @@ typedef enum {
         }
         
         [_contentTypeConnection cancel];
-        [_contentTypeConnection release], _contentTypeConnection = nil;
+        _contentTypeConnection = nil;
         
         if (_playlistPrivate.format == kFSPlaylistFormatNone) {
             /* Not a playlist file, just try to play the stream */
@@ -289,9 +284,9 @@ typedef enum {
         }
     } else if (_playlistRetrieveConnection) {
         if (_receivedPlaylistData) {
-            [_receivedPlaylistData release], _receivedPlaylistData = nil;
+            _receivedPlaylistData = nil;
         }
-        _receivedPlaylistData = [[NSMutableData data] retain];
+        _receivedPlaylistData = [NSMutableData data];
         [_receivedPlaylistData setLength:0];
     }
 }
@@ -308,7 +303,7 @@ typedef enum {
     if (_contentTypeConnection) {
         AC_TRACE(@"Error when checking content type: %@", [error localizedDescription]);
         
-        [_contentTypeConnection release], _contentTypeConnection = nil;
+        _contentTypeConnection = nil;
         /* Failed to read the stream's content type, try playing
          the stream anyway */
         _streamContentTypeChecked = YES;
@@ -316,8 +311,8 @@ typedef enum {
     } else if (_playlistRetrieveConnection) {
         AC_TRACE(@"Error when retrieving playlist: %@", [error localizedDescription]);
         
-        [_playlistRetrieveConnection release], _playlistRetrieveConnection = nil;
-        [_receivedPlaylistData release], _receivedPlaylistData = nil;
+        _playlistRetrieveConnection = nil;
+        _receivedPlaylistData = nil;
         /* Failed to read the playlist, try playing the stream anyway */
         _streamContentTypeChecked = YES;
         [_audioStream play];
@@ -326,9 +321,9 @@ typedef enum {
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
     if (_contentTypeConnection) {
-        [_contentTypeConnection release], _contentTypeConnection = nil;
+        _contentTypeConnection = nil;
     } else if (_playlistRetrieveConnection) {
-        [_playlistRetrieveConnection release], _playlistRetrieveConnection = nil;
+        _playlistRetrieveConnection = nil;
         
         [_playlistPrivate parsePlaylistFromData:_receivedPlaylistData];
         
@@ -340,7 +335,7 @@ typedef enum {
         _streamContentTypeChecked = YES;
         [_audioStream play];
         
-        [_receivedPlaylistData release], _receivedPlaylistData = nil;
+        _receivedPlaylistData = nil;
     }
 }
 
