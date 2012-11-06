@@ -6,6 +6,14 @@
 
 #include "audio_stream.h"
 
+/*
+ * Some servers may send an incorrect MIME type for the audio stream.
+ * By uncommenting the following line, relaxed checks will be
+ * performed for the MIME type. This allows playing more
+ * streams:
+ */
+//#define AS_RELAX_CONTENT_TYPE_CHECK 1
+
 //#define AS_DEBUG 1
 
 #if !defined (AS_DEBUG)
@@ -258,8 +266,12 @@ void Audio_Stream::streamIsReadyRead()
     size_t audioContentTypeLength = strlen(audioContentType);
     
     if (contentType.compare(0, audioContentTypeLength, audioContentType) != 0) {
+#if !defined (AS_RELAX_CONTENT_TYPE_CHECK)
         closeAndSignalError(AS_ERR_OPEN);
         return;
+#else
+        contentType = "audio/mpeg";
+#endif
     }
     
     /* OK, it should be an audio stream, let's try to open it */
