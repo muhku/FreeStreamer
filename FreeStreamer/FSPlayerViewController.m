@@ -13,12 +13,14 @@
 @interface FSPlayerViewController (PrivateMethods)
 
 - (void)updatePlaybackProgress;
+- (void)seekToNewTime;
 
 @end
 
 @implementation FSPlayerViewController
 
 @synthesize shouldStartPlaying=_shouldStartPlaying;
+@synthesize progressSlider=_progressSlider;
 @synthesize activityIndicator=_activityIndicator;
 @synthesize statusLabel=_statusLabel;
 @synthesize currentPlaybackTime=_currentPlaybackTime;
@@ -95,7 +97,7 @@
     [super viewDidDisappear:animated];
     
     if (_progressUpdateTimer) {
-        [_progressUpdateTimer invalidate];
+        [_progressUpdateTimer invalidate], _progressUpdateTimer = nil;
     }
 }
 
@@ -108,6 +110,7 @@
 - (void)audioStreamStateDidChange:(NSNotification *)notification {
     NSString *statusRetrievingURL = @"Retrieving stream URL";
     NSString *statusBuffering = @"Buffering...";
+    NSString *statusSeeking = @"Seeking...";
     NSString *statusEmpty = @"";
     
     NSDictionary *dict = [notification userInfo];
@@ -118,25 +121,46 @@
             [_activityIndicator startAnimating];
             self.statusLabel.text = statusRetrievingURL;
             [_statusLabel setHidden:NO];
+            self.progressSlider.enabled = NO;
             break;
         case kFsAudioStreamStopped:
             [_activityIndicator stopAnimating];
             self.statusLabel.text = statusEmpty;
+            self.progressSlider.enabled = NO;
             break;
         case kFsAudioStreamBuffering:
             self.statusLabel.text = statusBuffering;
             [_activityIndicator startAnimating];
             [_statusLabel setHidden:NO];
+            self.progressSlider.enabled = NO;
+            break;
+        case kFsAudioStreamSeeking:
+            self.statusLabel.text = statusSeeking;
+            [_activityIndicator startAnimating];
+            [_statusLabel setHidden:NO];
+            self.progressSlider.enabled = NO;
             break;
         case kFsAudioStreamPlaying:
             [_activityIndicator stopAnimating];
             if ([self.statusLabel.text isEqualToString:statusBuffering] ||
-                [self.statusLabel.text isEqualToString:statusRetrievingURL]) {
+                [self.statusLabel.text isEqualToString:statusRetrievingURL] ||
+                [self.statusLabel.text isEqualToString:statusSeeking]) {
                 self.statusLabel.text = statusEmpty;
             }
+            self.progressSlider.enabled = YES;
+            
+            if (!_progressUpdateTimer) {
+                _progressUpdateTimer = [NSTimer scheduledTimerWithTimeInterval:1.0
+                                                                        target:self
+                                                                      selector:@selector(updatePlaybackProgress)
+                                                                      userInfo:nil
+                                                                       repeats:YES];
+            }
+            
             break;
         case kFsAudioStreamFailed:
             [_activityIndicator stopAnimating];
+            self.progressSlider.enabled = NO;
             break;
     }
 }
@@ -207,6 +231,18 @@ out:
     [self.audioController stop];
 }
 
+- (IBAction)seek:(id)sender {
+    _seekToPoint = self.progressSlider.value;
+    
+    [_progressUpdateTimer invalidate], _progressUpdateTimer = nil;
+    
+    [_playbackSeekTimer invalidate], _playbackSeekTimer = [NSTimer scheduledTimerWithTimeInterval:1.0
+                                                                                           target:self
+                                                                                         selector:@selector(seekToNewTime)
+                                                                                           userInfo:nil
+                                                                                            repeats:NO];
+}
+
 /*
  * =======================================
  * Properties
@@ -239,12 +275,35 @@ out:
 
 - (void)updatePlaybackProgress
 {
+    double s = self.audioController.stream.currentTimePlayed.minute * 60 + self.audioController.stream.currentTimePlayed.second;
+    double e = self.audioController.stream.duration.minute * 60 + self.audioController.stream.duration.second;
+    
+    self.progressSlider.value = s / e;
+    
     FSStreamPosition cur = self.audioController.stream.currentTimePlayed;
     FSStreamPosition end = self.audioController.stream.duration;
     
     self.currentPlaybackTime.text = [NSString stringWithFormat:@"%i:%02i / %i:%02i",
                                      cur.minute, cur.second,
                                      end.minute, end.second];
+}
+
+- (void)seekToNewTime
+{
+    self.progressSlider.enabled = NO;
+    
+    unsigned u = (self.audioController.stream.duration.minute * 60 + self.audioController.stream.duration.second) * _seekToPoint;
+    
+    unsigned s,m;
+    
+    s = u % 60, u /= 60;
+    m = u;
+    
+    FSStreamPosition pos;
+    pos.minute = m;
+    pos.second = s;
+    
+    [self.audioController.stream seekToPosition:pos];
 }
 
 @end

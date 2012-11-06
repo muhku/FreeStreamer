@@ -68,6 +68,9 @@ public:
                 AudioSessionSetActive(true);
 #endif                
                 break;
+            case astreamer::Audio_Stream::SEEKING:
+                fsAudioState = [NSNumber numberWithInt:kFsAudioStreamSeeking];
+                break;
             case astreamer::Audio_Stream::END_OF_FILE:
                 fsAudioState = [NSNumber numberWithInt:kFSAudioStreamEndOfFile];
                 break;

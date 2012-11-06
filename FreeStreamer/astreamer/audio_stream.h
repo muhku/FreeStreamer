@@ -31,6 +31,7 @@ public:
         STOPPED,
         BUFFERING,
         PLAYING,
+        SEEKING,
         FAILED,
         END_OF_FILE
     };
@@ -78,6 +79,7 @@ private:
     AudioFileStreamID m_audioFileStream;	// the audio file stream parser
     
     SInt64 m_dataOffset;
+    unsigned m_seekTime;
     
     size_t contentLength();
     void closeAndSignalError(int error);

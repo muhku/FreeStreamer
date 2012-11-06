@@ -14,15 +14,19 @@
     BOOL _shouldStartPlaying;
     
     // UI
+    UISlider *_progressSlider;
     NSTimer *_progressUpdateTimer;
     UIActivityIndicatorView *_activityIndicator;
     UILabel *_statusLabel;
     UILabel *_currentPlaybackTime;
+    NSTimer *_playbackSeekTimer;
+    double _seekToPoint;
 }
 
 @property (nonatomic,assign) BOOL shouldStartPlaying;
 @property (nonatomic,strong) FSPlaylistItem *selectedPlaylistItem;
 
+@property (nonatomic,strong) IBOutlet UISlider *progressSlider;
 @property (nonatomic,strong) IBOutlet UIActivityIndicatorView *activityIndicator;
 @property (nonatomic,strong) IBOutlet UILabel *statusLabel;
 @property (nonatomic,strong) IBOutlet UILabel *currentPlaybackTime;
@@ -32,5 +36,6 @@
 - (void)audioStreamStateDidChange:(NSNotification *)notification;  
 - (IBAction)play:(id)sender;
 - (IBAction)stop:(id)sender;
+- (IBAction)seek:(id)sender;
 
 @end

@@ -19,6 +19,7 @@
 			<string>IBUINavigationBar</string>
 			<string>IBUINavigationController</string>
 			<string>IBUINavigationItem</string>
+			<string>IBUISlider</string>
 			<string>IBUITableView</string>
 			<string>IBUITableViewController</string>
 			<string>IBUIView</string>
@@ -42,10 +43,9 @@
 				<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 			</object>
 			<object class="IBUIWindow" id="475180133">
-				<reference key="NSNextResponder"/>
+				<nil key="NSNextResponder"/>
 				<int key="NSvFlags">292</int>
 				<string key="NSFrameSize">{320, 480}</string>
-				<reference key="NSSuperview"/>
 				<object class="NSColor" key="IBUIBackgroundColor">
 					<int key="NSColorSpace">1</int>
 					<bytes key="NSRGB">MSAxIDEAA</bytes>
@@ -80,10 +80,9 @@
 				<array class="NSMutableArray" key="IBUIViewControllers">
 					<object class="IBUITableViewController" id="551254382">
 						<object class="IBUITableView" key="IBUIView" id="392305345">
-							<reference key="NSNextResponder"/>
+							<nil key="NSNextResponder"/>
 							<int key="NSvFlags">274</int>
 							<string key="NSFrame">{{0, 64}, {320, 416}}</string>
-							<reference key="NSSuperview"/>
 							<object class="NSColor" key="IBUIBackgroundColor" id="44916998">
 								<int key="NSColorSpace">3</int>
 								<bytes key="NSWhite">MQA</bytes>
@@ -238,9 +237,10 @@
 						<object class="IBUILabel" id="401975833">
 							<reference key="NSNextResponder" ref="861133505"/>
 							<int key="NSvFlags">292</int>
-							<string key="NSFrame">{{0, 20}, {320, 21}}</string>
+							<string key="NSFrame">{{0, 30}, {320, 21}}</string>
 							<reference key="NSSuperview" ref="861133505"/>
 							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="731475300"/>
 							<string key="NSReuseIdentifierKey">_NS:9</string>
 							<bool key="IBUIOpaque">NO</bool>
 							<bool key="IBUIClipsSubviews">YES</bool>
@@ -263,11 +263,24 @@
 							</object>
 							<bool key="IBUIAdjustsFontSizeToFit">NO</bool>
 						</object>
+						<object class="IBUISlider" id="904248429">
+							<reference key="NSNextResponder" ref="861133505"/>
+							<int key="NSvFlags">292</int>
+							<string key="NSFrame">{{9, 7}, {300, 23}}</string>
+							<reference key="NSSuperview" ref="861133505"/>
+							<reference key="NSWindow"/>
+							<reference key="NSNextKeyView" ref="401975833"/>
+							<string key="NSReuseIdentifierKey">_NS:9</string>
+							<bool key="IBUIOpaque">NO</bool>
+							<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
+							<int key="IBUIContentHorizontalAlignment">0</int>
+							<int key="IBUIContentVerticalAlignment">0</int>
+						</object>
 					</array>
 					<string key="NSFrame">{{0, 64}, {320, 416}}</string>
 					<reference key="NSSuperview"/>
 					<reference key="NSWindow"/>
-					<reference key="NSNextKeyView" ref="731475300"/>
+					<reference key="NSNextKeyView" ref="904248429"/>
 					<object class="NSColor" key="IBUIBackgroundColor">
 						<int key="NSColorSpace">3</int>
 						<bytes key="NSWhite">MQA</bytes>
@@ -381,6 +394,14 @@
 					<int key="connectionID">47</int>
 				</object>
 				<object class="IBConnectionRecord">
+					<object class="IBCocoaTouchOutletConnection" key="connection">
+						<string key="label">progressSlider</string>
+						<reference key="source" ref="323191829"/>
+						<reference key="destination" ref="904248429"/>
+					</object>
+					<int key="connectionID">49</int>
+				</object>
+				<object class="IBConnectionRecord">
 					<object class="IBCocoaTouchEventConnection" key="connection">
 						<string key="label">play:</string>
 						<reference key="source" ref="838267386"/>
@@ -413,6 +434,15 @@
 						<reference key="destination" ref="475180133"/>
 					</object>
 					<int key="connectionID">39</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBCocoaTouchEventConnection" key="connection">
+						<string key="label">seek:</string>
+						<reference key="source" ref="904248429"/>
+						<reference key="destination" ref="323191829"/>
+						<int key="IBEventType">13</int>
+					</object>
+					<int key="connectionID">50</int>
 				</object>
 			</array>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -498,6 +528,7 @@
 							<reference ref="408840472"/>
 							<reference ref="993875900"/>
 							<reference ref="401975833"/>
+							<reference ref="904248429"/>
 						</array>
 						<reference key="parent" ref="323191829"/>
 					</object>
@@ -546,6 +577,11 @@
 						<reference key="object" ref="401975833"/>
 						<reference key="parent" ref="861133505"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">48</int>
+						<reference key="object" ref="904248429"/>
+						<reference key="parent" ref="861133505"/>
+					</object>
 				</array>
 			</object>
 			<dictionary class="NSMutableDictionary" key="flattenedProperties">
@@ -575,6 +611,7 @@
 				<string key="43.CustomClassName">FSAudioController</string>
 				<string key="43.IBPluginDependency">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 				<string key="46.IBPluginDependency">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
+				<string key="48.IBPluginDependency">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 				<string key="7.IBPluginDependency">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 				<string key="8.IBPluginDependency">com.apple.InterfaceBuilder.IBCocoaTouchPlugin</string>
 			</dictionary>
@@ -582,7 +619,7 @@
 			<nil key="activeLocalization"/>
 			<dictionary class="NSMutableDictionary" key="localizations"/>
 			<nil key="sourceID"/>
-			<int key="maxID">47</int>
+			<int key="maxID">50</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<array class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -629,11 +666,16 @@
 					<string key="superclassName">UIViewController</string>
 					<dictionary class="NSMutableDictionary" key="actions">
 						<string key="play:">id</string>
+						<string key="seek:">id</string>
 						<string key="stop:">id</string>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="actionInfosByName">
 						<object class="IBActionInfo" key="play:">
 							<string key="name">play:</string>
+							<string key="candidateClassName">id</string>
+						</object>
+						<object class="IBActionInfo" key="seek:">
+							<string key="name">seek:</string>
 							<string key="candidateClassName">id</string>
 						</object>
 						<object class="IBActionInfo" key="stop:">
@@ -645,6 +687,7 @@
 						<string key="activityIndicator">UIActivityIndicatorView</string>
 						<string key="audioController">FSAudioController</string>
 						<string key="currentPlaybackTime">UILabel</string>
+						<string key="progressSlider">UISlider</string>
 						<string key="statusLabel">UILabel</string>
 					</dictionary>
 					<dictionary class="NSMutableDictionary" key="toOneOutletInfosByName">
@@ -659,6 +702,10 @@
 						<object class="IBToOneOutletInfo" key="currentPlaybackTime">
 							<string key="name">currentPlaybackTime</string>
 							<string key="candidateClassName">UILabel</string>
+						</object>
+						<object class="IBToOneOutletInfo" key="progressSlider">
+							<string key="name">progressSlider</string>
+							<string key="candidateClassName">UISlider</string>
 						</object>
 						<object class="IBToOneOutletInfo" key="statusLabel">
 							<string key="name">statusLabel</string>

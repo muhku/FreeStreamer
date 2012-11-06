@@ -25,7 +25,8 @@ Audio_Stream::Audio_Stream() :
     m_state(STOPPED),
     m_httpStream(new HTTP_Stream()),
     m_audioQueue(new Audio_Queue()),
-    m_dataOffset(0)
+    m_dataOffset(0),
+    m_seekTime(0)
 {
     m_httpStream->m_delegate = this;
     m_audioQueue->m_delegate = this;
@@ -50,6 +51,7 @@ void Audio_Stream::open()
     }
     
     m_contentLength = 0;
+    m_seekTime = 0;
     
     if (m_httpStream->open()) {
         AS_TRACE("%s: HTTP stream opened, buffering...\n", __PRETTY_FUNCTION__);
@@ -80,7 +82,6 @@ void Audio_Stream::close()
     }
     
     m_audioQueue->stop();
-    
     m_dataOffset = 0;
     
     AS_TRACE("%s: leave\n", __PRETTY_FUNCTION__);
@@ -93,7 +94,7 @@ void Audio_Stream::pause()
     
 unsigned Audio_Stream::timePlayedInSeconds()
 {
-    return m_audioQueue->timePlayedInSeconds();
+    return m_seekTime + m_audioQueue->timePlayedInSeconds();
 }
     
 unsigned Audio_Stream::durationInSeconds()
@@ -118,24 +119,16 @@ void Audio_Stream::seekToTime(unsigned newSeekTime)
         return;
     }
     
-    if (m_httpStreamRunning) {
-        m_httpStream->close();
-        m_httpStreamRunning = false;
-    }
+    close();
     
-    UInt32 ioFlags = 0;
-    SInt64 packetAlignedByteOffset;
-    SInt64 seekPacket = floor(newSeekTime / m_audioQueue->packetDuration());
+    setState(SEEKING);
     
-    OSStatus result = AudioFileStreamSeek(m_audioFileStream, seekPacket, &packetAlignedByteOffset, &ioFlags);
-    if (result != 0) {
-        AS_TRACE("AudioFileStreamSeek failed");
-    }
-    
-    double offset = (double)newSeekTime / (double)duration;
     HTTP_Stream_Position position;
+    double offset = (double)newSeekTime / (double)duration;
     position.start = m_dataOffset + offset * (contentLength() - m_dataOffset);
     position.end = contentLength();
+    
+    m_seekTime = newSeekTime;
     
     if (m_httpStream->open(position)) {
         AS_TRACE("%s: HTTP stream opened, buffering...\n", __PRETTY_FUNCTION__);
@@ -281,6 +274,7 @@ void Audio_Stream::streamHasBytesAvailable(UInt8 *data, CFIndex numBytes)
 	
     if (m_audioStreamParserRunning) {
         OSStatus result = AudioFileStreamParseBytes(m_audioFileStream, numBytes, data, 0);
+        
         if (result != 0) {
             AS_TRACE("%s: AudioFileStreamParseBytes error %d\n", __PRETTY_FUNCTION__, (int)result);
             closeAndSignalError(AS_ERR_STREAM_PARSE);
