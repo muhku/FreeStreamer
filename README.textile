@@ -39,6 +39,10 @@ FSAudioStream *audioStream = [[FSAudioStream alloc] init];
 
 That's it! For more examples, please take a look at the example project. For instance, you may want to observe notifications on the audio stream state.
 
+h1. Working around server problems
+
+Some servers may send an incorrect MIME type. In this case, FreeStreamer may not be able to play the stream. If you encounter this problem, please uncomment the _AS_RELAX_CONTENT_TYPE_CHECK_ macro in _astreamer/audio_stream.cpp_.
+
 h1. Reporting bugs and contributing
 
 Your contributions are most welcome. If you want to send code, please a send a patch and make sure it can be merged to the master branch without conflicts.
