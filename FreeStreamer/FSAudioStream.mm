@@ -327,6 +327,11 @@ public:
     return pos;
 }
 
+- (BOOL)continuous {
+    FSStreamPosition duration = self.duration;
+    return (duration.minute == 0 && duration.second == 0);
+}
+
 @end
 
 /*

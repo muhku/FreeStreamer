@@ -51,5 +51,6 @@ typedef struct {
 @property (nonatomic,assign) NSURL *url;
 @property (nonatomic,readonly) FSStreamPosition currentTimePlayed;
 @property (nonatomic,readonly) FSStreamPosition duration;
+@property (nonatomic,readonly) BOOL continuous;
 
 @end
