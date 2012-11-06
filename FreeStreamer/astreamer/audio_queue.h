@@ -35,6 +35,8 @@ public:
     Audio_Queue();
     virtual ~Audio_Queue();
     
+    bool initialized();
+    
     void handlePropertyChange(AudioFileStreamID inAudioFileStream, AudioFileStreamPropertyID inPropertyID, UInt32 *ioFlags);
     void handleAudioPackets(UInt32 inNumberBytes, UInt32 inNumberPackets, const void *inInputData, AudioStreamPacketDescription *inPacketDescriptions);
     int handlePacket(const void *data, AudioStreamPacketDescription *desc);
@@ -49,7 +51,6 @@ public:
     unsigned bitrate();
 	
 private:
-    
     Audio_Queue(const Audio_Queue&);
     Audio_Queue& operator=(const Audio_Queue&);
     
@@ -95,6 +96,7 @@ public:
     virtual void audioQueueBuffersEmpty() = 0;
     virtual void audioQueueOverflow() = 0;
     virtual void audioQueueUnderflow() = 0;
+    virtual void audioQueueInitializationFailed() = 0;
 };
 
 } // namespace astreamer

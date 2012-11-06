@@ -59,6 +59,11 @@ Audio_Queue::~Audio_Queue()
     stop();
 }
     
+bool Audio_Queue::initialized()
+{
+    return (m_outAQ != 0);
+}
+    
 void Audio_Queue::start()
 {
     // start the queue if it has not been started already
@@ -181,6 +186,11 @@ void Audio_Queue::handlePropertyChange(AudioFileStreamID inAudioFileStream, Audi
             err = AudioQueueNewOutput(&m_streamDesc, audioQueueOutputCallback, this, CFRunLoopGetCurrent(), NULL, 0, &m_outAQ);
             if (err) {
                 AQ_TRACE("%s: error in AudioQueueNewOutput\n", __PRETTY_FUNCTION__);
+                
+                if (m_delegate) {
+                    m_delegate->audioQueueInitializationFailed();
+                }
+                
                 m_lastError = err;
                 break;
             }
@@ -189,7 +199,20 @@ void Audio_Queue::handlePropertyChange(AudioFileStreamID inAudioFileStream, Audi
             for (unsigned int i = 0; i < AQ_BUFFERS; ++i) {
                 err = AudioQueueAllocateBuffer(m_outAQ, AQ_BUFSIZ, &m_audioQueueBuffer[i]);
                 if (err) {
+                    /* If allocating the buffers failed, everything else will fail, too.
+                     *  Dispose the queue so that we can later on detect that this
+                     *  queue in fact has not been initialized.
+                     */
+                    
                     AQ_TRACE("%s: error in AudioQueueAllocateBuffer\n", __PRETTY_FUNCTION__);
+                    
+                    (void)AudioQueueDispose(m_outAQ, true);
+                    m_outAQ = 0;
+                    
+                    if (m_delegate) {
+                        m_delegate->audioQueueInitializationFailed();
+                    }
+                    
                     m_lastError = err;
                     break;
                 }
@@ -212,6 +235,12 @@ void Audio_Queue::handlePropertyChange(AudioFileStreamID inAudioFileStream, Audi
 
 void Audio_Queue::handleAudioPackets(UInt32 inNumberBytes, UInt32 inNumberPackets, const void *inInputData, AudioStreamPacketDescription *inPacketDescriptions)
 {
+    if (!initialized()) {
+        AQ_TRACE("%s: warning: attempt to handle audio packets with uninitialized audio queue. return.\n", __PRETTY_FUNCTION__);
+        
+        return;
+    }
+    
     // this is called by audio file stream when it finds packets of audio
     AQ_TRACE("got data.  bytes: %lu  packets: %lu\n", inNumberBytes, inNumberPackets);
     
@@ -250,6 +279,12 @@ void Audio_Queue::handleAudioPackets(UInt32 inNumberBytes, UInt32 inNumberPacket
     
 int Audio_Queue::handlePacket(const void *data, AudioStreamPacketDescription *desc)
 {
+    if (!initialized()) {
+        AQ_TRACE("%s: warning: attempt to handle audio packets with uninitialized audio queue. return.\n", __PRETTY_FUNCTION__);
+        
+        return -1;
+    }
+    
     UInt64 packetSize = desc->mDataByteSize;
     
     /* This shouldn't happen because most of the time we read the packet buffer
@@ -295,6 +330,12 @@ int Audio_Queue::handlePacket(const void *data, AudioStreamPacketDescription *de
     
 void Audio_Queue::cleanup()
 {
+    if (!initialized()) {
+        AQ_TRACE("%s: warning: attempt to cleanup an uninitialized audio queue. return.\n", __PRETTY_FUNCTION__);
+        
+        return;
+    }
+    
     if (AudioQueueDispose(m_outAQ, false) != 0) {
         AQ_TRACE("%s: AudioQueueDispose failed!\n", __PRETTY_FUNCTION__);
     }

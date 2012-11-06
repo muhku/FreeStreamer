@@ -54,6 +54,7 @@ public:
     void audioQueueBuffersEmpty();
     void audioQueueOverflow();
     void audioQueueUnderflow();
+    void audioQueueInitializationFailed();
     
     /* HTTP_Stream_Delegate */
     void streamIsReadyRead();

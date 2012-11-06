@@ -230,6 +230,20 @@ void Audio_Stream::audioQueueUnderflow()
     m_httpStream->setScheduledInRunLoop(true);
 }
     
+void Audio_Stream::audioQueueInitializationFailed()
+{
+    if (m_httpStreamRunning) {
+        m_httpStream->close();
+        m_httpStreamRunning = false;
+    }
+    
+    setState(FAILED);
+    
+    if (m_delegate) {
+        m_delegate->audioStreamErrorOccurred(AS_ERR_STREAM_PARSE);
+    }
+}
+    
 void Audio_Stream::streamIsReadyRead()
 {
     if (m_audioStreamParserRunning) {
@@ -295,6 +309,16 @@ void Audio_Stream::streamEndEncountered()
     
     m_httpStream->close();
     m_httpStreamRunning = false;
+    
+    /*
+     * When the audio playback is fine, the queue will signal
+     * back that the playback has ended. However, if there was
+     * a problem with the playback (a corrupted audio file for instance),
+     * the queue will not signal back.
+     */
+    if (!m_audioQueue->initialized()) {
+        closeAndSignalError(AS_ERR_STREAM_PARSE);
+    }
 }
 
 void Audio_Stream::streamErrorOccurred()
