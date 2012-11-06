@@ -78,6 +78,8 @@ bool HTTP_Stream::open()
     position.start = 0;
     position.end = 0;
     
+    m_contentLength = 0;
+    
     return open(position);
 }
 
