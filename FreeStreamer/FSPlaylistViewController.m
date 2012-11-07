@@ -21,11 +21,12 @@
  * =======================================
  */
 
-- (void)viewDidUnload {
-    [super viewDidUnload];
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
     
-    self.navigationController = nil;
-    self.playerViewController = nil;
+    self.navigationController.navigationBar.barStyle = UIBarStyleDefault;
+    self.navigationController.navigationBarHidden = NO;
 }
 
 /*

@@ -19,6 +19,8 @@
 
 @implementation FSPlayerViewController
 
+@synthesize playButton;
+@synthesize pauseButton;
 @synthesize shouldStartPlaying=_shouldStartPlaying;
 @synthesize progressSlider=_progressSlider;
 @synthesize activityIndicator=_activityIndicator;
@@ -41,10 +43,21 @@
 
 #pragma mark - View lifecycle
 
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    
+    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleBlackOpaque
+                                                animated:NO];
+    
+    self.navigationController.navigationBar.barStyle = UIBarStyleBlack;
+    self.navigationController.navigationBarHidden = NO;
+}
+
 - (void)viewDidAppear:(BOOL)animated {
     if (_shouldStartPlaying) {
         _shouldStartPlaying = NO;
-        [self play:self];
+        [self.audioController play];
     }
     
     _progressUpdateTimer = [NSTimer scheduledTimerWithTimeInterval:1.0
@@ -71,7 +84,11 @@
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(audioStreamMetaDataAvailable:)
                                                  name:FSAudioStreamMetaDataNotification
-                                               object:nil];    
+                                               object:nil];
+    
+    // Hide the buttons as we display them based on the playback status (callback)
+    self.playButton.hidden = YES;
+    self.pauseButton.hidden = YES;
 }
 
 - (void)viewDidUnload {
@@ -122,24 +139,40 @@
             self.statusLabel.text = statusRetrievingURL;
             [_statusLabel setHidden:NO];
             self.progressSlider.enabled = NO;
+            self.playButton.hidden = YES;
+            self.pauseButton.hidden = NO;
+            _paused = NO;
             break;
+            
         case kFsAudioStreamStopped:
             [_activityIndicator stopAnimating];
             self.statusLabel.text = statusEmpty;
             self.progressSlider.enabled = NO;
+            self.playButton.hidden = NO;
+            self.pauseButton.hidden = YES;
+            _paused = NO;
             break;
+            
         case kFsAudioStreamBuffering:
             self.statusLabel.text = statusBuffering;
             [_activityIndicator startAnimating];
             [_statusLabel setHidden:NO];
             self.progressSlider.enabled = NO;
+            self.playButton.hidden = YES;
+            self.pauseButton.hidden = NO;
+            _paused = NO;
             break;
+            
         case kFsAudioStreamSeeking:
             self.statusLabel.text = statusSeeking;
             [_activityIndicator startAnimating];
             [_statusLabel setHidden:NO];
             self.progressSlider.enabled = NO;
+            self.playButton.hidden = YES;
+            self.pauseButton.hidden = NO;
+            _paused = NO;
             break;
+            
         case kFsAudioStreamPlaying:
             [_activityIndicator stopAnimating];
             if ([self.statusLabel.text isEqualToString:statusBuffering] ||
@@ -157,10 +190,18 @@
                                                                        repeats:YES];
             }
             
+            self.playButton.hidden = YES;
+            self.pauseButton.hidden = NO;
+            _paused = NO;
+            
             break;
+            
         case kFsAudioStreamFailed:
             [_activityIndicator stopAnimating];
             self.progressSlider.enabled = NO;
+            self.playButton.hidden = NO;
+            self.pauseButton.hidden = YES;
+            _paused = NO;
             break;
     }
 }
@@ -220,15 +261,24 @@ out:
  */
 
 - (IBAction)play:(id)sender {
-    if (!self.audioController.url) {
-        return;
+    if (_paused) {
+        [self.audioController pause];
+        _paused = NO;
+    } else {
+        [self.audioController play];
     }
     
-    [self.audioController play];
+    self.playButton.hidden = YES;
+    self.pauseButton.hidden = NO;
 }
 
-- (IBAction)stop:(id)sender {
-    [self.audioController stop];
+- (IBAction)pause:(id)sender {
+    [self.audioController pause];
+    
+    _paused = YES;
+    
+    self.playButton.hidden = NO;
+    self.pauseButton.hidden = YES;
 }
 
 - (IBAction)seek:(id)sender {

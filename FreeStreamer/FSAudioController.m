@@ -199,6 +199,10 @@ typedef enum {
     [_audioStream stop];
 }
 
+- (void)pause {
+    [_audioStream pause];
+}
+
 /*
  * =======================================
  * Properties

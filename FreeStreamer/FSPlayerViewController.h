@@ -11,7 +11,11 @@
 
 @interface FSPlayerViewController : UIViewController {
     FSPlaylistItem *_selectedPlaylistItem;
+    
+    // State
+    BOOL _paused;
     BOOL _shouldStartPlaying;
+    
     
     // UI
     UISlider *_progressSlider;
@@ -26,6 +30,8 @@
 @property (nonatomic,assign) BOOL shouldStartPlaying;
 @property (nonatomic,strong) FSPlaylistItem *selectedPlaylistItem;
 
+@property (nonatomic,strong) IBOutlet UIButton *playButton;
+@property (nonatomic,strong) IBOutlet UIButton *pauseButton;
 @property (nonatomic,strong) IBOutlet UISlider *progressSlider;
 @property (nonatomic,strong) IBOutlet UIActivityIndicatorView *activityIndicator;
 @property (nonatomic,strong) IBOutlet UILabel *statusLabel;
@@ -35,7 +41,7 @@
 
 - (void)audioStreamStateDidChange:(NSNotification *)notification;  
 - (IBAction)play:(id)sender;
-- (IBAction)stop:(id)sender;
+- (IBAction)pause:(id)sender;
 - (IBAction)seek:(id)sender;
 
 @end

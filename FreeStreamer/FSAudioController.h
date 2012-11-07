@@ -24,6 +24,7 @@
 - (void)play;
 - (void)playFromURL:(NSURL*)url;
 - (void)stop;
+- (void)pause;
 
 @property (nonatomic,weak) NSURL *url;
 @property (nonatomic,weak,readonly) FSAudioStream *stream;
