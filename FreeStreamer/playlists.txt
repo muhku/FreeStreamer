@@ -1,6 +1,0 @@
-soma.fm GrooveSalad MP3 56
-http://somafm.com/groovesalad56.pls
-BassDrive AAC
-http://www.bassdrive.com/v2/streams/BassDrive3.pls
-BassDrive 128
-http://www.bassdrive.com/v2/streams/BassDrive.pls

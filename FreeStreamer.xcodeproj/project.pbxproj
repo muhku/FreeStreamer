@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		60AA4D19164A8AF60066938A /* FSXMLHttpRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 60AA4D18164A8AF60066938A /* FSXMLHttpRequest.m */; };
+		60AA4D1B164A8B160066938A /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 60AA4D1A164A8B160066938A /* libxml2.dylib */; };
+		60AA4D22164A8D570066938A /* FSParsePlaylistFeedRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 60AA4D21164A8D570066938A /* FSParsePlaylistFeedRequest.m */; };
 		60EB2B89164A39E300963C37 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 60EB2B86164A39E300963C37 /* Default-568h@2x.png */; };
 		60EB2B8A164A39E300963C37 /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = 60EB2B87164A39E300963C37 /* Default.png */; };
 		60EB2B8B164A39E300963C37 /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 60EB2B88164A39E300963C37 /* Default@2x.png */; };
@@ -19,12 +22,10 @@
 		631DEA69143BA0560039CCED /* http_stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 631DEA65143BA0560039CCED /* http_stream.cpp */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		631DEA78143BA0640039CCED /* FSAudioController.m in Sources */ = {isa = PBXBuildFile; fileRef = 631DEA6B143BA0640039CCED /* FSAudioController.m */; };
 		631DEA79143BA0640039CCED /* FSAudioStream.mm in Sources */ = {isa = PBXBuildFile; fileRef = 631DEA6D143BA0640039CCED /* FSAudioStream.mm */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
-		631DEA7A143BA0640039CCED /* FSDAO.m in Sources */ = {isa = PBXBuildFile; fileRef = 631DEA6F143BA0640039CCED /* FSDAO.m */; };
 		631DEA7B143BA0640039CCED /* FSMainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 631DEA70143BA0640039CCED /* FSMainWindow.xib */; };
 		631DEA7C143BA0640039CCED /* FSPlayerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 631DEA72143BA0640039CCED /* FSPlayerViewController.m */; };
 		631DEA7D143BA0640039CCED /* FSPlaylistItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 631DEA74143BA0640039CCED /* FSPlaylistItem.m */; };
 		631DEA7E143BA0640039CCED /* FSPlaylistViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 631DEA76143BA0640039CCED /* FSPlaylistViewController.m */; };
-		631DEA7F143BA0640039CCED /* playlists.txt in Resources */ = {isa = PBXBuildFile; fileRef = 631DEA77143BA0640039CCED /* playlists.txt */; };
 		631DEA81143BA07B0039CCED /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 631DEA80143BA07B0039CCED /* AVFoundation.framework */; };
 		631DEA83143BA0850039CCED /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 631DEA82143BA0850039CCED /* CFNetwork.framework */; };
 		631DEA8B143BA0F90039CCED /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 631DEA8A143BA0F90039CCED /* AudioToolbox.framework */; };
@@ -38,6 +39,11 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		60AA4D17164A8AF60066938A /* FSXMLHttpRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSXMLHttpRequest.h; sourceTree = "<group>"; };
+		60AA4D18164A8AF60066938A /* FSXMLHttpRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSXMLHttpRequest.m; sourceTree = "<group>"; };
+		60AA4D1A164A8B160066938A /* libxml2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.dylib; path = usr/lib/libxml2.dylib; sourceTree = SDKROOT; };
+		60AA4D20164A8D570066938A /* FSParsePlaylistFeedRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSParsePlaylistFeedRequest.h; sourceTree = "<group>"; };
+		60AA4D21164A8D570066938A /* FSParsePlaylistFeedRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSParsePlaylistFeedRequest.m; sourceTree = "<group>"; };
 		60EB2B86164A39E300963C37 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		60EB2B87164A39E300963C37 /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
 		60EB2B88164A39E300963C37 /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
@@ -55,8 +61,6 @@
 		631DEA6B143BA0640039CCED /* FSAudioController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSAudioController.m; sourceTree = "<group>"; };
 		631DEA6C143BA0640039CCED /* FSAudioStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSAudioStream.h; sourceTree = "<group>"; };
 		631DEA6D143BA0640039CCED /* FSAudioStream.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = FSAudioStream.mm; sourceTree = "<group>"; };
-		631DEA6E143BA0640039CCED /* FSDAO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSDAO.h; sourceTree = "<group>"; };
-		631DEA6F143BA0640039CCED /* FSDAO.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSDAO.m; sourceTree = "<group>"; };
 		631DEA70143BA0640039CCED /* FSMainWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = FSMainWindow.xib; sourceTree = "<group>"; };
 		631DEA71143BA0640039CCED /* FSPlayerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSPlayerViewController.h; sourceTree = "<group>"; };
 		631DEA72143BA0640039CCED /* FSPlayerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSPlayerViewController.m; sourceTree = "<group>"; };
@@ -64,7 +68,6 @@
 		631DEA74143BA0640039CCED /* FSPlaylistItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSPlaylistItem.m; sourceTree = "<group>"; };
 		631DEA75143BA0640039CCED /* FSPlaylistViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSPlaylistViewController.h; sourceTree = "<group>"; };
 		631DEA76143BA0640039CCED /* FSPlaylistViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSPlaylistViewController.m; sourceTree = "<group>"; };
-		631DEA77143BA0640039CCED /* playlists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = playlists.txt; sourceTree = "<group>"; };
 		631DEA80143BA07B0039CCED /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		631DEA82143BA0850039CCED /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		631DEA84143BA0890039CCED /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = System/Library/Frameworks/CoreAudio.framework; sourceTree = SDKROOT; };
@@ -87,6 +90,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				60AA4D1B164A8B160066938A /* libxml2.dylib in Frameworks */,
 				63B6C48A15054E85002654A9 /* MediaPlayer.framework in Frameworks */,
 				631DEA8B143BA0F90039CCED /* AudioToolbox.framework in Frameworks */,
 				631DEA83143BA0850039CCED /* CFNetwork.framework in Frameworks */,
@@ -144,6 +148,7 @@
 		63DEB779143B9FDE000AF919 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				60AA4D1A164A8B160066938A /* libxml2.dylib */,
 				63B6C48915054E85002654A9 /* MediaPlayer.framework */,
 				631DEA8A143BA0F90039CCED /* AudioToolbox.framework */,
 				631DEA84143BA0890039CCED /* CoreAudio.framework */,
@@ -159,12 +164,11 @@
 		63DEB780143B9FDE000AF919 /* FreeStreamer */ = {
 			isa = PBXGroup;
 			children = (
+				631DEA60143BA0560039CCED /* astreamer */,
 				631DEA6A143BA0640039CCED /* FSAudioController.h */,
 				631DEA6B143BA0640039CCED /* FSAudioController.m */,
 				631DEA6C143BA0640039CCED /* FSAudioStream.h */,
 				631DEA6D143BA0640039CCED /* FSAudioStream.mm */,
-				631DEA6E143BA0640039CCED /* FSDAO.h */,
-				631DEA6F143BA0640039CCED /* FSDAO.m */,
 				631DEA70143BA0640039CCED /* FSMainWindow.xib */,
 				631DEA71143BA0640039CCED /* FSPlayerViewController.h */,
 				631DEA72143BA0640039CCED /* FSPlayerViewController.m */,
@@ -172,10 +176,12 @@
 				631DEA74143BA0640039CCED /* FSPlaylistItem.m */,
 				631DEA75143BA0640039CCED /* FSPlaylistViewController.h */,
 				631DEA76143BA0640039CCED /* FSPlaylistViewController.m */,
-				631DEA77143BA0640039CCED /* playlists.txt */,
-				631DEA60143BA0560039CCED /* astreamer */,
 				63DEB789143B9FDE000AF919 /* FSAppDelegate.h */,
 				63DEB78A143B9FDE000AF919 /* FSAppDelegate.m */,
+				60AA4D17164A8AF60066938A /* FSXMLHttpRequest.h */,
+				60AA4D18164A8AF60066938A /* FSXMLHttpRequest.m */,
+				60AA4D20164A8D570066938A /* FSParsePlaylistFeedRequest.h */,
+				60AA4D21164A8D570066938A /* FSParsePlaylistFeedRequest.m */,
 				63DEB781143B9FDE000AF919 /* Supporting Files */,
 			);
 			path = FreeStreamer;
@@ -248,7 +254,6 @@
 			files = (
 				63DEB785143B9FDE000AF919 /* InfoPlist.strings in Resources */,
 				631DEA7B143BA0640039CCED /* FSMainWindow.xib in Resources */,
-				631DEA7F143BA0640039CCED /* playlists.txt in Resources */,
 				60EB2B89164A39E300963C37 /* Default-568h@2x.png in Resources */,
 				60EB2B8A164A39E300963C37 /* Default.png in Resources */,
 				60EB2B8B164A39E300963C37 /* Default@2x.png in Resources */,
@@ -273,10 +278,11 @@
 				631DEA69143BA0560039CCED /* http_stream.cpp in Sources */,
 				631DEA78143BA0640039CCED /* FSAudioController.m in Sources */,
 				631DEA79143BA0640039CCED /* FSAudioStream.mm in Sources */,
-				631DEA7A143BA0640039CCED /* FSDAO.m in Sources */,
 				631DEA7C143BA0640039CCED /* FSPlayerViewController.m in Sources */,
 				631DEA7D143BA0640039CCED /* FSPlaylistItem.m in Sources */,
 				631DEA7E143BA0640039CCED /* FSPlaylistViewController.m in Sources */,
+				60AA4D19164A8AF60066938A /* FSXMLHttpRequest.m in Sources */,
+				60AA4D22164A8D570066938A /* FSParsePlaylistFeedRequest.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -343,6 +349,7 @@
 				CLANG_ENABLE_OBJC_ARC = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "FreeStreamer/FreeStreamer-Prefix.pch";
+				HEADER_SEARCH_PATHS = "$(SDKROOT)/usr/include/libxml2";
 				INFOPLIST_FILE = "FreeStreamer/FreeStreamer-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
@@ -355,6 +362,7 @@
 				CLANG_ENABLE_OBJC_ARC = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "FreeStreamer/FreeStreamer-Prefix.pch";
+				HEADER_SEARCH_PATHS = "$(SDKROOT)/usr/include/libxml2";
 				INFOPLIST_FILE = "FreeStreamer/FreeStreamer-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;

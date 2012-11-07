@@ -5,15 +5,15 @@
  */
 
 #import "FSPlaylistViewController.h"
-#import "FSDAO.h"
 #import "FSPlaylistItem.h"
 #import "FSPlayerViewController.h"
+#import "FSParsePlaylistFeedRequest.h"
 
 @implementation FSPlaylistViewController
 
 @synthesize navigationController=_navigationController;
 @synthesize playerViewController=_playerViewContoller;
-@synthesize dao;
+@synthesize playlistItems;
 
 /*
  * =======================================
@@ -21,12 +21,46 @@
  * =======================================
  */
 
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+    
+    __weak FSPlaylistViewController *weakSelf = self;
+    
+    _request = [[FSParsePlaylistFeedRequest alloc] init];
+    _request.url = @"http://muhonen.net/project/FreeStreamer/example-rss-feed.xml";
+    _request.onCompletion = ^() {
+        [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+        
+        weakSelf.playlistItems = [[NSMutableArray alloc] initWithArray:_request.playlistItems];
+        [weakSelf.tableView reloadData];
+    };
+    _request.onFailure = ^() {
+        [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+        
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error"
+                                                        message:@"Failed to load playlists."
+                                                       delegate:nil
+                                              cancelButtonTitle:@"OK"
+                                              otherButtonTitles:nil];
+        [alert show];
+    };
+}
+
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
     
     self.navigationController.navigationBar.barStyle = UIBarStyleDefault;
     self.navigationController.navigationBarHidden = NO;
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+    [_request start];
 }
 
 /*
@@ -64,19 +98,6 @@
     self.playerViewController.shouldStartPlaying = YES;
     
     [self.navigationController pushViewController:self.playerViewController animated:YES];
-}
-
-/*
- * =======================================
- * Properties
- * =======================================
- */
-
-- (NSMutableArray *)playlistItems {
-    if (!_playlistItems) {
-        _playlistItems = [self.dao playlistItems];
-    }
-    return _playlistItems;
 }
 
 @end

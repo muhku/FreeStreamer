@@ -4,14 +4,12 @@
  * See the file ''LICENSE'' for using the code.
  */
 
-#import <Foundation/Foundation.h>
+#import "FSXMLHttpRequest.h"
 
-@interface FSDAO : NSObject {
-    NSString *_data;
+@interface FSParsePlaylistFeedRequest : FSXMLHttpRequest {
     NSMutableArray *_playlistItems;
 }
 
-- (void)parseData;
-- (NSMutableArray *)playlistItems;
+@property (strong,nonatomic) NSArray *playlistItems;
 
 @end
