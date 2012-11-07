@@ -292,7 +292,10 @@ int Audio_Queue::handlePacket(const void *data, AudioStreamPacketDescription *de
     /* This shouldn't happen because most of the time we read the packet buffer
      size from the file stream, but if we restored to guessing it we could
      come up too small here */
-    if (packetSize > AQ_BUFSIZ) return -1;
+    if (packetSize > AQ_BUFSIZ) {
+        AQ_TRACE("%s: packetSize %lli > AQ_BUFSIZ %li\n", __PRETTY_FUNCTION__, packetSize, AQ_BUFSIZ);
+        return -1;
+    }
     
     // if the space remaining in the buffer is not enough for this packet, then
     // enqueue the buffer and wait for another to become available.
@@ -301,6 +304,8 @@ int Audio_Queue::handlePacket(const void *data, AudioStreamPacketDescription *de
         if (hasFreeBuffer <= 0) {
             return hasFreeBuffer;
         }
+    } else {
+        AQ_TRACE("%s: skipped enqueueBuffer AQ_BUFSIZ - m_bytesFilled %lu, packetSize %lli\n", __PRETTY_FUNCTION__, (AQ_BUFSIZ - m_bytesFilled), packetSize);
     }
     
     m_processedPacketsSizeTotal += packetSize;
