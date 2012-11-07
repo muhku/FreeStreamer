@@ -285,6 +285,8 @@ int Audio_Queue::handlePacket(const void *data, AudioStreamPacketDescription *de
         return -1;
     }
     
+    AQ_TRACE("%s: enter\n", __PRETTY_FUNCTION__);
+    
     UInt64 packetSize = desc->mDataByteSize;
     
     /* This shouldn't happen because most of the time we read the packet buffer
@@ -407,6 +409,8 @@ void Audio_Queue::setState(State state)
 int Audio_Queue::enqueueBuffer()
 {
     assert(!m_bufferInUse[m_fillBufferIndex]);
+    
+    AQ_TRACE("%s: enter\n", __PRETTY_FUNCTION__);
     
     m_bufferInUse[m_fillBufferIndex] = true;
     m_buffersUsed++;
