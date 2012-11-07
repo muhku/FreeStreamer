@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		60EB2B89164A39E300963C37 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 60EB2B86164A39E300963C37 /* Default-568h@2x.png */; };
+		60EB2B8A164A39E300963C37 /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = 60EB2B87164A39E300963C37 /* Default.png */; };
+		60EB2B8B164A39E300963C37 /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 60EB2B88164A39E300963C37 /* Default@2x.png */; };
 		631DEA67143BA0560039CCED /* audio_queue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 631DEA61143BA0560039CCED /* audio_queue.cpp */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		631DEA68143BA0560039CCED /* audio_stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 631DEA63143BA0560039CCED /* audio_stream.cpp */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		631DEA69143BA0560039CCED /* http_stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 631DEA65143BA0560039CCED /* http_stream.cpp */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
@@ -31,6 +34,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		60EB2B86164A39E300963C37 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
+		60EB2B87164A39E300963C37 /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
+		60EB2B88164A39E300963C37 /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
 		631DEA61143BA0560039CCED /* audio_queue.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = audio_queue.cpp; sourceTree = "<group>"; };
 		631DEA62143BA0560039CCED /* audio_queue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = audio_queue.h; sourceTree = "<group>"; };
 		631DEA63143BA0560039CCED /* audio_stream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = audio_stream.cpp; sourceTree = "<group>"; };
@@ -159,6 +165,9 @@
 		63DEB781143B9FDE000AF919 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				60EB2B86164A39E300963C37 /* Default-568h@2x.png */,
+				60EB2B87164A39E300963C37 /* Default.png */,
+				60EB2B88164A39E300963C37 /* Default@2x.png */,
 				63DEB782143B9FDE000AF919 /* FreeStreamer-Info.plist */,
 				63DEB783143B9FDE000AF919 /* InfoPlist.strings */,
 				63DEB786143B9FDE000AF919 /* main.m */,
@@ -220,6 +229,9 @@
 				63DEB785143B9FDE000AF919 /* InfoPlist.strings in Resources */,
 				631DEA7B143BA0640039CCED /* FSMainWindow.xib in Resources */,
 				631DEA7F143BA0640039CCED /* playlists.txt in Resources */,
+				60EB2B89164A39E300963C37 /* Default-568h@2x.png in Resources */,
+				60EB2B8A164A39E300963C37 /* Default.png in Resources */,
+				60EB2B8B164A39E300963C37 /* Default@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
