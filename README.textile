@@ -12,7 +12,7 @@ FreeStreamer has the following features:
 * Supports interruptions (for example a phone call during playing the stream)
 * Supports backgrounding
 
-!http://muhonen.net/project/FreeStreamer/main.png!
+!http://muhonen.net/project/FreeStreamer/player-new.png!
 
 h1. Using the player in your own project
 
