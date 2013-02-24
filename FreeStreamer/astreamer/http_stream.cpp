@@ -128,7 +128,9 @@ bool HTTP_Stream::open(const HTTP_Stream_Position& position)
         /* Open failed: clean */
         CFReadStreamSetClient(m_readStream, 0, NULL, NULL);
         setScheduledInRunLoop(false);
-        CFRelease(m_readStream), m_readStream = 0;
+        if (m_readStream) {
+            CFRelease(m_readStream), m_readStream = 0;
+        }
         goto out;
     }
     
@@ -416,10 +418,6 @@ void HTTP_Stream::readCallBack(CFReadStreamRef stream, CFStreamEventType eventTy
 {
     HTTP_Stream *THIS = static_cast<HTTP_Stream*>(clientCallBackInfo);
     
-    if (!THIS->m_delegate) {
-        return;
-    }
-    
     switch (eventType) {
         case kCFStreamEventHasBytesAvailable: {
             if (!THIS->m_httpReadBuffer) {
@@ -429,7 +427,9 @@ void HTTP_Stream::readCallBack(CFReadStreamRef stream, CFStreamEventType eventTy
             CFIndex bytesRead = CFReadStreamRead(stream, THIS->m_httpReadBuffer, STREAM_BUFSIZ);
             
             if (bytesRead < 0) {
-                THIS->m_delegate->streamErrorOccurred();
+                if (THIS->m_delegate) {
+                    THIS->m_delegate->streamErrorOccurred();
+                }
                 break;
             }
             
@@ -439,17 +439,23 @@ void HTTP_Stream::readCallBack(CFReadStreamRef stream, CFStreamEventType eventTy
                 if (THIS->m_icyStream) {
                     THIS->parseICYStream(THIS->m_httpReadBuffer, bytesRead);
                 } else {
-                    THIS->m_delegate->streamHasBytesAvailable(THIS->m_httpReadBuffer, bytesRead);
+                    if (THIS->m_delegate) {
+                        THIS->m_delegate->streamHasBytesAvailable(THIS->m_httpReadBuffer, bytesRead);
+                    }
                 }
             } 
             break;
         }
         case kCFStreamEventEndEncountered: {
-            THIS->m_delegate->streamEndEncountered();
+            if (THIS->m_delegate) {
+                THIS->m_delegate->streamEndEncountered();
+            }
             break;
         }
         case kCFStreamEventErrorOccurred: {
-            THIS->m_delegate->streamErrorOccurred();
+            if (THIS->m_delegate) {
+                THIS->m_delegate->streamErrorOccurred();
+            }
             break;
         }
     }
