@@ -9,6 +9,12 @@
 #import "FSPlayerViewController.h"
 #import "FSParsePlaylistFeedRequest.h"
 
+@interface FSPlaylistViewController (PrivateMethods)
+
+@property (nonatomic,readonly) FSParsePlaylistFeedRequest *request;
+
+@end
+
 @implementation FSPlaylistViewController
 
 @synthesize navigationController=_navigationController;
@@ -32,7 +38,7 @@
     _request.onCompletion = ^() {
         [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
         
-        weakSelf.playlistItems = [[NSMutableArray alloc] initWithArray:_request.playlistItems];
+        weakSelf.playlistItems = [[NSMutableArray alloc] initWithArray:weakSelf.request.playlistItems];
         [weakSelf.tableView reloadData];
     };
     _request.onFailure = ^() {
@@ -98,6 +104,17 @@
     self.playerViewController.shouldStartPlaying = YES;
     
     [self.navigationController pushViewController:self.playerViewController animated:YES];
+}
+
+/*
+ * =======================================
+ * Private
+ * =======================================
+ */
+
+- (FSParsePlaylistFeedRequest *)request
+{
+    return _request;
 }
 
 @end
