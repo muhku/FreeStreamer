@@ -21,7 +21,7 @@
 		631DEA68143BA0560039CCED /* audio_stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 631DEA63143BA0560039CCED /* audio_stream.cpp */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		631DEA69143BA0560039CCED /* http_stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 631DEA65143BA0560039CCED /* http_stream.cpp */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		631DEA78143BA0640039CCED /* FSAudioController.m in Sources */ = {isa = PBXBuildFile; fileRef = 631DEA6B143BA0640039CCED /* FSAudioController.m */; };
-		631DEA79143BA0640039CCED /* FSAudioStream.mm in Sources */ = {isa = PBXBuildFile; fileRef = 631DEA6D143BA0640039CCED /* FSAudioStream.mm */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		631DEA79143BA0640039CCED /* FSAudioStream.mm in Sources */ = {isa = PBXBuildFile; fileRef = 631DEA6D143BA0640039CCED /* FSAudioStream.mm */; };
 		631DEA7B143BA0640039CCED /* FSMainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 631DEA70143BA0640039CCED /* FSMainWindow.xib */; };
 		631DEA7C143BA0640039CCED /* FSPlayerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 631DEA72143BA0640039CCED /* FSPlayerViewController.m */; };
 		631DEA7D143BA0640039CCED /* FSPlaylistItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 631DEA74143BA0640039CCED /* FSPlaylistItem.m */; };

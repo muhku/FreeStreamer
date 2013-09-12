@@ -152,11 +152,11 @@ public:
         _observer->source = _audioStream;
         _audioStream->m_delegate = _observer;
 
-#ifdef TARGET_OS_IPHONE        
+#ifdef TARGET_OS_IPHONE
         OSStatus result = AudioSessionInitialize(NULL,
                                                  NULL,
                                                  interruptionListener,
-                                                 self);
+                                                 (__bridge void*)self);
         
         if (result == kAudioSessionNoError) {
             UInt32 category = kAudioSessionCategory_MediaPlayback;
@@ -168,14 +168,10 @@ public:
 }
 
 - (void)dealloc {
-    [_url release], _url = nil;
-    
     _audioStream->close();
     
     delete _audioStream, _audioStream = nil;
     delete _observer, _observer = nil;
-
-	[super dealloc];
 }
 
 - (void)setUrl:(NSURL *)url {
@@ -188,9 +184,9 @@ public:
             return;
         }
         
-        [_url release], _url = [url copy];
+        _url = [url copy];
         
-        _audioStream->setUrl((CFURLRef)_url);
+        _audioStream->setUrl((__bridge CFURLRef)_url);
     }
     
     if (_currentlyPlaying) {
@@ -203,7 +199,7 @@ public:
         return nil;
     }
     
-    NSURL *copyOfURL = [[_url copy] autorelease];
+    NSURL *copyOfURL = [_url copy];
     return copyOfURL;
 }
 
@@ -266,11 +262,6 @@ public:
         _private = [[FSAudioStreamPrivate alloc] init];
     }
     return self;
-}
-
-- (void)dealloc {
-	[_private release], _private = nil;
-	[super dealloc];
 }
 
 - (void)setUrl:(NSURL *)url {
@@ -344,7 +335,7 @@ public:
 static void interruptionListener(void *	inClientData,
                                 UInt32	inInterruptionState)
 {
-	FSAudioStreamPrivate *THIS = (FSAudioStreamPrivate*)inClientData;
+	FSAudioStreamPrivate *THIS = (__bridge FSAudioStreamPrivate*)inClientData;
     
 	if (inInterruptionState == kAudioSessionBeginInterruption) {
         if ([THIS isPlaying]) {
