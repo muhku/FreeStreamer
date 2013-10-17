@@ -12,7 +12,7 @@ FreeStreamer has the following features:
 * Supports interruptions (for example a phone call during playing the stream)
 * Supports backgrounding
 
-!http://muhonen.net/project/FreeStreamer/player-new.png!
+!https://raw.github.com/muhku/FreeStreamer/master/Extra/player-new.png!
 
 h1. Using the player in your own project
 
@@ -54,7 +54,7 @@ h1. License
 The BSD license which the files are licensed under allows is as follows:
 
 <pre>
-    Copyright (c) 2011-2012 Matias Muhonen <mmu@iki.fi>
+    Copyright (c) 2011-2013 Matias Muhonen <mmu@iki.fi>
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
