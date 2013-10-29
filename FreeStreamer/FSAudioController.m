@@ -80,36 +80,67 @@ typedef enum {
 - (void)parsePlaylistPLS:(NSString *)playlist {
     [_playlistItems removeAllObjects];
     
+    NSMutableDictionary *props = [[NSMutableDictionary alloc] init];
+    
     size_t i = 0;
 
-    for (NSString *line in [playlist componentsSeparatedByString:@"\n"]) {
-        if (i == 0 && ![[line lowercaseString] hasPrefix:@"[playlist]"]) {
-            // Invalid playlist 
-            return;
-        }
-        if (i == 1 && ![[line lowercaseString] hasPrefix:@"numberofentries="]) {
-            // Invalid playlist 
-            return;
-        }
-        if ([[line lowercaseString] hasPrefix:@"file"]) {
-            NSString *file = [line substringFromIndex:[line rangeOfString:@"="].location + 1];
-            if ([file hasPrefix:@"http://"] ||
-                [file hasPrefix:@"https://"]) {
-                FSPlaylistItem *item = [[FSPlaylistItem alloc] init];
-                item.url = [file stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-                
-                [_playlistItems addObject:item];
-            }
-        }
-        if ([[line lowercaseString] hasPrefix:@"title"]) {
-            FSPlaylistItem *item = [_playlistItems lastObject];
-            if (item) {
-                NSString *title = [[line substringFromIndex:[line rangeOfString:@"="].location + 1] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-                item.title = title;
+    for (NSString *rawLine in [playlist componentsSeparatedByString:@"\n"]) {
+        NSString *line = [rawLine stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+        
+        if (i == 0) {
+            if ([[line lowercaseString] hasPrefix:@"[playlist]"]) {
+                i++;
+                continue;
+            } else {
+                // Invalid playlist; the first line should indicate that this is a playlist
+                return;
             }
         }
         
+        // Ignore empty lines
+        if ([line length] == 0) {
+            i++;
+            continue;
+        }
+
+        // Not an empty line; so expect that this is a key/value pair
+        NSRange r = [line rangeOfString:@"="];
+        
+        // Invalid format, key/value pair not found
+        if (r.length == 0) {
+            return;
+        }
+        
+        NSString *key = [[line substringToIndex:r.location] lowercaseString];
+        NSString *value = [line substringFromIndex:r.location + 1];
+        
+        [props setObject:value forKey:key];
         i++;
+    }
+    
+    NSInteger numItems = [[props valueForKey:@"numberofentries"] integerValue];
+    
+    if (numItems == 0) {
+        // Invalid playlist; number of playlist items not defined
+        return;
+    }
+    
+    for (i=0; i < numItems; i++) {
+        FSPlaylistItem *item = [[FSPlaylistItem alloc] init];
+        
+        NSString *title = [props valueForKey:[NSString stringWithFormat:@"title%lu", (i+1)]];
+        
+        item.title = title;
+        
+        NSString *file = [props valueForKey:[NSString stringWithFormat:@"file%lu", (i+1)]];
+        
+        if ([file hasPrefix:@"http://"] ||
+            [file hasPrefix:@"https://"]) {
+            
+            item.url = file;
+            
+            [_playlistItems addObject:item];
+        }
     }
 }
 
