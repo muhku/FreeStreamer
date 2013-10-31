@@ -34,7 +34,8 @@ Audio_Stream::Audio_Stream() :
     m_httpStream(new HTTP_Stream()),
     m_audioQueue(new Audio_Queue()),
     m_dataOffset(0),
-    m_seekTime(0)
+    m_seekTime(0),
+    m_defaultContentType("audio/mpeg")
 {
     m_httpStream->m_delegate = this;
     m_audioQueue->m_delegate = this;
@@ -150,6 +151,11 @@ void Audio_Stream::seekToTime(unsigned newSeekTime)
 void Audio_Stream::setUrl(CFURLRef url)
 {
     m_httpStream->setUrl(url);
+}
+
+void Audio_Stream::setDefaultContentType(std::string& defaultContentType)
+{
+    m_defaultContentType = defaultContentType;
 }
     
 AudioFileTypeID Audio_Stream::audioStreamTypeFromContentType(std::string contentType)
@@ -270,7 +276,7 @@ void Audio_Stream::streamIsReadyRead()
         closeAndSignalError(AS_ERR_OPEN);
         return;
 #else
-        contentType = "audio/mpeg";
+        contentType = m_defaultContentType;
 #endif
     }
     

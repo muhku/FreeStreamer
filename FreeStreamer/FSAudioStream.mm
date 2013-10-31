@@ -120,12 +120,14 @@ public:
 	AudioStreamStateObserver *_observer;
     BOOL _currentlyPlaying;
     BOOL _wasInterrupted;
+    NSString *_defaultContentType;
 #ifdef TARGET_OS_IPHONE    
     UIBackgroundTaskIdentifier _backgroundTask;
 #endif
 }
 
 @property (nonatomic,assign) NSURL *url;
+@property (nonatomic,assign) NSString *defaultContentType;
 @property (nonatomic,assign) BOOL wasInterrupted;
 
 - (void)play;
@@ -208,6 +210,21 @@ public:
     [self play];
 }
 
+- (void)setDefaultContentType:(NSString *)defaultContentType {
+    _defaultContentType = [defaultContentType copy];
+    std::string contentType([_defaultContentType UTF8String]);
+    _audioStream->setDefaultContentType(contentType);
+}
+
+- (NSString*)defaultContentType {
+    if (!_defaultContentType) {
+        return nil;
+    }
+    
+    NSString *copyOfDefaultContentType = [_defaultContentType copy];
+    return copyOfDefaultContentType;
+}
+
 - (void)play
 {
     _audioStream->open();
@@ -270,6 +287,14 @@ public:
 
 - (NSURL*)url {
     return [_private url];
+}
+
+- (void)setDefaultContentType:(NSString *)defaultContentType {
+    [_private setDefaultContentType:defaultContentType];
+}
+
+- (NSString*)defaultContentType {
+    return [_private defaultContentType];
 }
 
 - (void)play {

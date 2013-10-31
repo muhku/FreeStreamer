@@ -48,6 +48,7 @@ public:
     void seekToTime(unsigned newSeekTime);
     
     void setUrl(CFURLRef url);
+    void setDefaultContentType(std::string& defaultContentType);
     
     /* Audio_Queue_Delegate */
     void audioQueueStateChanged(Audio_Queue::State state);
@@ -81,6 +82,8 @@ private:
     
     SInt64 m_dataOffset;
     unsigned m_seekTime;
+    
+    std::string m_defaultContentType;
     
     size_t contentLength();
     void closeAndSignalError(int error);
