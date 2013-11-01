@@ -8,7 +8,7 @@
 
 #include "audio_stream.h"
 
-#if !defined(TARGET_OS_MAC)
+#if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
 #import <AudioToolbox/AudioToolbox.h>
 #endif
 
@@ -22,7 +22,7 @@ NSString* const FSAudioStreamNotificationKey_Error = @"error";
 NSString* const FSAudioStreamMetaDataNotification = @"FSAudioStreamMetaDataNotification";
 NSString* const FSAudioStreamNotificationKey_MetaData = @"metadata";
 
-#if !defined(TARGET_OS_MAC)
+#if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
 static void interruptionListener(void *	inClientData,
                                 UInt32	inInterruptionState);
 #endif
@@ -55,7 +55,7 @@ public:
         switch (state) {
             case astreamer::Audio_Stream::STOPPED:
                 fsAudioState = [NSNumber numberWithInt:kFsAudioStreamStopped];
-#if !defined(TARGET_OS_MAC)
+#if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
                 AudioSessionSetActive(false);
 #endif
                 break;
@@ -64,7 +64,7 @@ public:
                 break;
             case astreamer::Audio_Stream::PLAYING:
                 fsAudioState = [NSNumber numberWithInt:kFsAudioStreamPlaying];
-#if !defined(TARGET_OS_MAC)
+#if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
                 AudioSessionSetActive(true);
 #endif                
                 break;
@@ -76,7 +76,7 @@ public:
                 break;
             case astreamer::Audio_Stream::FAILED:
                 fsAudioState = [NSNumber numberWithInt:kFsAudioStreamFailed];
-#if !defined(TARGET_OS_MAC)
+#if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
                 AudioSessionSetActive(false);
 #endif                
                 break;
@@ -122,7 +122,7 @@ public:
     BOOL _currentlyPlaying;
     BOOL _wasInterrupted;
     NSString *_defaultContentType;
-#if !defined(TARGET_OS_MAC)
+#if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
     UIBackgroundTaskIdentifier _backgroundTask;
 #endif
 }
@@ -156,7 +156,7 @@ public:
         _observer->source = _audioStream;
         _audioStream->m_delegate = _observer;
 
-#if !defined(TARGET_OS_MAC)
+#if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
         OSStatus result = AudioSessionInitialize(NULL,
                                                  NULL,
                                                  interruptionListener,
@@ -249,7 +249,7 @@ public:
     _audioStream->close();
     _currentlyPlaying = NO;
     
-#if !defined(TARGET_OS_MAC)
+#if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
     if (_backgroundTask != UIBackgroundTaskInvalid) {
         [[UIApplication sharedApplication] endBackgroundTask:_backgroundTask];
         _backgroundTask = UIBackgroundTaskInvalid;
@@ -379,7 +379,7 @@ public:
  * ===============================================================
  */
 
-#if !defined(TARGET_OS_MAC)
+#if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
 static void interruptionListener(void *	inClientData,
                                 UInt32	inInterruptionState)
 {
