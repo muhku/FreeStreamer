@@ -49,6 +49,7 @@ typedef struct {
 - (void)seekToPosition:(FSStreamPosition)position;
 
 @property (nonatomic,assign) NSURL *url;
+@property (nonatomic,assign) BOOL strictContentTypeChecking;
 @property (nonatomic,assign) NSString *defaultContentType;
 @property (nonatomic,readonly) FSStreamPosition currentTimePlayed;
 @property (nonatomic,readonly) FSStreamPosition duration;

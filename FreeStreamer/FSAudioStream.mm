@@ -117,6 +117,7 @@ public:
 @interface FSAudioStreamPrivate : NSObject {
     astreamer::Audio_Stream *_audioStream;
     NSURL *_url;
+    BOOL _strictContentTypeChecking;
 	AudioStreamStateObserver *_observer;
     BOOL _currentlyPlaying;
     BOOL _wasInterrupted;
@@ -127,6 +128,7 @@ public:
 }
 
 @property (nonatomic,assign) NSURL *url;
+@property (nonatomic,assign) BOOL strictContentTypeChecking;
 @property (nonatomic,assign) NSString *defaultContentType;
 @property (nonatomic,assign) BOOL wasInterrupted;
 
@@ -203,6 +205,19 @@ public:
     
     NSURL *copyOfURL = [_url copy];
     return copyOfURL;
+}
+
+- (void)setStrictContentTypeChecking:(BOOL)strictContentTypeChecking {
+    if (_strictContentTypeChecking == strictContentTypeChecking) {
+        // No change
+        return;
+    }
+    _strictContentTypeChecking = strictContentTypeChecking;
+    _audioStream->setStrictContentTypeChecking(strictContentTypeChecking);
+}
+
+- (BOOL)strictContentTypeChecking {
+    return _strictContentTypeChecking;
 }
 
 - (void)playFromURL:(NSURL*)url {
@@ -287,6 +302,14 @@ public:
 
 - (NSURL*)url {
     return [_private url];
+}
+
+- (void)setStrictContentTypeChecking:(BOOL)strictContentTypeChecking {
+    [_private setStrictContentTypeChecking:strictContentTypeChecking];
+}
+
+- (BOOL)strictContentTypeChecking {
+    return [_private strictContentTypeChecking];
 }
 
 - (void)setDefaultContentType:(NSString *)defaultContentType {

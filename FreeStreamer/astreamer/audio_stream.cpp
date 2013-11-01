@@ -35,6 +35,11 @@ Audio_Stream::Audio_Stream() :
     m_audioQueue(new Audio_Queue()),
     m_dataOffset(0),
     m_seekTime(0),
+#if defined (AS_RELAX_CONTENT_TYPE_CHECK)
+    m_strictContentTypeChecking(false),
+#else
+    m_strictContentTypeChecking(true),
+#endif
     m_defaultContentType("audio/mpeg")
 {
     m_httpStream->m_delegate = this;
@@ -151,6 +156,11 @@ void Audio_Stream::seekToTime(unsigned newSeekTime)
 void Audio_Stream::setUrl(CFURLRef url)
 {
     m_httpStream->setUrl(url);
+}
+    
+void Audio_Stream::setStrictContentTypeChecking(bool strictChecking)
+{
+    m_strictContentTypeChecking = strictChecking;
 }
 
 void Audio_Stream::setDefaultContentType(std::string& defaultContentType)
@@ -272,12 +282,12 @@ void Audio_Stream::streamIsReadyRead()
     size_t audioContentTypeLength = strlen(audioContentType);
     
     if (contentType.compare(0, audioContentTypeLength, audioContentType) != 0) {
-#if !defined (AS_RELAX_CONTENT_TYPE_CHECK)
-        closeAndSignalError(AS_ERR_OPEN);
-        return;
-#else
-        contentType = m_defaultContentType;
-#endif
+        if (m_strictContentTypeChecking) {
+            closeAndSignalError(AS_ERR_OPEN);
+            return;
+        } else {
+            contentType = m_defaultContentType;
+        }
     }
     
     /* OK, it should be an audio stream, let's try to open it */

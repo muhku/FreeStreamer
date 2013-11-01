@@ -37,6 +37,14 @@ FSAudioStream *audioStream = [[FSAudioStream alloc] init];
 [audioStream playFromURL:[NSURL URLWithString:@"http://www.example.com/audio_file.mp3"]];
 </pre>
 
+If you want to avoid the content-type checks (that the stream actually is an audio file), you can set the following property:
+
+<pre>
+audioStream.strictContentTypeChecking = NO;
+// Optionally, set the content-type where to fallback to
+audioStream.defaultContentType = "audio/mpeg";
+</pre>
+
 That's it! For more examples, please take a look at the example project. For instance, you may want to observe notifications on the audio stream state.
 
 h1. Working around server problems
