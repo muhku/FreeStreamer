@@ -1,6 +1,6 @@
 h1. Introduction
 
-FreeStreamer is an audio player engine for the iPhone/iPad, designed for playing audio streams. The engine has a minimal UI for demonstration; hopefully, it is a helpful example for using the engine.
+FreeStreamer is an audio player engine for iOS and OS X, designed for playing audio streams. The engine has a minimal UI for demonstration; hopefully, it is a helpful example for using the engine.
 
 The engine is written in C++ and the FSAudioController Objective-C class wraps the implementation.
 
