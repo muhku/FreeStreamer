@@ -8,7 +8,7 @@
 #import <Cocoa/Cocoa.h>
 #import "FSAudioController.h"
 
-@interface FSPlayerViewController : NSViewController {
+@interface FSXPlayerViewController : NSViewController {
     BOOL _paused;
     FSAudioController *_audioController;
 }

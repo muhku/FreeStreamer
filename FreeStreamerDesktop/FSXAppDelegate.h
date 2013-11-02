@@ -6,7 +6,7 @@
 
 #import <Cocoa/Cocoa.h>
 
-@interface FSAppDelegate : NSObject <NSApplicationDelegate>
+@interface FSXAppDelegate : NSObject <NSApplicationDelegate>
 
 @property (assign) IBOutlet NSWindow *window;
 

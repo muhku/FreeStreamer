@@ -4,10 +4,10 @@
  * See the file ''LICENSE'' for using the code.
  */
 
-#import "FSPlayerViewController.h"
+#import "FSXPlayerViewController.h"
 #import "FSAudioStream.h"
 
-@interface FSPlayerViewController ()
+@interface FSXPlayerViewController ()
 
 - (void)audioStreamStateDidChange:(NSNotification *)notification;
 - (void)audioStreamErrorOccurred:(NSNotification *)notification;
@@ -15,7 +15,7 @@
 
 @end
 
-@implementation FSPlayerViewController
+@implementation FSXPlayerViewController
 
 @synthesize urlTextField;
 @synthesize stateTextFieldCell;

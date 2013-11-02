@@ -4,9 +4,9 @@
  * See the file ''LICENSE'' for using the code.
  */
 
-#import "FSAppDelegate.h"
+#import "FSXAppDelegate.h"
 
-@implementation FSAppDelegate
+@implementation FSXAppDelegate
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {

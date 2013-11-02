@@ -707,13 +707,13 @@
                 </subviews>
             </view>
         </window>
-        <customObject id="494" customClass="FSAppDelegate">
+        <customObject id="494" customClass="FSXAppDelegate">
             <connections>
                 <outlet property="window" destination="371" id="532"/>
             </connections>
         </customObject>
         <customObject id="420" customClass="NSFontManager"/>
-        <viewController id="GOp-h0-FXd" customClass="FSPlayerViewController">
+        <viewController id="GOp-h0-FXd" customClass="FSXPlayerViewController">
             <connections>
                 <outlet property="pauseButton" destination="2eK-oe-Y2E" id="WRg-cf-uPY"/>
                 <outlet property="playButton" destination="UlQ-px-9JH" id="TBp-Bf-qcK"/>
