@@ -11,11 +11,13 @@
 @interface FSXPlayerViewController : NSViewController {
     BOOL _paused;
     FSAudioController *_audioController;
+    NSTimer *_progressUpdateTimer;
 }
 
 @property (nonatomic,readonly) FSAudioController *audioController;
 @property (nonatomic,strong) IBOutlet NSTextField *urlTextField;
 @property (nonatomic,strong) IBOutlet NSTextFieldCell *stateTextFieldCell;
+@property (nonatomic,strong) IBOutlet NSTextFieldCell *progressTextFieldCell;
 @property (nonatomic,strong) IBOutlet NSButton *playButton;
 @property (nonatomic,strong) IBOutlet NSButton *pauseButton;
 

@@ -685,7 +685,7 @@
                         </connections>
                     </button>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="HTh-z8-cfK">
-                        <rect key="frame" x="106" y="87" width="461" height="24"/>
+                        <rect key="frame" x="98" y="66" width="461" height="45"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" id="QBs-gx-2v0">
                             <font key="font" metaFont="system"/>
@@ -704,6 +704,15 @@
                             <action selector="pause:" target="GOp-h0-FXd" id="0rR-UO-WsY"/>
                         </connections>
                     </button>
+                    <textField appearanceType="aqua" horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="j0W-eE-4nW">
+                        <rect key="frame" x="100" y="133" width="362" height="17"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" id="y4W-TK-A4C">
+                            <font key="font" metaFont="system"/>
+                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
                 </subviews>
             </view>
         </window>
@@ -717,6 +726,7 @@
             <connections>
                 <outlet property="pauseButton" destination="2eK-oe-Y2E" id="WRg-cf-uPY"/>
                 <outlet property="playButton" destination="UlQ-px-9JH" id="TBp-Bf-qcK"/>
+                <outlet property="progressTextFieldCell" destination="y4W-TK-A4C" id="YfS-pH-yA1"/>
                 <outlet property="stateTextFieldCell" destination="QBs-gx-2v0" id="M7t-Zh-RMY"/>
                 <outlet property="urlTextField" destination="Y1B-l0-ZsC" id="wUi-LN-xls"/>
                 <outlet property="view" destination="372" id="Cax-EC-UL6"/>

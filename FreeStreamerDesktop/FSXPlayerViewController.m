@@ -9,6 +9,8 @@
 
 @interface FSXPlayerViewController ()
 
+- (void)updatePlaybackProgress;
+
 - (void)audioStreamStateDidChange:(NSNotification *)notification;
 - (void)audioStreamErrorOccurred:(NSNotification *)notification;
 - (void)audioStreamMetaDataAvailable:(NSNotification *)notification;
@@ -19,6 +21,7 @@
 
 @synthesize urlTextField;
 @synthesize stateTextFieldCell;
+@synthesize progressTextFieldCell;
 
 - (FSAudioController *)audioController
 {
@@ -74,6 +77,26 @@
 
 /*
  * =======================================
+ * Private
+ * =======================================
+ */
+
+- (void)updatePlaybackProgress
+{
+    if (self.audioController.stream.continuous) {
+        [self.progressTextFieldCell setTitle:@""];
+    } else {
+        FSStreamPosition cur = self.audioController.stream.currentTimePlayed;
+        FSStreamPosition end = self.audioController.stream.duration;
+        
+        [self.progressTextFieldCell setTitle:[NSString stringWithFormat:@"%i:%02i / %i:%02i",
+                                         cur.minute, cur.second,
+                                         end.minute, end.second]];
+    }
+}
+
+/*
+ * =======================================
  * Observers
  * =======================================
  */
@@ -95,6 +118,12 @@
             [self.playButton setHidden:YES];
             [self.pauseButton setHidden:NO];
             _paused = NO;
+            
+            if (_progressUpdateTimer) {
+                [_progressUpdateTimer invalidate];
+            }
+            [self.progressTextFieldCell setTitle:@""];
+            
             break;
             
         case kFsAudioStreamStopped:
@@ -103,6 +132,12 @@
             [self.playButton setHidden:NO];
             [self.pauseButton setHidden:YES];
             _paused = NO;
+            
+            if (_progressUpdateTimer) {
+                [_progressUpdateTimer invalidate];
+            }
+            [self.progressTextFieldCell setTitle:@""];
+            
             break;
             
         case kFsAudioStreamBuffering:
@@ -111,6 +146,12 @@
             [self.playButton setHidden:YES];
             [self.pauseButton setHidden:NO];
             _paused = NO;
+            
+            if (_progressUpdateTimer) {
+                [_progressUpdateTimer invalidate];
+            }
+            [self.progressTextFieldCell setTitle:@""];
+            
             break;
             
         case kFsAudioStreamSeeking:
@@ -132,12 +173,27 @@
             [self.pauseButton setHidden:NO];
             _paused = NO;
             
+            if (_progressUpdateTimer) {
+                [_progressUpdateTimer invalidate];
+            }
+            
+            _progressUpdateTimer = [NSTimer scheduledTimerWithTimeInterval:1.0
+                                                                    target:self
+                                                                  selector:@selector(updatePlaybackProgress)
+                                                                  userInfo:nil
+                                                                   repeats:YES];
+            
             break;
             
         case kFsAudioStreamFailed:
             [self.playButton setHidden:NO];
             [self.pauseButton setHidden:YES];
             _paused = NO;
+            
+            if (_progressUpdateTimer) {
+                [_progressUpdateTimer invalidate];
+            }
+            
             break;
     }
 }
