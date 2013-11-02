@@ -51,6 +51,8 @@
     NSURL *url = [NSURL URLWithString:[self.urlTextField stringValue]];
     
     if (![self.audioController.url isEqual:url]) {
+        [self.audioController stop];
+        
         self.audioController.url = url;
     }
     
@@ -63,6 +65,8 @@
     
     [self.playButton setHidden:YES];
     [self.pauseButton setHidden:NO];
+    
+    [self.urlTextField setEditable:NO];
 }
 
 - (IBAction)pause:(id)sender
@@ -73,6 +77,8 @@
     
     [self.playButton setHidden:NO];
     [self.pauseButton setHidden:YES];
+    
+    [self.urlTextField setEditable:YES];
 }
 
 /*
@@ -114,6 +120,7 @@
     switch (state) {
         case kFsAudioStreamRetrievingURL:
             [self.stateTextFieldCell setTitle:statusRetrievingURL];
+            [self.urlTextField setEditable:NO];
 
             [self.playButton setHidden:YES];
             [self.pauseButton setHidden:NO];
@@ -128,6 +135,7 @@
             
         case kFsAudioStreamStopped:
             [self.stateTextFieldCell setTitle:statusEmpty];
+            [self.urlTextField setEditable:YES];
 
             [self.playButton setHidden:NO];
             [self.pauseButton setHidden:YES];
@@ -142,6 +150,7 @@
             
         case kFsAudioStreamBuffering:
             [self.stateTextFieldCell setTitle:statusBuffering];
+            [self.urlTextField setEditable:NO];
             
             [self.playButton setHidden:YES];
             [self.pauseButton setHidden:NO];
@@ -156,6 +165,7 @@
             
         case kFsAudioStreamSeeking:
             [self.stateTextFieldCell setTitle:statusSeeking];
+            [self.urlTextField setEditable:NO];
             
             [self.playButton setHidden:YES];
             [self.pauseButton setHidden:NO];
@@ -163,6 +173,8 @@
             break;
             
         case kFsAudioStreamPlaying:
+            [self.urlTextField setEditable:NO];
+            
             if ([[self.stateTextFieldCell title] isEqualToString:statusBuffering] ||
                 [[self.stateTextFieldCell title] isEqualToString:statusRetrievingURL] ||
                 [[self.stateTextFieldCell title] isEqualToString:statusSeeking]) {
@@ -186,6 +198,8 @@
             break;
             
         case kFsAudioStreamFailed:
+            [self.urlTextField setEditable:YES];
+            
             [self.playButton setHidden:NO];
             [self.pauseButton setHidden:YES];
             _paused = NO;
