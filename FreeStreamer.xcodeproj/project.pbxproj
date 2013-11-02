@@ -22,7 +22,6 @@
 		6066DA6D182422CC0005E1A2 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6066DA6C182422CC0005E1A2 /* Images.xcassets */; };
 		6066DA74182422E00005E1A2 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 6066DA70182422E00005E1A2 /* Credits.rtf */; };
 		6066DA75182422E00005E1A2 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6066DA72182422E00005E1A2 /* InfoPlist.strings */; };
-		6066DA77182422F20005E1A2 /* FreeStreamer-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 6066DA76182422F20005E1A2 /* FreeStreamer-Info.plist */; };
 		6066DA83182424860005E1A2 /* button-pause.png in Resources */ = {isa = PBXBuildFile; fileRef = 6066DA7F182424860005E1A2 /* button-pause.png */; };
 		6066DA84182424860005E1A2 /* button-play.png in Resources */ = {isa = PBXBuildFile; fileRef = 6066DA80182424860005E1A2 /* button-play.png */; };
 		6066DA85182424860005E1A2 /* player-bg-bottom.png in Resources */ = {isa = PBXBuildFile; fileRef = 6066DA81182424860005E1A2 /* player-bg-bottom.png */; };
@@ -38,41 +37,23 @@
 		6066DA9A182425090005E1A2 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6066DA99182425090005E1A2 /* AudioToolbox.framework */; };
 		6066DA9C182425150005E1A2 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6066DA9B182425150005E1A2 /* CFNetwork.framework */; };
 		6066DA9E182425240005E1A2 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6066DA9D182425240005E1A2 /* AVFoundation.framework */; };
-		6066DAB9182427330005E1A2 /* FSAudioController.h in Sources */ = {isa = PBXBuildFile; fileRef = 60CF9E511824156F00999FDF /* FSAudioController.h */; };
 		6066DABA182427330005E1A2 /* FSAudioController.m in Sources */ = {isa = PBXBuildFile; fileRef = 60CF9E521824156F00999FDF /* FSAudioController.m */; };
-		6066DABB182427330005E1A2 /* FSAudioStream.h in Sources */ = {isa = PBXBuildFile; fileRef = 60CF9E531824156F00999FDF /* FSAudioStream.h */; };
 		6066DABC182427330005E1A2 /* FSAudioStream.mm in Sources */ = {isa = PBXBuildFile; fileRef = 60CF9E541824156F00999FDF /* FSAudioStream.mm */; };
-		6066DABD182427330005E1A2 /* FSParsePlaylistFeedRequest.h in Sources */ = {isa = PBXBuildFile; fileRef = 60CF9E551824156F00999FDF /* FSParsePlaylistFeedRequest.h */; };
 		6066DABE182427330005E1A2 /* FSParsePlaylistFeedRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 60CF9E561824156F00999FDF /* FSParsePlaylistFeedRequest.m */; };
-		6066DABF182427330005E1A2 /* FSPlaylistItem.h in Sources */ = {isa = PBXBuildFile; fileRef = 60CF9E571824156F00999FDF /* FSPlaylistItem.h */; };
 		6066DAC0182427330005E1A2 /* FSPlaylistItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 60CF9E581824156F00999FDF /* FSPlaylistItem.m */; };
-		6066DAC1182427330005E1A2 /* FSXMLHttpRequest.h in Sources */ = {isa = PBXBuildFile; fileRef = 60CF9E591824156F00999FDF /* FSXMLHttpRequest.h */; };
 		6066DAC2182427330005E1A2 /* FSXMLHttpRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 60CF9E5A1824156F00999FDF /* FSXMLHttpRequest.m */; };
 		6066DAC31824273A0005E1A2 /* audio_queue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60AA8F70182412F9001DE57B /* audio_queue.cpp */; };
-		6066DAC41824273A0005E1A2 /* audio_queue.h in Sources */ = {isa = PBXBuildFile; fileRef = 60AA8F71182412F9001DE57B /* audio_queue.h */; };
 		6066DAC51824273A0005E1A2 /* audio_stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60AA8F72182412F9001DE57B /* audio_stream.cpp */; };
-		6066DAC61824273A0005E1A2 /* audio_stream.h in Sources */ = {isa = PBXBuildFile; fileRef = 60AA8F73182412F9001DE57B /* audio_stream.h */; };
 		6066DAC71824273A0005E1A2 /* http_stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60AA8F74182412F9001DE57B /* http_stream.cpp */; };
-		6066DAC81824273A0005E1A2 /* http_stream.h in Sources */ = {isa = PBXBuildFile; fileRef = 60AA8F75182412F9001DE57B /* http_stream.h */; };
-		6066DAD1182427A30005E1A2 /* FSAudioController.h in Sources */ = {isa = PBXBuildFile; fileRef = 60CF9E511824156F00999FDF /* FSAudioController.h */; };
 		6066DAD2182427A30005E1A2 /* FSAudioController.m in Sources */ = {isa = PBXBuildFile; fileRef = 60CF9E521824156F00999FDF /* FSAudioController.m */; };
-		6066DAD3182427A30005E1A2 /* FSAudioStream.h in Sources */ = {isa = PBXBuildFile; fileRef = 60CF9E531824156F00999FDF /* FSAudioStream.h */; };
 		6066DAD4182427A30005E1A2 /* FSAudioStream.mm in Sources */ = {isa = PBXBuildFile; fileRef = 60CF9E541824156F00999FDF /* FSAudioStream.mm */; };
-		6066DAD5182427A30005E1A2 /* FSParsePlaylistFeedRequest.h in Sources */ = {isa = PBXBuildFile; fileRef = 60CF9E551824156F00999FDF /* FSParsePlaylistFeedRequest.h */; };
 		6066DAD6182427A30005E1A2 /* FSParsePlaylistFeedRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 60CF9E561824156F00999FDF /* FSParsePlaylistFeedRequest.m */; };
-		6066DAD7182427A30005E1A2 /* FSPlaylistItem.h in Sources */ = {isa = PBXBuildFile; fileRef = 60CF9E571824156F00999FDF /* FSPlaylistItem.h */; };
 		6066DAD8182427A30005E1A2 /* FSPlaylistItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 60CF9E581824156F00999FDF /* FSPlaylistItem.m */; };
-		6066DAD9182427A30005E1A2 /* FSXMLHttpRequest.h in Sources */ = {isa = PBXBuildFile; fileRef = 60CF9E591824156F00999FDF /* FSXMLHttpRequest.h */; };
 		6066DADA182427A30005E1A2 /* FSXMLHttpRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 60CF9E5A1824156F00999FDF /* FSXMLHttpRequest.m */; };
 		6066DADB182427A30005E1A2 /* audio_queue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60AA8F70182412F9001DE57B /* audio_queue.cpp */; };
-		6066DADC182427A30005E1A2 /* audio_queue.h in Sources */ = {isa = PBXBuildFile; fileRef = 60AA8F71182412F9001DE57B /* audio_queue.h */; };
 		6066DADD182427A30005E1A2 /* audio_stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60AA8F72182412F9001DE57B /* audio_stream.cpp */; };
-		6066DADE182427A30005E1A2 /* audio_stream.h in Sources */ = {isa = PBXBuildFile; fileRef = 60AA8F73182412F9001DE57B /* audio_stream.h */; };
 		6066DADF182427A30005E1A2 /* http_stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60AA8F74182412F9001DE57B /* http_stream.cpp */; };
-		6066DAE0182427A30005E1A2 /* http_stream.h in Sources */ = {isa = PBXBuildFile; fileRef = 60AA8F75182412F9001DE57B /* http_stream.h */; };
-		6066DAE1182427A30005E1A2 /* FSAppDelegate.h in Sources */ = {isa = PBXBuildFile; fileRef = 6066DA63182422A50005E1A2 /* FSAppDelegate.h */; };
 		6066DAE2182427A30005E1A2 /* FSAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 6066DA64182422A50005E1A2 /* FSAppDelegate.m */; };
-		6066DAE3182427A30005E1A2 /* FSPlayerViewController.h in Sources */ = {isa = PBXBuildFile; fileRef = 6066DA65182422A50005E1A2 /* FSPlayerViewController.h */; };
 		6066DAE4182427A30005E1A2 /* FSPlayerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6066DA66182422A50005E1A2 /* FSPlayerViewController.m */; };
 		6066DAE5182427A30005E1A2 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6066DA6E182422D70005E1A2 /* main.m */; };
 		60CF9E611824158C00999FDF /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 60CF9E601824158C00999FDF /* libxml2.dylib */; };
@@ -408,7 +389,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6066DA77182422F20005E1A2 /* FreeStreamer-Info.plist in Resources */,
 				6066DA6D182422CC0005E1A2 /* Images.xcassets in Resources */,
 				6066DA75182422E00005E1A2 /* InfoPlist.strings in Resources */,
 				6066DA74182422E00005E1A2 /* Credits.rtf in Resources */,
@@ -440,25 +420,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6066DAD1182427A30005E1A2 /* FSAudioController.h in Sources */,
 				6066DAD2182427A30005E1A2 /* FSAudioController.m in Sources */,
-				6066DAD3182427A30005E1A2 /* FSAudioStream.h in Sources */,
 				6066DAD4182427A30005E1A2 /* FSAudioStream.mm in Sources */,
-				6066DAD5182427A30005E1A2 /* FSParsePlaylistFeedRequest.h in Sources */,
 				6066DAD6182427A30005E1A2 /* FSParsePlaylistFeedRequest.m in Sources */,
-				6066DAD7182427A30005E1A2 /* FSPlaylistItem.h in Sources */,
 				6066DAD8182427A30005E1A2 /* FSPlaylistItem.m in Sources */,
-				6066DAD9182427A30005E1A2 /* FSXMLHttpRequest.h in Sources */,
 				6066DADA182427A30005E1A2 /* FSXMLHttpRequest.m in Sources */,
 				6066DADB182427A30005E1A2 /* audio_queue.cpp in Sources */,
-				6066DADC182427A30005E1A2 /* audio_queue.h in Sources */,
 				6066DADD182427A30005E1A2 /* audio_stream.cpp in Sources */,
-				6066DADE182427A30005E1A2 /* audio_stream.h in Sources */,
 				6066DADF182427A30005E1A2 /* http_stream.cpp in Sources */,
-				6066DAE0182427A30005E1A2 /* http_stream.h in Sources */,
-				6066DAE1182427A30005E1A2 /* FSAppDelegate.h in Sources */,
 				6066DAE2182427A30005E1A2 /* FSAppDelegate.m in Sources */,
-				6066DAE3182427A30005E1A2 /* FSPlayerViewController.h in Sources */,
 				6066DAE4182427A30005E1A2 /* FSPlayerViewController.m in Sources */,
 				6066DAE5182427A30005E1A2 /* main.m in Sources */,
 			);
@@ -469,20 +439,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				6066DAC31824273A0005E1A2 /* audio_queue.cpp in Sources */,
-				6066DAC41824273A0005E1A2 /* audio_queue.h in Sources */,
 				6066DAC51824273A0005E1A2 /* audio_stream.cpp in Sources */,
-				6066DAC61824273A0005E1A2 /* audio_stream.h in Sources */,
 				6066DAC71824273A0005E1A2 /* http_stream.cpp in Sources */,
-				6066DAC81824273A0005E1A2 /* http_stream.h in Sources */,
-				6066DAB9182427330005E1A2 /* FSAudioController.h in Sources */,
 				6066DABA182427330005E1A2 /* FSAudioController.m in Sources */,
-				6066DABB182427330005E1A2 /* FSAudioStream.h in Sources */,
 				6066DABC182427330005E1A2 /* FSAudioStream.mm in Sources */,
-				6066DABD182427330005E1A2 /* FSParsePlaylistFeedRequest.h in Sources */,
 				6066DABE182427330005E1A2 /* FSParsePlaylistFeedRequest.m in Sources */,
-				6066DABF182427330005E1A2 /* FSPlaylistItem.h in Sources */,
 				6066DAC0182427330005E1A2 /* FSPlaylistItem.m in Sources */,
-				6066DAC1182427330005E1A2 /* FSXMLHttpRequest.h in Sources */,
 				6066DAC2182427330005E1A2 /* FSXMLHttpRequest.m in Sources */,
 				6066DA44182422430005E1A2 /* main.m in Sources */,
 				6066DA48182422430005E1A2 /* FSAppDelegate.m in Sources */,
