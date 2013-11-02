@@ -92,7 +92,7 @@ public:
 class HTTP_Stream_Delegate {
 public:
     virtual void streamIsReadyRead() = 0;
-    virtual void streamHasBytesAvailable(UInt8 *data, CFIndex numBytes) = 0;
+    virtual void streamHasBytesAvailable(UInt8 *data, UInt32 numBytes) = 0;
     virtual void streamEndEncountered() = 0;
     virtual void streamErrorOccurred() = 0;
     virtual void streamMetaDataAvailable(std::string metaData) = 0;

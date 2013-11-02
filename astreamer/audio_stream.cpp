@@ -305,7 +305,7 @@ void Audio_Stream::streamIsReadyRead()
     }
 }
 	
-void Audio_Stream::streamHasBytesAvailable(UInt8 *data, CFIndex numBytes)
+void Audio_Stream::streamHasBytesAvailable(UInt8 *data, UInt32 numBytes)
 {
     AS_TRACE("%s: %lu bytes\n", __FUNCTION__, numBytes);
     

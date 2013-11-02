@@ -367,7 +367,7 @@ void HTTP_Stream::parseICYStream(UInt8 *buf, CFIndex bufSize)
         m_icyReadBuffer = new UInt8[STREAM_BUFSIZ];
     }
     
-    size_t i=0;
+    UInt32 i=0;
     
     for (; offset < bufSize; offset++) {
         // is this a metadata byte?
@@ -440,7 +440,7 @@ void HTTP_Stream::readCallBack(CFReadStreamRef stream, CFStreamEventType eventTy
                     THIS->parseICYStream(THIS->m_httpReadBuffer, bytesRead);
                 } else {
                     if (THIS->m_delegate) {
-                        THIS->m_delegate->streamHasBytesAvailable(THIS->m_httpReadBuffer, bytesRead);
+                        THIS->m_delegate->streamHasBytesAvailable(THIS->m_httpReadBuffer, (UInt32)bytesRead);
                     }
                 }
             } 

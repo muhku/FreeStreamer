@@ -112,7 +112,7 @@
     const char *encoding = [self detectEncoding];
     
     _xmlDocument = xmlReadMemory([_receivedData bytes],
-                                 [_receivedData length],
+                                 (int)[_receivedData length],
                                  "",
                                  encoding,
                                  0);

@@ -60,7 +60,7 @@ public:
     
     /* HTTP_Stream_Delegate */
     void streamIsReadyRead();
-    void streamHasBytesAvailable(UInt8 *data, CFIndex numBytes);
+    void streamHasBytesAvailable(UInt8 *data, UInt32 numBytes);
     void streamEndEncountered();
     void streamErrorOccurred();
     void streamMetaDataAvailable(std::string metaData);
