@@ -189,7 +189,7 @@
                 [_progressUpdateTimer invalidate];
             }
             
-            _progressUpdateTimer = [NSTimer scheduledTimerWithTimeInterval:1.0
+            _progressUpdateTimer = [NSTimer scheduledTimerWithTimeInterval:0.5
                                                                     target:self
                                                                   selector:@selector(updatePlaybackProgress)
                                                                   userInfo:nil
