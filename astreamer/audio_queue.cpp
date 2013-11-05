@@ -343,7 +343,12 @@ void Audio_Queue::cleanup()
         return;
     }
     
-    if (AudioQueueDispose(m_outAQ, false) != 0) {
+    AudioQueueRemovePropertyListener(m_outAQ,
+                                     kAudioQueueProperty_IsRunning,
+                                     audioQueueIsRunningCallback,
+                                     this);
+    
+    if (AudioQueueDispose(m_outAQ, true) != 0) {
         AQ_TRACE("%s: AudioQueueDispose failed!\n", __PRETTY_FUNCTION__);
     }
     m_outAQ = 0;
