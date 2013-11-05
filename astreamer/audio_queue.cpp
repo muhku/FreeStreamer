@@ -113,14 +113,27 @@ void Audio_Queue::stop(bool stopImmediately)
         AQ_TRACE("%s: AudioQueueFlush failed!\n", __PRETTY_FUNCTION__);
     }
     
+    if (stopImmediately) {
+        AudioQueueRemovePropertyListener(m_outAQ,
+                                         kAudioQueueProperty_IsRunning,
+                                         audioQueueIsRunningCallback,
+                                         this);
+    }
+    
     if (AudioQueueStop(m_outAQ, stopImmediately) != 0) {
         AQ_TRACE("%s: AudioQueueStop failed!\n", __PRETTY_FUNCTION__);
     }
     
-    // Note that if we dispose the audio queue right after stopping it,
-    // we won't get an audio queue notification callback that the queue
-    // has been stopped. Therefore we do the cleanup in the notification
-    // callback.
+    if (stopImmediately) {
+        // If the queue was requested to stop immediately we can safely dispose
+        // it now
+        cleanup();
+        setState(IDLE);
+    } else {
+        // Otherwise, we wait until the playback has finished and then do the
+        // cleanup in the notification callback.
+        ;
+    }
     
     AQ_TRACE("%s: leave\n", __PRETTY_FUNCTION__);
 }
@@ -342,11 +355,6 @@ void Audio_Queue::cleanup()
         
         return;
     }
-    
-    AudioQueueRemovePropertyListener(m_outAQ,
-                                     kAudioQueueProperty_IsRunning,
-                                     audioQueueIsRunningCallback,
-                                     this);
     
     if (AudioQueueDispose(m_outAQ, true) != 0) {
         AQ_TRACE("%s: AudioQueueDispose failed!\n", __PRETTY_FUNCTION__);
