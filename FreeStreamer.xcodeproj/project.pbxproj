@@ -39,17 +39,13 @@
 		6066DA9E182425240005E1A2 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6066DA9D182425240005E1A2 /* AVFoundation.framework */; };
 		6066DABA182427330005E1A2 /* FSAudioController.m in Sources */ = {isa = PBXBuildFile; fileRef = 60CF9E521824156F00999FDF /* FSAudioController.m */; };
 		6066DABC182427330005E1A2 /* FSAudioStream.mm in Sources */ = {isa = PBXBuildFile; fileRef = 60CF9E541824156F00999FDF /* FSAudioStream.mm */; };
-		6066DABE182427330005E1A2 /* FSParsePlaylistFeedRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 60CF9E561824156F00999FDF /* FSParsePlaylistFeedRequest.m */; };
 		6066DAC0182427330005E1A2 /* FSPlaylistItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 60CF9E581824156F00999FDF /* FSPlaylistItem.m */; };
-		6066DAC2182427330005E1A2 /* FSXMLHttpRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 60CF9E5A1824156F00999FDF /* FSXMLHttpRequest.m */; };
 		6066DAC31824273A0005E1A2 /* audio_queue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60AA8F70182412F9001DE57B /* audio_queue.cpp */; };
 		6066DAC51824273A0005E1A2 /* audio_stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60AA8F72182412F9001DE57B /* audio_stream.cpp */; };
 		6066DAC71824273A0005E1A2 /* http_stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60AA8F74182412F9001DE57B /* http_stream.cpp */; };
 		6066DAD2182427A30005E1A2 /* FSAudioController.m in Sources */ = {isa = PBXBuildFile; fileRef = 60CF9E521824156F00999FDF /* FSAudioController.m */; };
 		6066DAD4182427A30005E1A2 /* FSAudioStream.mm in Sources */ = {isa = PBXBuildFile; fileRef = 60CF9E541824156F00999FDF /* FSAudioStream.mm */; };
-		6066DAD6182427A30005E1A2 /* FSParsePlaylistFeedRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 60CF9E561824156F00999FDF /* FSParsePlaylistFeedRequest.m */; };
 		6066DAD8182427A30005E1A2 /* FSPlaylistItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 60CF9E581824156F00999FDF /* FSPlaylistItem.m */; };
-		6066DADA182427A30005E1A2 /* FSXMLHttpRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 60CF9E5A1824156F00999FDF /* FSXMLHttpRequest.m */; };
 		6066DADB182427A30005E1A2 /* audio_queue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60AA8F70182412F9001DE57B /* audio_queue.cpp */; };
 		6066DADD182427A30005E1A2 /* audio_stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60AA8F72182412F9001DE57B /* audio_stream.cpp */; };
 		6066DADF182427A30005E1A2 /* http_stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60AA8F74182412F9001DE57B /* http_stream.cpp */; };
@@ -60,7 +56,8 @@
 		609F6DAA18295F54000E45B2 /* FSParsePlaylistRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 609F6DA918295F54000E45B2 /* FSParsePlaylistRequest.m */; };
 		609F6DAB18295F54000E45B2 /* FSParsePlaylistRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 609F6DA918295F54000E45B2 /* FSParsePlaylistRequest.m */; };
 		609F6DAC182962C4000E45B2 /* FSCheckAudioFileFormatRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 609F6DA618295684000E45B2 /* FSCheckAudioFileFormatRequest.m */; };
-		60CF9E611824158C00999FDF /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 60CF9E601824158C00999FDF /* libxml2.dylib */; };
+		609F6DAF18296EB6000E45B2 /* FSXMLHttpRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 609F6DAE18296EB6000E45B2 /* FSXMLHttpRequest.m */; };
+		609F6DB218296EBF000E45B2 /* FSParsePlaylistFeedRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 609F6DB118296EBF000E45B2 /* FSParsePlaylistFeedRequest.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -115,6 +112,10 @@
 		609F6DA618295684000E45B2 /* FSCheckAudioFileFormatRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSCheckAudioFileFormatRequest.m; sourceTree = "<group>"; };
 		609F6DA818295F54000E45B2 /* FSParsePlaylistRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSParsePlaylistRequest.h; sourceTree = "<group>"; };
 		609F6DA918295F54000E45B2 /* FSParsePlaylistRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSParsePlaylistRequest.m; sourceTree = "<group>"; };
+		609F6DAD18296EB6000E45B2 /* FSXMLHttpRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSXMLHttpRequest.h; sourceTree = "<group>"; };
+		609F6DAE18296EB6000E45B2 /* FSXMLHttpRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSXMLHttpRequest.m; sourceTree = "<group>"; };
+		609F6DB018296EBF000E45B2 /* FSParsePlaylistFeedRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSParsePlaylistFeedRequest.h; sourceTree = "<group>"; };
+		609F6DB118296EBF000E45B2 /* FSParsePlaylistFeedRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSParsePlaylistFeedRequest.m; sourceTree = "<group>"; };
 		60AA8F70182412F9001DE57B /* audio_queue.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = audio_queue.cpp; path = astreamer/audio_queue.cpp; sourceTree = SOURCE_ROOT; };
 		60AA8F71182412F9001DE57B /* audio_queue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = audio_queue.h; path = astreamer/audio_queue.h; sourceTree = SOURCE_ROOT; };
 		60AA8F72182412F9001DE57B /* audio_stream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = audio_stream.cpp; path = astreamer/audio_stream.cpp; sourceTree = SOURCE_ROOT; };
@@ -125,12 +126,8 @@
 		60CF9E521824156F00999FDF /* FSAudioController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSAudioController.m; sourceTree = "<group>"; };
 		60CF9E531824156F00999FDF /* FSAudioStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSAudioStream.h; sourceTree = "<group>"; };
 		60CF9E541824156F00999FDF /* FSAudioStream.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = FSAudioStream.mm; sourceTree = "<group>"; };
-		60CF9E551824156F00999FDF /* FSParsePlaylistFeedRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSParsePlaylistFeedRequest.h; sourceTree = "<group>"; };
-		60CF9E561824156F00999FDF /* FSParsePlaylistFeedRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSParsePlaylistFeedRequest.m; sourceTree = "<group>"; };
 		60CF9E571824156F00999FDF /* FSPlaylistItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSPlaylistItem.h; sourceTree = "<group>"; };
 		60CF9E581824156F00999FDF /* FSPlaylistItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSPlaylistItem.m; sourceTree = "<group>"; };
-		60CF9E591824156F00999FDF /* FSXMLHttpRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSXMLHttpRequest.h; sourceTree = "<group>"; };
-		60CF9E5A1824156F00999FDF /* FSXMLHttpRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSXMLHttpRequest.m; sourceTree = "<group>"; };
 		60CF9E601824158C00999FDF /* libxml2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.dylib; path = usr/lib/libxml2.dylib; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -139,7 +136,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				60CF9E611824158C00999FDF /* libxml2.dylib in Frameworks */,
 				603228A01824123100B7027B /* CFNetwork.framework in Frameworks */,
 				6032289E1824122700B7027B /* AudioToolbox.framework in Frameworks */,
 				6032289C1824121800B7027B /* AVFoundation.framework in Frameworks */,
@@ -261,6 +257,10 @@
 		6066DA3D182422430005E1A2 /* FreeStreamerMobile */ = {
 			isa = PBXGroup;
 			children = (
+				609F6DAD18296EB6000E45B2 /* FSXMLHttpRequest.h */,
+				609F6DB018296EBF000E45B2 /* FSParsePlaylistFeedRequest.h */,
+				609F6DB118296EBF000E45B2 /* FSParsePlaylistFeedRequest.m */,
+				609F6DAE18296EB6000E45B2 /* FSXMLHttpRequest.m */,
 				6066DA8F182424C10005E1A2 /* FSPlayerViewController.h */,
 				6066DA90182424C10005E1A2 /* FSPlayerViewController.m */,
 				6066DA91182424C10005E1A2 /* FSPlaylistViewController.h */,
@@ -307,12 +307,8 @@
 				60CF9E521824156F00999FDF /* FSAudioController.m */,
 				60CF9E531824156F00999FDF /* FSAudioStream.h */,
 				60CF9E541824156F00999FDF /* FSAudioStream.mm */,
-				60CF9E551824156F00999FDF /* FSParsePlaylistFeedRequest.h */,
-				60CF9E561824156F00999FDF /* FSParsePlaylistFeedRequest.m */,
 				60CF9E571824156F00999FDF /* FSPlaylistItem.h */,
 				60CF9E581824156F00999FDF /* FSPlaylistItem.m */,
-				60CF9E591824156F00999FDF /* FSXMLHttpRequest.h */,
-				60CF9E5A1824156F00999FDF /* FSXMLHttpRequest.m */,
 				609F6DA518295684000E45B2 /* FSCheckAudioFileFormatRequest.h */,
 				609F6DA618295684000E45B2 /* FSCheckAudioFileFormatRequest.m */,
 				609F6DA818295F54000E45B2 /* FSParsePlaylistRequest.h */,
@@ -434,9 +430,7 @@
 			files = (
 				6066DAD2182427A30005E1A2 /* FSAudioController.m in Sources */,
 				6066DAD4182427A30005E1A2 /* FSAudioStream.mm in Sources */,
-				6066DAD6182427A30005E1A2 /* FSParsePlaylistFeedRequest.m in Sources */,
 				6066DAD8182427A30005E1A2 /* FSPlaylistItem.m in Sources */,
-				6066DADA182427A30005E1A2 /* FSXMLHttpRequest.m in Sources */,
 				6066DADB182427A30005E1A2 /* audio_queue.cpp in Sources */,
 				6066DADD182427A30005E1A2 /* audio_stream.cpp in Sources */,
 				6066DADF182427A30005E1A2 /* http_stream.cpp in Sources */,
@@ -455,12 +449,12 @@
 				609F6DAC182962C4000E45B2 /* FSCheckAudioFileFormatRequest.m in Sources */,
 				6066DAC31824273A0005E1A2 /* audio_queue.cpp in Sources */,
 				6066DAC51824273A0005E1A2 /* audio_stream.cpp in Sources */,
+				609F6DAF18296EB6000E45B2 /* FSXMLHttpRequest.m in Sources */,
 				6066DAC71824273A0005E1A2 /* http_stream.cpp in Sources */,
 				6066DABA182427330005E1A2 /* FSAudioController.m in Sources */,
 				6066DABC182427330005E1A2 /* FSAudioStream.mm in Sources */,
-				6066DABE182427330005E1A2 /* FSParsePlaylistFeedRequest.m in Sources */,
 				6066DAC0182427330005E1A2 /* FSPlaylistItem.m in Sources */,
-				6066DAC2182427330005E1A2 /* FSXMLHttpRequest.m in Sources */,
+				609F6DB218296EBF000E45B2 /* FSParsePlaylistFeedRequest.m in Sources */,
 				6066DA44182422430005E1A2 /* main.m in Sources */,
 				609F6DAB18295F54000E45B2 /* FSParsePlaylistRequest.m in Sources */,
 				6066DA48182422430005E1A2 /* FSAppDelegate.m in Sources */,
@@ -585,7 +579,6 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-					"$(SDKROOT)/usr/include/libxml2",
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/FreeStreamerDesktop/FreeStreamer-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -603,7 +596,6 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-					"$(SDKROOT)/usr/include/libxml2",
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/FreeStreamerDesktop/FreeStreamer-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
