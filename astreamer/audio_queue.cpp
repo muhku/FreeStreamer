@@ -57,6 +57,10 @@ Audio_Queue::Audio_Queue()
 Audio_Queue::~Audio_Queue()
 {
     stop(true);
+    
+    if (initialized()) {
+        cleanup();
+    }
 }
     
 bool Audio_Queue::initialized()
@@ -97,10 +101,6 @@ void Audio_Queue::pause()
 void Audio_Queue::stop()
 {
     stop(true);
-    
-    if (initialized()) {
-        cleanup();
-    }
 }
 
 void Audio_Queue::stop(bool stopImmediately)
