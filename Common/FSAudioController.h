@@ -8,25 +8,25 @@
 
 @class FSAudioStream;
 @class FSPlaylistPrivate;
+@class FSCheckAudioFileFormatRequest;
+@class FSParsePlaylistRequest;
 
 @interface FSAudioController : NSObject <NSURLConnectionDelegate> {
-    NSURL *_url;
+    NSString *_url;
     FSAudioStream *_audioStream;
     
-    BOOL _streamContentTypeChecked;
-    NSURLConnection *_contentTypeConnection;    
-    NSURLConnection *_playlistRetrieveConnection;
-    NSMutableData *_receivedPlaylistData;
+    BOOL _readyToPlay;
     
-    FSPlaylistPrivate *_playlistPrivate;
+    FSCheckAudioFileFormatRequest *_checkAudioFileFormatRequest;
+    FSParsePlaylistRequest *_parsePlaylistRequest;
 }
 
 - (void)play;
-- (void)playFromURL:(NSURL*)url;
+- (void)playFromURL:(NSString*)url;
 - (void)stop;
 - (void)pause;
 
-@property (nonatomic,weak) NSURL *url;
-@property (nonatomic,weak,readonly) FSAudioStream *stream;
+@property (nonatomic,assign) NSString *url;
+@property (readonly) FSAudioStream *stream;
 
 @end

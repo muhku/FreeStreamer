@@ -310,7 +310,7 @@ out:
     
     [self.audioController stop];
     
-    self.audioController.url = self.selectedPlaylistItem.nsURL;
+    self.audioController.url = self.selectedPlaylistItem.url;
 }
 
 - (FSPlaylistItem *)selectedPlaylistItem {

@@ -48,7 +48,7 @@
 
 - (IBAction)playFromUrl:(id)sender
 {
-    NSURL *url = [NSURL URLWithString:[self.urlTextField stringValue]];
+    NSString *url = [self.urlTextField stringValue];
     
     if (![self.audioController.url isEqual:url]) {
         [self.audioController stop];

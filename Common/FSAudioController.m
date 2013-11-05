@@ -7,6 +7,8 @@
 #import "FSAudioController.h"
 #import "FSAudioStream.h"
 #import "FSPlaylistItem.h"
+#import "FSCheckAudioFileFormatRequest.h"
+#import "FSParsePlaylistRequest.h"
 
 //#define AC_DEBUG 1
 
@@ -16,170 +18,62 @@
 #define AC_TRACE(...) NSLog(__VA_ARGS__)
 #endif
 
-typedef enum {
-    kFSPlaylistFormatNone,
-    kFSPlaylistFormatM3U,
-    kFSPlaylistFormatPLS
-} FSPlaylistFormat;
-
-@interface FSPlaylistPrivate : NSObject {
-    FSPlaylistFormat _format;
-    NSMutableArray *_playlistItems;
-}
-
-@property (nonatomic,assign) FSPlaylistFormat format;
-@property (readonly) NSMutableArray *playlistItems;
-
-- (void)parsePlaylistFromData:(NSData *)data;
-- (void)parsePlaylistM3U:(NSString *)playlist;
-- (void)parsePlaylistPLS:(NSString *)playlist;
-
-@end
-
-@implementation FSPlaylistPrivate
-
-@synthesize format=_format;
-@synthesize playlistItems=_playlistItems;
-
-- (id)init {
-    if (self = [super init]) {
-        _playlistItems = [[NSMutableArray alloc] init];
-    }
-    return self;
-}
-
-- (void)parsePlaylistFromData:(NSData *)data {
-    NSString *playlistData = [[NSString alloc] initWithData:data encoding:NSASCIIStringEncoding];
-
-    if (self.format == kFSPlaylistFormatM3U) {
-        [self parsePlaylistM3U:playlistData];
-    } else if (self.format == kFSPlaylistFormatPLS) {
-        [self parsePlaylistPLS:playlistData];
-    }
-    
-}
-
-- (void)parsePlaylistM3U:(NSString *)playlist {
-    [_playlistItems removeAllObjects];
-    
-    for (NSString *line in [playlist componentsSeparatedByString:@"\n"]) {
-        if ([line hasPrefix:@"#"]) {
-            /* metadata, skip */
-            continue;
-        }
-        if ([line hasPrefix:@"http://"] ||
-            [line hasPrefix:@"https://"]) {
-            FSPlaylistItem *item = [[FSPlaylistItem alloc] init];
-            item.url = [line stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-            
-            [_playlistItems addObject:item];
-        }
-    }
-}
-
-- (void)parsePlaylistPLS:(NSString *)playlist {
-    [_playlistItems removeAllObjects];
-    
-    NSMutableDictionary *props = [[NSMutableDictionary alloc] init];
-    
-    size_t i = 0;
-
-    for (NSString *rawLine in [playlist componentsSeparatedByString:@"\n"]) {
-        NSString *line = [rawLine stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
-        
-        if (i == 0) {
-            if ([[line lowercaseString] hasPrefix:@"[playlist]"]) {
-                i++;
-                continue;
-            } else {
-                // Invalid playlist; the first line should indicate that this is a playlist
-                return;
-            }
-        }
-        
-        // Ignore empty lines
-        if ([line length] == 0) {
-            i++;
-            continue;
-        }
-
-        // Not an empty line; so expect that this is a key/value pair
-        NSRange r = [line rangeOfString:@"="];
-        
-        // Invalid format, key/value pair not found
-        if (r.length == 0) {
-            return;
-        }
-        
-        NSString *key = [[line substringToIndex:r.location] lowercaseString];
-        NSString *value = [line substringFromIndex:r.location + 1];
-        
-        [props setObject:value forKey:key];
-        i++;
-    }
-    
-    NSInteger numItems = [[props valueForKey:@"numberofentries"] integerValue];
-    
-    if (numItems == 0) {
-        // Invalid playlist; number of playlist items not defined
-        return;
-    }
-    
-    for (i=0; i < numItems; i++) {
-        FSPlaylistItem *item = [[FSPlaylistItem alloc] init];
-        
-        NSString *title = [props valueForKey:[NSString stringWithFormat:@"title%lu", (i+1)]];
-        
-        item.title = title;
-        
-        NSString *file = [props valueForKey:[NSString stringWithFormat:@"file%lu", (i+1)]];
-        
-        if ([file hasPrefix:@"http://"] ||
-            [file hasPrefix:@"https://"]) {
-            
-            item.url = file;
-            
-            [_playlistItems addObject:item];
-        }
-    }
-}
-
-@end
-
 @interface FSAudioController ()
-- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response;
-- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data;
-- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error;
-- (void)connectionDidFinishLoading:(NSURLConnection *)connection;
+@property (readonly) FSAudioStream *audioStream;
+@property (readonly) FSCheckAudioFileFormatRequest *checkAudioFileFormatRequest;
+@property (readonly) FSParsePlaylistRequest *parsePlaylistRequest;
+@property (nonatomic,assign) BOOL readyToPlay;
 @end
 
 @implementation FSAudioController
 
--(id)init {
+@synthesize readyToPlay;
+
+-(id)init
+{
     if (self = [super init]) {
         _url = nil;
-        _streamContentTypeChecked = NO;
-        _receivedPlaylistData = nil;
-        _playlistPrivate = nil;
         _audioStream = [[FSAudioStream alloc] init];
-        _playlistPrivate = [[FSPlaylistPrivate alloc] init];
+        _checkAudioFileFormatRequest = nil;
+        _parsePlaylistRequest = nil;
+        _readyToPlay = NO;
     }
     return self;
 }
 
-- (void)dealloc {
+- (void)dealloc
+{
     _url = nil;
     _audioStream = nil;
-    _receivedPlaylistData = nil;
-    _playlistPrivate = nil;
-    if (_contentTypeConnection) {
-        [_contentTypeConnection cancel];
-        _contentTypeConnection = nil;
+    if (_checkAudioFileFormatRequest) {
+        [_checkAudioFileFormatRequest cancel];
+        _checkAudioFileFormatRequest = nil;
     }
-    if (_playlistRetrieveConnection) {
-        [_playlistRetrieveConnection cancel];
-        _playlistRetrieveConnection = nil;
+    if (_parsePlaylistRequest) {
+        [_parsePlaylistRequest cancel];
+        _parsePlaylistRequest = nil;
     }
+}
+
+/*
+ * =======================================
+ * Properties
+ * =======================================
+ */
+
+- (FSAudioStream *)audioStream
+{
+    return _audioStream;
+}
+
+- (FSCheckAudioFileFormatRequest *)checkAudioFileFormatRequest
+{
+    return _checkAudioFileFormatRequest;
+}
+
+- (FSParsePlaylistRequest *)parsePlaylistRequest
+{
+    return _parsePlaylistRequest;
 }
 
 /*
@@ -188,32 +82,56 @@ typedef enum {
  * =======================================
  */
 
-- (void)play {
+- (void)play
+{
     @synchronized (self) {
-        if (_streamContentTypeChecked) {            
-            [_audioStream play];
+        if (self.readyToPlay) {
+            [self.audioStream play];
             return;
         }
         
-        if (_contentTypeConnection || _playlistRetrieveConnection) {
-            /* Already checking the stream content type */
-            return;
-        }
+        __weak FSAudioController *weakSelf = self;
         
-        _streamContentTypeChecked = NO;
+        _parsePlaylistRequest = [[FSParsePlaylistRequest alloc] init];
+        _parsePlaylistRequest.url = self.url;
+        _parsePlaylistRequest.onCompletion = ^() {
+            if ([weakSelf.parsePlaylistRequest.playlistItems count] > 0) {
+                // Play the first item from the playlist
+                FSPlaylistItem *playlistItem = weakSelf.parsePlaylistRequest.playlistItems.firstObject;
+                
+                weakSelf.audioStream.url = playlistItem.nsURL;
+                weakSelf.readyToPlay = YES;
+                
+                [weakSelf.audioStream play];
+            }
+        };
+        _parsePlaylistRequest.onFailure = ^() {
+            // Failed to parse the playlist; try playing anyway
             
-        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:_url
-                                                                   cachePolicy:NSURLRequestReloadIgnoringCacheData
-                                                               timeoutInterval:30.0];
-        [request setHTTPMethod:@"HEAD"];
-        _contentTypeConnection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
+            weakSelf.readyToPlay = YES;
+            [weakSelf.audioStream play];
+        };
         
-        if (!_contentTypeConnection) {
-            /* Failed, just try to play */
-            _streamContentTypeChecked = YES;
-            [_audioStream play];
-            return;
-        }
+        _checkAudioFileFormatRequest = [[FSCheckAudioFileFormatRequest alloc] init];
+        _checkAudioFileFormatRequest.url = self.url;
+        _checkAudioFileFormatRequest.onCompletion = ^() {
+            if (weakSelf.checkAudioFileFormatRequest.playlist) {
+                // The URL is a playlist; retrieve the contents
+                [weakSelf.parsePlaylistRequest start];
+            } else {
+                // Not a playlist; try directly playing the URL
+                
+                weakSelf.readyToPlay = YES;
+                [weakSelf.audioStream play];
+            }
+        };
+        _checkAudioFileFormatRequest.onFailure = ^() {
+            // Failed to check the format; try playing anyway
+            
+            weakSelf.readyToPlay = YES;
+            [weakSelf.audioStream play];
+        };
+        [_checkAudioFileFormatRequest start];
         
         NSDictionary *userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:kFsAudioStreamRetrievingURL] forKey:FSAudioStreamNotificationKey_State];
         NSNotification *notification = [NSNotification notificationWithName:FSAudioStreamStateChangeNotification object:nil userInfo:userInfo];
@@ -221,16 +139,20 @@ typedef enum {
     }
 }
 
-- (void)playFromURL:(NSURL*)url {
+- (void)playFromURL:(NSString*)url
+{
     self.url = url;
     [self play];
 }
 
-- (void)stop {
+- (void)stop
+{
     [_audioStream stop];
+    self.readyToPlay = NO;
 }
 
-- (void)pause {
+- (void)pause
+{
     [_audioStream pause];
 }
 
@@ -240,138 +162,38 @@ typedef enum {
  * =======================================
  */
 
-- (void)setUrl:(NSURL *)url {
+- (void)setUrl:(NSURL *)url
+{
     @synchronized (self) {
         _url = nil;
     
         if (url && ![url isEqual:_url]) {
-            NSURL *copyOfURL = [url copy];
+            [_checkAudioFileFormatRequest cancel], _checkAudioFileFormatRequest = nil;
+            [_parsePlaylistRequest cancel], _parsePlaylistRequest = nil;
+            
+            NSString *copyOfURL = [url copy];
             _url = copyOfURL;
-            /* Since the stream URL changed, we don't know
-               its content-type */
-            _streamContentTypeChecked = NO;
-            [_playlistPrivate.playlistItems removeAllObjects];
+            /* Since the stream URL changed, the content may have changed */
+            self.readyToPlay = NO;
         }
     
-        _audioStream.url = _url;
+        _audioStream.url = [NSURL URLWithString:_url];
     }
 }
 
-- (NSURL*)url {
+- (NSString*)url
+{
     if (!_url) {
         return nil;
     }
     
-    NSURL *copyOfURL = [_url copy];
+    NSString *copyOfURL = [_url copy];
     return copyOfURL;
 }
 
-- (FSAudioStream *)stream {
+- (FSAudioStream *)stream
+{
     return _audioStream;
-}
-
-/*
- * =======================================
- * NSURLConnectionDelegate
- * =======================================
- */
-
-- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response {
-    if (_contentTypeConnection) {
-        NSString *contentType = response.MIMEType;
-        
-        if ([contentType isEqualToString:@"audio/x-mpegurl"]) {
-            _playlistPrivate.format = kFSPlaylistFormatM3U;
-        } else if ([contentType isEqualToString:@"audio/x-scpls"]) {
-            _playlistPrivate.format = kFSPlaylistFormatPLS;
-        } else if ([contentType isEqualToString:@"text/plain"]) {
-            NSString *absoluteUrl = [_url absoluteString];
-            
-            if ([absoluteUrl hasSuffix:@".m3u"]) {
-                _playlistPrivate.format = kFSPlaylistFormatM3U;
-            } else if ([absoluteUrl hasSuffix:@".pls"]) {
-                _playlistPrivate.format = kFSPlaylistFormatPLS;
-            }            
-        } else {
-            _playlistPrivate.format = kFSPlaylistFormatNone;
-        }
-        
-        [_contentTypeConnection cancel];
-        _contentTypeConnection = nil;
-        
-        if (_playlistPrivate.format == kFSPlaylistFormatNone) {
-            /* Not a playlist file, just try to play the stream */
-            _streamContentTypeChecked = YES;
-            [_audioStream play];
-            return;
-        }
-        
-        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:_url
-                                                            cachePolicy:NSURLRequestReloadIgnoringCacheData
-                                                            timeoutInterval:30.0];
-        [request setHTTPMethod:@"GET"];
-        _playlistRetrieveConnection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
-        
-        if (!_playlistRetrieveConnection) {
-            /* Failed to retrieve the playlist, just try to play */
-            [_audioStream play];
-            return;
-        }
-    } else if (_playlistRetrieveConnection) {
-        if (_receivedPlaylistData) {
-            _receivedPlaylistData = nil;
-        }
-        _receivedPlaylistData = [NSMutableData data];
-        [_receivedPlaylistData setLength:0];
-    }
-}
-
-- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
-    if (_contentTypeConnection) {
-        /* ignore any incoming data */
-    } else if (_playlistRetrieveConnection) {
-        [_receivedPlaylistData appendData:data];
-    }
-}
-
-- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
-    if (_contentTypeConnection) {
-        AC_TRACE(@"Error when checking content type: %@", [error localizedDescription]);
-        
-        _contentTypeConnection = nil;
-        /* Failed to read the stream's content type, try playing
-         the stream anyway */
-        _streamContentTypeChecked = YES;
-        [_audioStream play];
-    } else if (_playlistRetrieveConnection) {
-        AC_TRACE(@"Error when retrieving playlist: %@", [error localizedDescription]);
-        
-        _playlistRetrieveConnection = nil;
-        _receivedPlaylistData = nil;
-        /* Failed to read the playlist, try playing the stream anyway */
-        _streamContentTypeChecked = YES;
-        [_audioStream play];
-    }    
-}
-
-- (void)connectionDidFinishLoading:(NSURLConnection *)connection {
-    if (_contentTypeConnection) {
-        _contentTypeConnection = nil;
-    } else if (_playlistRetrieveConnection) {
-        _playlistRetrieveConnection = nil;
-        
-        [_playlistPrivate parsePlaylistFromData:_receivedPlaylistData];
-        
-        if ([_playlistPrivate.playlistItems count] > 0) {
-            FSPlaylistItem *first = [_playlistPrivate.playlistItems objectAtIndex:0];
-            _audioStream.url = first.nsURL;
-        }
-        
-        _streamContentTypeChecked = YES;
-        [_audioStream play];
-        
-        _receivedPlaylistData = nil;
-    }
 }
 
 @end
