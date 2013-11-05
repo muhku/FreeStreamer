@@ -97,6 +97,10 @@ void Audio_Queue::pause()
 void Audio_Queue::stop()
 {
     stop(true);
+    
+    if (initialized()) {
+        cleanup();
+    }
 }
 
 void Audio_Queue::stop(bool stopImmediately)
@@ -184,6 +188,12 @@ void Audio_Queue::handlePropertyChange(AudioFileStreamID inAudioFileStream, Audi
     switch (inPropertyID) {
         case kAudioFileStreamProperty_ReadyToProducePackets:
         {
+            if (initialized()) {
+                AQ_TRACE("%s: need cleanup\n", __PRETTY_FUNCTION__);
+                         
+                cleanup();
+            }
+            
             // the file stream parser is now ready to produce audio packets.
             // get the stream format.
             memset(&m_streamDesc, 0, sizeof(m_streamDesc));
@@ -549,7 +559,6 @@ void Audio_Queue::audioQueueIsRunningCallback(void *inClientData, AudioQueueRef 
         AQ_TRACE("audio queue running!\n");
         audioQueue->setState(RUNNING);
     } else {
-        audioQueue->cleanup();
         audioQueue->setState(IDLE);
     }
 }    
