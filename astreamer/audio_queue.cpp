@@ -133,10 +133,6 @@ void Audio_Queue::stop(bool stopImmediately)
         // it now
         cleanup();
         setState(IDLE);
-    } else {
-        // Otherwise, we wait until the playback has finished and then do the
-        // cleanup in the notification callback.
-        ;
     }
     
     AQ_TRACE("%s: leave\n", __PRETTY_FUNCTION__);
