@@ -58,9 +58,7 @@ Audio_Queue::~Audio_Queue()
 {
     stop(true);
     
-    if (initialized()) {
-        cleanup();
-    }
+    cleanup();
 }
     
 bool Audio_Queue::initialized()
@@ -129,9 +127,6 @@ void Audio_Queue::stop(bool stopImmediately)
     }
     
     if (stopImmediately) {
-        // If the queue was requested to stop immediately we can safely dispose
-        // it now
-        cleanup();
         setState(IDLE);
     }
     
@@ -184,11 +179,7 @@ void Audio_Queue::handlePropertyChange(AudioFileStreamID inAudioFileStream, Audi
     switch (inPropertyID) {
         case kAudioFileStreamProperty_ReadyToProducePackets:
         {
-            if (initialized()) {
-                AQ_TRACE("%s: need cleanup\n", __PRETTY_FUNCTION__);
-                         
-                cleanup();
-            }
+            cleanup();
             
             // the file stream parser is now ready to produce audio packets.
             // get the stream format.
