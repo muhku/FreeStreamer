@@ -35,15 +35,13 @@
 
 - (void)dealloc
 {
-    _url = nil;
-    _audioStream = nil;
+    [_audioStream stop];
+    
     if (_checkAudioFileFormatRequest) {
         [_checkAudioFileFormatRequest cancel];
-        _checkAudioFileFormatRequest = nil;
     }
     if (_parsePlaylistRequest) {
         [_parsePlaylistRequest cancel];
-        _parsePlaylistRequest = nil;
     }
 }
 
