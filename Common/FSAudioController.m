@@ -10,14 +10,6 @@
 #import "FSCheckAudioFileFormatRequest.h"
 #import "FSParsePlaylistRequest.h"
 
-//#define AC_DEBUG 1
-
-#if !defined (AC_DEBUG)
-#define AC_TRACE(...) do {} while (0)
-#else
-#define AC_TRACE(...) NSLog(__VA_ARGS__)
-#endif
-
 @interface FSAudioController ()
 @property (readonly) FSAudioStream *audioStream;
 @property (readonly) FSCheckAudioFileFormatRequest *checkAudioFileFormatRequest;
