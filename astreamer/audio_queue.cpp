@@ -56,7 +56,7 @@ Audio_Queue::Audio_Queue()
     
 Audio_Queue::~Audio_Queue()
 {
-    stop();
+    stop(true);
 }
     
 bool Audio_Queue::initialized()
