@@ -7,11 +7,15 @@
 #import <Foundation/Foundation.h>
 
 @class FSAudioStream;
-@class FSPlaylistPrivate;
 @class FSCheckAudioFileFormatRequest;
 @class FSParsePlaylistRequest;
 
-@interface FSAudioController : NSObject <NSURLConnectionDelegate> {
+/*
+ * FSAudioController is a convenience wrapper for using FSAudioStream:
+ * it resolves playlists automatically so you can directly feed it
+ * with a playlist URL.
+ */
+@interface FSAudioController : NSObject {
     NSString *_url;
     FSAudioStream *_audioStream;
     
