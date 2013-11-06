@@ -152,7 +152,7 @@
  * =======================================
  */
 
-- (void)setUrl:(NSURL *)url
+- (void)setUrl:(NSString *)url
 {
     @synchronized (self) {
         _url = nil;
