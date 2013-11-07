@@ -90,7 +90,9 @@ bool HTTP_Stream::open()
     position.end = 0;
     
     m_contentLength = 0;
+#ifdef INCLUDE_ID3TAG_SUPPORT
     m_id3Parser->reset();
+#endif
     
     return open(position);
 }
