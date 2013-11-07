@@ -6,6 +6,12 @@
 
 #include "http_stream.h"
 #include "audio_queue.h"
+#include "id3_parser.h"
+
+/*
+ * Uncomment the following line to enable the experimental ID3 tag support
+ */
+//#define INCLUDE_ID3TAG_SUPPORT 1
 
 namespace astreamer {
 
@@ -38,8 +44,11 @@ HTTP_Stream::HTTP_Stream() :
     m_metaDataBytesRemaining(0),
     
     m_httpReadBuffer(0),
-    m_icyReadBuffer(0)
+    m_icyReadBuffer(0),
+    
+    m_id3Parser(new ID3_Parser())
 {
+    m_id3Parser->m_delegate = this;
 }
 
 HTTP_Stream::~HTTP_Stream()
@@ -55,6 +64,8 @@ HTTP_Stream::~HTTP_Stream()
     if (m_url) {
         CFRelease(m_url), m_url = 0;
     }
+    
+    delete m_id3Parser, m_id3Parser = 0;
 }
     
 HTTP_Stream_Position HTTP_Stream::position()
@@ -79,6 +90,7 @@ bool HTTP_Stream::open()
     position.end = 0;
     
     m_contentLength = 0;
+    m_id3Parser->reset();
     
     return open(position);
 }
@@ -180,6 +192,13 @@ void HTTP_Stream::setUrl(CFURLRef url)
         CFRelease(m_url);
     }
     m_url = (CFURLRef)CFRetain(url);
+}
+    
+void HTTP_Stream::id3metaDataAvailable(std::string metaData)
+{
+    if (m_delegate) {
+        m_delegate->streamMetaDataAvailable(metaData);
+    }
 }
     
 /* private */
@@ -435,6 +454,12 @@ void HTTP_Stream::readCallBack(CFReadStreamRef stream, CFStreamEventType eventTy
             
             if (bytesRead > 0) {
                 THIS->parseHttpHeadersIfNeeded(THIS->m_httpReadBuffer, bytesRead);
+                
+#ifdef INCLUDE_ID3TAG_SUPPORT
+                if (THIS->m_id3Parser->wantData()) {
+                    THIS->m_id3Parser->feedData(THIS->m_httpReadBuffer, (UInt32)bytesRead);
+                }
+#endif
                 
                 if (THIS->m_icyStream) {
                     THIS->parseICYStream(THIS->m_httpReadBuffer, bytesRead);

@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		601369D2182C36AA001819D6 /* id3_parser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 601369D0182C36AA001819D6 /* id3_parser.cpp */; };
+		601369D3182C36AA001819D6 /* id3_parser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 601369D0182C36AA001819D6 /* id3_parser.cpp */; };
 		6032285E182411B500B7027B /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6032285D182411B500B7027B /* Cocoa.framework */; };
 		6032289C1824121800B7027B /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6032289B1824121800B7027B /* AVFoundation.framework */; };
 		6032289E1824122700B7027B /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6032289D1824122700B7027B /* AudioToolbox.framework */; };
@@ -61,6 +63,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		601369D0182C36AA001819D6 /* id3_parser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = id3_parser.cpp; path = astreamer/id3_parser.cpp; sourceTree = SOURCE_ROOT; };
+		601369D1182C36AA001819D6 /* id3_parser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = id3_parser.h; path = astreamer/id3_parser.h; sourceTree = SOURCE_ROOT; };
 		6032285A182411B500B7027B /* FreeStreamerDesktop.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FreeStreamerDesktop.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6032285D182411B500B7027B /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		60322860182411B500B7027B /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -243,6 +247,8 @@
 		60322891182411F000B7027B /* astreamer */ = {
 			isa = PBXGroup;
 			children = (
+				601369D0182C36AA001819D6 /* id3_parser.cpp */,
+				601369D1182C36AA001819D6 /* id3_parser.h */,
 				60AA8F70182412F9001DE57B /* audio_queue.cpp */,
 				60AA8F71182412F9001DE57B /* audio_queue.h */,
 				60AA8F72182412F9001DE57B /* audio_stream.cpp */,
@@ -435,6 +441,7 @@
 				6066DADD182427A30005E1A2 /* audio_stream.cpp in Sources */,
 				6066DADF182427A30005E1A2 /* http_stream.cpp in Sources */,
 				6066DAE2182427A30005E1A2 /* FSXAppDelegate.m in Sources */,
+				601369D2182C36AA001819D6 /* id3_parser.cpp in Sources */,
 				609F6DAA18295F54000E45B2 /* FSParsePlaylistRequest.m in Sources */,
 				6066DAE4182427A30005E1A2 /* FSXPlayerViewController.m in Sources */,
 				609F6DA718295684000E45B2 /* FSCheckAudioFileFormatRequest.m in Sources */,
@@ -450,6 +457,7 @@
 				6066DAC31824273A0005E1A2 /* audio_queue.cpp in Sources */,
 				6066DAC51824273A0005E1A2 /* audio_stream.cpp in Sources */,
 				609F6DAF18296EB6000E45B2 /* FSXMLHttpRequest.m in Sources */,
+				601369D3182C36AA001819D6 /* id3_parser.cpp in Sources */,
 				6066DAC71824273A0005E1A2 /* http_stream.cpp in Sources */,
 				6066DABA182427330005E1A2 /* FSAudioController.m in Sources */,
 				6066DABC182427330005E1A2 /* FSAudioStream.mm in Sources */,

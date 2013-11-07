@@ -10,6 +10,7 @@
 #import <CFNetwork/CFNetwork.h>
 #import <string>
 #import <vector>
+#import "id3_parser.h"
 
 namespace astreamer {
 
@@ -20,7 +21,7 @@ struct HTTP_Stream_Position {
     size_t end;
 };
 
-class HTTP_Stream {
+class HTTP_Stream : public ID3_Parser_Delegate {
 private:
     
     HTTP_Stream(const HTTP_Stream&);
@@ -62,6 +63,8 @@ private:
     UInt8 *m_httpReadBuffer;
     UInt8 *m_icyReadBuffer;
     
+    ID3_Parser *m_id3Parser;
+    
     CFReadStreamRef createReadStream(CFURLRef url);
     void parseHttpHeadersIfNeeded(UInt8 *buf, CFIndex bufSize);
     void parseICYStream(UInt8 *buf, CFIndex bufSize);
@@ -87,6 +90,9 @@ public:
     void setScheduledInRunLoop(bool scheduledInRunLoop);
     
     void setUrl(CFURLRef url);
+    
+    /* ID3_Parser_Delegate */
+    void id3metaDataAvailable(std::string metaData);
 };
 
 class HTTP_Stream_Delegate {

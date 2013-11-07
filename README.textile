@@ -47,6 +47,14 @@ audioStream.defaultContentType = "audio/mpeg";
 
 That's it! For more examples, please take a look at the example project. For instance, you may want to observe notifications on the audio stream state.
 
+h1. Experimental ID3 tag support
+
+If you want to enable detecting ID3 tags on streams, uncomment the following line in "http_stream.cpp":https://github.com/muhku/FreeStreamer/blob/master/astreamer/http_stream.cpp
+
+<pre>
+#define INCLUDE_ID3TAG_SUPPORT 1
+</pre>
+
 h1. Reporting bugs and contributing
 
 Your contributions are most welcome. If you want to send code, please a send a patch and make sure it can be merged to the master branch without conflicts.
