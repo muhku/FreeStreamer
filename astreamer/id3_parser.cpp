@@ -9,6 +9,14 @@
 #include <vector>
 #include <sstream>
 
+//#define ID3_DEBUG 1
+
+#if !defined ( ID3_DEBUG)
+#define ID3_TRACE(...) do {} while (0)
+#else
+#define ID3_TRACE(...) printf(__VA_ARGS__)
+#endif
+
 namespace astreamer {
     
 enum ID3_Parser_State {
@@ -90,6 +98,8 @@ void ID3_Parser_Private::feedData(UInt8 *data, UInt32 numBytes)
     
     m_bytesReceived += numBytes;
     
+    ID3_TRACE("received %i bytes, total bytes %i\n", numBytes, m_bytesReceived);
+    
     for (CFIndex i=0; i < numBytes; i++) {
         m_tagData.push_back(data[i]);
     }
@@ -108,6 +118,8 @@ void ID3_Parser_Private::feedData(UInt8 *data, UInt32 numBytes)
                 if (!(m_tagData[0] == 'I' &&
                     m_tagData[1] == 'D' &&
                     m_tagData[2] == '3')) {
+                    ID3_TRACE("Not an ID3 tag, bailing out\n");
+                    
                     // Does not begin with the tag header; not an ID3 tag
                     setState(ID3_Parser_State_Not_Valid_Tag);
                     enoughBytesToParse = false;
@@ -117,6 +129,8 @@ void ID3_Parser_Private::feedData(UInt8 *data, UInt32 numBytes)
                 UInt8 majorVersion = m_tagData[3];
                 // Currently support only id3v2.3
                 if (majorVersion != 3) {
+                    ID3_TRACE("ID3v2.%i not supported by the parser\n", majorVersion);
+                    
                     setState(ID3_Parser_State_Not_Valid_Tag);
                     enoughBytesToParse = false;
                     break;
@@ -142,6 +156,8 @@ void ID3_Parser_Private::feedData(UInt8 *data, UInt32 numBytes)
                     }
                     m_tagSize += 10;
                     
+                    ID3_TRACE("tag size: %i\n", m_tagSize);
+                    
                     setState(ID3_Parser_State_Parse_Frames);
                     break;
                 }
@@ -154,6 +170,9 @@ void ID3_Parser_Private::feedData(UInt8 *data, UInt32 numBytes)
             case ID3_Parser_State_Parse_Frames: {
                 // Do we have enough data to parse the frames?
                 if (m_tagData.size() < m_tagSize) {
+                    ID3_TRACE("Not enough data received for parsing, have %lu bytes, need %i bytes\n",
+                              m_tagData.size(),
+                              m_tagSize);
                     enoughBytesToParse = false;
                     break;
                 }
@@ -167,16 +186,18 @@ void ID3_Parser_Private::feedData(UInt8 *data, UInt32 numBytes)
                                                  (m_tagData[pos+2] << 7) |
                                                  m_tagData[pos+3]);
                     
-                    if (pos + extendedHeaderSize > m_tagData.size()) {
+                    if (pos + extendedHeaderSize >= m_tagSize) {
                         setState(ID3_Parser_State_Not_Valid_Tag);
                         enoughBytesToParse = false;
                         break;
                     }
                     
+                    ID3_TRACE("Skipping extended header, size %i\n", extendedHeaderSize);
+                    
                     pos += extendedHeaderSize;
                 }
                 
-                while (pos < m_tagData.size()) {
+                while (pos < m_tagSize) {
                     char frameName[5];
                     frameName[0] = m_tagData[pos];
                     frameName[1] = m_tagData[pos+1];
@@ -200,18 +221,24 @@ void ID3_Parser_Private::feedData(UInt8 *data, UInt32 numBytes)
                     
                     CFStringEncoding encoding;
                     
-                    if (m_tagData[pos] == 0) {
-                        encoding = kCFStringEncodingISOLatin1;
-                    } else if (m_tagData[pos] == 3) {
+                    if (m_tagData[pos] == 3) {
                         encoding = kCFStringEncodingUTF8;
                     } else {
-                        encoding = kCFStringEncodingUTF16;
+                        // ISO-8859-1 is the default encoding
+                        encoding = kCFStringEncodingISOLatin1;
                     }
                     
                     if (!strcmp(frameName, "TIT2")) {
                         m_title = parseContent(framesize, pos + 1, encoding);
+                        
+                        ID3_TRACE("ID3 title parsed: '%s'\n", m_title.c_str());
                     } else if (!strcmp(frameName, "TPE1")) {
                         m_performer = parseContent(framesize, pos + 1, encoding);
+                        
+                        ID3_TRACE("ID3 performer parsed: '%s'\n", m_performer.c_str());
+                    } else {
+                        // Unknown/unhandled frame
+                        ID3_TRACE("Unknown/unhandled frame: %s, size %i\n", frameName, framesize);
                     }
                     
                     pos += framesize;
