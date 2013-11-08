@@ -41,6 +41,7 @@ public:
     ID3_Parser_State m_state;
     UInt32 m_bytesReceived;
     UInt32 m_tagSize;
+    bool m_hasFooter;
     bool m_usesUnsynchronisation;
     bool m_usesExtendedHeader;
     
@@ -58,6 +59,7 @@ ID3_Parser_Private::ID3_Parser_Private() :
     m_state(ID3_Parser_State_Initial),
     m_bytesReceived(0),
     m_tagSize(0),
+    m_hasFooter(false),
     m_usesUnsynchronisation(false),
     m_usesExtendedHeader(false)
 {
@@ -127,11 +129,18 @@ void ID3_Parser_Private::feedData(UInt8 *data, UInt32 numBytes)
                     m_usesUnsynchronisation = true;
                 } else if ((m_tagData[5] & 0x40) != 0) {
                     m_usesExtendedHeader = true;
+                } else if ((m_tagData[5] & 0x10) != 0) {
+                    m_hasFooter = true;
                 }
                 
-                m_tagSize = (m_tagData[9] & 0xFF) | ((m_tagData[8] & 0xFF) << 7 ) | ((m_tagData[7] & 0xFF) << 14);
+                m_tagSize = (m_tagData[6] << 21) + (m_tagData[7] << 14) + (m_tagData[8] << 7) + m_tagData[9];
                 
                 if (m_tagSize > 0) {
+                    if (m_hasFooter) {
+                        m_tagSize += 10;
+                    }
+                    m_tagSize += 10;
+                    
                     setState(ID3_Parser_State_Parse_Frames);
                     break;
                 }
@@ -152,9 +161,9 @@ void ID3_Parser_Private::feedData(UInt8 *data, UInt32 numBytes)
                 
                 // Do we have an extended header? If we do, skip it
                 if (m_usesExtendedHeader) {
-                    UInt32 extendedHeaderSize = (m_tagData[pos] << 21 |
-                                                 m_tagData[pos+1] << 14 |
-                                                 m_tagData[pos+2] << 7 |
+                    UInt32 extendedHeaderSize = ((m_tagData[pos] << 21) |
+                                                 (m_tagData[pos+1] << 14) |
+                                                 (m_tagData[pos+2] << 7) |
                                                  m_tagData[pos+3]);
                     
                     if (pos + extendedHeaderSize > m_tagData.size()) {
@@ -229,8 +238,9 @@ void ID3_Parser_Private::reset()
     m_state = ID3_Parser_State_Initial;
     m_bytesReceived = 0;
     m_tagSize = 0;
-    m_usesUnsynchronisation = 0;
-    m_usesExtendedHeader = 0;
+    m_hasFooter = false;
+    m_usesUnsynchronisation = false;
+    m_usesExtendedHeader = false;
     
     m_tagData.clear();
 }
