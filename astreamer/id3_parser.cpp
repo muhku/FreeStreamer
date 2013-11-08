@@ -34,8 +34,7 @@ public:
     void setState(ID3_Parser_State state);
     void reset();
     
-    bool frameNameMatches(const char *frameName, UInt32 position);
-    CFStringRef parseContent(UInt32 framesize, UInt32 pos, CFStringEncoding encoding);
+    std::string parseContent(UInt32 framesize, UInt32 pos, CFStringEncoding encoding);
     
     ID3_Parser *m_parser;
     ID3_Parser_State m_state;
@@ -44,6 +43,8 @@ public:
     bool m_hasFooter;
     bool m_usesUnsynchronisation;
     bool m_usesExtendedHeader;
+    std::string m_title;
+    std::string m_performer;
     
     std::vector<UInt8> m_tagData;
 };
@@ -176,44 +177,60 @@ void ID3_Parser_Private::feedData(UInt8 *data, UInt32 numBytes)
                 }
                 
                 while (pos < m_tagData.size()) {
-                    UInt32 framesize = (m_tagData[pos+7] & 0xFF) |
-                                        ((m_tagData[pos+6] & 0xFF) << 8) |
-                                        ((m_tagData[pos+5] & 0xFF) << 16) |
-                                        ((m_tagData[pos+4] & 0xFF) << 24);
+                    char frameName[5];
+                    frameName[0] = m_tagData[pos];
+                    frameName[1] = m_tagData[pos+1];
+                    frameName[2] = m_tagData[pos+2];
+                    frameName[3] = m_tagData[pos+3];
+                    frameName[4] = 0;
+                    
+                    pos += 4;
+                    
+                    UInt32 framesize = ((m_tagData[pos] << 21) |
+                                        (m_tagData[pos+1] << 14) |
+                                        (m_tagData[pos+2] << 7) |
+                                        m_tagData[pos+3]);
                     if (framesize == 0) {
                         setState(ID3_Parser_State_Not_Valid_Tag);
                         enoughBytesToParse = false;
                         break;
                     }
                     
+                    pos += 6;
+                    
                     CFStringEncoding encoding;
                     
-                    if (m_tagData[pos+10] == 0) {
+                    if (m_tagData[pos] == 0) {
                         encoding = kCFStringEncodingISOLatin1;
-                    } else if (m_tagData[pos+10] == 3) {
+                    } else if (m_tagData[pos] == 3) {
                         encoding = kCFStringEncodingUTF8;
                     } else {
                         encoding = kCFStringEncodingUTF16;
                     }
                     
-                    if (frameNameMatches("TIT2", pos)) {
-                        CFStringRef content = parseContent(framesize, pos, encoding);
-                        
-                        const char *str = CFStringGetCStringPtr(content, kCFStringEncodingUTF8);
-                        if (str) {
-                            std::stringstream metaData;
-                            metaData << "StreamTitle='";
-                            metaData << str;
-                            metaData << "';";
-                            
-                            if (m_parser->m_delegate) {
-                                m_parser->m_delegate->id3metaDataAvailable(metaData.str());
-                            }
-                        }
-                        CFRelease(content);
+                    if (!strcmp(frameName, "TIT2")) {
+                        m_title = parseContent(framesize, pos + 1, encoding);
+                    } else if (!strcmp(frameName, "TPE1")) {
+                        m_performer = parseContent(framesize, pos + 1, encoding);
                     }
                     
                     pos += framesize;
+                }
+                
+                // Push out the metadata
+                if (m_parser->m_delegate) {
+                    std::stringstream metaData;
+                    metaData << "StreamTitle='";
+                    
+                    if (m_performer.length() > 0) {
+                        metaData << m_performer;
+                        metaData << " - ";
+                    }
+                    
+                    metaData << m_title;
+                    metaData << "';";
+                
+                    m_parser->m_delegate->id3metaDataAvailable(metaData.str());
                 }
                 
                 setState(ID3_Parser_State_Tag_Parsed);
@@ -241,39 +258,38 @@ void ID3_Parser_Private::reset()
     m_hasFooter = false;
     m_usesUnsynchronisation = false;
     m_usesExtendedHeader = false;
+    m_title = "";
+    m_performer = "";
     
     m_tagData.clear();
 }
     
-bool ID3_Parser_Private::frameNameMatches(const char *frameName, UInt32 position)
+std::string ID3_Parser_Private::parseContent(UInt32 framesize, UInt32 pos, CFStringEncoding encoding)
 {
-    size_t len = strlen(frameName);
-    
-    for (size_t i=0; i < len; i++) {
-        if (m_tagData[position + i] != frameName[i]) {
-            return false;
-        }
-    }
-    return true;
-}
-    
-CFStringRef ID3_Parser_Private::parseContent(UInt32 framesize, UInt32 pos, CFStringEncoding encoding)
-{
+    std::string frameContent;
     UInt8* buf = new UInt8[framesize];
     CFIndex bufLen = 0;
     
     for (CFIndex i=0; i < framesize - 1; i++) {
-        buf[i] = m_tagData[pos+11+i];
+        buf[i] = m_tagData[pos+i];
         bufLen++;
     }
     
-    delete[] buf;
+    CFStringRef content = CFStringCreateWithBytes(kCFAllocatorDefault,
+                                                   buf,
+                                                   bufLen,
+                                                   encoding,
+                                                   false);
     
-    return CFStringCreateWithBytes(kCFAllocatorDefault,
-                                   buf,
-                                   bufLen,
-                                   encoding,
-                                   false);
+    const char *str = CFStringGetCStringPtr(content, kCFStringEncodingUTF8);
+    if (str) {
+        frameContent = std::string(str);
+    }
+    
+    delete[] buf;
+    CFRelease(content);
+    
+    return frameContent;
 }
     
 /*
