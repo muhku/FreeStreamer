@@ -9,7 +9,7 @@
 @class FSPlayerViewController;
 @class FSParsePlaylistFeedRequest;
 
-@interface FSPlaylistViewController : UITableViewController<UITableViewDataSource,UITableViewDelegate> {
+@interface FSPlaylistViewController : UITableViewController<UITableViewDataSource,UITableViewDelegate,UIAlertViewDelegate> {
     NSMutableArray *_playlistItems;
     UINavigationController *_navigationController;
     FSPlayerViewController *_playerViewController;
@@ -19,5 +19,7 @@
 @property (nonatomic,strong) NSMutableArray *playlistItems;
 @property (nonatomic,strong) IBOutlet UINavigationController *navigationController;
 @property (nonatomic,strong) IBOutlet FSPlayerViewController *playerViewController;
+
+- (IBAction)addPlaylistItem:(id)sender;
 
 @end

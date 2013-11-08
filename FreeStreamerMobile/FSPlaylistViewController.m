@@ -71,6 +71,45 @@
 
 /*
  * =======================================
+ * Actions
+ * =======================================
+ */
+- (IBAction)addPlaylistItem:(id)sender
+{
+    UIAlertView * alert = [[UIAlertView alloc]
+                           initWithTitle:@"Add Playlist Item"
+                           message:@"URL:"
+                           delegate:self
+                           cancelButtonTitle:@"Cancel" otherButtonTitles:@"Ok", nil];
+    alert.alertViewStyle = UIAlertViewStylePlainTextInput;
+    [alert show];
+}
+
+/*
+ * =======================================
+ * Alert view delegate
+ * =======================================
+ */
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    if (buttonIndex == 0) {
+        return;
+    }
+    
+    NSString *url = [[alertView textFieldAtIndex:0] text];
+    
+    FSPlaylistItem *item = [[FSPlaylistItem alloc] init];
+    item.title = url;
+    item.url = url;
+    
+    [self.playlistItems addObject:item];
+    
+    [self.tableView reloadData];
+}
+
+/*
+ * =======================================
  * Table view
  * =======================================
  */
