@@ -9,7 +9,7 @@
 #include "id3_parser.h"
 
 /*
- * Uncomment the following line to enable the experimental ID3 tag support
+ * Comment the following line to disable ID3 tag support:
  */
 #define INCLUDE_ID3TAG_SUPPORT 1
 
