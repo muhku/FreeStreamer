@@ -11,6 +11,7 @@ FreeStreamer has the following features:
 * Supports ShoutCast metadata
 * Supports interruptions (for example a phone call during playing the stream)
 * Supports backgrounding
+* Supports a subset of the ID3v2 tag specification 
 
 !https://raw.github.com/muhku/FreeStreamer/master/Extra/player-new.png!
 
@@ -46,14 +47,6 @@ audioStream.defaultContentType = "audio/mpeg";
 </pre>
 
 That's it! For more examples, please take a look at the example project. For instance, you may want to observe notifications on the audio stream state.
-
-h1. Experimental ID3 tag support
-
-If you want to enable detecting ID3 tags on streams, uncomment the following line in "http_stream.cpp":https://github.com/muhku/FreeStreamer/blob/master/astreamer/http_stream.cpp
-
-<pre>
-#define INCLUDE_ID3TAG_SUPPORT 1
-</pre>
 
 h1. Reporting bugs and contributing
 
