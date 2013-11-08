@@ -20,6 +20,7 @@
 @synthesize navigationController=_navigationController;
 @synthesize playerViewController=_playerViewContoller;
 @synthesize playlistItems;
+@synthesize userPlaylistItems;
 
 /*
  * =======================================
@@ -31,6 +32,8 @@
 {
     [super viewDidLoad];
     
+    self.userPlaylistItems = [[NSMutableArray alloc] init];
+    
     __weak FSPlaylistViewController *weakSelf = self;
     
     _request = [[FSParsePlaylistFeedRequest alloc] init];
@@ -39,6 +42,8 @@
         [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
         
         weakSelf.playlistItems = [[NSMutableArray alloc] initWithArray:weakSelf.request.playlistItems];
+        [weakSelf.playlistItems addObjectsFromArray:weakSelf.userPlaylistItems];
+        
         [weakSelf.tableView reloadData];
     };
     _request.onFailure = ^() {
@@ -103,7 +108,9 @@
     item.title = url;
     item.url = url;
     
-    [self.playlistItems addObject:item];
+    [self.userPlaylistItems addObject:item];
+    
+    [self.playlistItems addObjectsFromArray:self.userPlaylistItems];
     
     [self.tableView reloadData];
 }

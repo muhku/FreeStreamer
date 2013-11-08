@@ -10,13 +10,13 @@
 @class FSParsePlaylistFeedRequest;
 
 @interface FSPlaylistViewController : UITableViewController<UITableViewDataSource,UITableViewDelegate,UIAlertViewDelegate> {
-    NSMutableArray *_playlistItems;
     UINavigationController *_navigationController;
     FSPlayerViewController *_playerViewController;
     FSParsePlaylistFeedRequest *_request;
 }
 
 @property (nonatomic,strong) NSMutableArray *playlistItems;
+@property (nonatomic,strong) NSMutableArray *userPlaylistItems;
 @property (nonatomic,strong) IBOutlet UINavigationController *navigationController;
 @property (nonatomic,strong) IBOutlet FSPlayerViewController *playerViewController;
 
