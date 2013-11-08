@@ -20,9 +20,20 @@
     return self;
 }
 
-
 - (NSURL *)nsURL {
     return [NSURL URLWithString:_url];
+}
+
+- (BOOL)isEqual:(id)anObject
+{
+    FSPlaylistItem *otherObject = anObject;
+    
+    if ([otherObject.title isEqual:self.title] &&
+        [otherObject.url isEqual:self.url]) {
+        return YES;
+    }
+    
+    return NO;
 }
 
 @end

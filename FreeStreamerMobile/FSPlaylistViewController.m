@@ -11,6 +11,8 @@
 
 @interface FSPlaylistViewController (PrivateMethods)
 
+- (void)addUserPlaylistItems;
+
 @property (nonatomic,readonly) FSParsePlaylistFeedRequest *request;
 
 @end
@@ -21,6 +23,30 @@
 @synthesize playerViewController=_playerViewContoller;
 @synthesize playlistItems;
 @synthesize userPlaylistItems;
+
+/*
+ * =======================================
+ * Private
+ * =======================================
+ */
+
+- (void)addUserPlaylistItems
+{
+    for (FSPlaylistItem *item in self.userPlaylistItems) {
+        BOOL alreadyInPlaylist = NO;
+        
+        for (FSPlaylistItem *existingItem in self.playlistItems) {
+            if ([existingItem isEqual:item]) {
+                alreadyInPlaylist = YES;
+                break;
+            }
+        }
+        
+        if (!alreadyInPlaylist) {
+            [self.playlistItems addObject:item];
+        }
+    }
+}
 
 /*
  * =======================================
@@ -42,7 +68,8 @@
         [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
         
         weakSelf.playlistItems = [[NSMutableArray alloc] initWithArray:weakSelf.request.playlistItems];
-        [weakSelf.playlistItems addObjectsFromArray:weakSelf.userPlaylistItems];
+        
+        [weakSelf addUserPlaylistItems];
         
         [weakSelf.tableView reloadData];
     };
@@ -108,10 +135,15 @@
     item.title = url;
     item.url = url;
     
+    for (FSPlaylistItem *existingItem in self.userPlaylistItems) {
+        if ([existingItem isEqual:item]) {
+            return;
+        }
+    }
+    
     [self.userPlaylistItems addObject:item];
     
-    [self.playlistItems addObjectsFromArray:self.userPlaylistItems];
-    
+    [self addUserPlaylistItems];
     [self.tableView reloadData];
 }
 
