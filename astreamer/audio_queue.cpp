@@ -297,7 +297,7 @@ int Audio_Queue::handlePacket(const void *data, AudioStreamPacketDescription *de
     
     AQ_TRACE("%s: enter\n", __PRETTY_FUNCTION__);
     
-    UInt64 packetSize = desc->mDataByteSize;
+    UInt32 packetSize = desc->mDataByteSize;
     
     /* This shouldn't happen because most of the time we read the packet buffer
      size from the file stream, but if we restored to guessing it we could
