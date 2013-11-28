@@ -51,6 +51,8 @@ public:
     void setStrictContentTypeChecking(bool strictChecking);
     void setDefaultContentType(std::string& defaultContentType);
     
+    State state();
+    
     /* Audio_Queue_Delegate */
     void audioQueueStateChanged(Audio_Queue::State state);
     void audioQueueBuffersEmpty();

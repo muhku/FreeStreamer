@@ -168,6 +168,11 @@ void Audio_Stream::setDefaultContentType(std::string& defaultContentType)
     m_defaultContentType = defaultContentType;
 }
     
+Audio_Stream::State Audio_Stream::state()
+{
+    return m_state;
+}
+    
 AudioFileTypeID Audio_Stream::audioStreamTypeFromContentType(std::string contentType)
 {
     AudioFileTypeID fileTypeHint = kAudioFileAAC_ADTSType;

@@ -7,8 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		600032771847CF94001C83BE /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 600032761847CF94001C83BE /* SystemConfiguration.framework */; };
 		601369D2182C36AA001819D6 /* id3_parser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 601369D0182C36AA001819D6 /* id3_parser.cpp */; };
 		601369D3182C36AA001819D6 /* id3_parser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 601369D0182C36AA001819D6 /* id3_parser.cpp */; };
+		602C629B1847936B00EA657D /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 602C629A1847936B00EA657D /* Reachability.m */; };
+		602C629C1847961A00EA657D /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 602C629A1847936B00EA657D /* Reachability.m */; };
 		6032285E182411B500B7027B /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6032285D182411B500B7027B /* Cocoa.framework */; };
 		6032289C1824121800B7027B /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6032289B1824121800B7027B /* AVFoundation.framework */; };
 		6032289E1824122700B7027B /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6032289D1824122700B7027B /* AudioToolbox.framework */; };
@@ -63,8 +66,11 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		600032761847CF94001C83BE /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		601369D0182C36AA001819D6 /* id3_parser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = id3_parser.cpp; path = astreamer/id3_parser.cpp; sourceTree = SOURCE_ROOT; };
 		601369D1182C36AA001819D6 /* id3_parser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = id3_parser.h; path = astreamer/id3_parser.h; sourceTree = SOURCE_ROOT; };
+		602C62991847936B00EA657D /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
+		602C629A1847936B00EA657D /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
 		6032285A182411B500B7027B /* FreeStreamerDesktop.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FreeStreamerDesktop.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6032285D182411B500B7027B /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		60322860182411B500B7027B /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
@@ -140,6 +146,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				600032771847CF94001C83BE /* SystemConfiguration.framework in Frameworks */,
 				603228A01824123100B7027B /* CFNetwork.framework in Frameworks */,
 				6032289E1824122700B7027B /* AudioToolbox.framework in Frameworks */,
 				6032289C1824121800B7027B /* AVFoundation.framework in Frameworks */,
@@ -189,6 +196,7 @@
 		6032285C182411B500B7027B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				600032761847CF94001C83BE /* SystemConfiguration.framework */,
 				6066DA9D182425240005E1A2 /* AVFoundation.framework */,
 				6066DA9B182425150005E1A2 /* CFNetwork.framework */,
 				6066DA99182425090005E1A2 /* AudioToolbox.framework */,
@@ -309,6 +317,8 @@
 		60CF9E501824156F00999FDF /* Common */ = {
 			isa = PBXGroup;
 			children = (
+				602C62991847936B00EA657D /* Reachability.h */,
+				602C629A1847936B00EA657D /* Reachability.m */,
 				60CF9E511824156F00999FDF /* FSAudioController.h */,
 				60CF9E521824156F00999FDF /* FSAudioController.m */,
 				60CF9E531824156F00999FDF /* FSAudioStream.h */,
@@ -434,6 +444,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				602C629B1847936B00EA657D /* Reachability.m in Sources */,
 				6066DAD2182427A30005E1A2 /* FSAudioController.m in Sources */,
 				6066DAD4182427A30005E1A2 /* FSAudioStream.mm in Sources */,
 				6066DAD8182427A30005E1A2 /* FSPlaylistItem.m in Sources */,
@@ -453,6 +464,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				602C629C1847961A00EA657D /* Reachability.m in Sources */,
 				609F6DAC182962C4000E45B2 /* FSCheckAudioFileFormatRequest.m in Sources */,
 				6066DAC31824273A0005E1A2 /* audio_queue.cpp in Sources */,
 				6066DAC51824273A0005E1A2 /* audio_stream.cpp in Sources */,

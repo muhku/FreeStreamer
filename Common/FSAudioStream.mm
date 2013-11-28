@@ -6,6 +6,8 @@
 
 #import "FSAudioStream.h"
 
+#import "Reachability.h"
+
 #include "audio_stream.h"
 
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
@@ -119,9 +121,10 @@ public:
     NSURL *_url;
     BOOL _strictContentTypeChecking;
 	AudioStreamStateObserver *_observer;
-    BOOL _currentlyPlaying;
     BOOL _wasInterrupted;
+    BOOL _wasDisconnected;
     NSString *_defaultContentType;
+    Reachability *_reachability;
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
     UIBackgroundTaskIdentifier _backgroundTask;
 #endif
@@ -131,6 +134,8 @@ public:
 @property (nonatomic,assign) BOOL strictContentTypeChecking;
 @property (nonatomic,assign) NSString *defaultContentType;
 @property (nonatomic,assign) BOOL wasInterrupted;
+
+- (void)reachabilityChanged:(NSNotification *)note;
 
 - (void)play;
 - (void)playFromURL:(NSURL*)url;
@@ -150,11 +155,19 @@ public:
     if (self = [super init]) {
         _url = nil;
         _wasInterrupted = NO;
+        _wasDisconnected = NO;
         
         _observer = new AudioStreamStateObserver();
         _audioStream = new astreamer::Audio_Stream();
         _observer->source = _audioStream;
         _audioStream->m_delegate = _observer;
+        
+        _reachability = [Reachability reachabilityForInternetConnection];
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(reachabilityChanged:)
+                                                     name:kReachabilityChangedNotification
+                                                   object:nil];
 
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
         OSStatus result = AudioSessionInitialize(NULL,
@@ -172,6 +185,10 @@ public:
 }
 
 - (void)dealloc {
+    [_reachability stopNotifier];
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    
     _audioStream->close();
     
     delete _audioStream, _audioStream = nil;
@@ -179,7 +196,7 @@ public:
 }
 
 - (void)setUrl:(NSURL *)url {
-    if (_currentlyPlaying) {
+    if ([self isPlaying]) {
         [self stop];
     }
     
@@ -193,7 +210,7 @@ public:
         _audioStream->setUrl((__bridge CFURLRef)_url);
     }
     
-    if (_currentlyPlaying) {
+    if ([self isPlaying]) {
         [self play];
     }
 }
@@ -240,14 +257,40 @@ public:
     return copyOfDefaultContentType;
 }
 
+- (void)reachabilityChanged:(NSNotification *)note {
+    Reachability *reach = [note object];
+    NetworkStatus netStatus = [reach currentReachabilityStatus];
+    BOOL internetConnectionAvailable = (netStatus == ReachableViaWiFi || netStatus == ReachableViaWWAN);
+    
+    if ([self isPlaying] && !internetConnectionAvailable) {
+        _wasDisconnected = YES;
+    }
+    
+    if (_wasDisconnected && internetConnectionAvailable) {
+        _wasDisconnected = NO;
+        
+        /*
+         * If we call play immediately after the reachability notification,
+         * the network still fails. Give some time for the network to be actually
+         * connected.
+         */
+        [NSTimer scheduledTimerWithTimeInterval:1
+                                         target:self
+                                       selector:@selector(play)
+                                       userInfo:nil
+                                        repeats:NO];
+    }
+}
+
 - (void)play
 {
     _audioStream->open();
+    
+    [_reachability startNotifier];
 }
 
 - (void)stop {
     _audioStream->close();
-    _currentlyPlaying = NO;
     
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
     if (_backgroundTask != UIBackgroundTaskInvalid) {
@@ -255,11 +298,12 @@ public:
         _backgroundTask = UIBackgroundTaskInvalid;
     }
 #endif
-
+    
+    [_reachability stopNotifier];
 }
 
 - (BOOL)isPlaying {
-    return _currentlyPlaying;
+    return (_audioStream->state() == astreamer::Audio_Stream::PLAYING);
 }
 
 - (void)pause {
