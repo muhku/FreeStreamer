@@ -10,6 +10,8 @@
 
 #include "audio_stream.h"
 
+#import <AVFoundation/AVFoundation.h>
+
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
 #import <AudioToolbox/AudioToolbox.h>
 #endif
@@ -58,7 +60,7 @@ public:
             case astreamer::Audio_Stream::STOPPED:
                 fsAudioState = [NSNumber numberWithInt:kFsAudioStreamStopped];
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
-                AudioSessionSetActive(false);
+                [[AVAudioSession sharedInstance] setActive:NO error:nil];
 #endif
                 break;
             case astreamer::Audio_Stream::BUFFERING:
@@ -67,7 +69,7 @@ public:
             case astreamer::Audio_Stream::PLAYING:
                 fsAudioState = [NSNumber numberWithInt:kFsAudioStreamPlaying];
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
-                AudioSessionSetActive(true);
+                [[AVAudioSession sharedInstance] setActive:YES error:nil];
 #endif                
                 break;
             case astreamer::Audio_Stream::SEEKING:
@@ -79,7 +81,7 @@ public:
             case astreamer::Audio_Stream::FAILED:
                 fsAudioState = [NSNumber numberWithInt:kFsAudioStreamFailed];
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
-                AudioSessionSetActive(false);
+                [[AVAudioSession sharedInstance] setActive:NO error:nil];
 #endif                
                 break;
             default:
@@ -136,6 +138,7 @@ public:
 @property (nonatomic,assign) BOOL wasInterrupted;
 
 - (void)reachabilityChanged:(NSNotification *)note;
+- (void)interruptionOccurred:(NSNotification *)notification;
 
 - (void)play;
 - (void)playFromURL:(NSURL*)url;
@@ -170,15 +173,14 @@ public:
                                                    object:nil];
 
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
-        OSStatus result = AudioSessionInitialize(NULL,
-                                                 NULL,
-                                                 interruptionListener,
-                                                 (__bridge void*)self);
+        [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
+#endif
         
-        if (result == kAudioSessionNoError) {
-            UInt32 category = kAudioSessionCategory_MediaPlayback;
-            (void)AudioSessionSetProperty(kAudioSessionProperty_AudioCategory, sizeof(category), &category);
-        }
+#if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 60000)
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(interruptionOccurred:)
+                                                     name:AVAudioSessionInterruptionNotification
+                                                   object:nil];
 #endif
     }
     return self;
@@ -280,6 +282,32 @@ public:
                                        userInfo:nil
                                         repeats:NO];
     }
+}
+
+- (void)interruptionOccurred:(NSNotification *)notification
+{
+#if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 60000)
+    NSDictionary *dict = notification.userInfo;
+    NSUInteger interruptionType = (NSUInteger)[dict valueForKey:AVAudioSessionInterruptionTypeKey];
+    if (interruptionType == AVAudioSessionInterruptionTypeBegan) {
+        if ([self isPlaying]) {
+            self.wasInterrupted = YES;
+            
+            [self pause];
+        }
+    } else if (interruptionType == AVAudioSessionInterruptionTypeEnded) {
+        if (self.wasInterrupted) {
+            self.wasInterrupted = NO;
+            
+            [[AVAudioSession sharedInstance] setActive:YES error:nil];
+            
+            /*
+             * Resume playing.
+             */
+            [self pause];
+        }
+    }
+#endif
 }
 
 - (void)play
@@ -416,36 +444,3 @@ public:
 }
 
 @end
-
-/*
- * ===============================================================
- * Interruption listener for the audio session
- * ===============================================================
- */
-
-#if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
-static void interruptionListener(void *	inClientData,
-                                UInt32	inInterruptionState)
-{
-	FSAudioStreamPrivate *THIS = (__bridge FSAudioStreamPrivate*)inClientData;
-    
-	if (inInterruptionState == kAudioSessionBeginInterruption) {
-        if ([THIS isPlaying]) {
-            THIS.wasInterrupted = YES;
-            
-            [THIS pause];
-        }
-	} else if (inInterruptionState == kAudioSessionEndInterruption) {
-        if (THIS.wasInterrupted) {
-            THIS.wasInterrupted = NO;
-            
-            AudioSessionSetActive(true);
-            
-            /*
-             * Resume playing.
-             */
-            [THIS pause];
-        }
-    }
-}
-#endif
