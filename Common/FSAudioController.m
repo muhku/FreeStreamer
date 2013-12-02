@@ -15,11 +15,15 @@
 @property (readonly) FSCheckAudioFileFormatRequest *checkAudioFileFormatRequest;
 @property (readonly) FSParsePlaylistRequest *parsePlaylistRequest;
 @property (nonatomic,assign) BOOL readyToPlay;
+@property (nonatomic,assign) NSUInteger currentPlaylistItemIndex;
+@property (nonatomic,strong) NSMutableArray *playlistItems;
 @end
 
 @implementation FSAudioController
 
 @synthesize readyToPlay;
+@synthesize currentPlaylistItemIndex;
+@synthesize playlistItems;
 
 -(id)init
 {
@@ -76,6 +80,12 @@
 {
     @synchronized (self) {
         if (self.readyToPlay) {
+            if ([self.playlistItems count] > 0) {
+                FSPlaylistItem *playlistItem = [self.playlistItems objectAtIndex:self.currentPlaylistItemIndex];
+                
+                _audioStream.url = playlistItem.nsURL;
+            }
+            
             [self.audioStream play];
             return;
         }
@@ -86,13 +96,19 @@
         _parsePlaylistRequest.url = self.url;
         _parsePlaylistRequest.onCompletion = ^() {
             if ([weakSelf.parsePlaylistRequest.playlistItems count] > 0) {
-                // Play the first item from the playlist
-                FSPlaylistItem *playlistItem = weakSelf.parsePlaylistRequest.playlistItems.firstObject;
+                weakSelf.playlistItems = weakSelf.parsePlaylistRequest.playlistItems;
                 
-                weakSelf.audioStream.url = playlistItem.nsURL;
                 weakSelf.readyToPlay = YES;
                 
-                [weakSelf.audioStream play];
+                weakSelf.audioStream.onCompletion = ^() {
+                    if (weakSelf.currentPlaylistItemIndex + 1 < [weakSelf.playlistItems count]) {
+                        weakSelf.currentPlaylistItemIndex = weakSelf.currentPlaylistItemIndex + 1;
+                        
+                        [weakSelf play];
+                    }
+                };
+                
+                [weakSelf play];
             }
         };
         _parsePlaylistRequest.onFailure = ^() {
@@ -132,6 +148,7 @@
 - (void)playFromURL:(NSString*)url
 {
     self.url = url;
+        
     [self play];
 }
 
@@ -156,7 +173,8 @@
 {
     @synchronized (self) {
         _url = nil;
-    
+        self.currentPlaylistItemIndex = 0;
+        
         if (url && ![url isEqual:_url]) {
             [_checkAudioFileFormatRequest cancel], _checkAudioFileFormatRequest = nil;
             [_parsePlaylistRequest cancel], _parsePlaylistRequest = nil;
@@ -165,9 +183,10 @@
             _url = copyOfURL;
             /* Since the stream URL changed, the content may have changed */
             self.readyToPlay = NO;
+            self.playlistItems = [[NSMutableArray alloc] init];
         }
     
-        _audioStream.url = [NSURL URLWithString:_url];
+        self.audioStream.url = [NSURL URLWithString:_url];
     }
 }
 

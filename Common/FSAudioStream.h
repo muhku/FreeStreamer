@@ -55,4 +55,14 @@ typedef struct {
 @property (nonatomic,readonly) FSStreamPosition duration;
 @property (nonatomic,readonly) BOOL continuous;
 
+/*
+ * Called upon completion of the stream. Note that for continuous
+ * streams this is never called.
+ */
+@property (copy) void (^onCompletion)();
+/*
+ * Called upon a failure.
+ */
+@property (copy) void (^onFailure)();
+
 @end
