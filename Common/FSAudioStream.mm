@@ -287,7 +287,7 @@ public:
 - (void)interruptionOccurred:(NSNotification *)notification
 {
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 60000)
-    NSNumber *interruptionType = [[note userInfo] valueForKey:AVAudioSessionInterruptionTypeKey];
+    NSNumber *interruptionType = [[notification userInfo] valueForKey:AVAudioSessionInterruptionTypeKey];
     if ([interruptionType intValue] == AVAudioSessionInterruptionTypeBegan) {
         if ([self isPlaying]) {
             self.wasInterrupted = YES;
