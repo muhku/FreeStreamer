@@ -26,11 +26,6 @@ NSString* const FSAudioStreamNotificationKey_Error = @"error";
 NSString* const FSAudioStreamMetaDataNotification = @"FSAudioStreamMetaDataNotification";
 NSString* const FSAudioStreamNotificationKey_MetaData = @"metadata";
 
-#if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
-static void interruptionListener(void *	inClientData,
-                                UInt32	inInterruptionState);
-#endif
-
 /*
  * ===============================================================
  * Listens to the state from the audio stream.
