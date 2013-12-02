@@ -287,15 +287,14 @@ public:
 - (void)interruptionOccurred:(NSNotification *)notification
 {
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 60000)
-    NSDictionary *dict = notification.userInfo;
-    NSUInteger interruptionType = (NSUInteger)[dict valueForKey:AVAudioSessionInterruptionTypeKey];
-    if (interruptionType == AVAudioSessionInterruptionTypeBegan) {
+    NSNumber *interruptionType = [[note userInfo] valueForKey:AVAudioSessionInterruptionTypeKey];
+    if ([interruptionType intValue] == AVAudioSessionInterruptionTypeBegan) {
         if ([self isPlaying]) {
             self.wasInterrupted = YES;
             
             [self pause];
         }
-    } else if (interruptionType == AVAudioSessionInterruptionTypeEnded) {
+    } else if ([interruptionType intValue] == AVAudioSessionInterruptionTypeEnded) {
         if (self.wasInterrupted) {
             self.wasInterrupted = NO;
             
