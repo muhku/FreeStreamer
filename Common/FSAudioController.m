@@ -9,11 +9,13 @@
 #import "FSPlaylistItem.h"
 #import "FSCheckContentTypeRequest.h"
 #import "FSParsePlaylistRequest.h"
+#import "FSParseRssPodcastFeedRequest.h"
 
 @interface FSAudioController ()
 @property (readonly) FSAudioStream *audioStream;
 @property (readonly) FSCheckContentTypeRequest *checkContentTypeRequest;
 @property (readonly) FSParsePlaylistRequest *parsePlaylistRequest;
+@property (readonly) FSParseRssPodcastFeedRequest *parseRssPodcastFeedRequest;
 @property (nonatomic,assign) BOOL readyToPlay;
 @property (nonatomic,assign) NSUInteger currentPlaylistItemIndex;
 @property (nonatomic,strong) NSMutableArray *playlistItems;
@@ -70,6 +72,11 @@
     return _parsePlaylistRequest;
 }
 
+- (FSParseRssPodcastFeedRequest *)parseRssPodcastFeedRequest
+{
+    return _parseRssPodcastFeedRequest;
+}
+
 /*
  * =======================================
  * Public interface
@@ -91,6 +98,10 @@
         }
         
         __weak FSAudioController *weakSelf = self;
+        
+        /*
+         * Handle playlists
+         */
         
         _parsePlaylistRequest = [[FSParsePlaylistRequest alloc] init];
         _parsePlaylistRequest.url = self.url;
@@ -118,12 +129,49 @@
             [weakSelf.audioStream play];
         };
         
+        /*
+         * Handle RSS feed parsing
+         */
+        
+        _parseRssPodcastFeedRequest = [[FSParseRssPodcastFeedRequest alloc] init];
+        _parseRssPodcastFeedRequest.url = self.url;
+        _parseRssPodcastFeedRequest.onCompletion = ^() {
+            if ([weakSelf.parseRssPodcastFeedRequest.playlistItems count] > 0) {
+                weakSelf.playlistItems = weakSelf.parseRssPodcastFeedRequest.playlistItems;
+                
+                weakSelf.readyToPlay = YES;
+                
+                weakSelf.audioStream.onCompletion = ^() {
+                    if (weakSelf.currentPlaylistItemIndex + 1 < [weakSelf.playlistItems count]) {
+                        weakSelf.currentPlaylistItemIndex = weakSelf.currentPlaylistItemIndex + 1;
+                        
+                        [weakSelf play];
+                    }
+                };
+                
+                [weakSelf play];
+            }
+        };
+        _parseRssPodcastFeedRequest.onFailure = ^() {
+            // Failed to parse the XML file; try playing anyway
+            
+            weakSelf.readyToPlay = YES;
+            [weakSelf.audioStream play];
+        };
+        
+        /*
+         * Handle content type check
+         */
+        
         _checkContentTypeRequest = [[FSCheckContentTypeRequest alloc] init];
         _checkContentTypeRequest.url = self.url;
         _checkContentTypeRequest.onCompletion = ^() {
             if (weakSelf.checkContentTypeRequest.playlist) {
                 // The URL is a playlist; retrieve the contents
                 [weakSelf.parsePlaylistRequest start];
+            } else if (weakSelf.checkContentTypeRequest.xml) {
+                // The URL may be an RSS feed, check the contents
+                [weakSelf.parseRssPodcastFeedRequest start];
             } else {
                 // Not a playlist; try directly playing the URL
                 

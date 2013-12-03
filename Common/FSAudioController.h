@@ -9,6 +9,7 @@
 @class FSAudioStream;
 @class FSCheckContentTypeRequest;
 @class FSParsePlaylistRequest;
+@class FSParseRssPodcastFeedRequest;
 
 /*
  * FSAudioController is a convenience wrapper for using FSAudioStream:
@@ -23,6 +24,7 @@
     
     FSCheckContentTypeRequest *_checkContentTypeRequest;
     FSParsePlaylistRequest *_parsePlaylistRequest;
+    FSParseRssPodcastFeedRequest *_parseRssPodcastFeedRequest;
 }
 
 - (void)play;

@@ -22,6 +22,7 @@ typedef enum {
     NSMutableData *_receivedData;
     xmlDocPtr _xmlDocument;
     FSXMLHttpRequestError lastError;
+    NSDateFormatter *_dateFormatter;
 }
 
 @property (nonatomic,copy) NSString *url;
@@ -35,5 +36,7 @@ typedef enum {
 - (NSArray *)performXPathQuery:(NSString *)query;
 - (NSString *)contentForNode:(xmlNodePtr)node;
 - (NSString *)contentForNodeAttribute:(xmlNodePtr)node attribute:(const char *)attr;
+
+- (NSDate *)dateFromNode:(xmlNodePtr)node;
 
 @end

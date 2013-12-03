@@ -18,6 +18,7 @@
     if (self) {
         _format = kFSFileFormatUnknown;
         _playlist = NO;
+        _xml = NO;
     }
     return self;
 }
@@ -79,6 +80,11 @@
     return _playlist;
 }
 
+- (BOOL)xml
+{
+    return _xml;
+}
+
 /*
  * =======================================
  * NSURLConnectionDelegate
@@ -132,6 +138,10 @@
             _format = kFSFileFormatPLSPlaylist;
             _playlist = YES;
         }
+    } else if ([_contentType isEqualToString:@"text/xml"] ||
+               [_contentType isEqualToString:@"application/xml"]) {
+        _format = kFSFileFormatXML;
+        _xml = YES;
     }
     
     [_connection cancel];

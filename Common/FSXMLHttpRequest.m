@@ -8,6 +8,9 @@
 
 #import <libxml/xpath.h>
 
+#define DATE_COMPONENTS (NSYearCalendarUnit| NSMonthCalendarUnit | NSDayCalendarUnit | NSWeekCalendarUnit |  NSHourCalendarUnit | NSMinuteCalendarUnit | NSSecondCalendarUnit | NSWeekdayCalendarUnit | NSWeekdayOrdinalCalendarUnit)
+#define CURRENT_CALENDAR [NSCalendar currentCalendar]
+
 @interface FSXMLHttpRequest (PrivateMethods)
 - (const char *)detectEncoding;
 - (void)parseResponseData;
@@ -26,8 +29,14 @@
 {
     self = [super init];
     if (self) {
+        _dateFormatter = [[NSDateFormatter alloc] init];
     }
     return self;
+}
+
+- (void)dealloc
+{
+    _receivedData = nil;
 }
 
 - (void)start
@@ -222,6 +231,39 @@ cleanup:
     
     free((void *)header);
     return encoding;
+}
+
+- (NSDate *)dateFromNode:(xmlNodePtr)node
+{
+    NSString *dateString = [self contentForNode:node];
+    
+    /*
+     * For some NSDateFormatter date parsing oddities: http://www.openradar.me/9944011
+     *
+     * Engineering has determined that this issue behaves as intended based on the following information:
+     *
+     * This is an intentional change in iOS 5. The issue is this: With the short formats as specified by z (=zzz) or v (=vvv),
+     * there can be a lot of ambiguity. For example, "ET" for Eastern Time" could apply to different time zones in many different regions.
+     * To improve formatting and parsing reliability, the short forms are only used in a locale if the "cu" (commonly used) flag is set
+     * for the locale. Otherwise, only the long forms are used (for both formatting and parsing). This is a change in
+     * open-source CLDR 2.0 / ICU 4.8, which is the basis for the ICU in iOS 5, which in turn is the basis of NSDateFormatter behavior.
+     *
+     * For the "en" locale (= "en_US"), the cu flag is set for metazones such as Alaska, America_Central, America_Eastern, America_Mountain,
+     * America_Pacific, Atlantic, Hawaii_Aleutian, and GMT. It is not set for Europe_Central.
+     *
+     * However, for the "en_GB" locale, the cu flag is set for Europe_Central.
+     *
+     * So, a formatter set for short timezone style "z" or "zzz" and locale "en" or "en_US" will not parse "CEST" or "CET", but if the
+     * locale is instead set to "en_GB" it will parse those. The "GMT" style will be parsed by all.
+     *
+     * If the formatter is set for the long timezone style "zzzz", and the locale is any of "en", "en_US", or "en_GB", then any of the
+     * following will be parsed, because they are unambiguous:
+     *
+     * "Pacific Daylight Time" "Central European Summer Time" "Central European Time"
+     *
+     */
+    
+    return [_dateFormatter dateFromString:dateString];
 }
 
 @end

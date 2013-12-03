@@ -13,6 +13,9 @@ typedef enum {
     kFSFileFormatM3UPlaylist,
     kFSFileFormatPLSPlaylist,
     
+    /* RSS */
+    kFSFileFormatXML,
+    
     /* Audio file */
     kFSFileFormatMP3,
     kFSFileFormatWAVE,
@@ -32,6 +35,7 @@ typedef enum {
     FSFileFormat _format;
     NSString *_contentType;
     BOOL _playlist;
+    BOOL _xml;
 }
 
 @property (nonatomic,copy) NSString *url;
@@ -40,6 +44,7 @@ typedef enum {
 @property (nonatomic,readonly) FSFileFormat format;
 @property (nonatomic,readonly) NSString *contentType;
 @property (nonatomic,readonly) BOOL playlist;
+@property (nonatomic,readonly) BOOL xml;
 
 - (void)start;
 - (void)cancel;
