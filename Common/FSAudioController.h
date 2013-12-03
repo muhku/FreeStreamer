@@ -27,6 +27,8 @@
     FSParseRssPodcastFeedRequest *_parseRssPodcastFeedRequest;
 }
 
+- (id)initWithUrl:(NSString *)url;
+
 - (void)play;
 - (void)playFromURL:(NSString*)url;
 - (void)stop;
@@ -35,6 +37,8 @@
  * Otherwise (the stream is paused), calling pause will continue the playback.
  */
 - (void)pause;
+
+- (BOOL)isPlaying;
 
 @property (nonatomic,assign) NSString *url;
 @property (readonly) FSAudioStream *stream;
