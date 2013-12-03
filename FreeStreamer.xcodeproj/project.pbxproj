@@ -57,10 +57,10 @@
 		6066DAE2182427A30005E1A2 /* FSXAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 6066DA64182422A50005E1A2 /* FSXAppDelegate.m */; };
 		6066DAE4182427A30005E1A2 /* FSXPlayerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6066DA66182422A50005E1A2 /* FSXPlayerViewController.m */; };
 		6066DAE5182427A30005E1A2 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6066DA6E182422D70005E1A2 /* main.m */; };
-		609F6DA718295684000E45B2 /* FSCheckAudioFileFormatRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 609F6DA618295684000E45B2 /* FSCheckAudioFileFormatRequest.m */; };
+		609F6DA718295684000E45B2 /* FSCheckContentTypeRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 609F6DA618295684000E45B2 /* FSCheckContentTypeRequest.m */; };
 		609F6DAA18295F54000E45B2 /* FSParsePlaylistRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 609F6DA918295F54000E45B2 /* FSParsePlaylistRequest.m */; };
 		609F6DAB18295F54000E45B2 /* FSParsePlaylistRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 609F6DA918295F54000E45B2 /* FSParsePlaylistRequest.m */; };
-		609F6DAC182962C4000E45B2 /* FSCheckAudioFileFormatRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 609F6DA618295684000E45B2 /* FSCheckAudioFileFormatRequest.m */; };
+		609F6DAC182962C4000E45B2 /* FSCheckContentTypeRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 609F6DA618295684000E45B2 /* FSCheckContentTypeRequest.m */; };
 		609F6DAF18296EB6000E45B2 /* FSXMLHttpRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 609F6DAE18296EB6000E45B2 /* FSXMLHttpRequest.m */; };
 		609F6DB218296EBF000E45B2 /* FSParsePlaylistFeedRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 609F6DB118296EBF000E45B2 /* FSParsePlaylistFeedRequest.m */; };
 /* End PBXBuildFile section */
@@ -118,8 +118,8 @@
 		6066DA99182425090005E1A2 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.0.sdk/System/Library/Frameworks/AudioToolbox.framework; sourceTree = DEVELOPER_DIR; };
 		6066DA9B182425150005E1A2 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.0.sdk/System/Library/Frameworks/CFNetwork.framework; sourceTree = DEVELOPER_DIR; };
 		6066DA9D182425240005E1A2 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.0.sdk/System/Library/Frameworks/AVFoundation.framework; sourceTree = DEVELOPER_DIR; };
-		609F6DA518295684000E45B2 /* FSCheckAudioFileFormatRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSCheckAudioFileFormatRequest.h; sourceTree = "<group>"; };
-		609F6DA618295684000E45B2 /* FSCheckAudioFileFormatRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSCheckAudioFileFormatRequest.m; sourceTree = "<group>"; };
+		609F6DA518295684000E45B2 /* FSCheckContentTypeRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSCheckContentTypeRequest.h; sourceTree = "<group>"; };
+		609F6DA618295684000E45B2 /* FSCheckContentTypeRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSCheckContentTypeRequest.m; sourceTree = "<group>"; };
 		609F6DA818295F54000E45B2 /* FSParsePlaylistRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSParsePlaylistRequest.h; sourceTree = "<group>"; };
 		609F6DA918295F54000E45B2 /* FSParsePlaylistRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSParsePlaylistRequest.m; sourceTree = "<group>"; };
 		609F6DAD18296EB6000E45B2 /* FSXMLHttpRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSXMLHttpRequest.h; sourceTree = "<group>"; };
@@ -325,8 +325,8 @@
 				60CF9E541824156F00999FDF /* FSAudioStream.mm */,
 				60CF9E571824156F00999FDF /* FSPlaylistItem.h */,
 				60CF9E581824156F00999FDF /* FSPlaylistItem.m */,
-				609F6DA518295684000E45B2 /* FSCheckAudioFileFormatRequest.h */,
-				609F6DA618295684000E45B2 /* FSCheckAudioFileFormatRequest.m */,
+				609F6DA518295684000E45B2 /* FSCheckContentTypeRequest.h */,
+				609F6DA618295684000E45B2 /* FSCheckContentTypeRequest.m */,
 				609F6DA818295F54000E45B2 /* FSParsePlaylistRequest.h */,
 				609F6DA918295F54000E45B2 /* FSParsePlaylistRequest.m */,
 			);
@@ -455,7 +455,7 @@
 				601369D2182C36AA001819D6 /* id3_parser.cpp in Sources */,
 				609F6DAA18295F54000E45B2 /* FSParsePlaylistRequest.m in Sources */,
 				6066DAE4182427A30005E1A2 /* FSXPlayerViewController.m in Sources */,
-				609F6DA718295684000E45B2 /* FSCheckAudioFileFormatRequest.m in Sources */,
+				609F6DA718295684000E45B2 /* FSCheckContentTypeRequest.m in Sources */,
 				6066DAE5182427A30005E1A2 /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -465,7 +465,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				602C629C1847961A00EA657D /* Reachability.m in Sources */,
-				609F6DAC182962C4000E45B2 /* FSCheckAudioFileFormatRequest.m in Sources */,
+				609F6DAC182962C4000E45B2 /* FSCheckContentTypeRequest.m in Sources */,
 				6066DAC31824273A0005E1A2 /* audio_queue.cpp in Sources */,
 				6066DAC51824273A0005E1A2 /* audio_stream.cpp in Sources */,
 				609F6DAF18296EB6000E45B2 /* FSXMLHttpRequest.m in Sources */,

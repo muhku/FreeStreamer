@@ -7,12 +7,12 @@
 #import "FSAudioController.h"
 #import "FSAudioStream.h"
 #import "FSPlaylistItem.h"
-#import "FSCheckAudioFileFormatRequest.h"
+#import "FSCheckContentTypeRequest.h"
 #import "FSParsePlaylistRequest.h"
 
 @interface FSAudioController ()
 @property (readonly) FSAudioStream *audioStream;
-@property (readonly) FSCheckAudioFileFormatRequest *checkAudioFileFormatRequest;
+@property (readonly) FSCheckContentTypeRequest *checkContentTypeRequest;
 @property (readonly) FSParsePlaylistRequest *parsePlaylistRequest;
 @property (nonatomic,assign) BOOL readyToPlay;
 @property (nonatomic,assign) NSUInteger currentPlaylistItemIndex;
@@ -30,7 +30,7 @@
     if (self = [super init]) {
         _url = nil;
         _audioStream = [[FSAudioStream alloc] init];
-        _checkAudioFileFormatRequest = nil;
+        _checkContentTypeRequest = nil;
         _parsePlaylistRequest = nil;
         _readyToPlay = NO;
     }
@@ -41,8 +41,8 @@
 {
     [_audioStream stop];
     
-    if (_checkAudioFileFormatRequest) {
-        [_checkAudioFileFormatRequest cancel];
+    if (_checkContentTypeRequest) {
+        [_checkContentTypeRequest cancel];
     }
     if (_parsePlaylistRequest) {
         [_parsePlaylistRequest cancel];
@@ -60,9 +60,9 @@
     return _audioStream;
 }
 
-- (FSCheckAudioFileFormatRequest *)checkAudioFileFormatRequest
+- (FSCheckContentTypeRequest *)checkContentTypeRequest
 {
-    return _checkAudioFileFormatRequest;
+    return _checkContentTypeRequest;
 }
 
 - (FSParsePlaylistRequest *)parsePlaylistRequest
@@ -118,10 +118,10 @@
             [weakSelf.audioStream play];
         };
         
-        _checkAudioFileFormatRequest = [[FSCheckAudioFileFormatRequest alloc] init];
-        _checkAudioFileFormatRequest.url = self.url;
-        _checkAudioFileFormatRequest.onCompletion = ^() {
-            if (weakSelf.checkAudioFileFormatRequest.playlist) {
+        _checkContentTypeRequest = [[FSCheckContentTypeRequest alloc] init];
+        _checkContentTypeRequest.url = self.url;
+        _checkContentTypeRequest.onCompletion = ^() {
+            if (weakSelf.checkContentTypeRequest.playlist) {
                 // The URL is a playlist; retrieve the contents
                 [weakSelf.parsePlaylistRequest start];
             } else {
@@ -131,13 +131,13 @@
                 [weakSelf.audioStream play];
             }
         };
-        _checkAudioFileFormatRequest.onFailure = ^() {
+        _checkContentTypeRequest.onFailure = ^() {
             // Failed to check the format; try playing anyway
             
             weakSelf.readyToPlay = YES;
             [weakSelf.audioStream play];
         };
-        [_checkAudioFileFormatRequest start];
+        [_checkContentTypeRequest start];
         
         NSDictionary *userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:kFsAudioStreamRetrievingURL] forKey:FSAudioStreamNotificationKey_State];
         NSNotification *notification = [NSNotification notificationWithName:FSAudioStreamStateChangeNotification object:nil userInfo:userInfo];
@@ -176,7 +176,7 @@
         self.currentPlaylistItemIndex = 0;
         
         if (url && ![url isEqual:_url]) {
-            [_checkAudioFileFormatRequest cancel], _checkAudioFileFormatRequest = nil;
+            [_checkContentTypeRequest cancel], _checkContentTypeRequest = nil;
             [_parsePlaylistRequest cancel], _parsePlaylistRequest = nil;
             
             NSString *copyOfURL = [url copy];

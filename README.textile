@@ -59,7 +59,7 @@ audioController.url = @"http://www.example.com/my_playlist.pls";
 It is also possible to check the exact content of the stream by using the "FSCheckAudioFileFormatRequest.h":https://github.com/muhku/FreeStreamer/blob/master/Common/FSCheckAudioFileFormatRequest.h and "FSParsePlaylistRequest.h":https://github.com/muhku/FreeStreamer/blob/master/Common/FSParsePlaylistRequest.h classes:
 
 <pre>
-FSCheckAudioFileFormatRequest *request = [[FSCheckAudioFileFormatRequest alloc] init];
+FSCheckContentTypeRequest *request = [[FSCheckContentTypeRequest alloc] init];
 request.url = @"http://www.example.com/not-sure-about-the-type-of-this-file";
 request.onCompletion = ^() {
     if (self.request.playlist) {

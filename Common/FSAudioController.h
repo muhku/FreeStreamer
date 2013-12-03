@@ -7,7 +7,7 @@
 #import <Foundation/Foundation.h>
 
 @class FSAudioStream;
-@class FSCheckAudioFileFormatRequest;
+@class FSCheckContentTypeRequest;
 @class FSParsePlaylistRequest;
 
 /*
@@ -21,7 +21,7 @@
     
     BOOL _readyToPlay;
     
-    FSCheckAudioFileFormatRequest *_checkAudioFileFormatRequest;
+    FSCheckContentTypeRequest *_checkContentTypeRequest;
     FSParsePlaylistRequest *_parsePlaylistRequest;
 }
 
