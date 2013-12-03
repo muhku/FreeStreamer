@@ -57,9 +57,16 @@
     }
     
     if (_paused) {
+        /*
+         * If we are paused, call pause again to unpause so
+         * that the stream playback will continue.
+         */
         [self.audioController pause];
         _paused = NO;
     } else {
+        /*
+         * Not paused, just directly call play.
+         */
         [self.audioController play];
     }
     
