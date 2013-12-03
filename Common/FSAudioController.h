@@ -28,6 +28,10 @@
 - (void)play;
 - (void)playFromURL:(NSString*)url;
 - (void)stop;
+/*
+ * If the stream is playing, the stream playback is paused upon calling pause.
+ * Otherwise (the stream is paused), calling pause will continue the playback.
+ */
 - (void)pause;
 
 @property (nonatomic,assign) NSString *url;
