@@ -42,6 +42,7 @@ typedef struct {
     FSAudioStreamPrivate *_private;
 }
 
+- (id)initWithUrl:(NSURL *)url;
 - (void)play;
 - (void)playFromURL:(NSURL*)url;
 - (void)stop;
@@ -51,6 +52,7 @@ typedef struct {
  */
 - (void)pause;
 - (void)seekToPosition:(FSStreamPosition)position;
+- (BOOL)isPlaying;
 
 @property (nonatomic,assign) NSURL *url;
 @property (nonatomic,assign) BOOL strictContentTypeChecking;
