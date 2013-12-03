@@ -366,7 +366,7 @@ void Audio_Stream::streamErrorOccurred()
     closeAndSignalError(AS_ERR_NETWORK);
 }
     
-void Audio_Stream::streamMetaDataAvailable(std::string metaData)
+void Audio_Stream::streamMetaDataAvailable(std::map<std::string,std::string> metaData)
 {
     if (m_delegate) {
         m_delegate->audioStreamMetaDataAvailable(metaData);

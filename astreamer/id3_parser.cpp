@@ -246,18 +246,19 @@ void ID3_Parser_Private::feedData(UInt8 *data, UInt32 numBytes)
                 
                 // Push out the metadata
                 if (m_parser->m_delegate) {
-                    std::stringstream metaData;
-                    metaData << "StreamTitle='";
+                    std::map<std::string,std::string> metadataMap;
+                    std::stringstream info;
                     
                     if (m_performer.length() > 0) {
-                        metaData << m_performer;
-                        metaData << " - ";
+                        info << m_performer;
+                        info << " - ";
                     }
                     
-                    metaData << m_title;
-                    metaData << "';";
+                    info << m_title;
+                    
+                    metadataMap["StreamTitle"] = info.str();
                 
-                    m_parser->m_delegate->id3metaDataAvailable(metaData.str());
+                    m_parser->m_delegate->id3metaDataAvailable(metadataMap);
                 }
                 
                 setState(ID3_Parser_State_Tag_Parsed);

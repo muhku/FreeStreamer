@@ -10,6 +10,7 @@
 #import <CFNetwork/CFNetwork.h>
 #import <string>
 #import <vector>
+#import <map>
 #import "id3_parser.h"
 
 namespace astreamer {
@@ -92,7 +93,7 @@ public:
     void setUrl(CFURLRef url);
     
     /* ID3_Parser_Delegate */
-    void id3metaDataAvailable(std::string metaData);
+    void id3metaDataAvailable(std::map<std::string,std::string> metaData);
 };
 
 class HTTP_Stream_Delegate {
@@ -101,7 +102,7 @@ public:
     virtual void streamHasBytesAvailable(UInt8 *data, UInt32 numBytes) = 0;
     virtual void streamEndEncountered() = 0;
     virtual void streamErrorOccurred() = 0;
-    virtual void streamMetaDataAvailable(std::string metaData) = 0;
+    virtual void streamMetaDataAvailable(std::map<std::string,std::string> metaData) = 0;
 };
 
 } // namespace astreamer

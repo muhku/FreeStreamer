@@ -242,25 +242,9 @@
 
 - (void)audioStreamMetaDataAvailable:(NSNotification *)notification
 {
-    NSString *streamTitle = @"";
-    
     NSDictionary *dict = [notification userInfo];
-    
-    NSString *metaData = [dict valueForKey:FSAudioStreamNotificationKey_MetaData];
-    NSRange start = [metaData rangeOfString:@"StreamTitle='"];
-    
-    if (start.location == NSNotFound) {
-        goto done;
-    }
-    
-    streamTitle = [metaData substringFromIndex:start.location + 13];
-    NSRange end = [streamTitle rangeOfString:@"';"];
-    
-    if (end.location == NSNotFound) {
-        goto done;
-    }
-    
-    streamTitle = [streamTitle substringToIndex:end.location];
+    NSDictionary *metaData = [dict valueForKey:FSAudioStreamNotificationKey_MetaData];
+    NSString *streamTitle = [metaData objectForKey:@"StreamTitle"];
 
 done:
     [self.stateTextFieldCell setTitle:streamTitle];

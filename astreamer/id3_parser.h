@@ -8,6 +8,7 @@
 #define ASTREAMER_ID3_PARSER_H
 
 #include <string>
+#include <map>
 
 #import <CFNetwork/CFNetwork.h>
 
@@ -33,7 +34,7 @@ private:
 
 class ID3_Parser_Delegate {
 public:
-    virtual void id3metaDataAvailable(std::string metaData) = 0;
+    virtual void id3metaDataAvailable(std::map<std::string,std::string> metaData) = 0;
 };
     
 } // namespace astreamer

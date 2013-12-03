@@ -37,7 +37,7 @@ public:
     
     void audioStreamErrorOccurred(int errorCode);
     void audioStreamStateChanged(astreamer::Audio_Stream::State state);
-    void audioStreamMetaDataAvailable(std::string metaData);
+    void audioStreamMetaDataAvailable(std::map<std::string,std::string> metaData);
 };
 
 /*
@@ -480,12 +480,20 @@ void AudioStreamStateObserver::audioStreamStateChanged(astreamer::Audio_Stream::
     [[NSNotificationCenter defaultCenter] postNotification:notification];
 }
     
-void AudioStreamStateObserver::audioStreamMetaDataAvailable(std::string metaData)
+void AudioStreamStateObserver::audioStreamMetaDataAvailable(std::map<std::string,std::string> metaData)
 {
-    NSString *s = [NSString stringWithUTF8String:metaData.c_str()];
+    NSMutableDictionary *metaDataDictionary = [[NSMutableDictionary alloc] init];
+    
+    for (std::map<std::string,std::string>::iterator iter = metaData.begin(); iter != metaData.end(); ++iter) {
+        std::string key = iter->first;
+        std::string value = iter->second;
+        
+        [metaDataDictionary setObject:[NSString stringWithUTF8String:value.c_str()]
+                               forKey:[NSString stringWithUTF8String:key.c_str()]];
+    }
     
     NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
-                              s, FSAudioStreamNotificationKey_MetaData,
+                              metaDataDictionary, FSAudioStreamNotificationKey_MetaData,
                               [NSValue valueWithPointer:source], FSAudioStreamNotificationKey_Stream, nil];
     NSNotification *notification = [NSNotification notificationWithName:FSAudioStreamMetaDataNotification object:nil userInfo:userInfo];
     

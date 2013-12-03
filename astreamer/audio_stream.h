@@ -65,7 +65,7 @@ public:
     void streamHasBytesAvailable(UInt8 *data, UInt32 numBytes);
     void streamEndEncountered();
     void streamErrorOccurred();
-    void streamMetaDataAvailable(std::string metaData);
+    void streamMetaDataAvailable(std::map<std::string,std::string> metaData);
 
 private:
     
@@ -103,7 +103,7 @@ class Audio_Stream_Delegate {
 public:
     virtual void audioStreamStateChanged(Audio_Stream::State state) = 0;
     virtual void audioStreamErrorOccurred(int errorCode) = 0;
-    virtual void audioStreamMetaDataAvailable(std::string metaData) = 0;
+    virtual void audioStreamMetaDataAvailable(std::map<std::string,std::string> metaData) = 0;
 };    
 
 } // namespace astreamer

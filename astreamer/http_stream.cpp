@@ -196,7 +196,7 @@ void HTTP_Stream::setUrl(CFURLRef url)
     m_url = (CFURLRef)CFRetain(url);
 }
     
-void HTTP_Stream::id3metaDataAvailable(std::string metaData)
+void HTTP_Stream::id3metaDataAvailable(std::map<std::string,std::string> metaData)
 {
     if (m_delegate) {
         m_delegate->streamMetaDataAvailable(metaData);
@@ -399,7 +399,23 @@ void HTTP_Stream::parseICYStream(UInt8 *buf, CFIndex bufSize)
                 m_dataByteReadCount = 0;
                 
                 if (m_delegate && !m_icyMetaData.empty()) {
-                    m_delegate->streamMetaDataAvailable(m_icyMetaData);
+                    std::map<std::string,std::string> metadataMap;
+                    std::string delimiter = ";";
+                    
+                    size_t pos = 0;
+                    while ((pos = m_icyMetaData.find(delimiter)) != std::string::npos) {
+                        std::string token = m_icyMetaData.substr(0, pos);
+                        size_t index = token.find("='", 0);
+                        
+                        if (index > 0) {
+                            std::string key = token.substr(0, index);
+                            std::string value = token.substr(index + 2, token.length() - index - 3);
+                            
+                            metadataMap[key] = value;
+                        }
+                        m_icyMetaData.erase(0, pos + delimiter.length());
+                    }
+                    m_delegate->streamMetaDataAvailable(metadataMap);
                 }
                 m_icyMetaData.clear();
                 continue;

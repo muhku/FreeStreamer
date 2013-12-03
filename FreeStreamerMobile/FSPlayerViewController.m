@@ -234,27 +234,10 @@
 }
 
 - (void)audioStreamMetaDataAvailable:(NSNotification *)notification {
-    NSString *streamTitle = @"";
-    
     NSDictionary *dict = [notification userInfo];
+    NSDictionary *metaData = [dict valueForKey:FSAudioStreamNotificationKey_MetaData];
+    NSString *streamTitle = [metaData objectForKey:@"StreamTitle"];
     
-    NSString *metaData = [dict valueForKey:FSAudioStreamNotificationKey_MetaData];
-    NSRange start = [metaData rangeOfString:@"StreamTitle='"];
-    
-    if (start.location == NSNotFound) {
-        goto out;
-    }
-    
-    streamTitle = [metaData substringFromIndex:start.location + 13];
-    NSRange end = [streamTitle rangeOfString:@"';"];
-    
-    if (end.location == NSNotFound) {
-        goto out;
-    }
-                   
-    streamTitle = [streamTitle substringToIndex:end.location];
-    
-out:
     [_statusLabel setHidden:NO];
     self.statusLabel.text = streamTitle;
 }
