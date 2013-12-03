@@ -300,6 +300,14 @@ public:
     return self;
 }
 
+- (id)initWithUrl:(NSURL *)url
+{
+    if (self = [self init]) {
+        _private.url = url;
+    }
+    return self;
+}
+
 - (void)setUrl:(NSURL *)url {
     [_private setUrl:url];
 }
@@ -344,6 +352,11 @@ public:
     unsigned seekTime = position.minute * 60 + position.second;
     
     [_private seekToTime:seekTime];
+}
+
+- (BOOL)isPlaying
+{
+    return [_private isPlaying];
 }
 
 - (FSStreamPosition)currentTimePlayed {

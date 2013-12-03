@@ -39,6 +39,14 @@
     return self;
 }
 
+- (id)initWithUrl:(NSString *)url
+{
+    if (self = [self init]) {
+        self.url = url;
+    }
+    return self;
+}
+
 - (void)dealloc
 {
     [_audioStream stop];
@@ -75,6 +83,11 @@
 - (FSParseRssPodcastFeedRequest *)parseRssPodcastFeedRequest
 {
     return _parseRssPodcastFeedRequest;
+}
+
+- (BOOL)isPlaying
+{
+    return [_audioStream isPlaying];
 }
 
 /*
