@@ -57,6 +57,9 @@
     if (_parsePlaylistRequest) {
         [_parsePlaylistRequest cancel];
     }
+    if (_parseRssPodcastFeedRequest) {
+        [_parseRssPodcastFeedRequest cancel];
+    }
 }
 
 /*
