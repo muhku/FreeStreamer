@@ -414,9 +414,8 @@ public:
     
 void AudioStreamStateObserver::audioStreamErrorOccurred(int errorCode)
 {
-    NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
-                              [NSNumber numberWithInt:errorCode], FSAudioStreamNotificationKey_Error,
-                              [NSValue valueWithPointer:source], FSAudioStreamNotificationKey_Stream, nil];
+    NSDictionary *userInfo = @{FSAudioStreamNotificationKey_Error: @(errorCode),
+                              FSAudioStreamNotificationKey_Stream: [NSValue valueWithPointer:source]};
     NSNotification *notification = [NSNotification notificationWithName:FSAudioStreamErrorNotification object:nil userInfo:userInfo];
     
     [[NSNotificationCenter defaultCenter] postNotification:notification];
@@ -472,9 +471,8 @@ void AudioStreamStateObserver::audioStreamStateChanged(astreamer::Audio_Stream::
             break;
     }
     
-    NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
-                              fsAudioState, FSAudioStreamNotificationKey_State,
-                              [NSValue valueWithPointer:source], FSAudioStreamNotificationKey_Stream, nil];
+    NSDictionary *userInfo = @{FSAudioStreamNotificationKey_State: fsAudioState,
+                              FSAudioStreamNotificationKey_Stream: [NSValue valueWithPointer:source]};
     NSNotification *notification = [NSNotification notificationWithName:FSAudioStreamStateChangeNotification object:nil userInfo:userInfo];
     
     [[NSNotificationCenter defaultCenter] postNotification:notification];
@@ -488,13 +486,11 @@ void AudioStreamStateObserver::audioStreamMetaDataAvailable(std::map<std::string
         std::string key = iter->first;
         std::string value = iter->second;
         
-        [metaDataDictionary setObject:[NSString stringWithUTF8String:value.c_str()]
-                               forKey:[NSString stringWithUTF8String:key.c_str()]];
+        metaDataDictionary[@(key.c_str())] = @(value.c_str());
     }
     
-    NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
-                              metaDataDictionary, FSAudioStreamNotificationKey_MetaData,
-                              [NSValue valueWithPointer:source], FSAudioStreamNotificationKey_Stream, nil];
+    NSDictionary *userInfo = @{FSAudioStreamNotificationKey_MetaData: metaDataDictionary,
+                              FSAudioStreamNotificationKey_Stream: [NSValue valueWithPointer:source]};
     NSNotification *notification = [NSNotification notificationWithName:FSAudioStreamMetaDataNotification object:nil userInfo:userInfo];
     
     [[NSNotificationCenter defaultCenter] postNotification:notification];

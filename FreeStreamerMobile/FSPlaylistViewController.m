@@ -169,14 +169,14 @@
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
     }
     
-    FSPlaylistItem *item = [[self playlistItems] objectAtIndex:indexPath.row];
+    FSPlaylistItem *item = [self playlistItems][indexPath.row];
     cell.textLabel.text = item.title;
     
 	return cell;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-	FSPlaylistItem *item = [[self playlistItems] objectAtIndex:indexPath.row];
+	FSPlaylistItem *item = [self playlistItems][indexPath.row];
     
     self.playerViewController.selectedPlaylistItem = item;
     self.playerViewController.shouldStartPlaying = YES;

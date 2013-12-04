@@ -190,7 +190,7 @@ cleanup:
         if (!content) {
             return stringWithContent;
         }
-        stringWithContent = [NSString stringWithCString:(const char *)content encoding:NSUTF8StringEncoding];
+        stringWithContent = @((const char *)content);
         xmlFree(content);
     }
     return stringWithContent;
@@ -206,7 +206,7 @@ cleanup:
         if (!content) {
             return stringWithContent;
         }
-        stringWithContent = [NSString stringWithCString:(const char *)content encoding:NSUTF8StringEncoding];
+        stringWithContent = @((const char *)content);
         xmlFree(content);
     }
     return stringWithContent;

@@ -236,7 +236,7 @@
 - (void)audioStreamMetaDataAvailable:(NSNotification *)notification {
     NSDictionary *dict = [notification userInfo];
     NSDictionary *metaData = [dict valueForKey:FSAudioStreamNotificationKey_MetaData];
-    NSString *streamTitle = [metaData objectForKey:@"StreamTitle"];
+    NSString *streamTitle = metaData[@"StreamTitle"];
     
     [_statusLabel setHidden:NO];
     self.statusLabel.text = streamTitle;

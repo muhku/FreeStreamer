@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		600032771847CF94001C83BE /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 600032761847CF94001C83BE /* SystemConfiguration.framework */; };
 		600507D0184E1DCF0002314D /* FSXMLHttpRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 600507CF184E1DCF0002314D /* FSXMLHttpRequest.m */; };
-		600507D1184E1E3D0002314D /* FSXMLHttpRequest.h in Sources */ = {isa = PBXBuildFile; fileRef = 600507CE184E1DCF0002314D /* FSXMLHttpRequest.h */; };
 		600507D2184E1E3D0002314D /* FSXMLHttpRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 600507CF184E1DCF0002314D /* FSXMLHttpRequest.m */; };
 		600507D5184E1FC60002314D /* FSParseRssPodcastFeedRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 600507D4184E1FC60002314D /* FSParseRssPodcastFeedRequest.m */; };
 		600507D6184E1FE10002314D /* FSParseRssPodcastFeedRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 600507D4184E1FC60002314D /* FSParseRssPodcastFeedRequest.m */; };
@@ -477,7 +476,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				600507D6184E1FE10002314D /* FSParseRssPodcastFeedRequest.m in Sources */,
-				600507D1184E1E3D0002314D /* FSXMLHttpRequest.h in Sources */,
 				600507D2184E1E3D0002314D /* FSXMLHttpRequest.m in Sources */,
 				602C629C1847961A00EA657D /* Reachability.m in Sources */,
 				609F6DAC182962C4000E45B2 /* FSCheckContentTypeRequest.m in Sources */,

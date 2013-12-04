@@ -20,8 +20,7 @@ static NSString *const kXPathQueryItems = @"/rss/channel/item";
     FSPlaylistItem *item = [[FSPlaylistItem alloc] init];
     
     for (xmlNodePtr n = node->children; n != NULL; n = n->next) {
-        NSString *nodeName = [NSString stringWithCString:(const char *)n->name
-                                                encoding:NSUTF8StringEncoding];
+        NSString *nodeName = @((const char *)n->name);
         if ([nodeName isEqualToString:@"title"]) {
             item.title = [self contentForNode:n];
         } else if ([nodeName isEqualToString:@"enclosure"]) {

@@ -151,7 +151,7 @@
         NSString *key = [[line substringToIndex:r.location] lowercaseString];
         NSString *value = [line substringFromIndex:r.location + 1];
         
-        [props setObject:value forKey:key];
+        props[key] = value;
         i++;
     }
     

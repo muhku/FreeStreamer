@@ -101,7 +101,7 @@
     @synchronized (self) {
         if (self.readyToPlay) {
             if ([self.playlistItems count] > 0) {
-                FSPlaylistItem *playlistItem = [self.playlistItems objectAtIndex:self.currentPlaylistItemIndex];
+                FSPlaylistItem *playlistItem = (self.playlistItems)[self.currentPlaylistItemIndex];
                 
                 _audioStream.url = playlistItem.nsURL;
             }
@@ -200,7 +200,7 @@
         };
         [_checkContentTypeRequest start];
         
-        NSDictionary *userInfo = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:kFsAudioStreamRetrievingURL] forKey:FSAudioStreamNotificationKey_State];
+        NSDictionary *userInfo = @{FSAudioStreamNotificationKey_State: @(kFsAudioStreamRetrievingURL)};
         NSNotification *notification = [NSNotification notificationWithName:FSAudioStreamStateChangeNotification object:nil userInfo:userInfo];
         [[NSNotificationCenter defaultCenter] postNotification:notification];
     }
