@@ -12,6 +12,7 @@
 #define ASTREAMER_AUDIO_QUEUE_H
 
 #include <AudioToolbox/AudioToolbox.h> /* AudioFileStreamID */
+#include <vector>
 
 namespace astreamer {
     
@@ -76,6 +77,8 @@ private:
     
     struct queued_packet *m_queuedHead;
     struct queued_packet *m_queuedTail;
+    
+    std::vector<AudioStreamPacketDescription*> m_cbrPacketDescriptions;
     
     OSStatus m_lastError;
 
