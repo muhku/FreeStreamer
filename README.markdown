@@ -16,6 +16,8 @@ FreeStreamer has the following features:
 - Supports a subset of the ID3v2 tag specification 
 - Supports Podcast RSS feeds
 
+The [API documentation](https://dl.dropboxusercontent.com/u/995250/FreeStreamer/index.html) is located here.
+
 [![Player view](https://raw.github.com/muhku/FreeStreamer/master/Extra/player-new.png)](https://github.com/muhku/FreeStreamer/)
 
 Using the player in your own project
