@@ -6,8 +6,14 @@
 
 #import <Cocoa/Cocoa.h>
 
+/**
+ * The application delegate of the OS X example application.
+ */
 @interface FSXAppDelegate : NSObject <NSApplicationDelegate>
 
+/**
+ * Reference to a window.
+ */
 @property (assign) IBOutlet NSWindow *window;
 
 @end
