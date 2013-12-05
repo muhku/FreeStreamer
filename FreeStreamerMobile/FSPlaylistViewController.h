@@ -40,6 +40,8 @@
 
 /**
  * An IBAction to add a new playlist item.
+ *
+ * @param sender The sender of the action.
  */
 - (IBAction)addPlaylistItem:(id)sender;
 

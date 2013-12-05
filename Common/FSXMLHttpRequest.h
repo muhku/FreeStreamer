@@ -71,18 +71,27 @@ typedef enum {
  * Performs an XPath query on the parsed XML data.
  * Yields a parseXMLNode method call, which must be
  * defined in the subclasses.
+ *
+ * @param query The XPath query to be performed.
  */
 - (NSArray *)performXPathQuery:(NSString *)query;
 /**
  * Retrieves content for the given XML node.
+ *
+ * @param node The node for content retreval.
  */
 - (NSString *)contentForNode:(xmlNodePtr)node;
 /**
  * Retrieves content for the given XML node attribute.
+ *
+ * @param node The node for content retrieval.
+ * @param attr The attribute from which the content is retrieved.
  */
 - (NSString *)contentForNodeAttribute:(xmlNodePtr)node attribute:(const char *)attr;
 /**
  * Retrieves date from the given XML node.
+ *
+ * @param node The node for retrieving the date.
  */
 - (NSDate *)dateFromNode:(xmlNodePtr)node;
 
