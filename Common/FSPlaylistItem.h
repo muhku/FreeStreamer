@@ -6,13 +6,25 @@
 
 #import <Foundation/Foundation.h>
 
+/**
+ * A playlist item. Each item has a title and url.
+ */
 @interface FSPlaylistItem : NSObject {
     NSString *_title;
     NSString *_url;
 }
 
+/**
+ * The title of the playlist.
+ */
 @property (nonatomic,copy) NSString *title;
+/**
+ * The URL of the playlist.
+ */
 @property (nonatomic,copy) NSString *url;
+/**
+ * The NSURL of the playlist.
+ */
 @property (weak, readonly) NSURL *nsURL;
 
 @end
