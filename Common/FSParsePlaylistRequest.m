@@ -11,6 +11,9 @@
 - (void)parsePlaylistFromData:(NSData *)data;
 - (void)parsePlaylistM3U:(NSString *)playlist;
 - (void)parsePlaylistPLS:(NSString *)playlist;
+
+@property (readonly) FSPlaylistFormat format;
+
 @end
 
 @implementation FSParsePlaylistRequest

@@ -39,7 +39,7 @@ typedef enum {
 } FSFileFormat;
 
 /**
- * The FSCheckContentTypeRequest is a class for checking the content type
+ * FSCheckContentTypeRequest is a class for checking the content type
  * of a URL. It makes an HTTP HEAD request and parses the header information
  * from the server. The resulting format is stored in the format property.
  *
