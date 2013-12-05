@@ -130,11 +130,12 @@
 					<array class="NSMutableArray" key="NSSubviews">
 						<object class="IBUIImageView" id="862489789">
 							<reference key="NSNextResponder" ref="861133505"/>
-							<int key="NSvFlags">292</int>
+							<int key="NSvFlags">-2147483356</int>
 							<string key="NSFrameSize">{320, 43}</string>
 							<reference key="NSSuperview" ref="861133505"/>
 							<reference key="NSNextKeyView" ref="904248429"/>
 							<string key="NSReuseIdentifierKey">_NS:9</string>
+							<float key="IBUIAlpha">0.69999998807907104</float>
 							<bool key="IBUIUserInteractionEnabled">NO</bool>
 							<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 							<object class="NSCustomResource" key="IBUIImage">
@@ -165,8 +166,8 @@
 							<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 							<string key="IBUIText">Foo.</string>
 							<object class="NSColor" key="IBUITextColor">
-								<int key="NSColorSpace">3</int>
-								<bytes key="NSWhite">MC4zMzMzMzMzMzMzAA</bytes>
+								<int key="NSColorSpace">1</int>
+								<bytes key="NSRGB">MC45MDE5NjA3ODQzIDAuOTAxOTYwNzg0MyAwLjkwMTk2MDc4NDMAA</bytes>
 							</object>
 							<nil key="IBUIHighlightedColor"/>
 							<int key="IBUIBaselineAdjustment">1</int>
@@ -236,6 +237,7 @@
 							<reference key="NSSuperview" ref="861133505"/>
 							<reference key="NSNextKeyView" ref="889281774"/>
 							<string key="NSReuseIdentifierKey">_NS:9</string>
+							<float key="IBUIAlpha">0.75</float>
 							<bool key="IBUIUserInteractionEnabled">NO</bool>
 							<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 							<object class="NSCustomResource" key="IBUIImage">
