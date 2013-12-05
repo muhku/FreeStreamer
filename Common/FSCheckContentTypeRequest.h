@@ -6,17 +6,26 @@
 
 #import <Foundation/Foundation.h>
 
+/**
+ * Content type format.
+ */
 typedef enum {
     kFSFileFormatUnknown = 0,
     
-    /* Playlist */
+    /**
+     * Playlist.
+     */
     kFSFileFormatM3UPlaylist,
     kFSFileFormatPLSPlaylist,
     
-    /* RSS */
+    /**
+     * XML.
+     */
     kFSFileFormatXML,
     
-    /* Audio file */
+    /**
+     * Audio file.
+     */
     kFSFileFormatMP3,
     kFSFileFormatWAVE,
     kFSFileFormatAIFC,
@@ -29,6 +38,15 @@ typedef enum {
     kFSFileFormatCount
 } FSFileFormat;
 
+/**
+ * The FSCheckContentTypeRequest is a class for checking the content type
+ * of a URL. It makes an HTTP HEAD request and parses the header information
+ * from the server. The resulting format is stored in the format property.
+ *
+ * To use the class, define the URL for checking the content type using
+ * the url property. Then, define the onCompletion and onFailure handlers.
+ * To start the request, use the start method.
+ */
 @interface FSCheckContentTypeRequest : NSObject<NSURLConnectionDelegate> {
     NSString *_url;
     NSURLConnection *_connection;
@@ -38,15 +56,42 @@ typedef enum {
     BOOL _xml;
 }
 
+/**
+ * The URL of this request.
+ */
 @property (nonatomic,copy) NSString *url;
+/**
+ * Called when the content type determination is completed.
+ */
 @property (copy) void (^onCompletion)();
+/**
+ * Called if the content type determination failed.
+ */
 @property (copy) void (^onFailure)();
+/**
+ * Contains the format of the URL upon completion of the request.
+ */
 @property (nonatomic,readonly) FSFileFormat format;
+/**
+ * Containts the content type of the URL upon completion of the request.
+ */
 @property (nonatomic,readonly) NSString *contentType;
+/**
+ * The property is true if the URL contains a playlist.
+ */
 @property (nonatomic,readonly) BOOL playlist;
+/**
+ * The property is true if the URL contains XML data.
+ */
 @property (nonatomic,readonly) BOOL xml;
 
+/**
+ * Starts the request.
+ */
 - (void)start;
+/**
+ * Cancels the request.
+ */
 - (void)cancel;
 
 @end
