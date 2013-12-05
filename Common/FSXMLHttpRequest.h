@@ -8,6 +8,9 @@
 
 #include <libxml/parser.h>
 
+/**
+ * XML HTTP request error status.
+ */
 typedef enum {
     FSXMLHttpRequestError_NoError = 0,
     FSXMLHttpRequestError_Connection_Failed,
@@ -15,6 +18,19 @@ typedef enum {
     FSXMLHttpRequestError_XML_Parser_Failed
 } FSXMLHttpRequestError;
 
+/**
+ * FSXMLHttpRequest is a class for retrieving data in the XML
+ * format over a HTTP or HTTPS connection. It provides
+ * the necessary foundation for parsing the retrieved XML data.
+ * This class is not meant to be used directly but subclassed
+ * to a specific requests.
+ *
+ * The usage pattern is the following:
+ *
+ * 1. Specify the URL with the url property.
+ * 2. Define the onCompletion and onFailure handlers.
+ * 3. Call the start method.
+ */
 @interface FSXMLHttpRequest : NSObject<NSURLConnectionDelegate> {
     NSString *_url;
     NSURLConnection *_connection;
@@ -25,18 +41,49 @@ typedef enum {
     NSDateFormatter *_dateFormatter;
 }
 
+/**
+ * The URL of the request.
+ */
 @property (nonatomic,copy) NSString *url;
+/**
+ * Called upon completion of the request.
+ */
 @property (copy) void (^onCompletion)();
+/**
+ * Called upon a failure.
+ */
 @property (copy) void (^onFailure)();
+/**
+ * If the request fails, contains the latest error status.
+ */
 @property (readonly) FSXMLHttpRequestError lastError;
 
+/**
+ * Starts the request.
+ */
 - (void)start;
+/**
+ * Cancels the request.
+ */
 - (void)cancel;
 
+/**
+ * Performs an XPath query on the parsed XML data.
+ * Yields a parseXMLNode method call, which must be
+ * defined in the subclasses.
+ */
 - (NSArray *)performXPathQuery:(NSString *)query;
+/**
+ * Retrieves content for the given XML node.
+ */
 - (NSString *)contentForNode:(xmlNodePtr)node;
+/**
+ * Retrieves content for the given XML node attribute.
+ */
 - (NSString *)contentForNodeAttribute:(xmlNodePtr)node attribute:(const char *)attr;
-
+/**
+ * Retrieves date from the given XML node.
+ */
 - (NSDate *)dateFromNode:(xmlNodePtr)node;
 
 @end
