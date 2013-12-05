@@ -1,66 +1,69 @@
-h1. Introduction
+Introduction
+====================
 
-FreeStreamer is an audio player engine for iOS and OS X, designed for playing audio streams. The engine has a minimal UI for demonstration. Respectfully, see the "FreeStreamerDesktop":https://github.com/muhku/FreeStreamer/tree/master/FreeStreamerDesktop directory for OS X, and, "FreeStreamerMobile":https://github.com/muhku/FreeStreamer/tree/master/FreeStreamerMobile for the iOS UI.
+FreeStreamer is an audio player engine for iOS and OS X, designed for playing audio streams. The engine has a minimal UI for demonstration. Respectfully, see the [FreeStreamerDesktop](https://github.com/muhku/FreeStreamer/tree/master/FreeStreamerDesktop) directory for OS X, and, [FreeStreamerMobile](https://github.com/muhku/FreeStreamer/tree/master/FreeStreamerMobile) for the iOS UI.
 
 The engine is written in C++ and the FSAudioController Objective-C class wraps the implementation.
 
 FreeStreamer has the following features:
-* Fast and low memory footprint (no overhead of Objective-C method calls)
-* Supports ShoutCast and IceCast audio streams + standard HTTP
-* Can detect the stream type based on the content type
-* Supports ShoutCast metadata
-* Supports interruptions (for example a phone call during playing the stream)
-* Supports backgrounding
-* Supports a subset of the ID3v2 tag specification 
-* Supports Podcast RSS feeds
 
-!https://raw.github.com/muhku/FreeStreamer/master/Extra/player-new.png!
+- Fast and low memory footprint (no overhead of Objective-C method calls)
+- Supports ShoutCast and IceCast audio streams + standard HTTP
+- Can detect the stream type based on the content type
+- Supports ShoutCast metadata
+- Supports interruptions (for example a phone call during playing the stream)
+- Supports backgrounding
+- Supports a subset of the ID3v2 tag specification 
+- Supports Podcast RSS feeds
 
-h1. Using the player in your own project
+[![Player view](https://raw.github.com/muhku/FreeStreamer/master/Extra/player-new.png)](https://github.com/muhku/FreeStreamer/)
+
+Using the player in your own project
+====================
 
 Please follow the following steps to use the player in your own project:
 
 1. Make sure you have the following frameworks linked to your project:
-* _CFNetwork.framework_
-* _AudioToolbox.framework_
-* _AVFoundation.framework_
-* _libxml2.dylib_ (add $(SDKROOT)/usr/include/libxml2 to the header search path, if not found)
-* _MediaPlayer.framework_ (iOS only)
+   - _CFNetwork.framework_
+   - _AudioToolbox.framework_
+   - _AVFoundation.framework_
+   - _libxml2.dylib_ (add ```$(SDKROOT)/usr/include/libxml2``` to the header search path, if not found)
+   - _MediaPlayer.framework_ (iOS only)
 
-2. Add the "Common":https://github.com/muhku/FreeStreamer/tree/master/Common and "astreamer":https://github.com/muhku/FreeStreamer/tree/master/astreamer directories to your project. Try building the project now and it should compile successfully.
+2. Add the [Common](https://github.com/muhku/FreeStreamer/tree/master/Common) and [astreamer](https://github.com/muhku/FreeStreamer/tree/master/astreamer) directories to your project. Try building the project now and it should compile successfully.
 
-3. iOS only: If you want to support background audio, add *App plays audio* to the target's *Required background modes*. You can find the property by clicking on the target on Xcode and opening the Info tab.
+3. **iOS only**: If you want to support background audio, add *App plays audio* to the target's *Required background modes*. You can find the property by clicking on the target on Xcode and opening the Info tab.
 
 You can now stream an audio file like this:
 
-<pre>
+```
 #import "FSAudioStream.h"
 
 FSAudioStream *audioStream = [[FSAudioStream alloc] init];
 [audioStream playFromURL:[NSURL URLWithString:@"http://www.example.com/audio_file.mp3"]];
-</pre>
+```
 
 Some servers may send an incorrect MIME type. In this case, FreeStreamer may not be able to play the stream. If you want to avoid the content-type checks (that the stream actually is an audio file), you can set the following property:
 
-<pre>
+```
 audioStream.strictContentTypeChecking = NO;
 // Optionally, set the content-type where to fallback to
 audioStream.defaultContentType = "audio/mpeg";
-</pre>
+```
 
-For streaming playlists, you need to use the "FSAudioController.h":https://github.com/muhku/FreeStreamer/blob/master/Common/FSAudioController.h class. The class has some additional logic to resolve the playback URLs:
+For streaming playlists, you need to use the [FSAudioController.h](https://github.com/muhku/FreeStreamer/blob/master/Common/FSAudioController.h) class. The class has some additional logic to resolve the playback URLs:
 
-<pre>
+```
 #import "FSAudioController.h"
 
 FSAudioController *audioController = [[FSAudioController alloc] init];
 audioController.url = @"http://www.example.com/my_playlist.pls";
 [audioController play];
-</pre>
+```
 
-It is also possible to check the exact content of the stream by using the "FSCheckAudioFileFormatRequest.h":https://github.com/muhku/FreeStreamer/blob/master/Common/FSCheckAudioFileFormatRequest.h and "FSParsePlaylistRequest.h":https://github.com/muhku/FreeStreamer/blob/master/Common/FSParsePlaylistRequest.h classes:
+It is also possible to check the exact content of the stream by using the [FSCheckContentTypeRequest.h](https://github.com/muhku/FreeStreamer/blob/master/Common/FSCheckContentTypeRequest.h) and [FSParsePlaylistRequest.h](https://github.com/muhku/FreeStreamer/blob/master/Common/FSParsePlaylistRequest.h) classes:
 
-<pre>
+```
 FSCheckContentTypeRequest *request = [[FSCheckContentTypeRequest alloc] init];
 request.url = @"http://www.example.com/not-sure-about-the-type-of-this-file";
 request.onCompletion = ^() {
@@ -72,21 +75,22 @@ request.onFailure = ^() {
 };
 
 [request start];
-</pre>
+```
 
 That's it! For more examples, please take a look at the example project. For instance, you may want to observe notifications on the audio stream state.
 
-h1. Reporting bugs and contributing
+Reporting bugs and contributing
+====================
 
 Your contributions are most welcome. If you want to send code, please a send a patch and make sure it can be merged to the master branch without conflicts.
 
 If you have anything to ask, you can use email.
 
-h1. License
+License
+====================
 
 The BSD license which the files are licensed under allows is as follows:
 
-<pre>
     Copyright (c) 2011-2013 Matias Muhonen <mmu@iki.fi>
     All rights reserved.
 
@@ -111,4 +115,3 @@ The BSD license which the files are licensed under allows is as follows:
     THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
     (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
     THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-</pre>
