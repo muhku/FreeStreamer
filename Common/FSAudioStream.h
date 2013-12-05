@@ -75,6 +75,8 @@ typedef struct {
 
 /**
  * Initializes the audio stream with an URL.
+ *
+ * @param url The URL from which the stream data is retrieved.
  */
 - (id)initWithUrl:(NSURL *)url;
 
@@ -86,6 +88,8 @@ typedef struct {
 
 /**
  * Starts playing the stream from the given URL.
+ *
+ * @param url The URL from which the stream data is retrieved.
  */
 - (void)playFromURL:(NSURL*)url;
 
@@ -103,6 +107,8 @@ typedef struct {
 /**
  * Seeks the stream to a given position. Requires a non-continuous stream
  * (a stream with a known duration).
+ *
+ * @param position The stream position to seek to.
  */
 - (void)seekToPosition:(FSStreamPosition)position;
 

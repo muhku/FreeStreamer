@@ -76,18 +76,26 @@
 
 /**
  * Handles the notification upon the audio stream state change.
+ *
+ * @param notification The audio stream state notification.
  */
 - (void)audioStreamStateDidChange:(NSNotification *)notification;
 /**
  * An action for starting the playback of the stream.
+ *
+ * @param sender The sender of the action.
  */
 - (IBAction)play:(id)sender;
 /**
  * An action for pausing the stream.
+ *
+ * @param sender The sender of the action.
  */
 - (IBAction)pause:(id)sender;
 /**
  * An action for seeking the stream.
+ *
+ * @param sender The sender of the action.
  */
 - (IBAction)seek:(id)sender;
 

@@ -34,6 +34,8 @@
 
 /**
  * Initializes the audio stream with an URL.
+ *
+ * @param url The URL from which the stream data is retrieved.
  */
 - (id)initWithUrl:(NSString *)url;
 
@@ -46,6 +48,8 @@
 /**
  * Starts playing the stream from an URL. Before the playback starts,
  * the URL content type is checked and playlists resolved.
+ *
+ * @param url The URL from which the stream data is retrieved.
  */
 - (void)playFromURL:(NSString*)url;
 
