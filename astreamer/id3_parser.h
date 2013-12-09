@@ -34,7 +34,7 @@ private:
 
 class ID3_Parser_Delegate {
 public:
-    virtual void id3metaDataAvailable(std::map<std::string,std::string> metaData) = 0;
+    virtual void id3metaDataAvailable(std::map<std::wstring,std::wstring> metaData) = 0;
 };
     
 } // namespace astreamer

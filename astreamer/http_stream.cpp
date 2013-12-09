@@ -122,7 +122,7 @@ bool HTTP_Stream::open(const HTTP_Stream_Position& position)
     m_icyMetaDataInterval = 0;
     m_dataByteReadCount = 0;
     m_metaDataBytesRemaining = 0;
-    m_icyMetaData = "";
+    m_icyMetaData = L"";
 	
     /* Failed to create a stream */
     if (!(m_readStream = createReadStream(m_url))) {
@@ -196,7 +196,7 @@ void HTTP_Stream::setUrl(CFURLRef url)
     m_url = (CFURLRef)CFRetain(url);
 }
     
-void HTTP_Stream::id3metaDataAvailable(std::map<std::string,std::string> metaData)
+void HTTP_Stream::id3metaDataAvailable(std::map<std::wstring,std::wstring> metaData)
 {
     if (m_delegate) {
         m_delegate->streamMetaDataAvailable(metaData);
@@ -399,17 +399,17 @@ void HTTP_Stream::parseICYStream(UInt8 *buf, CFIndex bufSize)
                 m_dataByteReadCount = 0;
                 
                 if (m_delegate && !m_icyMetaData.empty()) {
-                    std::map<std::string,std::string> metadataMap;
-                    std::string delimiter = ";";
+                    std::map<std::wstring,std::wstring> metadataMap;
+                    std::wstring delimiter = L";";
                     
                     size_t pos = 0;
-                    while ((pos = m_icyMetaData.find(delimiter)) != std::string::npos) {
-                        std::string token = m_icyMetaData.substr(0, pos);
-                        size_t index = token.find("='", 0);
+                    while ((pos = m_icyMetaData.find(delimiter)) != std::wstring::npos) {
+                        std::wstring token = m_icyMetaData.substr(0, pos);
+                        size_t index = token.find(L"='", 0);
                         
                         if (index > 0) {
-                            std::string key = token.substr(0, index);
-                            std::string value = token.substr(index + 2, token.length() - index - 3);
+                            std::wstring key = token.substr(0, index);
+                            std::wstring value = token.substr(index + 2, token.length() - index - 3);
                             
                             metadataMap[key] = value;
                         }
@@ -421,11 +421,7 @@ void HTTP_Stream::parseICYStream(UInt8 *buf, CFIndex bufSize)
                 continue;
             }
             
-            char c = buf[offset];
-            
-            if (c < 32 || c > 126) {
-                continue;
-            }
+            wchar_t c = buf[offset];
             
             m_icyMetaData.push_back(c);
             continue;
