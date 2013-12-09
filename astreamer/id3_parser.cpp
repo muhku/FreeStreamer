@@ -8,6 +8,8 @@
 
 #include <vector>
 #include <sstream>
+#include <codecvt>
+#include <string>
 
 //#define ID3_DEBUG 1
 
@@ -42,7 +44,7 @@ public:
     void setState(ID3_Parser_State state);
     void reset();
     
-    std::string parseContent(UInt32 framesize, UInt32 pos, CFStringEncoding encoding);
+    std::wstring parseContent(UInt32 framesize, UInt32 pos, CFStringEncoding encoding);
     
     ID3_Parser *m_parser;
     ID3_Parser_State m_state;
@@ -51,8 +53,8 @@ public:
     bool m_hasFooter;
     bool m_usesUnsynchronisation;
     bool m_usesExtendedHeader;
-    std::string m_title;
-    std::string m_performer;
+    std::wstring m_title;
+    std::wstring m_performer;
     
     std::vector<UInt8> m_tagData;
 };
@@ -246,8 +248,8 @@ void ID3_Parser_Private::feedData(UInt8 *data, UInt32 numBytes)
                 
                 // Push out the metadata
                 if (m_parser->m_delegate) {
-                    std::map<std::string,std::string> metadataMap;
-                    std::stringstream info;
+                    std::map<std::wstring,std::wstring> metadataMap;
+                    std::wstringstream info;
                     
                     if (m_performer.length() > 0) {
                         info << m_performer;
@@ -256,7 +258,7 @@ void ID3_Parser_Private::feedData(UInt8 *data, UInt32 numBytes)
                     
                     info << m_title;
                     
-                    metadataMap["StreamTitle"] = info.str();
+                    metadataMap[L"StreamTitle"] = info.str();
                 
                     m_parser->m_delegate->id3metaDataAvailable(metadataMap);
                 }
@@ -286,15 +288,15 @@ void ID3_Parser_Private::reset()
     m_hasFooter = false;
     m_usesUnsynchronisation = false;
     m_usesExtendedHeader = false;
-    m_title = "";
-    m_performer = "";
+    m_title = L"";
+    m_performer = L"";
     
     m_tagData.clear();
 }
     
-std::string ID3_Parser_Private::parseContent(UInt32 framesize, UInt32 pos, CFStringEncoding encoding)
+std::wstring ID3_Parser_Private::parseContent(UInt32 framesize, UInt32 pos, CFStringEncoding encoding)
 {
-    std::string frameContent;
+    std::wstring frameContent;
     UInt8* buf = new UInt8[framesize];
     CFIndex bufLen = 0;
     
@@ -311,7 +313,8 @@ std::string ID3_Parser_Private::parseContent(UInt32 framesize, UInt32 pos, CFStr
     
     const char *str = CFStringGetCStringPtr(content, kCFStringEncodingUTF8);
     if (str) {
-        frameContent = std::string(str);
+        std::wstring_convert<std::codecvt_utf8_utf16<wchar_t> > converter;
+        frameContent = converter.from_bytes(std::string(str));
     }
     
     delete[] buf;

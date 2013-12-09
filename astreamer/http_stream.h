@@ -58,7 +58,7 @@ private:
     size_t m_dataByteReadCount;
     size_t m_metaDataBytesRemaining;
     
-    std::string m_icyMetaData;
+    std::wstring m_icyMetaData;
     
     /* Read buffers */
     UInt8 *m_httpReadBuffer;
@@ -93,7 +93,7 @@ public:
     void setUrl(CFURLRef url);
     
     /* ID3_Parser_Delegate */
-    void id3metaDataAvailable(std::map<std::string,std::string> metaData);
+    void id3metaDataAvailable(std::map<std::wstring,std::wstring> metaData);
 };
 
 class HTTP_Stream_Delegate {
@@ -102,7 +102,7 @@ public:
     virtual void streamHasBytesAvailable(UInt8 *data, UInt32 numBytes) = 0;
     virtual void streamEndEncountered() = 0;
     virtual void streamErrorOccurred() = 0;
-    virtual void streamMetaDataAvailable(std::map<std::string,std::string> metaData) = 0;
+    virtual void streamMetaDataAvailable(std::map<std::wstring,std::wstring> metaData) = 0;
 };
 
 } // namespace astreamer
