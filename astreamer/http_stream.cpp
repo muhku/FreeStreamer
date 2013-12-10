@@ -122,7 +122,6 @@ bool HTTP_Stream::open(const HTTP_Stream_Position& position)
     m_icyMetaDataInterval = 0;
     m_dataByteReadCount = 0;
     m_metaDataBytesRemaining = 0;
-    m_icyMetaData = L"";
 	
     /* Failed to create a stream */
     if (!(m_readStream = createReadStream(m_url))) {
@@ -196,7 +195,7 @@ void HTTP_Stream::setUrl(CFURLRef url)
     m_url = (CFURLRef)CFRetain(url);
 }
     
-void HTTP_Stream::id3metaDataAvailable(std::map<std::wstring,std::wstring> metaData)
+void HTTP_Stream::id3metaDataAvailable(std::map<CFStringRef,CFStringRef> metaData)
 {
     if (m_delegate) {
         m_delegate->streamMetaDataAvailable(metaData);
@@ -399,31 +398,55 @@ void HTTP_Stream::parseICYStream(UInt8 *buf, CFIndex bufSize)
                 m_dataByteReadCount = 0;
                 
                 if (m_delegate && !m_icyMetaData.empty()) {
-                    std::map<std::wstring,std::wstring> metadataMap;
-                    std::wstring delimiter = L";";
+                    std::map<CFStringRef,CFStringRef> metadataMap;
                     
-                    size_t pos = 0;
-                    while ((pos = m_icyMetaData.find(delimiter)) != std::wstring::npos) {
-                        std::wstring token = m_icyMetaData.substr(0, pos);
-                        size_t index = token.find(L"='", 0);
+                    CFStringRef metaData = CFStringCreateWithBytes(kCFAllocatorDefault,
+                                                                  &m_icyMetaData[0],
+                                                                  m_icyMetaData.size(),
+                                                                  kCFStringEncodingUTF8,
+                                                                  false);
+                    
+                    CFArrayRef tokens = CFStringCreateArrayBySeparatingStrings(kCFAllocatorDefault,
+                                                                               metaData,
+                                                                               CFSTR(";"));
+                    
+                    for (CFIndex i=0, max=CFArrayGetCount(tokens); i < max; i++) {
+                        CFStringRef token = (CFStringRef) CFArrayGetValueAtIndex(tokens, i);
                         
-                        if (index > 0) {
-                            std::wstring key = token.substr(0, index);
-                            std::wstring value = token.substr(index + 2, token.length() - index - 3);
+                        CFRange foundRange;
+                        
+                        if (CFStringFindWithOptions(token,
+                                                    CFSTR("='"),
+                                                    CFRangeMake(0, CFStringGetLength(token)),
+                                                    NULL,
+                                                    &foundRange) == true) {
                             
-                            metadataMap[key] = value;
+                            CFRange keyRange = CFRangeMake(0, foundRange.location);
+                            
+                            CFStringRef metadaKey = CFStringCreateWithSubstring(kCFAllocatorDefault,
+                                                                                token,
+                                                                                keyRange);
+                            
+                            CFRange valueRange = CFRangeMake(foundRange.location + 2, CFStringGetLength(token) - keyRange.length - 3);
+                            
+                            CFStringRef metadaValue = CFStringCreateWithSubstring(kCFAllocatorDefault,
+                                                                                  token,
+                                                                                  valueRange);
+                            
+                            metadataMap[metadaKey] = metadaValue;
                         }
-                        m_icyMetaData.erase(0, pos + delimiter.length());
                     }
+                    
+                    CFRelease(tokens);
+                    CFRelease(metaData);
+                    
                     m_delegate->streamMetaDataAvailable(metadataMap);
                 }
                 m_icyMetaData.clear();
                 continue;
             }
             
-            wchar_t c = buf[offset];
-            
-            m_icyMetaData.push_back(c);
+            m_icyMetaData.push_back(buf[offset]);
             continue;
         }
         

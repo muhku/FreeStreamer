@@ -9,9 +9,6 @@
 #import "Reachability.h"
 
 #include "audio_stream.h"
-#include <iostream>
-#include <codecvt>
-#include <string>
 
 #import <AVFoundation/AVFoundation.h>
 
@@ -40,7 +37,7 @@ public:
     
     void audioStreamErrorOccurred(int errorCode);
     void audioStreamStateChanged(astreamer::Audio_Stream::State state);
-    void audioStreamMetaDataAvailable(std::map<std::wstring,std::wstring> metaData);
+    void audioStreamMetaDataAvailable(std::map<CFStringRef,CFStringRef> metaData);
 };
 
 /*
@@ -481,16 +478,15 @@ void AudioStreamStateObserver::audioStreamStateChanged(astreamer::Audio_Stream::
     [[NSNotificationCenter defaultCenter] postNotification:notification];
 }
     
-void AudioStreamStateObserver::audioStreamMetaDataAvailable(std::map<std::wstring,std::wstring> metaData)
+void AudioStreamStateObserver::audioStreamMetaDataAvailable(std::map<CFStringRef,CFStringRef> metaData)
 {
     NSMutableDictionary *metaDataDictionary = [[NSMutableDictionary alloc] init];
     
-    for (std::map<std::wstring,std::wstring>::iterator iter = metaData.begin(); iter != metaData.end(); ++iter) {
-        std::wstring_convert<std::codecvt_utf8_utf16<wchar_t> > converter;
-        std::wstring key = iter->first;
-        std::wstring value = iter->second;
+    for (std::map<CFStringRef,CFStringRef>::iterator iter = metaData.begin(); iter != metaData.end(); ++iter) {
+        CFStringRef key = iter->first;
+        CFStringRef value = iter->second;
         
-        metaDataDictionary[@(converter.to_bytes(key).c_str())] = @(converter.to_bytes(value).c_str());
+        metaDataDictionary[CFBridgingRelease(key)] = CFBridgingRelease(value);
     }
     
     NSDictionary *userInfo = @{FSAudioStreamNotificationKey_MetaData: metaDataDictionary,
