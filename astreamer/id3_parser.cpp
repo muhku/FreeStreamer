@@ -239,14 +239,14 @@ void ID3_Parser_Private::feedData(UInt8 *data, UInt32 numBytes)
                         }
                         m_title = parseContent(framesize, pos + 1, encoding);
                         
-                        ID3_TRACE("ID3 title parsed: '%s'\n", m_title.c_str());
+                        ID3_TRACE("ID3 title parsed: '%s'\n", CFStringGetCStringPtr(m_title, CFStringGetSystemEncoding()));
                     } else if (!strcmp(frameName, "TPE1")) {
                         if (m_performer) {
                             CFRelease(m_performer);
                         }
                         m_performer = parseContent(framesize, pos + 1, encoding);
                         
-                        ID3_TRACE("ID3 performer parsed: '%s'\n", m_performer.c_str());
+                        ID3_TRACE("ID3 performer parsed: '%s'\n", CFStringGetCStringPtr(m_performer, CFStringGetSystemEncoding()));
                     } else {
                         // Unknown/unhandled frame
                         ID3_TRACE("Unknown/unhandled frame: %s, size %i\n", frameName, framesize);
