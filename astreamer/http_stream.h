@@ -69,6 +69,7 @@ private:
     CFReadStreamRef createReadStream(CFURLRef url);
     void parseHttpHeadersIfNeeded(UInt8 *buf, CFIndex bufSize);
     void parseICYStream(UInt8 *buf, CFIndex bufSize);
+    CFStringRef createMetaDataStringWithMostReasonableEncoding(const UInt8 *bytes, CFIndex numBytes);
     
     static void readCallBack(CFReadStreamRef stream, CFStreamEventType eventType, void *clientCallBackInfo);
 

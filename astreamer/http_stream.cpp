@@ -400,11 +400,14 @@ void HTTP_Stream::parseICYStream(UInt8 *buf, CFIndex bufSize)
                 if (m_delegate && !m_icyMetaData.empty()) {
                     std::map<CFStringRef,CFStringRef> metadataMap;
                     
-                    CFStringRef metaData = CFStringCreateWithBytes(kCFAllocatorDefault,
-                                                                  &m_icyMetaData[0],
-                                                                  m_icyMetaData.size(),
-                                                                  kCFStringEncodingUTF8,
-                                                                  false);
+                    CFStringRef metaData = createMetaDataStringWithMostReasonableEncoding(&m_icyMetaData[0],
+                                                                                          m_icyMetaData.size());
+                    
+                    if (!metaData) {
+                        // Metadata encoding failed, cannot parse.
+                        m_icyMetaData.clear();
+                        continue;
+                    }
                     
                     CFArrayRef tokens = CFStringCreateArrayBySeparatingStrings(kCFAllocatorDefault,
                                                                                metaData,
@@ -468,6 +471,41 @@ void HTTP_Stream::parseICYStream(UInt8 *buf, CFIndex bufSize)
     if (m_delegate && i > 0) {
         m_delegate->streamHasBytesAvailable(m_icyReadBuffer, i);
     }
+}
+    
+CFStringRef HTTP_Stream::createMetaDataStringWithMostReasonableEncoding(const UInt8 *bytes, CFIndex numBytes)
+{
+    // Firstly try UTF-8
+    CFStringRef metaData;
+    
+    metaData = CFStringCreateWithBytes(kCFAllocatorDefault,
+                                       bytes,
+                                       numBytes,
+                                       kCFStringEncodingUTF8,
+                                       false);
+    if (metaData) {
+        return metaData;
+    }
+    
+    // Failed, try latin1
+    metaData = CFStringCreateWithBytes(kCFAllocatorDefault,
+                                       bytes,
+                                       numBytes,
+                                       kCFStringEncodingISOLatin1,
+                                       false);
+    
+    if (metaData) {
+        return metaData;
+    }
+    
+    // Still failed, try ASCII
+    metaData = CFStringCreateWithBytes(kCFAllocatorDefault,
+                                       bytes,
+                                       numBytes,
+                                       kCFStringEncodingASCII,
+                                       false);
+    
+    return metaData;
 }
     
 void HTTP_Stream::readCallBack(CFReadStreamRef stream, CFStreamEventType eventType, void *clientCallBackInfo)
