@@ -69,7 +69,9 @@ ID3_Parser_Private::ID3_Parser_Private() :
     m_tagSize(0),
     m_hasFooter(false),
     m_usesUnsynchronisation(false),
-    m_usesExtendedHeader(false)
+    m_usesExtendedHeader(false),
+    m_title(NULL),
+    m_performer(NULL)
 {
 }
     
