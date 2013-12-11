@@ -41,7 +41,7 @@ public:
     void setState(ID3_Parser_State state);
     void reset();
     
-    CFStringRef parseContent(UInt32 framesize, UInt32 pos);
+    CFStringRef parseContent(UInt32 framesize, UInt32 pos, CFStringEncoding encoding);
     
     ID3_Parser *m_parser;
     ID3_Parser_State m_state;
@@ -239,14 +239,14 @@ void ID3_Parser_Private::feedData(UInt8 *data, UInt32 numBytes)
                         if (m_title) {
                             CFRelease(m_title);
                         }
-                        m_title = parseContent(framesize, pos + 1);
+                        m_title = parseContent(framesize, pos + 1, encoding);
                         
                         ID3_TRACE("ID3 title parsed: '%s'\n", CFStringGetCStringPtr(m_title, CFStringGetSystemEncoding()));
                     } else if (!strcmp(frameName, "TPE1")) {
                         if (m_performer) {
                             CFRelease(m_performer);
                         }
-                        m_performer = parseContent(framesize, pos + 1);
+                        m_performer = parseContent(framesize, pos + 1, encoding);
                         
                         ID3_TRACE("ID3 performer parsed: '%s'\n", CFStringGetCStringPtr(m_performer, CFStringGetSystemEncoding()));
                     } else {
@@ -263,14 +263,12 @@ void ID3_Parser_Private::feedData(UInt8 *data, UInt32 numBytes)
                     
                     CFMutableArrayRef info = CFArrayCreateMutable(kCFAllocatorDefault, 3, NULL);
                     
-                    if (m_performer && CFStringGetLength(m_performer) > 0) {
+                    if (CFStringGetLength(m_performer) > 0) {
                         CFArrayAppendValue(info, m_performer);
                         CFArrayAppendValue(info, CFSTR(" - "));
                     }
                     
-                    if (m_title) {
-                        CFArrayAppendValue(info, m_title);
-                    }
+                    CFArrayAppendValue(info, m_title);
                     
                     metadataMap[CFSTR("StreamTitle")] = CFStringCreateByCombiningStrings(kCFAllocatorDefault,
                                                                                          info,
@@ -317,36 +315,13 @@ void ID3_Parser_Private::reset()
     m_tagData.clear();
 }
     
-CFStringRef ID3_Parser_Private::parseContent(UInt32 framesize, UInt32 pos)
+CFStringRef ID3_Parser_Private::parseContent(UInt32 framesize, UInt32 pos, CFStringEncoding encoding)
 {
-    CFStringRef content;
-    
-    content = CFStringCreateWithBytes(kCFAllocatorDefault,
+    CFStringRef content = CFStringCreateWithBytes(kCFAllocatorDefault,
                                                   &m_tagData[pos],
                                                   framesize - 1,
-                                                  kCFStringEncodingUTF8,
+                                                  encoding,
                                                   false);
-    if (content) {
-        return content;
-    }
-    
-    // Failed, try latin1
-    content = CFStringCreateWithBytes(kCFAllocatorDefault,
-                                      &m_tagData[pos],
-                                      framesize - 1,
-                                      kCFStringEncodingISOLatin1,
-                                      false);
-    
-    if (content) {
-        return content;
-    }
-    
-    // Still failed, try ASCII
-    content = CFStringCreateWithBytes(kCFAllocatorDefault,
-                                       &m_tagData[pos],
-                                       framesize - 1,
-                                       kCFStringEncodingASCII,
-                                       false);
     
     return content;
 }
