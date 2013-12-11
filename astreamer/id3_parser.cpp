@@ -41,7 +41,7 @@ public:
     void setState(ID3_Parser_State state);
     void reset();
     
-    CFStringRef parseContent(UInt32 framesize, UInt32 pos, CFStringEncoding encoding);
+    CFStringRef parseContent(UInt32 framesize, UInt32 pos, CFStringEncoding encoding, bool byteOrderMark);
     
     ID3_Parser *m_parser;
     ID3_Parser_State m_state;
@@ -227,9 +227,15 @@ void ID3_Parser_Private::feedData(UInt8 *data, UInt32 numBytes)
                     pos += 6;
                     
                     CFStringEncoding encoding;
+                    bool byteOrderMark = false;
                     
                     if (m_tagData[pos] == 3) {
                         encoding = kCFStringEncodingUTF8;
+                    } else if (m_tagData[pos] == 2) {
+                        encoding = kCFStringEncodingUTF16BE;
+                    } else if (m_tagData[pos] == 1) {
+                        encoding = kCFStringEncodingUTF16;
+                        byteOrderMark = true;
                     } else {
                         // ISO-8859-1 is the default encoding
                         encoding = kCFStringEncodingISOLatin1;
@@ -239,14 +245,14 @@ void ID3_Parser_Private::feedData(UInt8 *data, UInt32 numBytes)
                         if (m_title) {
                             CFRelease(m_title);
                         }
-                        m_title = parseContent(framesize, pos + 1, encoding);
+                        m_title = parseContent(framesize, pos + 1, encoding, byteOrderMark);
                         
                         ID3_TRACE("ID3 title parsed: '%s'\n", CFStringGetCStringPtr(m_title, CFStringGetSystemEncoding()));
                     } else if (!strcmp(frameName, "TPE1")) {
                         if (m_performer) {
                             CFRelease(m_performer);
                         }
-                        m_performer = parseContent(framesize, pos + 1, encoding);
+                        m_performer = parseContent(framesize, pos + 1, encoding, byteOrderMark);
                         
                         ID3_TRACE("ID3 performer parsed: '%s'\n", CFStringGetCStringPtr(m_performer, CFStringGetSystemEncoding()));
                     } else {
@@ -263,12 +269,14 @@ void ID3_Parser_Private::feedData(UInt8 *data, UInt32 numBytes)
                     
                     CFMutableArrayRef info = CFArrayCreateMutable(kCFAllocatorDefault, 3, NULL);
                     
-                    if (CFStringGetLength(m_performer) > 0) {
+                    if (m_performer && CFStringGetLength(m_performer) > 0) {
                         CFArrayAppendValue(info, m_performer);
                         CFArrayAppendValue(info, CFSTR(" - "));
                     }
                     
-                    CFArrayAppendValue(info, m_title);
+                    if (m_title) {
+                        CFArrayAppendValue(info, m_title);
+                    }
                     
                     metadataMap[CFSTR("StreamTitle")] = CFStringCreateByCombiningStrings(kCFAllocatorDefault,
                                                                                          info,
@@ -315,13 +323,13 @@ void ID3_Parser_Private::reset()
     m_tagData.clear();
 }
     
-CFStringRef ID3_Parser_Private::parseContent(UInt32 framesize, UInt32 pos, CFStringEncoding encoding)
+CFStringRef ID3_Parser_Private::parseContent(UInt32 framesize, UInt32 pos, CFStringEncoding encoding, bool byteOrderMark)
 {
     CFStringRef content = CFStringCreateWithBytes(kCFAllocatorDefault,
                                                   &m_tagData[pos],
                                                   framesize - 1,
                                                   encoding,
-                                                  false);
+                                                  byteOrderMark);
     
     return content;
 }
