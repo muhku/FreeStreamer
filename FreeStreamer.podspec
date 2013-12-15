@@ -11,8 +11,7 @@ Pod::Spec.new do |s|
 	s.source_files          = 'Common/*.{h,m,mm}', 'astreamer/*.{h,cpp}'
 	s.ios.frameworks        = 'CFNetwork', 'AudioToolbox', 'AVFoundation', 'MediaPlayer'
 	s.osx.frameworks        = 'CFNetwork', 'AudioToolbox', 'AVFoundation'
-	s.library	        = 'xml2'
-	s.library		= 'stdc++'
+	s.libraries	        = 'xml2', 'stdc++'
 	s.xcconfig              = { 'HEADER_SEARCH_PATHS' => '$(SDKROOT)/usr/include/libxml2' }
 	s.requires_arc          = true
 end
