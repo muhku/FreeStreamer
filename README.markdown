@@ -96,7 +96,7 @@ License
 
 The BSD license which the files are licensed under allows is as follows:
 
-    Copyright (c) 2011-2013 Matias Muhonen <mmu@iki.fi>
+    Copyright (c) 2011-2013 Matias Muhonen <info@freestreamer.io>
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without

@@ -1,10 +1,10 @@
 Pod::Spec.new do |s|
 	s.name                  = 'FreeStreamer'
-	s.version               = '1.3.9'
+	s.version               = '1.4.0'
 	s.license               = 'BSD'
 	s.summary               = 'A low-memory footprint streaming audio client for iOS and OS X.'
-	s.homepage              = 'http://freestreamer.muhonen.net'
-	s.author                = { 'Matias Muhonen' => 'mmu@iki.fi' }
+	s.homepage              = 'http://freestreamer.io'
+	s.author                = { 'Matias Muhonen' => 'info@freestreamer.io' }
 	s.source                = { :git => 'https://github.com/muhku/FreeStreamer.git', :tag => s.version.to_s }
 	s.ios.deployment_target = '6.0'
 	s.osx.deployment_target = '10.7'
