@@ -21,7 +21,7 @@ FreeStreamer has the following features:
 API documentation
 ====================
 
-See [here](http://freestreamer.muhonen.net/api/).
+See [here](http://freestreamer.io/api/).
 
 Using the player in your own project
 ====================
