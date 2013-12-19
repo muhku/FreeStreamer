@@ -84,6 +84,17 @@ request.onFailure = ^() {
 
 That's it! For more examples, please take a look at the example project. For instance, you may want to observe notifications on the audio stream state.
 
+Debugging
+====================
+
+To enable debug logging, enable the following line in [astreamer/audio_stream.cpp](https://github.com/muhku/FreeStreamer/blob/master/astreamer/audio_stream.cpp#L17):
+
+```
+#define AS_DEBUG 1
+```
+
+After enabling the line, compile the code and run it.
+
 Reporting bugs and contributing
 ====================
 
