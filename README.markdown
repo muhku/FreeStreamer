@@ -39,14 +39,27 @@ Please follow the following steps to use the player in your own project:
 
 3. **iOS only**: If you want to support background audio, add *App plays audio* to the target's *Required background modes*. You can find the property by clicking on the target on Xcode and opening the Info tab.
 
-You can now stream an audio file like this:
+You can now stream an audio file like this. Declare the stream in your header file:
+
+```
+@class FSAudioStream;
+
+@interface MyClass : NSObject {
+    FSAudioStream *_audioStream;
+}
+```
+
+Initialize and use the stream in your implementation:
+
 
 ```
 #import "FSAudioStream.h"
 
-FSAudioStream *audioStream = [[FSAudioStream alloc] init];
-[audioStream playFromURL:[NSURL URLWithString:@"http://www.example.com/audio_file.mp3"]];
+_audioStream = [[FSAudioStream alloc] init];
+[_audioStream playFromURL:[NSURL URLWithString:@"http://www.example.com/audio_file.mp3"]];
 ```
+
+Note that FSAudioStream must exist during the playback of the stream. Do not declare the class as a local variable of a method or the stream will be deallocated and will not play.
 
 Some servers may send an incorrect MIME type. In this case, FreeStreamer may not be able to play the stream. If you want to avoid the content-type checks (that the stream actually is an audio file), you can set the following property:
 
@@ -56,14 +69,24 @@ audioStream.strictContentTypeChecking = NO;
 audioStream.defaultContentType = "audio/mpeg";
 ```
 
-For streaming playlists, you need to use the [FSAudioController.h](https://github.com/muhku/FreeStreamer/blob/master/Common/FSAudioController.h) class. The class has some additional logic to resolve the playback URLs:
+For streaming playlists, you need to use the [FSAudioController.h](https://github.com/muhku/FreeStreamer/blob/master/Common/FSAudioController.h) class. The class has some additional logic to resolve the playback URLs. Again, declare the class:
 
 ```
-#import "FSAudioController.h"
+@class FSAudioController;
 
-FSAudioController *audioController = [[FSAudioController alloc] init];
-audioController.url = @"http://www.example.com/my_playlist.pls";
-[audioController play];
+@interface MyClass : NSObject {
+    FSAudioController *_audioController;
+}
+```
+
+And use it:
+
+```
+#import "FSAudioStream.h"
+
+_audioController = [[FSAudioController alloc] init];
+_audioController.url = @"http://www.example.com/my_playlist.pls";
+[_audioController play];
 ```
 
 It is also possible to check the exact content of the stream by using the [FSCheckContentTypeRequest.h](https://github.com/muhku/FreeStreamer/blob/master/Common/FSCheckContentTypeRequest.h) and [FSParsePlaylistRequest.h](https://github.com/muhku/FreeStreamer/blob/master/Common/FSParsePlaylistRequest.h) classes:
