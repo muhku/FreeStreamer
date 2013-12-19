@@ -31,7 +31,7 @@
 {
     if (self = [super init]) {
         _url = nil;
-        _audioStream = [[FSAudioStream alloc] init];
+        _audioStream = nil;
         _checkContentTypeRequest = nil;
         _parsePlaylistRequest = nil;
         _readyToPlay = NO;
@@ -51,15 +51,9 @@
 {
     [_audioStream stop];
     
-    if (_checkContentTypeRequest) {
-        [_checkContentTypeRequest cancel];
-    }
-    if (_parsePlaylistRequest) {
-        [_parsePlaylistRequest cancel];
-    }
-    if (_parseRssPodcastFeedRequest) {
-        [_parseRssPodcastFeedRequest cancel];
-    }
+    [_checkContentTypeRequest cancel];
+    [_parsePlaylistRequest cancel];
+    [_parseRssPodcastFeedRequest cancel];
 }
 
 /*
@@ -70,114 +64,16 @@
 
 - (FSAudioStream *)audioStream
 {
+    if (!_audioStream) {
+        _audioStream = [[FSAudioStream alloc] init];
+    }
     return _audioStream;
 }
 
 - (FSCheckContentTypeRequest *)checkContentTypeRequest
 {
-    return _checkContentTypeRequest;
-}
-
-- (FSParsePlaylistRequest *)parsePlaylistRequest
-{
-    return _parsePlaylistRequest;
-}
-
-- (FSParseRssPodcastFeedRequest *)parseRssPodcastFeedRequest
-{
-    return _parseRssPodcastFeedRequest;
-}
-
-- (BOOL)isPlaying
-{
-    return [_audioStream isPlaying];
-}
-
-/*
- * =======================================
- * Public interface
- * =======================================
- */
-
-- (void)play
-{
-    @synchronized (self) {
-        if (self.readyToPlay) {
-            if ([self.playlistItems count] > 0) {
-                FSPlaylistItem *playlistItem = (self.playlistItems)[self.currentPlaylistItemIndex];
-                
-                _audioStream.url = playlistItem.nsURL;
-            }
-            
-            [self.audioStream play];
-            return;
-        }
-        
+    if (!_checkContentTypeRequest) {
         __weak FSAudioController *weakSelf = self;
-        
-        /*
-         * Handle playlists
-         */
-        
-        _parsePlaylistRequest = [[FSParsePlaylistRequest alloc] init];
-        _parsePlaylistRequest.url = self.url;
-        _parsePlaylistRequest.onCompletion = ^() {
-            if ([weakSelf.parsePlaylistRequest.playlistItems count] > 0) {
-                weakSelf.playlistItems = weakSelf.parsePlaylistRequest.playlistItems;
-                
-                weakSelf.readyToPlay = YES;
-                
-                weakSelf.audioStream.onCompletion = ^() {
-                    if (weakSelf.currentPlaylistItemIndex + 1 < [weakSelf.playlistItems count]) {
-                        weakSelf.currentPlaylistItemIndex = weakSelf.currentPlaylistItemIndex + 1;
-                        
-                        [weakSelf play];
-                    }
-                };
-                
-                [weakSelf play];
-            }
-        };
-        _parsePlaylistRequest.onFailure = ^() {
-            // Failed to parse the playlist; try playing anyway
-            
-            weakSelf.readyToPlay = YES;
-            [weakSelf.audioStream play];
-        };
-        
-        /*
-         * Handle RSS feed parsing
-         */
-        
-        _parseRssPodcastFeedRequest = [[FSParseRssPodcastFeedRequest alloc] init];
-        _parseRssPodcastFeedRequest.url = self.url;
-        _parseRssPodcastFeedRequest.onCompletion = ^() {
-            if ([weakSelf.parseRssPodcastFeedRequest.playlistItems count] > 0) {
-                weakSelf.playlistItems = weakSelf.parseRssPodcastFeedRequest.playlistItems;
-                
-                weakSelf.readyToPlay = YES;
-                
-                weakSelf.audioStream.onCompletion = ^() {
-                    if (weakSelf.currentPlaylistItemIndex + 1 < [weakSelf.playlistItems count]) {
-                        weakSelf.currentPlaylistItemIndex = weakSelf.currentPlaylistItemIndex + 1;
-                        
-                        [weakSelf play];
-                    }
-                };
-                
-                [weakSelf play];
-            }
-        };
-        _parseRssPodcastFeedRequest.onFailure = ^() {
-            // Failed to parse the XML file; try playing anyway
-            
-            weakSelf.readyToPlay = YES;
-            [weakSelf.audioStream play];
-        };
-        
-        /*
-         * Handle content type check
-         */
         
         _checkContentTypeRequest = [[FSCheckContentTypeRequest alloc] init];
         _checkContentTypeRequest.url = self.url;
@@ -201,7 +97,102 @@
             weakSelf.readyToPlay = YES;
             [weakSelf.audioStream play];
         };
-        [_checkContentTypeRequest start];
+    }
+    return _checkContentTypeRequest;
+}
+
+- (FSParsePlaylistRequest *)parsePlaylistRequest
+{
+    if (!_parsePlaylistRequest) {
+        __weak FSAudioController *weakSelf = self;
+        
+        _parsePlaylistRequest = [[FSParsePlaylistRequest alloc] init];
+        _parsePlaylistRequest.onCompletion = ^() {
+            if ([weakSelf.parsePlaylistRequest.playlistItems count] > 0) {
+                weakSelf.playlistItems = weakSelf.parsePlaylistRequest.playlistItems;
+                
+                weakSelf.readyToPlay = YES;
+                
+                weakSelf.audioStream.onCompletion = ^() {
+                    if (weakSelf.currentPlaylistItemIndex + 1 < [weakSelf.playlistItems count]) {
+                        weakSelf.currentPlaylistItemIndex = weakSelf.currentPlaylistItemIndex + 1;
+                        
+                        [weakSelf play];
+                    }
+                };
+                
+                [weakSelf play];
+            }
+        };
+        _parsePlaylistRequest.onFailure = ^() {
+            // Failed to parse the playlist; try playing anyway
+            
+            weakSelf.readyToPlay = YES;
+            [weakSelf.audioStream play];
+        };
+    }
+    return _parsePlaylistRequest;
+}
+
+- (FSParseRssPodcastFeedRequest *)parseRssPodcastFeedRequest
+{
+    if (!_parseRssPodcastFeedRequest) {
+        __weak FSAudioController *weakSelf = self;
+        
+        _parseRssPodcastFeedRequest = [[FSParseRssPodcastFeedRequest alloc] init];
+        _parseRssPodcastFeedRequest.onCompletion = ^() {
+            if ([weakSelf.parseRssPodcastFeedRequest.playlistItems count] > 0) {
+                weakSelf.playlistItems = weakSelf.parseRssPodcastFeedRequest.playlistItems;
+                
+                weakSelf.readyToPlay = YES;
+                
+                weakSelf.audioStream.onCompletion = ^() {
+                    if (weakSelf.currentPlaylistItemIndex + 1 < [weakSelf.playlistItems count]) {
+                        weakSelf.currentPlaylistItemIndex = weakSelf.currentPlaylistItemIndex + 1;
+                        
+                        [weakSelf play];
+                    }
+                };
+                
+                [weakSelf play];
+            }
+        };
+        _parseRssPodcastFeedRequest.onFailure = ^() {
+            // Failed to parse the XML file; try playing anyway
+            
+            weakSelf.readyToPlay = YES;
+            [weakSelf.audioStream play];
+        };
+    }
+    return _parseRssPodcastFeedRequest;
+}
+
+- (BOOL)isPlaying
+{
+    return [self.audioStream isPlaying];
+}
+
+/*
+ * =======================================
+ * Public interface
+ * =======================================
+ */
+
+- (void)play
+{
+    @synchronized (self) {
+        if (self.readyToPlay) {
+            if ([self.playlistItems count] > 0) {
+                FSPlaylistItem *playlistItem = (self.playlistItems)[self.currentPlaylistItemIndex];
+                
+                self.audioStream.url = playlistItem.nsURL;
+            }
+            
+            [self.audioStream play];
+            return;
+        }
+        
+        [self.checkContentTypeRequest start];
         
         NSDictionary *userInfo = @{FSAudioStreamNotificationKey_State: @(kFsAudioStreamRetrievingURL)};
         NSNotification *notification = [NSNotification notificationWithName:FSAudioStreamStateChangeNotification object:nil userInfo:userInfo];
@@ -218,13 +209,13 @@
 
 - (void)stop
 {
-    [_audioStream stop];
+    [self.audioStream stop];
     self.readyToPlay = NO;
 }
 
 - (void)pause
 {
-    [_audioStream pause];
+    [self.audioStream pause];
 }
 
 /*
@@ -236,12 +227,24 @@
 - (void)setUrl:(NSString *)url
 {
     @synchronized (self) {
-        _url = nil;
+        if (!url) {
+            [self.audioStream stop];
+            _url = nil;
+            return;
+        }
+        
         self.currentPlaylistItemIndex = 0;
         
-        if (url && ![url isEqual:_url]) {
-            [_checkContentTypeRequest cancel], _checkContentTypeRequest = nil;
-            [_parsePlaylistRequest cancel], _parsePlaylistRequest = nil;
+        if (![url isEqual:_url]) {
+            [self.audioStream stop];
+            
+            [self.checkContentTypeRequest cancel];
+            [self.parsePlaylistRequest cancel];
+            [self.parseRssPodcastFeedRequest cancel];
+            
+            self.checkContentTypeRequest.url = url;
+            self.parsePlaylistRequest.url = url;
+            self.parseRssPodcastFeedRequest.url = url;
             
             NSString *copyOfURL = [url copy];
             _url = copyOfURL;
@@ -266,7 +269,7 @@
 
 - (FSAudioStream *)stream
 {
-    return _audioStream;
+    return self.audioStream;
 }
 
 @end
