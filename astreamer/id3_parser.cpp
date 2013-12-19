@@ -267,22 +267,15 @@ void ID3_Parser_Private::feedData(UInt8 *data, UInt32 numBytes)
                 if (m_parser->m_delegate) {
                     std::map<CFStringRef,CFStringRef> metadataMap;
                     
-                    CFMutableArrayRef info = CFArrayCreateMutable(kCFAllocatorDefault, 3, NULL);
-                    
                     if (m_performer && CFStringGetLength(m_performer) > 0) {
-                        CFArrayAppendValue(info, m_performer);
-                        CFArrayAppendValue(info, CFSTR(" - "));
+                        metadataMap[CFSTR("MPMediaItemPropertyArtist")] =
+                            CFStringCreateCopy(kCFAllocatorDefault, m_performer);
                     }
                     
-                    if (m_title) {
-                        CFArrayAppendValue(info, m_title);
+                    if (m_title && CFStringGetLength(m_title) > 0) {
+                        metadataMap[CFSTR("MPMediaItemPropertyTitle")] =
+                            CFStringCreateCopy(kCFAllocatorDefault, m_title);
                     }
-                    
-                    metadataMap[CFSTR("StreamTitle")] = CFStringCreateByCombiningStrings(kCFAllocatorDefault,
-                                                                                         info,
-                                                                                         CFSTR(""));
-                    
-                    CFRelease(info);
                 
                     m_parser->m_delegate->id3metaDataAvailable(metadataMap);
                 }

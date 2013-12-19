@@ -244,10 +244,19 @@
 {
     NSDictionary *dict = [notification userInfo];
     NSDictionary *metaData = [dict valueForKey:FSAudioStreamNotificationKey_MetaData];
-    NSString *streamTitle = [metaData objectForKey:@"StreamTitle"];
+    
+    NSMutableString *streamInfo = [[NSMutableString alloc] init];
+    
+    if (metaData[@"MPMediaItemPropertyArtist"] &&
+        metaData[@"MPMediaItemPropertyTitle"]) {
+        [streamInfo appendString:metaData[@"MPMediaItemPropertyArtist"]];
+        [streamInfo appendString:@" - "];
+        [streamInfo appendString:metaData[@"MPMediaItemPropertyTitle"]];
+    } else if (metaData[@"StreamTitle"]) {
+        [streamInfo appendString:metaData[@"StreamTitle"]];
+    }
 
-done:
-    [self.stateTextFieldCell setTitle:streamTitle];
+    [self.stateTextFieldCell setTitle:streamInfo];
 }
 
 @end

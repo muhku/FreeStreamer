@@ -80,6 +80,12 @@
  * @param notification The audio stream state notification.
  */
 - (void)audioStreamStateDidChange:(NSNotification *)notification;
+
+/**
+ * Handles remote control events.
+ * @param receivedEvent The event received.
+ */
+- (void)remoteControlReceivedWithEvent:(UIEvent *)receivedEvent;
 /**
  * An action for starting the playback of the stream.
  *

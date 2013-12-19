@@ -67,6 +67,10 @@
         [self.audioController play];
     }
     
+    [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
+    
+    [self becomeFirstResponder];
+    
     _progressUpdateTimer = [NSTimer scheduledTimerWithTimeInterval:1.0
                                                             target:self
                                                           selector:@selector(updatePlaybackProgress)
@@ -114,6 +118,17 @@
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
     // Return YES for supported orientations
     return (interfaceOrientation == UIInterfaceOrientationPortrait);
+}
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+    [self.audioController stop];
+    
+    [[UIApplication sharedApplication] endReceivingRemoteControlEvents];
+    
+    [self resignFirstResponder];
+    
+    [super viewWillDisappear:animated];
 }
 
 - (void)viewDidDisappear:(BOOL)animated
@@ -213,6 +228,23 @@
     }
 }
 
+- (void)remoteControlReceivedWithEvent:(UIEvent *)receivedEvent
+{
+    if (receivedEvent.type == UIEventTypeRemoteControl) {
+        switch (receivedEvent.subtype) {
+            case UIEventSubtypeRemoteControlTogglePlayPause:
+                if (_paused) {
+                    [self play:self];
+                } else {
+                    [self pause:self];
+                }
+                break;
+            default:
+                break;
+        }
+    }
+}
+
 - (void)audioStreamErrorOccurred:(NSNotification *)notification {
     [_statusLabel setHidden:NO];
     
@@ -238,10 +270,20 @@
 - (void)audioStreamMetaDataAvailable:(NSNotification *)notification {
     NSDictionary *dict = [notification userInfo];
     NSDictionary *metaData = [dict valueForKey:FSAudioStreamNotificationKey_MetaData];
-    NSString *streamTitle = metaData[@"StreamTitle"];
+    
+    NSMutableString *streamInfo = [[NSMutableString alloc] init];
+    
+    if (metaData[@"MPMediaItemPropertyArtist"] &&
+        metaData[@"MPMediaItemPropertyTitle"]) {
+        [streamInfo appendString:metaData[@"MPMediaItemPropertyArtist"]];
+        [streamInfo appendString:@" - "];
+        [streamInfo appendString:metaData[@"MPMediaItemPropertyTitle"]];
+    } else if (metaData[@"StreamTitle"]) {
+        [streamInfo appendString:metaData[@"StreamTitle"]];
+    }
     
     [_statusLabel setHidden:NO];
-    self.statusLabel.text = streamTitle;
+    self.statusLabel.text = streamInfo;
 }
 
 /*

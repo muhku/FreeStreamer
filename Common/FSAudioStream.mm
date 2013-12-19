@@ -16,6 +16,10 @@
 #import <AudioToolbox/AudioToolbox.h>
 #endif
 
+#if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 50000)
+#import <MediaPlayer/MediaPlayer.h>
+#endif
+
 NSString* const FSAudioStreamStateChangeNotification = @"FSAudioStreamStateChangeNotification";
 NSString* const FSAudioStreamNotificationKey_Stream = @"stream";
 NSString* const FSAudioStreamNotificationKey_State = @"state";
@@ -488,6 +492,22 @@ void AudioStreamStateObserver::audioStreamMetaDataAvailable(std::map<CFStringRef
         
         metaDataDictionary[CFBridgingRelease(key)] = CFBridgingRelease(value);
     }
+    
+#if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 50000)
+    NSMutableDictionary *songInfo = [[NSMutableDictionary alloc] init];
+    
+    if (metaDataDictionary[@"MPMediaItemPropertyTitle"]) {
+        songInfo[MPMediaItemPropertyTitle] = metaDataDictionary[@"MPMediaItemPropertyTitle"];
+    } else if (metaDataDictionary[@"StreamTitle"]) {
+        songInfo[MPMediaItemPropertyTitle] = metaDataDictionary[@"StreamTitle"];
+    }
+    
+    if (metaDataDictionary[@"MPMediaItemPropertyArtist"]) {
+        songInfo[MPMediaItemPropertyArtist] = metaDataDictionary[@"MPMediaItemPropertyArtist"];
+    }
+    
+    [[MPNowPlayingInfoCenter defaultCenter] setNowPlayingInfo:songInfo];
+#endif
     
     NSDictionary *userInfo = @{FSAudioStreamNotificationKey_MetaData: metaDataDictionary,
                               FSAudioStreamNotificationKey_Stream: [NSValue valueWithPointer:source]};
