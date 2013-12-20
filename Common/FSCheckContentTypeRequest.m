@@ -115,7 +115,8 @@
     } else if ([_contentType isEqualToString:@"audio/aac"] ||
                [_contentType isEqualToString:@"audio/aacp"]) {
         _format = kFSFileFormatAAC_ADTS;
-    } else if ([_contentType isEqualToString:@"audio/x-mpegurl"]) {
+    } else if ([_contentType isEqualToString:@"audio/x-mpegurl"] ||
+               [_contentType isEqualToString:@"application/x-mpegurl"]) {
         _format = kFSFileFormatM3UPlaylist;
         _playlist = YES;
     } else if ([_contentType isEqualToString:@"audio/x-scpls"] ||

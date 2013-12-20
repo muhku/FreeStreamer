@@ -200,7 +200,8 @@
     
     _format = kFSPlaylistFormatNone;
     
-    if ([contentType isEqualToString:@"audio/x-mpegurl"]) {
+    if ([contentType isEqualToString:@"audio/x-mpegurl"] ||
+        [contentType isEqualToString:@"application/x-mpegurl"]) {
         _format = kFSPlaylistFormatM3U;
     } else if ([contentType isEqualToString:@"audio/x-scpls"] ||
                [contentType isEqualToString:@"application/pls+xml"]) {
