@@ -1,3 +1,5 @@
+[![Build Status](https://api.travis-ci.org/muhku/FreeStreamer.png?branch=master)](https://travis-ci.org/muhku/FreeStreamer)
+
 Introduction
 ====================
 
