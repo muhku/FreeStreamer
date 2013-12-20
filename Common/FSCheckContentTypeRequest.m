@@ -118,7 +118,8 @@
     } else if ([_contentType isEqualToString:@"audio/x-mpegurl"]) {
         _format = kFSFileFormatM3UPlaylist;
         _playlist = YES;
-    } else if ([_contentType isEqualToString:@"audio/x-scpls"]) {
+    } else if ([_contentType isEqualToString:@"audio/x-scpls"] ||
+               [_contentType isEqualToString:@"application/pls+xml"]) {
         _format = kFSFileFormatPLSPlaylist;
         _playlist = YES;
     } else if ([_contentType isEqualToString:@"text/plain"]) {

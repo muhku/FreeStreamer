@@ -202,7 +202,8 @@
     
     if ([contentType isEqualToString:@"audio/x-mpegurl"]) {
         _format = kFSPlaylistFormatM3U;
-    } else if ([contentType isEqualToString:@"audio/x-scpls"]) {
+    } else if ([contentType isEqualToString:@"audio/x-scpls"] ||
+               [contentType isEqualToString:@"application/pls+xml"]) {
         _format = kFSPlaylistFormatPLS;
     } else if ([contentType isEqualToString:@"text/plain"]) {
         /* The server did not provide meaningful content type;
