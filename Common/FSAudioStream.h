@@ -41,6 +41,7 @@ typedef enum {
  * The audio stream errors.
  */
 typedef enum {
+    kFsAudioStreamErrorNone = 0,
     kFsAudioStreamErrorOpen = 1,
     kFsAudioStreamErrorStreamParse = 2,
     kFsAudioStreamErrorNetwork = 3
@@ -157,5 +158,9 @@ typedef struct {
  * Called upon a failure.
  */
 @property (copy) void (^onFailure)();
+/**
+ * The last stream error.
+ */
+@property (readonly) FSAudioStreamError lastError;
 
 @end

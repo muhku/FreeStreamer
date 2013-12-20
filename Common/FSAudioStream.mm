@@ -70,6 +70,7 @@ public:
 @property (nonatomic,assign) BOOL wasInterrupted;
 @property (copy) void (^onCompletion)();
 @property (copy) void (^onFailure)();
+@property (nonatomic,assign) FSAudioStreamError lastError;
 
 - (void)reachabilityChanged:(NSNotification *)note;
 - (void)interruptionOccurred:(NSNotification *)notification;
@@ -89,6 +90,7 @@ public:
 @synthesize wasInterrupted=_wasInterrupted;
 @synthesize onCompletion;
 @synthesize onFailure;
+@synthesize lastError;
 
 -(id)init {
     if (self = [super init]) {
@@ -103,6 +105,8 @@ public:
         _audioStream->m_delegate = _observer;
         
         _reachability = [Reachability reachabilityForInternetConnection];
+        
+        self.lastError = kFsAudioStreamErrorNone;
         
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(reachabilityChanged:)
@@ -408,6 +412,10 @@ public:
     _private.onFailure = onFailure;
 }
 
+- (FSAudioStreamError)lastError {
+    return _private.lastError;
+}
+
 @end
 
 /*
@@ -418,6 +426,20 @@ public:
     
 void AudioStreamStateObserver::audioStreamErrorOccurred(int errorCode)
 {
+    switch (errorCode) {
+        case kFsAudioStreamErrorOpen:
+            priv.lastError = kFsAudioStreamErrorOpen;
+            break;
+        case kFsAudioStreamErrorStreamParse:
+            priv.lastError = kFsAudioStreamErrorStreamParse;
+            break;
+        case kFsAudioStreamErrorNetwork:
+            priv.lastError = kFsAudioStreamErrorNetwork;
+            break;
+        default:
+            break;
+    }
+    
     NSDictionary *userInfo = @{FSAudioStreamNotificationKey_Error: @(errorCode),
                               FSAudioStreamNotificationKey_Stream: [NSValue valueWithPointer:source]};
     NSNotification *notification = [NSNotification notificationWithName:FSAudioStreamErrorNotification object:nil userInfo:userInfo];
@@ -431,6 +453,7 @@ void AudioStreamStateObserver::audioStreamStateChanged(astreamer::Audio_Stream::
     
     switch (state) {
         case astreamer::Audio_Stream::STOPPED:
+            priv.lastError = kFsAudioStreamErrorNone;
             fsAudioState = [NSNumber numberWithInt:kFsAudioStreamStopped];
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
             [[AVAudioSession sharedInstance] setActive:NO error:nil];
@@ -440,10 +463,12 @@ void AudioStreamStateObserver::audioStreamStateChanged(astreamer::Audio_Stream::
             }
             break;
         case astreamer::Audio_Stream::BUFFERING:
+            priv.lastError = kFsAudioStreamErrorNone;
             m_eofReached = false;
             fsAudioState = [NSNumber numberWithInt:kFsAudioStreamBuffering];
             break;
         case astreamer::Audio_Stream::PLAYING:
+            priv.lastError = kFsAudioStreamErrorNone;
             m_eofReached = false;
             fsAudioState = [NSNumber numberWithInt:kFsAudioStreamPlaying];
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
@@ -451,10 +476,12 @@ void AudioStreamStateObserver::audioStreamStateChanged(astreamer::Audio_Stream::
 #endif
             break;
         case astreamer::Audio_Stream::SEEKING:
+            priv.lastError = kFsAudioStreamErrorNone;
             m_eofReached = false;
             fsAudioState = [NSNumber numberWithInt:kFsAudioStreamSeeking];
             break;
         case astreamer::Audio_Stream::END_OF_FILE:
+            priv.lastError = kFsAudioStreamErrorNone;
             m_eofReached = true;
             fsAudioState = [NSNumber numberWithInt:kFSAudioStreamEndOfFile];
             break;
