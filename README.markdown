@@ -120,6 +120,18 @@ To enable debug logging, enable the following line in [astreamer/audio_stream.cp
 
 After enabling the line, compile the code and run it.
 
+It is also possible to check the lastError property in the FSAudioStreamer class:
+
+```
+NSLog(@"Last error code: %i", audioStream.lastError);
+```
+
+Or if you are using the FSAudioController class, then:
+
+```
+NSLog(@"Last error code: %i", audioController.stream.lastError);
+```
+
 Reporting bugs and contributing
 ====================
 
