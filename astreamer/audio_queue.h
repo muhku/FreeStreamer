@@ -80,8 +80,10 @@ private:
     
     std::vector<AudioStreamPacketDescription*> m_cbrPacketDescriptions;
     
+public:
     OSStatus m_lastError;
 
+private:
     void cleanup();
     void setCookiesForStream(AudioFileStreamID inAudioFileStream);
     void setState(State state);

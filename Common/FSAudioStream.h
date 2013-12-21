@@ -44,7 +44,8 @@ typedef enum {
     kFsAudioStreamErrorNone = 0,
     kFsAudioStreamErrorOpen = 1,
     kFsAudioStreamErrorStreamParse = 2,
-    kFsAudioStreamErrorNetwork = 3
+    kFsAudioStreamErrorNetwork = 3,
+    kFsAudioStreamErrorUnsupportedFormat = 4
 } FSAudioStreamError;
 
 @class FSAudioStreamPrivate;

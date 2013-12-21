@@ -269,7 +269,11 @@ void Audio_Stream::audioQueueInitializationFailed()
     setState(FAILED);
     
     if (m_delegate) {
-        m_delegate->audioStreamErrorOccurred(AS_ERR_STREAM_PARSE);
+        if (m_audioQueue->m_lastError == kAudioFormatUnsupportedDataFormatError) {
+            m_delegate->audioStreamErrorOccurred(AS_ERR_UNSUPPORTED_FORMAT);
+        } else {
+            m_delegate->audioStreamErrorOccurred(AS_ERR_STREAM_PARSE);
+        }
     }
 }
     

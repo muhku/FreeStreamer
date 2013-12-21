@@ -261,6 +261,9 @@
         case kFsAudioStreamErrorNetwork:
             self.statusLabel.text = @"Network failed: cannot play the audio stream";
             break;
+        case kFsAudioStreamErrorUnsupportedFormat:
+            self.statusLabel.text = @"Unsupported format";
+            break;
         default:
             self.statusLabel.text = @"Unknown error occurred";
             break;

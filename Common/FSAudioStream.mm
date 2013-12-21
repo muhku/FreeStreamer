@@ -436,6 +436,8 @@ void AudioStreamStateObserver::audioStreamErrorOccurred(int errorCode)
         case kFsAudioStreamErrorNetwork:
             priv.lastError = kFsAudioStreamErrorNetwork;
             break;
+        case kFsAudioStreamErrorUnsupportedFormat:
+            priv.lastError = kFsAudioStreamErrorUnsupportedFormat;
         default:
             break;
     }

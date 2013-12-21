@@ -234,6 +234,9 @@
         case kFsAudioStreamErrorNetwork:
             [self.stateTextFieldCell setTitle:@"Network failed: cannot play the audio stream"];
             break;
+        case kFsAudioStreamErrorUnsupportedFormat:
+            [self.stateTextFieldCell setTitle:@"Unsupported format"];
+            break;
         default:
             [self.stateTextFieldCell setTitle:@"Unknown error occurred"];
             break;

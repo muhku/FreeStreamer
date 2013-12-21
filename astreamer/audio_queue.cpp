@@ -197,11 +197,12 @@ void Audio_Queue::handlePropertyChange(AudioFileStreamID inAudioFileStream, Audi
             if (err) {
                 AQ_TRACE("%s: error in AudioQueueNewOutput\n", __PRETTY_FUNCTION__);
                 
+                m_lastError = err;
+                
                 if (m_delegate) {
                     m_delegate->audioQueueInitializationFailed();
                 }
                 
-                m_lastError = err;
                 break;
             }
             
@@ -219,11 +220,12 @@ void Audio_Queue::handlePropertyChange(AudioFileStreamID inAudioFileStream, Audi
                     (void)AudioQueueDispose(m_outAQ, true);
                     m_outAQ = 0;
                     
+                    m_lastError = err;
+                    
                     if (m_delegate) {
                         m_delegate->audioQueueInitializationFailed();
                     }
                     
-                    m_lastError = err;
                     break;
                 }
             }
