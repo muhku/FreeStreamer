@@ -316,7 +316,7 @@ void Audio_Stream::streamIsReadyRead()
 	
 void Audio_Stream::streamHasBytesAvailable(UInt8 *data, UInt32 numBytes)
 {
-    AS_TRACE("%s: %lu bytes\n", __FUNCTION__, numBytes);
+    AS_TRACE("%s: %u bytes\n", __FUNCTION__, (unsigned int)numBytes);
     
     if (!m_httpStreamRunning) {
         AS_TRACE("%s: stray callback detected!\n", __PRETTY_FUNCTION__);
@@ -446,7 +446,7 @@ void Audio_Stream::propertyValueCallback(void *inClientData, AudioFileStreamID i
 /* This is called by audio file stream parser when it finds packets of audio */
 void Audio_Stream::streamDataCallback(void *inClientData, UInt32 inNumberBytes, UInt32 inNumberPackets, const void *inInputData, AudioStreamPacketDescription *inPacketDescriptions)
 {    
-    AS_TRACE("%s: inNumberBytes %lu, inNumberPackets %lu\n", __FUNCTION__, inNumberBytes, inNumberPackets);
+    AS_TRACE("%s: inNumberBytes %u, inNumberPackets %u\n", __FUNCTION__, inNumberBytes, inNumberPackets);
     Audio_Stream *THIS = static_cast<Audio_Stream*>(inClientData);
     
     if (!THIS->m_audioStreamParserRunning) {

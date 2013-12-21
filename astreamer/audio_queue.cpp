@@ -174,7 +174,7 @@ void Audio_Queue::handlePropertyChange(AudioFileStreamID inAudioFileStream, Audi
 {
     OSStatus err = noErr;
     
-    AQ_TRACE("found property '%lu%lu%lu%lu'\n", (inPropertyID>>24)&255, (inPropertyID>>16)&255, (inPropertyID>>8)&255, inPropertyID&255);
+    AQ_TRACE("found property '%u%u%u%u'\n", (inPropertyID>>24)&255, (inPropertyID>>16)&255, (inPropertyID>>8)&255, inPropertyID&255);
     
     switch (inPropertyID) {
         case kAudioFileStreamProperty_ReadyToProducePackets:
@@ -254,7 +254,7 @@ void Audio_Queue::handleAudioPackets(UInt32 inNumberBytes, UInt32 inNumberPacket
     }
     
     // this is called by audio file stream when it finds packets of audio
-    AQ_TRACE("got data.  bytes: %lu  packets: %lu\n", inNumberBytes, inNumberPackets);
+    AQ_TRACE("got data.  bytes: %u  packets: %u\n", inNumberBytes, (unsigned int)inNumberPackets);
     
     /* Place each packet into a buffer and then send each buffer into the audio
      queue */
@@ -323,7 +323,7 @@ int Audio_Queue::handlePacket(const void *data, AudioStreamPacketDescription *de
      size from the file stream, but if we restored to guessing it we could
      come up too small here */
     if (packetSize > AQ_BUFSIZ) {
-        AQ_TRACE("%s: packetSize %lli > AQ_BUFSIZ %li\n", __PRETTY_FUNCTION__, packetSize, AQ_BUFSIZ);
+        AQ_TRACE("%s: packetSize %u > AQ_BUFSIZ %li\n", __PRETTY_FUNCTION__, (unsigned int)packetSize, AQ_BUFSIZ);
         return -1;
     }
     
@@ -335,7 +335,7 @@ int Audio_Queue::handlePacket(const void *data, AudioStreamPacketDescription *de
             return hasFreeBuffer;
         }
     } else {
-        AQ_TRACE("%s: skipped enqueueBuffer AQ_BUFSIZ - m_bytesFilled %lu, packetSize %lli\n", __PRETTY_FUNCTION__, (AQ_BUFSIZ - m_bytesFilled), packetSize);
+        AQ_TRACE("%s: skipped enqueueBuffer AQ_BUFSIZ - m_bytesFilled %lu, packetSize %u\n", __PRETTY_FUNCTION__, (AQ_BUFSIZ - m_bytesFilled), (unsigned int)packetSize);
     }
     
     m_processedPacketsSizeTotal += packetSize;
@@ -413,7 +413,7 @@ void Audio_Queue::setCookiesForStream(AudioFileStreamID inAudioFileStream)
         AQ_TRACE("error in info kAudioFileStreamProperty_MagicCookieData\n");
         return;
     }
-    AQ_TRACE("cookieSize %lu\n", cookieSize);
+    AQ_TRACE("cookieSize %u\n", (unsigned int)cookieSize);
     
     // get the cookie data
     void* cookieData = calloc(1, cookieSize);
@@ -483,7 +483,7 @@ int Audio_Queue::enqueueBuffer()
     
     // wait until next buffer is not in use
     if (m_bufferInUse[m_fillBufferIndex]) {
-        AQ_TRACE("waiting for buffer %lu\n", m_fillBufferIndex);
+        AQ_TRACE("waiting for buffer %u\n", (unsigned int)m_fillBufferIndex);
         
         if (m_delegate) {
             m_delegate->audioQueueOverflow();
