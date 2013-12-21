@@ -17,6 +17,7 @@ FreeStreamer has the following features:
 - Supports backgrounding
 - Supports a subset of the ID3v2 tag specification 
 - Supports Podcast RSS feeds
+- The stream contents can be stored in a file (see the OS X application for an example)
 
 [![Player view](https://raw.github.com/muhku/FreeStreamer/master/Extra/player-new.png)](https://github.com/muhku/FreeStreamer/)
 
