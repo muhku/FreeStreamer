@@ -16,6 +16,7 @@
  */
 @interface FSXPlayerViewController : NSViewController {
     BOOL _paused;
+    BOOL _record;
     FSAudioController *_audioController;
     NSTimer *_progressUpdateTimer;
 }
@@ -57,5 +58,10 @@
  * @param sender The sender of the action.
  */
 - (IBAction)pause:(id)sender;
-
+/**
+ * An action for recording the output the stream to a file.
+ *
+ * @param sender The sender of the action.
+ */
+- (IBAction)record:(id)sender;
 @end

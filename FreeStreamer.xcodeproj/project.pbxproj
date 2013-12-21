@@ -23,6 +23,8 @@
 		6032289C1824121800B7027B /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6032289B1824121800B7027B /* AVFoundation.framework */; };
 		6032289E1824122700B7027B /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6032289D1824122700B7027B /* AudioToolbox.framework */; };
 		603228A01824123100B7027B /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6032289F1824123100B7027B /* CFNetwork.framework */; };
+		604849E018662FE100E8F808 /* file_output.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 604849DE18662FE100E8F808 /* file_output.cpp */; };
+		604849E118662FE100E8F808 /* file_output.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 604849DE18662FE100E8F808 /* file_output.cpp */; };
 		6066DA38182422430005E1A2 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6066DA37182422430005E1A2 /* Foundation.framework */; };
 		6066DA3A182422430005E1A2 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6066DA39182422430005E1A2 /* CoreGraphics.framework */; };
 		6066DA3C182422430005E1A2 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6066DA3B182422430005E1A2 /* UIKit.framework */; };
@@ -92,6 +94,8 @@
 		6032289B1824121800B7027B /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		6032289D1824122700B7027B /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		6032289F1824123100B7027B /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
+		604849DE18662FE100E8F808 /* file_output.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = file_output.cpp; path = astreamer/file_output.cpp; sourceTree = SOURCE_ROOT; };
+		604849DF18662FE100E8F808 /* file_output.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = file_output.h; path = astreamer/file_output.h; sourceTree = SOURCE_ROOT; };
 		6066DA36182422430005E1A2 /* FreeStreamerMobile.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FreeStreamerMobile.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6066DA37182422430005E1A2 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		6066DA39182422430005E1A2 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -266,6 +270,8 @@
 		60322891182411F000B7027B /* astreamer */ = {
 			isa = PBXGroup;
 			children = (
+				604849DE18662FE100E8F808 /* file_output.cpp */,
+				604849DF18662FE100E8F808 /* file_output.h */,
 				601369D0182C36AA001819D6 /* id3_parser.cpp */,
 				601369D1182C36AA001819D6 /* id3_parser.h */,
 				60AA8F70182412F9001DE57B /* audio_queue.cpp */,
@@ -461,6 +467,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				604849E018662FE100E8F808 /* file_output.cpp in Sources */,
 				602C629B1847936B00EA657D /* Reachability.m in Sources */,
 				6066DAD2182427A30005E1A2 /* FSAudioController.m in Sources */,
 				6066DAD4182427A30005E1A2 /* FSAudioStream.mm in Sources */,
@@ -495,6 +502,7 @@
 				6066DABC182427330005E1A2 /* FSAudioStream.mm in Sources */,
 				6066DAC0182427330005E1A2 /* FSPlaylistItem.m in Sources */,
 				609F6DB218296EBF000E45B2 /* FSParsePlaylistFeedRequest.m in Sources */,
+				604849E118662FE100E8F808 /* file_output.cpp in Sources */,
 				6066DA44182422430005E1A2 /* main.m in Sources */,
 				609F6DAB18295F54000E45B2 /* FSParsePlaylistRequest.m in Sources */,
 				6066DA48182422430005E1A2 /* FSAppDelegate.m in Sources */,

@@ -23,6 +23,7 @@ enum Audio_Stream_Error {
 };
     
 class Audio_Stream_Delegate;
+class File_Output;
 	
 class Audio_Stream : public HTTP_Stream_Delegate, public Audio_Queue_Delegate {    
 public:
@@ -51,6 +52,9 @@ public:
     void setUrl(CFURLRef url);
     void setStrictContentTypeChecking(bool strictChecking);
     void setDefaultContentType(std::string& defaultContentType);
+    
+    void setOutputFile(CFURLRef url);
+    CFURLRef outputFile();
     
     State state();
     
@@ -89,6 +93,10 @@ private:
     
     bool m_strictContentTypeChecking;
     std::string m_defaultContentType;
+    
+    File_Output *m_fileOutput;
+    
+    CFURLRef m_outputFile;
     
     size_t contentLength();
     void closeAndSignalError(int error);

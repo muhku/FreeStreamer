@@ -67,6 +67,7 @@ public:
 @property (nonatomic,assign) NSURL *url;
 @property (nonatomic,assign) BOOL strictContentTypeChecking;
 @property (nonatomic,assign) NSString *defaultContentType;
+@property (nonatomic,assign) NSURL *outputFile;
 @property (nonatomic,assign) BOOL wasInterrupted;
 @property (copy) void (^onCompletion)();
 @property (copy) void (^onFailure)();
@@ -200,6 +201,24 @@ public:
     return copyOfDefaultContentType;
 }
 
+- (NSURL*)outputFile {
+    CFURLRef url = _audioStream->outputFile();
+    if (url) {
+        NSURL *u = (__bridge NSURL*)url;
+        return [u copy];
+    }
+    return nil;
+}
+
+- (void)setOutputFile:(NSURL *)outputFile {
+    if (!outputFile) {
+        _audioStream->setOutputFile(NULL);
+        return;
+    }
+    NSURL *copyOfURL = [outputFile copy];
+    _audioStream->setOutputFile((__bridge CFURLRef)copyOfURL);
+}
+
 - (void)reachabilityChanged:(NSNotification *)note {
     Reachability *reach = [note object];
     NetworkStatus netStatus = [reach currentReachabilityStatus];
@@ -330,6 +349,14 @@ public:
 
 - (BOOL)strictContentTypeChecking {
     return [_private strictContentTypeChecking];
+}
+
+- (NSURL*)outputFile {
+    return [_private outputFile];
+}
+
+- (void)setOutputFile:(NSURL *)outputFile {
+    [_private setOutputFile:outputFile];
 }
 
 - (void)setDefaultContentType:(NSString *)defaultContentType {

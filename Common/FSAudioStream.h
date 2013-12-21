@@ -132,6 +132,10 @@ typedef struct {
  */
 @property (nonatomic,assign) BOOL strictContentTypeChecking;
 /**
+ * Set an output file to store the stream contents to a file.
+ */
+@property (nonatomic,assign) NSURL *outputFile;
+/**
  * Sets a default content type for the stream. Only used when strict content
  * type checking is disabled.
  */

@@ -27,6 +27,7 @@
 {
     if (!_audioController) {
         _audioController = [[FSAudioController alloc] init];
+        _record = NO;
         
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(audioStreamStateDidChange:)
@@ -86,6 +87,32 @@
     [self.pauseButton setHidden:YES];
     
     [self.urlTextField setEditable:YES];
+}
+
+- (IBAction)record:(id)sender
+{
+    _record = (!_record);
+    
+    if (!_record) {
+        self.audioController.stream.outputFile = nil;
+        return;
+    }
+    
+    NSMutableString *basePath = [[NSMutableString alloc] init];
+    
+    [basePath appendString:NSHomeDirectory()];
+    [basePath appendString:@"/Desktop"];
+    [basePath appendString:@"/FreeStreamer-capture"];
+    
+    NSString *fileName;
+    unsigned index = 0;
+    
+    do {
+        fileName = [[NSString alloc] initWithFormat:@"%@-%i.mp3", basePath, index];
+        index++;
+    } while ([[NSFileManager defaultManager] fileExistsAtPath:fileName]);
+    
+    self.audioController.stream.outputFile = [NSURL fileURLWithPath:fileName];
 }
 
 /*

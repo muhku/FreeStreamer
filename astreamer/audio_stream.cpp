@@ -5,6 +5,7 @@
  */
 
 #include "audio_stream.h"
+#include "file_output.h"
 
 /*
  * Some servers may send an incorrect MIME type for the audio stream.
@@ -40,7 +41,9 @@ Audio_Stream::Audio_Stream() :
 #else
     m_strictContentTypeChecking(true),
 #endif
-    m_defaultContentType("audio/mpeg")
+    m_defaultContentType("audio/mpeg"),
+    m_fileOutput(0),
+    m_outputFile(NULL)
 {
     m_httpStream->m_delegate = this;
     m_audioQueue->m_delegate = this;
@@ -55,6 +58,10 @@ Audio_Stream::~Audio_Stream()
     
     m_audioQueue->m_delegate = 0;
     delete m_audioQueue, m_audioQueue = 0;
+    
+    if (m_fileOutput) {
+        delete m_fileOutput, m_fileOutput = 0;
+    }
 }
 
 void Audio_Stream::open()
@@ -166,6 +173,22 @@ void Audio_Stream::setStrictContentTypeChecking(bool strictChecking)
 void Audio_Stream::setDefaultContentType(std::string& defaultContentType)
 {
     m_defaultContentType = defaultContentType;
+}
+    
+void Audio_Stream::setOutputFile(CFURLRef url)
+{
+    if (m_fileOutput) {
+        delete m_fileOutput, m_fileOutput = 0;
+    }
+    if (url) {
+        m_fileOutput = new File_Output(url);
+    }
+    m_outputFile = url;
+}
+    
+CFURLRef Audio_Stream::outputFile()
+{
+    return m_outputFile;
 }
     
 Audio_Stream::State Audio_Stream::state()
@@ -321,6 +344,10 @@ void Audio_Stream::streamHasBytesAvailable(UInt8 *data, UInt32 numBytes)
     if (!m_httpStreamRunning) {
         AS_TRACE("%s: stray callback detected!\n", __PRETTY_FUNCTION__);
         return;
+    }
+    
+    if (m_fileOutput) {
+        m_fileOutput->write(data, numBytes);
     }
 	
     if (m_audioStreamParserRunning) {
