@@ -473,40 +473,44 @@ void HTTP_Stream::parseICYStream(UInt8 *buf, CFIndex bufSize)
     }
 }
     
+#define TRY_ENCODING(STR,ENC) STR = CFStringCreateWithBytes(kCFAllocatorDefault, bytes, numBytes, ENC, false); \
+    if (STR != NULL) { return STR; }
+    
 CFStringRef HTTP_Stream::createMetaDataStringWithMostReasonableEncoding(const UInt8 *bytes, CFIndex numBytes)
 {
-    // Firstly try UTF-8
     CFStringRef metaData;
     
-    metaData = CFStringCreateWithBytes(kCFAllocatorDefault,
-                                       bytes,
-                                       numBytes,
-                                       kCFStringEncodingUTF8,
-                                       false);
-    if (metaData) {
-        return metaData;
-    }
-    
-    // Failed, try latin1
-    metaData = CFStringCreateWithBytes(kCFAllocatorDefault,
-                                       bytes,
-                                       numBytes,
-                                       kCFStringEncodingISOLatin1,
-                                       false);
-    
-    if (metaData) {
-        return metaData;
-    }
-    
-    // Still failed, try ASCII
-    metaData = CFStringCreateWithBytes(kCFAllocatorDefault,
-                                       bytes,
-                                       numBytes,
-                                       kCFStringEncodingASCII,
-                                       false);
+    TRY_ENCODING(metaData, kCFStringEncodingUTF8);
+    TRY_ENCODING(metaData, kCFStringEncodingISOLatin1);
+    TRY_ENCODING(metaData, kCFStringEncodingWindowsLatin1);
+    TRY_ENCODING(metaData, kCFStringEncodingNextStepLatin);
+    TRY_ENCODING(metaData, kCFStringEncodingISOLatin2);
+    TRY_ENCODING(metaData, kCFStringEncodingISOLatin3);
+    TRY_ENCODING(metaData, kCFStringEncodingISOLatin4);
+    TRY_ENCODING(metaData, kCFStringEncodingISOLatinCyrillic);
+    TRY_ENCODING(metaData, kCFStringEncodingISOLatinArabic);
+    TRY_ENCODING(metaData, kCFStringEncodingISOLatinGreek);
+    TRY_ENCODING(metaData, kCFStringEncodingISOLatinHebrew);
+    TRY_ENCODING(metaData, kCFStringEncodingISOLatin5);
+    TRY_ENCODING(metaData, kCFStringEncodingISOLatin6);
+    TRY_ENCODING(metaData, kCFStringEncodingISOLatinThai);
+    TRY_ENCODING(metaData, kCFStringEncodingISOLatin7);
+    TRY_ENCODING(metaData, kCFStringEncodingISOLatin8);
+    TRY_ENCODING(metaData, kCFStringEncodingISOLatin9);
+    TRY_ENCODING(metaData, kCFStringEncodingWindowsLatin2);
+    TRY_ENCODING(metaData, kCFStringEncodingWindowsCyrillic);
+    TRY_ENCODING(metaData, kCFStringEncodingWindowsGreek);
+    TRY_ENCODING(metaData, kCFStringEncodingWindowsLatin5);
+    TRY_ENCODING(metaData, kCFStringEncodingWindowsHebrew);
+    TRY_ENCODING(metaData, kCFStringEncodingWindowsArabic);
+    TRY_ENCODING(metaData, kCFStringEncodingKOI8_R);
+    TRY_ENCODING(metaData, kCFStringEncodingBig5);
+    TRY_ENCODING(metaData, kCFStringEncodingASCII);
     
     return metaData;
 }
+    
+#undef TRY_ENCODING
     
 void HTTP_Stream::readCallBack(CFReadStreamRef stream, CFStreamEventType eventType, void *clientCallBackInfo)
 {
