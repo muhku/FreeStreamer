@@ -122,6 +122,10 @@ bool HTTP_Stream::open(const HTTP_Stream_Position& position)
     m_icyMetaDataInterval = 0;
     m_dataByteReadCount = 0;
     m_metaDataBytesRemaining = 0;
+    
+    if (!m_url) {
+        goto out;
+    }
 	
     /* Failed to create a stream */
     if (!(m_readStream = createReadStream(m_url))) {
@@ -192,7 +196,11 @@ void HTTP_Stream::setUrl(CFURLRef url)
     if (m_url) {
         CFRelease(m_url);
     }
-    m_url = (CFURLRef)CFRetain(url);
+    if (url) {
+        m_url = (CFURLRef)CFRetain(url);
+    } else {
+        m_url = NULL;
+    }
 }
     
 void HTTP_Stream::id3metaDataAvailable(std::map<CFStringRef,CFStringRef> metaData)
