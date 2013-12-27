@@ -8,20 +8,19 @@
 
 @implementation FSPlaylistItem
 
-@synthesize title=_title;
-@synthesize url=_url;
+@synthesize title;
+@synthesize url;
+@synthesize originatingUrl;
 
-- (id)init {
-    self = [super init];
-    if (self) {
-        // Initialization code here.
+- (NSURL *)nsURL
+{
+    if (self.url) {
+        return [NSURL URLWithString:self.url];
     }
-    
-    return self;
-}
-
-- (NSURL *)nsURL {
-    return [NSURL URLWithString:_url];
+    if (self.originatingUrl) {
+        return [NSURL URLWithString:self.originatingUrl];
+    }
+    return nil;
 }
 
 - (BOOL)isEqual:(id)anObject

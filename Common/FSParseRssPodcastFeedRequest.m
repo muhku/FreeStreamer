@@ -25,7 +25,15 @@ static NSString *const kXPathQueryItems = @"/rss/channel/item";
             item.title = [self contentForNode:n];
         } else if ([nodeName isEqualToString:@"enclosure"]) {
             item.url = [self contentForNodeAttribute:n attribute:"url"];
+        } else if ([nodeName isEqualToString:@"link"]) {
+            item.originatingUrl = [self contentForNode:n];
         }
+    }
+    
+    if (nil == item.url &&
+        nil == item.originatingUrl) {
+        // Not a valid item, as there is no URL. Skip.
+        return;
     }
     
     [_playlistItems addObject:item];
