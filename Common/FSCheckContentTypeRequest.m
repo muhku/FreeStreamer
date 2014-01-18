@@ -6,6 +6,10 @@
 
 #import "FSCheckContentTypeRequest.h"
 
+@interface FSCheckContentTypeRequest ()
+- (BOOL)guessContentTypeByUrl:(NSURLResponse *)response;
+@end
+
 @implementation FSCheckContentTypeRequest
 
 @synthesize url=_url;
@@ -123,27 +127,12 @@
                [_contentType isEqualToString:@"application/pls+xml"]) {
         _format = kFSFileFormatPLSPlaylist;
         _playlist = YES;
-    } else if ([_contentType isEqualToString:@"text/plain"]) {
-        /* The server did not provide meaningful content type;
-           last resort: check the file suffix, if there is one */
-        
-        NSString *absoluteUrl = [response.URL absoluteString];
-        
-        if ([absoluteUrl hasSuffix:@".mp3"]) {
-            _format = kFSFileFormatMP3;
-        } else if ([absoluteUrl hasSuffix:@".mp4"]) {
-            _format = kFSFileFormatMPEG4;
-        } else if ([absoluteUrl hasSuffix:@".m3u"]) {
-            _format = kFSFileFormatM3UPlaylist;
-            _playlist = YES;
-        } else if ([absoluteUrl hasSuffix:@".pls"]) {
-            _format = kFSFileFormatPLSPlaylist;
-            _playlist = YES;
-        }
     } else if ([_contentType isEqualToString:@"text/xml"] ||
                [_contentType isEqualToString:@"application/xml"]) {
         _format = kFSFileFormatXML;
         _xml = YES;
+    } else {
+        [self guessContentTypeByUrl:response];
     }
     
     [_connection cancel];
@@ -165,12 +154,63 @@
         _playlist = NO;
     }
     
-    onFailure();
+    // Still, try if we could resolve the content type by the URL
+    if ([self guessContentTypeByUrl:nil]) {
+        onCompletion();
+    } else {
+        onFailure();
+    }
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
 {
     // Do nothing
+}
+
+/*
+ * =======================================
+ * Private
+ * =======================================
+ */
+
+- (BOOL)guessContentTypeByUrl:(NSURLResponse *)response
+{
+    /* The server did not provide meaningful content type;
+     last resort: check the file suffix, if there is one */
+    
+    NSString *absoluteUrl;
+    
+    if (response) {
+        absoluteUrl = [response.URL absoluteString];
+    } else {
+        absoluteUrl = _url;
+    }
+    
+    if ([absoluteUrl hasSuffix:@".mp3"]) {
+        _format = kFSFileFormatMP3;
+    } else if ([absoluteUrl hasSuffix:@".mp4"]) {
+        _format = kFSFileFormatMPEG4;
+    } else if ([absoluteUrl hasSuffix:@".m3u"]) {
+        _format = kFSFileFormatM3UPlaylist;
+        _playlist = YES;
+    } else if ([absoluteUrl hasSuffix:@".pls"]) {
+        _format = kFSFileFormatPLSPlaylist;
+        _playlist = YES;
+    } else if ([absoluteUrl hasSuffix:@".xml"]) {
+        _format = kFSFileFormatXML;
+        _xml = YES;
+    } else {
+        
+        /*
+         * Failed to guess the content type based on the URL.
+         */
+        return NO;
+    }
+    
+    /*
+     * We have determined a content-type.
+     */
+    return YES;
 }
 
 @end
