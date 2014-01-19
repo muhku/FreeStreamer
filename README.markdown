@@ -110,6 +110,11 @@ request.onFailure = ^() {
 
 That's it! For more examples, please take a look at the example project. For instance, you may want to observe notifications on the audio stream state.
 
+FAQ
+====================
+
+See [here](https://github.com/muhku/FreeStreamer/wiki/FreeStreamer-FAQ).
+
 Debugging
 ====================
 
