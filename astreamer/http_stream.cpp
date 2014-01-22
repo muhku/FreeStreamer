@@ -29,6 +29,7 @@ CFStringRef HTTP_Stream::icyMetaDataValue  = CFSTR("1"); /* always request ICY m
 HTTP_Stream::HTTP_Stream() :
     m_readStream(0),
     m_scheduledInRunLoop(false),
+    m_readPending(false),
     m_delegate(0),
     m_url(0),
     m_httpHeadersParsed(false),
@@ -110,6 +111,7 @@ bool HTTP_Stream::open(const HTTP_Stream_Position& position)
     /* Reset state */
     m_position = position;
     
+    m_readPending = false;
     m_httpHeadersParsed = false;
     m_contentType = "";
     
@@ -185,6 +187,12 @@ void HTTP_Stream::setScheduledInRunLoop(bool scheduledInRunLoop)
     if (m_scheduledInRunLoop) {
         CFReadStreamUnscheduleFromRunLoop(m_readStream, CFRunLoopGetCurrent(), kCFRunLoopCommonModes);
     } else {
+        if (m_readPending) {
+            m_readPending = false;
+            
+            readCallBack(m_readStream, kCFStreamEventHasBytesAvailable, this);
+        }
+        
         CFReadStreamScheduleWithRunLoop(m_readStream, CFRunLoopGetCurrent(), kCFRunLoopCommonModes);
     }
     
@@ -531,6 +539,17 @@ void HTTP_Stream::readCallBack(CFReadStreamRef stream, CFStreamEventType eventTy
             }
             
             while (CFReadStreamHasBytesAvailable(stream)) {
+                if (!THIS->m_scheduledInRunLoop) {
+                    /*
+                     * This is critical - though the stream has data available,
+                     * do not try to feed the audio queue with data, if it has
+                     * indicated that it doesn't want more data due to buffers
+                     * full.
+                     */
+                    THIS->m_readPending = true;
+                    break;
+                }
+                
                 CFIndex bytesRead = CFReadStreamRead(stream, THIS->m_httpReadBuffer, STREAM_BUFSIZ);
                 
                 if (CFReadStreamGetStatus(stream) == kCFStreamStatusError ||

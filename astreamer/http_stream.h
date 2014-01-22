@@ -40,6 +40,7 @@ private:
     CFURLRef m_url;
     CFReadStreamRef m_readStream;
     bool m_scheduledInRunLoop;
+    bool m_readPending;
     HTTP_Stream_Position m_position;
     
     /* HTTP headers */
