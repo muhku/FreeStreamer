@@ -25,7 +25,7 @@ public:
     
     static const size_t AQ_BUFFERS = 16;            // number of audio queue buffers we allocate
     static const size_t AQ_BUFSIZ = 2048;           // number of bytes in each audio queue buffer
-    static const size_t AQ_MAX_PACKET_DESCS = 512;  // number of packet descriptions in our array
+    static const size_t AQ_MAX_PACKET_DESCS = 512;  // Maximum number of packets which can be contained in one buffer
     
     enum State {
         IDLE,

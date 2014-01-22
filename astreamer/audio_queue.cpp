@@ -353,11 +353,8 @@ int Audio_Queue::handlePacket(const void *data, AudioStreamPacketDescription *de
     m_bytesFilled += packetSize;
     m_packetsFilled++;
     
-    /* Maximum number of packets which can be contained in one buffer */
-#define kAQMaxPacketDescs 512
-    
     /* If filled our buffer with packets, then commit it to the system */
-    if (m_packetsFilled >= kAQMaxPacketDescs) {
+    if (m_packetsFilled >= AQ_MAX_PACKET_DESCS) {
         return enqueueBuffer();
     }
     return 1;
