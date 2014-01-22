@@ -530,36 +530,32 @@ void HTTP_Stream::readCallBack(CFReadStreamRef stream, CFStreamEventType eventTy
                 THIS->m_httpReadBuffer = new UInt8[STREAM_BUFSIZ];
             }
             
-            while (CFReadStreamHasBytesAvailable(stream)) {
-                CFIndex bytesRead = CFReadStreamRead(stream, THIS->m_httpReadBuffer, STREAM_BUFSIZ);
-                
-                if (CFReadStreamGetStatus(stream) == kCFStreamStatusError ||
-                    bytesRead < 0) {
-                    if (THIS->m_delegate) {
-                        THIS->m_delegate->streamErrorOccurred();
-                    }
-                    break;
+            CFIndex bytesRead = CFReadStreamRead(stream, THIS->m_httpReadBuffer, STREAM_BUFSIZ);
+            
+            if (bytesRead < 0) {
+                if (THIS->m_delegate) {
+                    THIS->m_delegate->streamErrorOccurred();
                 }
-                
-                if (bytesRead > 0) {
-                    THIS->parseHttpHeadersIfNeeded(THIS->m_httpReadBuffer, bytesRead);
-                    
-    #ifdef INCLUDE_ID3TAG_SUPPORT
-                    if (THIS->m_id3Parser->wantData()) {
-                        THIS->m_id3Parser->feedData(THIS->m_httpReadBuffer, (UInt32)bytesRead);
-                    }
-    #endif
-                    
-                    if (THIS->m_icyStream) {
-                        THIS->parseICYStream(THIS->m_httpReadBuffer, bytesRead);
-                    } else {
-                        if (THIS->m_delegate) {
-                            THIS->m_delegate->streamHasBytesAvailable(THIS->m_httpReadBuffer, (UInt32)bytesRead);
-                        }
-                    }
-                }
+                break;
             }
+            
+            if (bytesRead > 0) {
+                THIS->parseHttpHeadersIfNeeded(THIS->m_httpReadBuffer, bytesRead);
                 
+#ifdef INCLUDE_ID3TAG_SUPPORT
+                if (THIS->m_id3Parser->wantData()) {
+                    THIS->m_id3Parser->feedData(THIS->m_httpReadBuffer, (UInt32)bytesRead);
+                }
+#endif
+                
+                if (THIS->m_icyStream) {
+                    THIS->parseICYStream(THIS->m_httpReadBuffer, bytesRead);
+                } else {
+                    if (THIS->m_delegate) {
+                        THIS->m_delegate->streamHasBytesAvailable(THIS->m_httpReadBuffer, (UInt32)bytesRead);
+                    }
+                }
+            } 
             break;
         }
         case kCFStreamEventEndEncountered: {
