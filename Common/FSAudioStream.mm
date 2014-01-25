@@ -88,7 +88,8 @@ public:
 
 @implementation FSAudioStreamPrivate
 
--(id)init {
+-(id)init
+{
     if (self = [super init]) {
         _url = nil;
         _wasInterrupted = NO;
@@ -123,7 +124,8 @@ public:
     return self;
 }
 
-- (void)dealloc {
+- (void)dealloc
+{
     [_reachability stopNotifier];
     
     [[NSNotificationCenter defaultCenter] removeObserver:self];
@@ -134,7 +136,8 @@ public:
     delete _observer, _observer = nil;
 }
 
-- (void)setUrl:(NSURL *)url {
+- (void)setUrl:(NSURL *)url
+{
     if ([self isPlaying]) {
         [self stop];
     }
@@ -154,7 +157,8 @@ public:
     }
 }
 
-- (NSURL*)url {
+- (NSURL*)url
+{
     if (!_url) {
         return nil;
     }
@@ -163,7 +167,8 @@ public:
     return copyOfURL;
 }
 
-- (void)setStrictContentTypeChecking:(BOOL)strictContentTypeChecking {
+- (void)setStrictContentTypeChecking:(BOOL)strictContentTypeChecking
+{
     if (_strictContentTypeChecking == strictContentTypeChecking) {
         // No change
         return;
@@ -172,22 +177,26 @@ public:
     _audioStream->setStrictContentTypeChecking(strictContentTypeChecking);
 }
 
-- (BOOL)strictContentTypeChecking {
+- (BOOL)strictContentTypeChecking
+{
     return _strictContentTypeChecking;
 }
 
-- (void)playFromURL:(NSURL*)url {
+- (void)playFromURL:(NSURL*)url
+{
     [self setUrl:url];
     [self play];
 }
 
-- (void)setDefaultContentType:(NSString *)defaultContentType {
+- (void)setDefaultContentType:(NSString *)defaultContentType
+{
     _defaultContentType = [defaultContentType copy];
     std::string contentType([_defaultContentType UTF8String]);
     _audioStream->setDefaultContentType(contentType);
 }
 
-- (NSString*)defaultContentType {
+- (NSString*)defaultContentType
+{
     if (!_defaultContentType) {
         return nil;
     }
@@ -196,7 +205,8 @@ public:
     return copyOfDefaultContentType;
 }
 
-- (NSURL*)outputFile {
+- (NSURL*)outputFile
+{
     CFURLRef url = _audioStream->outputFile();
     if (url) {
         NSURL *u = (__bridge NSURL*)url;
@@ -205,7 +215,8 @@ public:
     return nil;
 }
 
-- (void)setOutputFile:(NSURL *)outputFile {
+- (void)setOutputFile:(NSURL *)outputFile
+{
     if (!outputFile) {
         _audioStream->setOutputFile(NULL);
         return;
@@ -214,7 +225,8 @@ public:
     _audioStream->setOutputFile((__bridge CFURLRef)copyOfURL);
 }
 
-- (void)reachabilityChanged:(NSNotification *)note {
+- (void)reachabilityChanged:(NSNotification *)note
+{
     Reachability *reach = [note object];
     NetworkStatus netStatus = [reach currentReachabilityStatus];
     BOOL internetConnectionAvailable = (netStatus == ReachableViaWiFi || netStatus == ReachableViaWWAN);
@@ -271,7 +283,8 @@ public:
     [_reachability startNotifier];
 }
 
-- (void)stop {
+- (void)stop
+{
     _audioStream->close();
     
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
@@ -284,23 +297,28 @@ public:
     [_reachability stopNotifier];
 }
 
-- (BOOL)isPlaying {
+- (BOOL)isPlaying
+{
     return (_audioStream->state() == astreamer::Audio_Stream::PLAYING);
 }
 
-- (void)pause {
+- (void)pause
+{
     _audioStream->pause();
 }
 
-- (void)seekToTime:(unsigned)newSeekTime {
+- (void)seekToTime:(unsigned)newSeekTime
+{
     _audioStream->seekToTime(newSeekTime);
 }
 
-- (unsigned)timePlayedInSeconds {
+- (unsigned)timePlayedInSeconds
+{
     return _audioStream->timePlayedInSeconds();
 }
 
-- (unsigned)durationInSeconds {
+- (unsigned)durationInSeconds
+{
     return _audioStream->durationInSeconds();
 }
 
@@ -315,7 +333,8 @@ public:
 
 @implementation FSAudioStream
 
--(id)init {
+-(id)init
+{
     if (self = [super init]) {
         _private = [[FSAudioStreamPrivate alloc] init];
     }
@@ -330,55 +349,68 @@ public:
     return self;
 }
 
-- (void)setUrl:(NSURL *)url {
+- (void)setUrl:(NSURL *)url
+{
     [_private setUrl:url];
 }
 
-- (NSURL*)url {
+- (NSURL*)url
+{
     return [_private url];
 }
 
-- (void)setStrictContentTypeChecking:(BOOL)strictContentTypeChecking {
+- (void)setStrictContentTypeChecking:(BOOL)strictContentTypeChecking
+{
     [_private setStrictContentTypeChecking:strictContentTypeChecking];
 }
 
-- (BOOL)strictContentTypeChecking {
+- (BOOL)strictContentTypeChecking
+{
     return [_private strictContentTypeChecking];
 }
 
-- (NSURL*)outputFile {
+- (NSURL*)outputFile
+{
     return [_private outputFile];
 }
 
-- (void)setOutputFile:(NSURL *)outputFile {
+- (void)setOutputFile:(NSURL *)outputFile
+{
     [_private setOutputFile:outputFile];
 }
 
-- (void)setDefaultContentType:(NSString *)defaultContentType {
+- (void)setDefaultContentType:(NSString *)defaultContentType
+{
     [_private setDefaultContentType:defaultContentType];
 }
 
-- (NSString*)defaultContentType {
+- (NSString*)defaultContentType
+{
     return [_private defaultContentType];
 }
 
-- (void)play {
+- (void)play
+{
     [_private play];   
 }
 
-- (void)playFromURL:(NSURL*)url {
+- (void)playFromURL:(NSURL*)url
+{
     [_private playFromURL:url];
 }
 
-- (void)stop {
+- (void)stop
+{
     [_private stop];
 }
 
-- (void)pause {
+- (void)pause
+{
     [_private pause];
 }
 
-- (void)seekToPosition:(FSStreamPosition)position {
+- (void)seekToPosition:(FSStreamPosition)position
+{
     unsigned seekTime = position.minute * 60 + position.second;
     
     [_private seekToTime:seekTime];
@@ -389,7 +421,8 @@ public:
     return [_private isPlaying];
 }
 
-- (FSStreamPosition)currentTimePlayed {
+- (FSStreamPosition)currentTimePlayed
+{
     unsigned u = [_private timePlayedInSeconds];
     
     unsigned s,m;
@@ -401,7 +434,8 @@ public:
     return pos;
 }
 
-- (FSStreamPosition)duration {
+- (FSStreamPosition)duration
+{
     unsigned u = [_private durationInSeconds];
     
     unsigned s,m;
@@ -413,28 +447,34 @@ public:
     return pos;
 }
 
-- (BOOL)continuous {
+- (BOOL)continuous
+{
     FSStreamPosition duration = self.duration;
     return (duration.minute == 0 && duration.second == 0);
 }
 
-- (void (^)())onCompletion {
+- (void (^)())onCompletion
+{
     return _private.onCompletion;
 }
 
-- (void)setOnCompletion:(void (^)())onCompletion {
+- (void)setOnCompletion:(void (^)())onCompletion
+{
     _private.onCompletion = onCompletion;
 }
 
-- (void (^)())onFailure {
+- (void (^)())onFailure
+{
     return _private.onFailure;
 }
 
-- (void)setOnFailure:(void (^)())onFailure {
+- (void)setOnFailure:(void (^)())onFailure
+{
     _private.onFailure = onFailure;
 }
 
-- (FSAudioStreamError)lastError {
+- (FSAudioStreamError)lastError
+{
     return _private.lastError;
 }
 

@@ -25,7 +25,8 @@
  * =======================================
  */
 
-- (void)didReceiveMemoryWarning {
+- (void)didReceiveMemoryWarning
+{
     // Releases the view if it doesn't have a superview.
     [super didReceiveMemoryWarning];
     
@@ -52,7 +53,8 @@
     self.view.backgroundColor = [UIColor clearColor];
 }
 
-- (void)viewDidAppear:(BOOL)animated {
+- (void)viewDidAppear:(BOOL)animated
+{
     if (_shouldStartPlaying) {
         _shouldStartPlaying = NO;
         [self.audioController play];
@@ -69,7 +71,8 @@
                                                            repeats:YES];
 }
 
-- (void)viewDidLoad {
+- (void)viewDidLoad
+{
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
     
@@ -93,7 +96,8 @@
     self.pauseButton.hidden = YES;
 }
 
-- (void)viewDidUnload {
+- (void)viewDidUnload
+{
     [super viewDidUnload];
     // Release any retained subviews of the main view.
     // e.g. self.myOutlet = nil;
@@ -106,7 +110,8 @@
     self.statusLabel = nil;
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+{
     // Return YES for supported orientations
     return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
@@ -137,7 +142,8 @@
  * =======================================
  */
 
-- (void)audioStreamStateDidChange:(NSNotification *)notification {
+- (void)audioStreamStateDidChange:(NSNotification *)notification
+{
     NSString *statusRetrievingURL = @"Retrieving stream URL";
     NSString *statusBuffering = @"Buffering...";
     NSString *statusSeeking = @"Seeking...";
@@ -236,7 +242,8 @@
     }
 }
 
-- (void)audioStreamErrorOccurred:(NSNotification *)notification {
+- (void)audioStreamErrorOccurred:(NSNotification *)notification
+{
     [_statusLabel setHidden:NO];
     
     NSDictionary *dict = [notification userInfo];
@@ -261,7 +268,8 @@
     }
 }
 
-- (void)audioStreamMetaDataAvailable:(NSNotification *)notification {
+- (void)audioStreamMetaDataAvailable:(NSNotification *)notification
+{
     NSDictionary *dict = [notification userInfo];
     NSDictionary *metaData = [dict valueForKey:FSAudioStreamNotificationKey_MetaData];
     
@@ -286,7 +294,8 @@
  * =======================================
  */
 
-- (IBAction)play:(id)sender {
+- (IBAction)play:(id)sender
+{
     if (_paused) {
         /*
          * If we are paused, call pause again to unpause so
@@ -305,7 +314,8 @@
     self.pauseButton.hidden = NO;
 }
 
-- (IBAction)pause:(id)sender {
+- (IBAction)pause:(id)sender
+{
     [self.audioController pause];
     
     _paused = YES;
@@ -314,7 +324,8 @@
     self.pauseButton.hidden = YES;
 }
 
-- (IBAction)seek:(id)sender {
+- (IBAction)seek:(id)sender
+{
     _seekToPoint = self.progressSlider.value;
     
     [_progressUpdateTimer invalidate], _progressUpdateTimer = nil;
@@ -332,7 +343,8 @@
  * =======================================
  */
 
-- (void)setSelectedPlaylistItem:(FSPlaylistItem *)selectedPlaylistItem {
+- (void)setSelectedPlaylistItem:(FSPlaylistItem *)selectedPlaylistItem
+{
     if (_selectedPlaylistItem == selectedPlaylistItem) {
         return;
     }
@@ -344,7 +356,8 @@
     self.audioController.url = self.selectedPlaylistItem.url;
 }
 
-- (FSPlaylistItem *)selectedPlaylistItem {
+- (FSPlaylistItem *)selectedPlaylistItem
+{
     return _selectedPlaylistItem;
 }
 
