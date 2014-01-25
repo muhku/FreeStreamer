@@ -181,17 +181,6 @@ void Audio_Queue::handlePropertyChange(AudioFileStreamID inAudioFileStream, Audi
         {
             cleanup();
             
-            // the file stream parser is now ready to produce audio packets.
-            // get the stream format.
-            memset(&m_streamDesc, 0, sizeof(m_streamDesc));
-            UInt32 asbdSize = sizeof(m_streamDesc);
-            err = AudioFileStreamGetProperty(inAudioFileStream, kAudioFileStreamProperty_DataFormat, &asbdSize, &m_streamDesc);
-            if (err) {
-                AQ_TRACE("%s: error in kAudioFileStreamProperty_DataFormat\n", __PRETTY_FUNCTION__);
-                m_lastError = err;
-                break;
-            }
-            
             // create the audio queue
             err = AudioQueueNewOutput(&m_streamDesc, audioQueueOutputCallback, this, CFRunLoopGetCurrent(), NULL, 0, &m_outAQ);
             if (err) {
@@ -229,8 +218,6 @@ void Audio_Queue::handlePropertyChange(AudioFileStreamID inAudioFileStream, Audi
                     break;
                 }
             }
-            
-            setCookiesForStream(inAudioFileStream);
             
             // listen for kAudioQueueProperty_IsRunning
             err = AudioQueueAddPropertyListener(m_outAQ, kAudioQueueProperty_IsRunning, audioQueueIsRunningCallback, this);
@@ -395,38 +382,6 @@ void Audio_Queue::cleanup()
     
     m_waitingOnBuffer = false;
     m_lastError = noErr;
-}
-    
-void Audio_Queue::setCookiesForStream(AudioFileStreamID inAudioFileStream)
-{
-    OSStatus err;
-    
-    // get the cookie size
-    UInt32 cookieSize;
-    Boolean writable;
-    
-    err = AudioFileStreamGetPropertyInfo(inAudioFileStream, kAudioFileStreamProperty_MagicCookieData, &cookieSize, &writable);
-    if (err) {
-        AQ_TRACE("error in info kAudioFileStreamProperty_MagicCookieData\n");
-        return;
-    }
-    AQ_TRACE("cookieSize %u\n", (unsigned int)cookieSize);
-    
-    // get the cookie data
-    void* cookieData = calloc(1, cookieSize);
-    err = AudioFileStreamGetProperty(inAudioFileStream, kAudioFileStreamProperty_MagicCookieData, &cookieSize, cookieData);
-    if (err) {
-        AQ_TRACE("error in get kAudioFileStreamProperty_MagicCookieData");
-        free(cookieData);
-        return;
-    }
-    
-    // set the cookie on the queue.
-    err = AudioQueueSetProperty(m_outAQ, kAudioQueueProperty_MagicCookie, cookieData, cookieSize);
-    free(cookieData);
-    if (err) {
-        AQ_TRACE("error in set kAudioQueueProperty_MagicCookie");
-    }
 }
     
 void Audio_Queue::setState(State state)

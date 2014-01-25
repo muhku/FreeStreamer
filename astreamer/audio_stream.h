@@ -12,8 +12,15 @@
 
 #include <AudioToolbox/AudioToolbox.h>
 #include <string>
+#include <list>
 
 namespace astreamer {
+    
+typedef struct queued_packet {
+    AudioStreamPacketDescription desc;
+    struct queued_packet *next;
+    char data[];
+} queued_packet_t;
     
 enum Audio_Stream_Error {
     AS_ERR_OPEN = 1,          // Cannot open the audio stream
@@ -87,6 +94,12 @@ private:
     Audio_Queue *m_audioQueue;
     
     AudioFileStreamID m_audioFileStream;	// the audio file stream parser
+    AudioConverterRef m_audioConverter;
+    AudioStreamBasicDescription m_srcFormat;
+    AudioStreamBasicDescription m_dstFormat;
+    
+    UInt32 m_outputBufferSize;
+    UInt8 *m_outputBuffer;
     
     SInt64 m_dataOffset;
     unsigned m_seekTime;
@@ -98,10 +111,17 @@ private:
     
     CFURLRef m_outputFile;
     
+    queued_packet_t *m_queuedHead;
+    queued_packet_t *m_queuedTail;
+    
+    std::list <queued_packet_t*> m_processedPackets;
+    
     size_t contentLength();
     void closeAndSignalError(int error);
     void setState(State state);
+    void setCookiesForStream(AudioFileStreamID inAudioFileStream);
     
+    static OSStatus encoderDataCallback(AudioConverterRef inAudioConverter, UInt32 *ioNumberDataPackets, AudioBufferList *ioData, AudioStreamPacketDescription **outDataPacketDescription, void *inUserData);
     static void propertyValueCallback(void *inClientData, AudioFileStreamID inAudioFileStream, AudioFileStreamPropertyID inPropertyID, UInt32 *ioFlags);
     static void streamDataCallback(void *inClientData, UInt32 inNumberBytes, UInt32 inNumberPackets, const void *inInputData, AudioStreamPacketDescription *inPacketDescriptions);
     

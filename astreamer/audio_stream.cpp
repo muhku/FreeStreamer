@@ -35,6 +35,9 @@ Audio_Stream::Audio_Stream() :
     m_httpStream(new HTTP_Stream()),
     m_audioQueue(new Audio_Queue()),
     m_audioFileStream(0),
+    m_audioConverter(0),
+    m_outputBufferSize(Audio_Queue::AQ_BUFSIZ),
+    m_outputBuffer(new UInt8[m_outputBufferSize]),
     m_dataOffset(0),
     m_seekTime(0),
 #if defined (AS_RELAX_CONTENT_TYPE_CHECK)
@@ -44,21 +47,42 @@ Audio_Stream::Audio_Stream() :
 #endif
     m_defaultContentType("audio/mpeg"),
     m_fileOutput(0),
-    m_outputFile(NULL)
+    m_outputFile(NULL),
+    m_queuedHead(0),
+    m_queuedTail(0)
 {
     m_httpStream->m_delegate = this;
     m_audioQueue->m_delegate = this;
+    
+    memset(&m_dstFormat, 0, sizeof m_dstFormat);
+    
+    m_dstFormat.mSampleRate = 44100;
+	m_dstFormat.mFormatID = kAudioFormatLinearPCM;
+	m_dstFormat.mFormatFlags = kLinearPCMFormatFlagIsSignedInteger | kAudioFormatFlagsNativeEndian | kAudioFormatFlagIsPacked;
+	m_dstFormat.mBytesPerPacket = 4;
+	m_dstFormat.mFramesPerPacket = 1;
+	m_dstFormat.mBytesPerFrame = 4;
+	m_dstFormat.mChannelsPerFrame = 2;
+	m_dstFormat.mBitsPerChannel = 16;
+    
+    m_audioQueue->m_streamDesc = m_dstFormat;
 }
 
 Audio_Stream::~Audio_Stream()
 {
     close();
     
+    delete [] m_outputBuffer, m_outputBuffer = 0;
+    
     m_httpStream->m_delegate = 0;
     delete m_httpStream, m_httpStream = 0;
     
     m_audioQueue->m_delegate = 0;
     delete m_audioQueue, m_audioQueue = 0;
+    
+    if (m_audioConverter) {
+        AudioConverterDispose(m_audioConverter), m_audioConverter = 0;
+    }
     
     if (m_fileOutput) {
         delete m_fileOutput, m_fileOutput = 0;
@@ -443,6 +467,62 @@ void Audio_Stream::setState(State state)
     }
 }
     
+void Audio_Stream::setCookiesForStream(AudioFileStreamID inAudioFileStream)
+{
+    OSStatus err;
+    
+    // get the cookie size
+    UInt32 cookieSize;
+    Boolean writable;
+    
+    err = AudioFileStreamGetPropertyInfo(inAudioFileStream, kAudioFileStreamProperty_MagicCookieData, &cookieSize, &writable);
+    if (err) {
+        return;
+    }
+    
+    // get the cookie data
+    void* cookieData = calloc(1, cookieSize);
+    err = AudioFileStreamGetProperty(inAudioFileStream, kAudioFileStreamProperty_MagicCookieData, &cookieSize, cookieData);
+    if (err) {
+        free(cookieData);
+        return;
+    }
+    
+    // set the cookie on the queue.
+    if (m_audioConverter) {
+        err = AudioConverterSetProperty(m_audioConverter, kAudioConverterDecompressionMagicCookie, cookieSize, cookieData);
+    }
+    
+    free(cookieData);
+}
+
+OSStatus Audio_Stream::encoderDataCallback(AudioConverterRef inAudioConverter, UInt32 *ioNumberDataPackets, AudioBufferList *ioData, AudioStreamPacketDescription **outDataPacketDescription, void *inUserData)
+{
+    Audio_Stream *THIS = (Audio_Stream *)inUserData;
+    
+    AS_TRACE("encoderDataCallback called\n");
+
+    *ioNumberDataPackets = 1;
+    
+    // Dequeue one packet per time for the decoder
+    queued_packet_t *front = THIS->m_queuedHead;
+    
+    ioData->mBuffers[0].mData = front->data;
+	ioData->mBuffers[0].mDataByteSize = front->desc.mDataByteSize;
+	ioData->mBuffers[0].mNumberChannels = THIS->m_srcFormat.mChannelsPerFrame;
+    
+    if (outDataPacketDescription) {
+        *outDataPacketDescription = &front->desc;
+    }
+    
+    THIS->m_queuedHead = front->next;
+    
+    front->next = NULL;
+    THIS->m_processedPackets.push_front(front);
+    
+    return noErr;
+}
+    
 /* This is called by audio file stream parser when it finds property values */
 void Audio_Stream::propertyValueCallback(void *inClientData, AudioFileStreamID inAudioFileStream, AudioFileStreamPropertyID inPropertyID, UInt32 *ioFlags)
 {
@@ -467,6 +547,34 @@ void Audio_Stream::propertyValueCallback(void *inClientData, AudioFileStreamID i
             
             break;
         }
+        case kAudioFileStreamProperty_ReadyToProducePackets: {
+            memset(&(THIS->m_srcFormat), 0, sizeof m_srcFormat);
+            UInt32 asbdSize = sizeof(m_srcFormat);
+            OSStatus err = AudioFileStreamGetProperty(inAudioFileStream, kAudioFileStreamProperty_DataFormat, &asbdSize, &(THIS->m_srcFormat));
+            if (err) {
+                AS_TRACE("Unable to set the src format\n");
+                break;
+            }
+            
+            AS_TRACE("srcFormat, bytes per packet %i\n", THIS->m_srcFormat.mBytesPerPacket);
+            
+            if (THIS->m_audioConverter) {
+                AudioConverterDispose(THIS->m_audioConverter);
+            }
+            
+            err = AudioConverterNew(&(THIS->m_srcFormat),
+                                    &(THIS->m_dstFormat),
+                                    &(THIS->m_audioConverter));
+            
+            if (err) {
+                AS_TRACE("Error in creating an audio converter\n");
+            }
+            
+            THIS->setCookiesForStream(inAudioFileStream);
+            
+            THIS->m_audioQueue->handlePropertyChange(inAudioFileStream, inPropertyID, ioFlags);
+            break;
+        }
         default: {
             THIS->m_audioQueue->handlePropertyChange(inAudioFileStream, inPropertyID, ioFlags);
             break;
@@ -485,7 +593,68 @@ void Audio_Stream::streamDataCallback(void *inClientData, UInt32 inNumberBytes, 
         return;
     }
     
-    THIS->m_audioQueue->handleAudioPackets(inNumberBytes, inNumberPackets, inInputData, inPacketDescriptions);
+    for (int i = 0; i < inNumberPackets; i++) {
+        /* Allocate the packet */
+        UInt32 size = inPacketDescriptions[i].mDataByteSize;
+        queued_packet_t *packet = (queued_packet_t *)malloc(sizeof(queued_packet_t) + size);
+        
+        /* Prepare the packet */
+        packet->next = NULL;
+        packet->desc = inPacketDescriptions[i];
+        packet->desc.mStartOffset = 0;
+        memcpy(packet->data, (const char *)inInputData + inPacketDescriptions[i].mStartOffset,
+               size);
+        
+        if (THIS->m_queuedHead == NULL) {
+            THIS->m_queuedHead = THIS->m_queuedTail = packet;
+        } else {
+            THIS->m_queuedTail->next = packet;
+            THIS->m_queuedTail = packet;
+        }
+    }
+    
+    int count = 0;
+    queued_packet_t *cur = THIS->m_queuedHead;
+    while (cur) {
+        cur = cur->next;
+        count++;
+    }
+    
+    if (count > 10) {
+        AudioBufferList outputBufferList;
+        outputBufferList.mNumberBuffers = 1;
+        outputBufferList.mBuffers[0].mNumberChannels = THIS->m_dstFormat.mChannelsPerFrame;
+        outputBufferList.mBuffers[0].mDataByteSize = THIS->m_outputBufferSize;
+        outputBufferList.mBuffers[0].mData = THIS->m_outputBuffer;
+        
+        UInt32 ioOutputDataPackets = THIS->m_outputBufferSize / THIS->m_dstFormat.mBytesPerPacket;
+        
+        AS_TRACE("calling AudioConverterFillComplexBuffer\n");
+        
+        OSStatus err = AudioConverterFillComplexBuffer(THIS->m_audioConverter,
+                                                       &encoderDataCallback,
+                                                       THIS,
+                                                       &ioOutputDataPackets,
+                                                       &outputBufferList,
+                                                       NULL);
+        if (err == noErr) {
+            AS_TRACE("%i output bytes available for the audio queue\n", ioOutputDataPackets);
+            
+            THIS->m_audioQueue->handleAudioPackets(outputBufferList.mBuffers[0].mDataByteSize,
+                                                   outputBufferList.mNumberBuffers,
+                                                   outputBufferList.mBuffers[0].mData,
+                                                   NULL);
+            
+            for(std::list<queued_packet_t*>::iterator iter = THIS->m_processedPackets.begin();
+                iter != THIS->m_processedPackets.end(); iter++) {
+                queued_packet_t *cur = *iter;
+                free(cur);
+            }
+            THIS->m_processedPackets.clear();
+        }
+    } else {
+        AS_TRACE("Less than 10 packets queued, returning...\n");
+    }
 }
 
 } // namespace astreamer

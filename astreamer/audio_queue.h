@@ -24,7 +24,7 @@ public:
     Audio_Queue_Delegate *m_delegate;
     
     static const size_t AQ_BUFFERS = 16;            // number of audio queue buffers we allocate
-    static const size_t AQ_BUFSIZ = 2048;           // number of bytes in each audio queue buffer
+    static const size_t AQ_BUFSIZ = 32768;           // number of bytes in each audio queue buffer
     static const size_t AQ_MAX_PACKET_DESCS = 512;  // Maximum number of packets which can be contained in one buffer
     
     enum State {
@@ -57,7 +57,6 @@ private:
     
     State m_state;
     
-    AudioStreamBasicDescription m_streamDesc;
     AudioQueueRef m_outAQ;                                           // the audio queue
     
     AudioQueueBufferRef m_audioQueueBuffer[AQ_BUFFERS];              // audio queue buffers	
@@ -82,6 +81,7 @@ private:
     
 public:
     OSStatus m_lastError;
+    AudioStreamBasicDescription m_streamDesc;
 
 private:
     void cleanup();
