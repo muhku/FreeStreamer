@@ -178,6 +178,10 @@
 {
     @synchronized (self) {
         if (self.readyToPlay) {
+            /*
+             * All prework done; we should have a playable URL for the stream.
+             * Start playback.
+             */
             if ([self.playlistItems count] > 0) {
                 FSPlaylistItem *playlistItem = (self.playlistItems)[self.currentPlaylistItemIndex];
                 
@@ -185,14 +189,17 @@
             }
             
             [self.audioStream play];
-            return;
+        } else {
+            /*
+             * Not ready to play; start by checking the content type of the given
+             * URL.
+             */
+            [self.checkContentTypeRequest start];
+        
+            NSDictionary *userInfo = @{FSAudioStreamNotificationKey_State: @(kFsAudioStreamRetrievingURL)};
+            NSNotification *notification = [NSNotification notificationWithName:FSAudioStreamStateChangeNotification object:nil userInfo:userInfo];
+            [[NSNotificationCenter defaultCenter] postNotification:notification];
         }
-        
-        [self.checkContentTypeRequest start];
-        
-        NSDictionary *userInfo = @{FSAudioStreamNotificationKey_State: @(kFsAudioStreamRetrievingURL)};
-        NSNotification *notification = [NSNotification notificationWithName:FSAudioStreamStateChangeNotification object:nil userInfo:userInfo];
-        [[NSNotificationCenter defaultCenter] postNotification:notification];
     }
 }
 
