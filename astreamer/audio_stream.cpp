@@ -34,6 +34,7 @@ Audio_Stream::Audio_Stream() :
     m_state(STOPPED),
     m_httpStream(new HTTP_Stream()),
     m_audioQueue(new Audio_Queue()),
+    m_audioFileStream(0),
     m_dataOffset(0),
     m_seekTime(0),
 #if defined (AS_RELAX_CONTENT_TYPE_CHECK)
@@ -96,8 +97,11 @@ void Audio_Stream::close()
     }
     
     if (m_audioStreamParserRunning) {
-        if (AudioFileStreamClose(m_audioFileStream) != 0) {
-            AS_TRACE("%s: AudioFileStreamClose failed\n", __PRETTY_FUNCTION__);
+        if (m_audioFileStream) {
+            if (AudioFileStreamClose(m_audioFileStream) != 0) {
+                AS_TRACE("%s: AudioFileStreamClose failed\n", __PRETTY_FUNCTION__);
+            }
+            m_audioFileStream = 0;
         }
         m_audioStreamParserRunning = false;
     }
