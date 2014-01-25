@@ -341,8 +341,6 @@
     
     self.navigationItem.title = self.selectedPlaylistItem.title;
     
-    [self.audioController stop];
-    
     self.audioController.url = self.selectedPlaylistItem.url;
 }
 
