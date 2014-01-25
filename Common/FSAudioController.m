@@ -230,17 +230,26 @@
 - (void)setUrl:(NSString *)url
 {
     @synchronized (self) {
+        /*
+         * The URL set to nil; stop the audio stream.
+         */
         if (!url) {
             [self.audioStream stop];
             _url = nil;
             return;
         }
         
-        self.currentPlaylistItemIndex = 0;
-        
         if (![url isEqual:_url]) {
+            /*
+             * Since the stream URL changed, the stream does not match
+             * the currently played URL. Thereby, stop the stream.
+             */
             [self.audioStream stop];
             
+            /*
+             * Reset the content checks as they may be invalid
+             * now when the URL changed.
+             */
             [self.checkContentTypeRequest cancel];
             [self.parsePlaylistRequest cancel];
             [self.parseRssPodcastFeedRequest cancel];
@@ -251,11 +260,15 @@
             
             NSString *copyOfURL = [url copy];
             _url = copyOfURL;
-            /* Since the stream URL changed, the content may have changed */
+            
+            /*
+             * Reset the state.
+             */
             self.readyToPlay = NO;
             self.playlistItems = [[NSMutableArray alloc] init];
         }
     
+        self.currentPlaylistItemIndex = 0;
         self.audioStream.url = [NSURL URLWithString:_url];
     }
 }
