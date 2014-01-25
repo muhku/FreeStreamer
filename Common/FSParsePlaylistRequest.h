@@ -24,7 +24,6 @@ typedef enum {
  * To start the request, use the start method.
  */
 @interface FSParsePlaylistRequest : NSObject<NSURLConnectionDelegate> {
-    NSString *_url;
     NSURLConnection *_connection;
     NSInteger _httpStatus;
     NSMutableData *_receivedData;

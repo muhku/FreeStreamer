@@ -23,11 +23,7 @@
     BOOL _shouldStartPlaying;
     
     // UI
-    UISlider *_progressSlider;
     NSTimer *_progressUpdateTimer;
-    UIActivityIndicatorView *_activityIndicator;
-    UILabel *_statusLabel;
-    UILabel *_currentPlaybackTime;
     NSTimer *_playbackSeekTimer;
     double _seekToPoint;
 }

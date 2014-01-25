@@ -19,10 +19,6 @@
 
 @implementation FSXPlayerViewController
 
-@synthesize urlTextField;
-@synthesize stateTextFieldCell;
-@synthesize progressTextFieldCell;
-
 - (FSAudioController *)audioController
 {
     if (!_audioController) {

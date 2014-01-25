@@ -19,11 +19,6 @@
 
 @implementation FSPlaylistViewController
 
-@synthesize navigationController=_navigationController;
-@synthesize playerViewController=_playerViewContoller;
-@synthesize playlistItems;
-@synthesize userPlaylistItems;
-
 /*
  * =======================================
  * Private

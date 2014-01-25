@@ -9,9 +9,6 @@
 
 @implementation FSAppDelegate
 
-@synthesize window=_window;
-@synthesize navigationController=_navigationController;
-
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     [self.window setRootViewController:self.navigationController];

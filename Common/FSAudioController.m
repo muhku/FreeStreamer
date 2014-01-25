@@ -23,10 +23,6 @@
 
 @implementation FSAudioController
 
-@synthesize readyToPlay;
-@synthesize currentPlaylistItemIndex;
-@synthesize playlistItems;
-
 -(id)init
 {
     if (self = [super init]) {

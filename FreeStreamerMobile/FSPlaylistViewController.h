@@ -16,8 +16,7 @@
  * FSParsePlaylistFeedRequest class.
  */
 @interface FSPlaylistViewController : UITableViewController<UITableViewDataSource,UITableViewDelegate,UIAlertViewDelegate> {
-    UINavigationController *_navigationController;
-    FSPlayerViewController *_playerViewController;
+    
     FSParsePlaylistFeedRequest *_request;
 }
 

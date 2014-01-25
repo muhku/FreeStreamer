@@ -12,10 +12,6 @@
 
 @implementation FSCheckContentTypeRequest
 
-@synthesize url=_url;
-@synthesize onCompletion;
-@synthesize onFailure;
-
 - (id)init
 {
     self = [super init];
@@ -47,7 +43,7 @@
     }
     
     if (!_connection) {
-        onFailure();
+        self.onFailure();
         return;
     }
 }
@@ -138,7 +134,7 @@
     [_connection cancel];
     _connection = nil;
     
-    onCompletion();
+    self.onCompletion();
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
@@ -156,9 +152,9 @@
     
     // Still, try if we could resolve the content type by the URL
     if ([self guessContentTypeByUrl:nil]) {
-        onCompletion();
+        self.onCompletion();
     } else {
-        onFailure();
+        self.onFailure();
     }
 }
 

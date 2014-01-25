@@ -32,12 +32,10 @@ typedef enum {
  * 3. Call the start method.
  */
 @interface FSXMLHttpRequest : NSObject<NSURLConnectionDelegate> {
-    NSString *_url;
     NSURLConnection *_connection;
     NSInteger _httpStatus;
     NSMutableData *_receivedData;
     xmlDocPtr _xmlDocument;
-    FSXMLHttpRequestError lastError;
     NSDateFormatter *_dateFormatter;
 }
 

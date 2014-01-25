@@ -8,10 +8,6 @@
 
 @implementation FSPlaylistItem
 
-@synthesize title;
-@synthesize url;
-@synthesize originatingUrl;
-
 - (NSURL *)nsURL
 {
     if (self.url) {

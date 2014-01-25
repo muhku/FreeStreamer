@@ -88,11 +88,6 @@ public:
 
 @implementation FSAudioStreamPrivate
 
-@synthesize wasInterrupted=_wasInterrupted;
-@synthesize onCompletion;
-@synthesize onFailure;
-@synthesize lastError;
-
 -(id)init {
     if (self = [super init]) {
         _url = nil;

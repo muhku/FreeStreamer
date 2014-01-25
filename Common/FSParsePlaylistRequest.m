@@ -18,10 +18,6 @@
 
 @implementation FSParsePlaylistRequest
 
-@synthesize url=_url;
-@synthesize onCompletion;
-@synthesize onFailure;
-
 - (id)init
 {
     self = [super init];
@@ -48,7 +44,7 @@
     }
     
     if (!_connection) {
-        onFailure();
+        self.onFailure();
         return;
     }
 }
@@ -219,7 +215,7 @@
     
     if (_format == kFSPlaylistFormatNone) {
         [_connection cancel];
-        onFailure();
+        self.onFailure();
     }
 
     [_receivedData setLength:0];
@@ -237,7 +233,7 @@
         _receivedData = nil;
     }
     
-    onFailure();
+   self.onFailure();
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
@@ -249,13 +245,13 @@
     }
     
     if (_httpStatus != 200) {
-        onFailure();
+        self.onFailure();
         return;
     }
     
     [self parsePlaylistFromData:_receivedData];
     
-    onCompletion();
+    self.onCompletion();
 }
 
 @end

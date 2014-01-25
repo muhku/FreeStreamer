@@ -20,11 +20,6 @@
 
 @implementation FSXMLHttpRequest
 
-@synthesize url=_url;
-@synthesize onCompletion;
-@synthesize onFailure;
-@synthesize lastError=_lastError;
-
 - (id)init
 {
     self = [super init];
@@ -57,7 +52,7 @@
     }
     
     if (!_connection) {
-        onFailure();
+        self.onFailure();
         return;
     }
 }
@@ -101,7 +96,7 @@
     }
     
     _lastError = FSXMLHttpRequestError_Connection_Failed;
-    onFailure();
+    self.onFailure();
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
@@ -114,7 +109,7 @@
     
     if (_httpStatus != 200) {
         _lastError = FSXMLHttpRequestError_Invalid_Http_Status;
-        onFailure();
+        self.onFailure();
         return;
     }
     
@@ -128,7 +123,7 @@
     
     if (!_xmlDocument) {
         _lastError = FSXMLHttpRequestError_XML_Parser_Failed;
-        onFailure();
+        self.onFailure();
         return;
     }
     
@@ -136,7 +131,7 @@
     
     xmlFreeDoc(_xmlDocument), _xmlDocument = nil;
     
-    onCompletion();
+    self.onCompletion();
 }
 
 /*

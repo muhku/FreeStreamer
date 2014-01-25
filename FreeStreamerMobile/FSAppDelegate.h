@@ -10,8 +10,6 @@
  * The application delegate of the iOS example application.
  */
 @interface FSAppDelegate : UIResponder <UIApplicationDelegate> {
-    UIWindow *_window;
-    UINavigationController *_navigationController;
 }
 
 /**

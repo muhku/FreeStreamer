@@ -48,7 +48,6 @@ typedef enum {
  * To start the request, use the start method.
  */
 @interface FSCheckContentTypeRequest : NSObject<NSURLConnectionDelegate> {
-    NSString *_url;
     NSURLConnection *_connection;
     FSFileFormat _format;
     NSString *_contentType;

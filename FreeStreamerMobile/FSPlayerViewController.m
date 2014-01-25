@@ -19,15 +19,6 @@
 
 @implementation FSPlayerViewController
 
-@synthesize playButton;
-@synthesize pauseButton;
-@synthesize shouldStartPlaying=_shouldStartPlaying;
-@synthesize progressSlider=_progressSlider;
-@synthesize activityIndicator=_activityIndicator;
-@synthesize statusLabel=_statusLabel;
-@synthesize currentPlaybackTime=_currentPlaybackTime;
-@synthesize audioController;
-
 /*
  * =======================================
  * View control
