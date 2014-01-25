@@ -80,7 +80,7 @@ void Audio_Stream::open()
         setState(BUFFERING);
     } else {
         AS_TRACE("%s: failed to open the HTTP stream\n", __PRETTY_FUNCTION__);
-        setState(FAILED);
+        closeAndSignalError(AS_ERR_OPEN);
     }
 }
     
