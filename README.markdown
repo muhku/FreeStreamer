@@ -18,6 +18,7 @@ FreeStreamer has the following features:
 - Supports a subset of the ID3v2 tag specification 
 - Supports Podcast RSS feeds
 - The stream contents can be stored in a file (see the OS X application for an example)
+- It is possible to access the PCM audio samples (useful if you want your own audio analyzer, for instance)
 
 [![Player view](https://raw.github.com/muhku/FreeStreamer/master/Extra/player-new.png)](https://github.com/muhku/FreeStreamer/)
 
