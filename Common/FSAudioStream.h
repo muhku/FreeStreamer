@@ -176,8 +176,16 @@ typedef struct {
 
 @end
 
+/**
+ * To access the PCM audio data, use this delegate.
+ */
 @protocol FSPCMAudioStreamDelegate <NSObject>
 
 @optional
+/**
+ * Called when there are PCM audio samples available. Do not do any blocking operations
+ * when you receive the data. Instead, copy the data and process it so that the
+ * main event loop doesn't block. Failing to do so may cause glitches to the audio playback.
+ */
 - (void)audioStream:(FSAudioStream *)audioStream samplesAvailable:(const int16_t *)samples count:(NSUInteger)count;
 @end
