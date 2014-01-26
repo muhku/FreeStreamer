@@ -501,11 +501,25 @@ OSStatus Audio_Stream::encoderDataCallback(AudioConverterRef inAudioConverter, U
     Audio_Stream *THIS = (Audio_Stream *)inUserData;
     
     AS_TRACE("encoderDataCallback called\n");
-
-    *ioNumberDataPackets = 1;
     
     // Dequeue one packet per time for the decoder
     queued_packet_t *front = THIS->m_queuedHead;
+    
+    if (!front) {
+        /*
+         * End of stream - Inside your input procedure, you must set the total amount of packets read and the sizes of the data in the AudioBufferList to zero. The input procedure should also return noErr. This will signal the AudioConverter that you are out of data. More specifically, set ioNumberDataPackets and ioBufferList->mDataByteSize to zero in your input proc and return noErr. Where ioNumberDataPackets is the amount of data converted and ioBufferList->mDataByteSize is the size of the amount of data converted in each AudioBuffer within your input procedure callback. Your input procedure may be called a few more times; you should just keep returning zero and noErr.
+         */
+        
+        AS_TRACE("run out of data to provide for encoding\n");
+        
+        *ioNumberDataPackets = 0;
+        
+        ioData->mBuffers[0].mDataByteSize = 0;
+        
+        return noErr;
+    }
+    
+    *ioNumberDataPackets = 1;
     
     ioData->mBuffers[0].mData = front->data;
 	ioData->mBuffers[0].mDataByteSize = front->desc.mDataByteSize;
