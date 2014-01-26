@@ -133,6 +133,17 @@ void Audio_Stream::close()
     m_audioQueue->stop();
     m_dataOffset = 0;
     
+    /*
+     * Free any remaining queud packets for encoding.
+     */
+    queued_packet_t *cur = m_queuedHead;
+    while (cur) {
+        queued_packet_t *tmp = cur->next;
+        free(cur);
+        cur = tmp;
+    }
+    m_queuedHead = m_queuedTail = 0;
+    
     AS_TRACE("%s: leave\n", __PRETTY_FUNCTION__);
 }
     
