@@ -12,7 +12,6 @@
 #define ASTREAMER_AUDIO_QUEUE_H
 
 #include <AudioToolbox/AudioToolbox.h> /* AudioFileStreamID */
-#include <vector>
 
 namespace astreamer {
     
