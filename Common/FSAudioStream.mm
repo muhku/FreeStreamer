@@ -73,6 +73,8 @@ public:
 @property (copy) void (^onCompletion)();
 @property (copy) void (^onFailure)();
 @property (nonatomic,assign) FSAudioStreamError lastError;
+@property (nonatomic,unsafe_unretained) id<FSPCMAudioStreamDelegate> delegate;
+@property (nonatomic,unsafe_unretained) FSAudioStream *stream;
 
 - (void)reachabilityChanged:(NSNotification *)note;
 - (void)interruptionOccurred:(NSNotification *)notification;
@@ -105,6 +107,8 @@ public:
         _reachability = [Reachability reachabilityForInternetConnection];
         
         self.lastError = kFsAudioStreamErrorNone;
+        
+        _delegate = nil;
         
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(reachabilityChanged:)
@@ -338,6 +342,7 @@ public:
 {
     if (self = [super init]) {
         _private = [[FSAudioStreamPrivate alloc] init];
+        _private.stream = self;
     }
     return self;
 }
@@ -479,6 +484,16 @@ public:
     return _private.lastError;
 }
 
+- (void)setDelegate:(id<FSPCMAudioStreamDelegate>)delegate
+{
+    _private.delegate = delegate;
+}
+
+- (id<FSPCMAudioStreamDelegate>)delegate
+{
+    return _private.delegate;
+}
+
 @end
 
 /*
@@ -610,4 +625,7 @@ void AudioStreamStateObserver::audioStreamMetaDataAvailable(std::map<CFStringRef
 
 void AudioStreamStateObserver::samplesAvailable(AudioBufferList samples, AudioStreamPacketDescription description)
 {
+    if ([priv.delegate respondsToSelector:@selector(audioStream:samplesAvailable:packetDescription:)]) {
+        [priv.delegate audioStream:priv.stream samplesAvailable:samples packetDescription:description];
+    }
 }
