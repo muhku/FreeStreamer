@@ -42,6 +42,7 @@ public:
     void audioStreamErrorOccurred(int errorCode);
     void audioStreamStateChanged(astreamer::Audio_Stream::State state);
     void audioStreamMetaDataAvailable(std::map<CFStringRef,CFStringRef> metaData);
+    void samplesAvailable(AudioBufferList samples, AudioStreamPacketDescription description);
 };
 
 /*
@@ -605,4 +606,8 @@ void AudioStreamStateObserver::audioStreamMetaDataAvailable(std::map<CFStringRef
     NSNotification *notification = [NSNotification notificationWithName:FSAudioStreamMetaDataNotification object:nil userInfo:userInfo];
     
     [[NSNotificationCenter defaultCenter] postNotification:notification];
+}
+
+void AudioStreamStateObserver::samplesAvailable(AudioBufferList samples, AudioStreamPacketDescription description)
+{
 }

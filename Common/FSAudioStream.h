@@ -5,6 +5,7 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <CoreAudio/CoreAudioTypes.h>
 
 /**
  * Follow this notification for the audio stream state changes.
@@ -48,6 +49,7 @@ typedef enum {
     kFsAudioStreamErrorUnsupportedFormat = 4
 } FSAudioStreamError;
 
+@protocol FSPCMAudioStreamDelegate;
 @class FSAudioStreamPrivate;
 
 /**
@@ -167,5 +169,15 @@ typedef struct {
  * The last stream error.
  */
 @property (readonly) FSAudioStreamError lastError;
+/**
+ * Delegate.
+ */
+@property (nonatomic,unsafe_unretained) IBOutlet id<FSPCMAudioStreamDelegate> delegate;
 
+@end
+
+@protocol FSPCMAudioStreamDelegate <NSObject>
+
+@optional
+- (void)audioStream:(FSAudioStream *)audioStream samplesAvailable:(AudioBufferList)samples packetDescription:(AudioStreamPacketDescription)description;
 @end
