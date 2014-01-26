@@ -116,10 +116,14 @@ private:
     
     std::list <queued_packet_t*> m_processedPackets;
     
+    UInt32 m_processedPacketsSizeTotal;  // global packet statistics: total size
+    UInt32 m_processedPacketsCount;      // global packet statistics: count
+    
     size_t contentLength();
     void closeAndSignalError(int error);
     void setState(State state);
     void setCookiesForStream(AudioFileStreamID inAudioFileStream);
+    unsigned bitrate();
     
     static OSStatus encoderDataCallback(AudioConverterRef inAudioConverter, UInt32 *ioNumberDataPackets, AudioBufferList *ioData, AudioStreamPacketDescription **outDataPacketDescription, void *inUserData);
     static void propertyValueCallback(void *inClientData, AudioFileStreamID inAudioFileStream, AudioFileStreamPropertyID inPropertyID, UInt32 *ioFlags);

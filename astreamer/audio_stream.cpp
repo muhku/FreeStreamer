@@ -49,7 +49,9 @@ Audio_Stream::Audio_Stream() :
     m_fileOutput(0),
     m_outputFile(NULL),
     m_queuedHead(0),
-    m_queuedTail(0)
+    m_queuedTail(0),
+    m_processedPacketsSizeTotal(0),
+    m_processedPacketsCount(0)
 {
     m_httpStream->m_delegate = this;
     m_audioQueue->m_delegate = this;
@@ -98,6 +100,8 @@ void Audio_Stream::open()
     
     m_contentLength = 0;
     m_seekTime = 0;
+    m_processedPacketsSizeTotal = 0;
+    m_processedPacketsCount = 0;
     
     if (m_httpStream->open()) {
         AS_TRACE("%s: HTTP stream opened, buffering...\n", __PRETTY_FUNCTION__);
@@ -160,7 +164,7 @@ unsigned Audio_Stream::timePlayedInSeconds()
 unsigned Audio_Stream::durationInSeconds()
 {
     unsigned duration = 0;
-    unsigned bitrate = m_audioQueue->bitrate();
+    unsigned bitrate = this->bitrate();
     
     if (bitrate == 0) {
         goto out;
@@ -506,6 +510,20 @@ void Audio_Stream::setCookiesForStream(AudioFileStreamID inAudioFileStream)
     
     free(cookieData);
 }
+    
+unsigned Audio_Stream::bitrate()
+{
+    unsigned bitrate = 0;
+    
+    double packetDuration = m_srcFormat.mFramesPerPacket / m_srcFormat.mSampleRate;
+    
+    if (packetDuration > 0 && m_processedPacketsCount > 50) {
+        double averagePacketByteSize = m_processedPacketsSizeTotal / m_processedPacketsCount;
+        bitrate = 8 * averagePacketByteSize / packetDuration;
+    }
+    
+    return bitrate;
+}
 
 OSStatus Audio_Stream::encoderDataCallback(AudioConverterRef inAudioConverter, UInt32 *ioNumberDataPackets, AudioBufferList *ioData, AudioStreamPacketDescription **outDataPacketDescription, void *inUserData)
 {
@@ -544,6 +562,9 @@ OSStatus Audio_Stream::encoderDataCallback(AudioConverterRef inAudioConverter, U
     
     front->next = NULL;
     THIS->m_processedPackets.push_front(front);
+    
+    THIS->m_processedPacketsSizeTotal += front->desc.mDataByteSize;
+    THIS->m_processedPacketsCount++;
     
     return noErr;
 }

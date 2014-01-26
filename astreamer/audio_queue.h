@@ -47,9 +47,7 @@ public:
     void stop(bool stopImmediately);
     void stop();
     
-    double packetDuration();
     unsigned timePlayedInSeconds();
-    unsigned bitrate();
 	
 private:
     Audio_Queue(const Audio_Queue&);
@@ -66,9 +64,6 @@ private:
     UInt32 m_bytesFilled;                                            // how many bytes have been filled
     UInt32 m_packetsFilled;                                          // how many packets have been filled
     UInt32 m_buffersUsed;                                            // how many buffers are used
-    
-    UInt32 m_processedPacketsSizeTotal;                              // global packet statistics: total size
-    UInt32 m_processedPacketsCount;                                  // global packet statistics: count
     
     bool m_audioQueueStarted;                                        // flag to indicate that the queue has been started
     bool m_bufferInUse[AQ_BUFFERS];                                  // flags to indicate that a buffer is still in use

@@ -41,8 +41,6 @@ Audio_Queue::Audio_Queue()
     m_bytesFilled(0),
     m_packetsFilled(0),
     m_buffersUsed(0),
-    m_processedPacketsSizeTotal(0),
-    m_processedPacketsCount(0),
     m_audioQueueStarted(false),
     m_waitingOnBuffer(false),
     m_queuedHead(0),
@@ -133,11 +131,6 @@ void Audio_Queue::stop(bool stopImmediately)
     AQ_TRACE("%s: leave\n", __PRETTY_FUNCTION__);
 }
     
-double Audio_Queue::packetDuration()
-{
-    return m_streamDesc.mFramesPerPacket / m_streamDesc.mSampleRate;
-}
-    
 unsigned Audio_Queue::timePlayedInSeconds()
 {
     unsigned timePlayed = 0;
@@ -154,20 +147,6 @@ unsigned Audio_Queue::timePlayedInSeconds()
     
 out:
     return timePlayed;
-}
-    
-unsigned Audio_Queue::bitrate()
-{
-    unsigned bitrate = 0;
-    
-    double packetDuration = this->packetDuration();
-    
-    if (packetDuration > 0 && m_processedPacketsCount > 50) {
-        double averagePacketByteSize = m_processedPacketsSizeTotal / m_processedPacketsCount;
-        bitrate = 8 * averagePacketByteSize / packetDuration;
-    }
-    
-    return bitrate;
 }
 
 void Audio_Queue::handlePropertyChange(AudioFileStreamID inAudioFileStream, AudioFileStreamPropertyID inPropertyID, UInt32 *ioFlags)
@@ -308,9 +287,6 @@ int Audio_Queue::handlePacket(const void *data, AudioStreamPacketDescription *de
         AQ_TRACE("%s: skipped enqueueBuffer AQ_BUFSIZ - m_bytesFilled %lu, packetSize %u\n", __PRETTY_FUNCTION__, (AQ_BUFSIZ - m_bytesFilled), (unsigned int)packetSize);
     }
     
-    m_processedPacketsSizeTotal += packetSize;
-    m_processedPacketsCount++;
-    
     // copy data to the audio queue buffer
     AudioQueueBufferRef buf = m_audioQueueBuffer[m_fillBufferIndex];
     memcpy((char*)buf->mAudioData + m_bytesFilled, data, packetSize);
@@ -344,7 +320,7 @@ void Audio_Queue::cleanup()
         AQ_TRACE("%s: AudioQueueDispose failed!\n", __PRETTY_FUNCTION__);
     }
     m_outAQ = 0;
-    m_fillBufferIndex = m_bytesFilled = m_packetsFilled = m_buffersUsed = m_processedPacketsSizeTotal = m_processedPacketsCount = 0;
+    m_fillBufferIndex = m_bytesFilled = m_packetsFilled = m_buffersUsed = 0;
     
     for (size_t i=0; i < AQ_BUFFERS; i++) {
         m_bufferInUse[i] = false;
