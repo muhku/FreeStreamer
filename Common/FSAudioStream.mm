@@ -625,7 +625,10 @@ void AudioStreamStateObserver::audioStreamMetaDataAvailable(std::map<CFStringRef
 
 void AudioStreamStateObserver::samplesAvailable(AudioBufferList samples, AudioStreamPacketDescription description)
 {
-    if ([priv.delegate respondsToSelector:@selector(audioStream:samplesAvailable:packetDescription:)]) {
-        [priv.delegate audioStream:priv.stream samplesAvailable:samples packetDescription:description];
+    if ([priv.delegate respondsToSelector:@selector(audioStream:samplesAvailable:count:)]) {
+        int16_t *buffer = (int16_t *)samples.mBuffers[0].mData;
+        NSUInteger count = description.mDataByteSize / sizeof(int16_t);
+        
+        [priv.delegate audioStream:priv.stream samplesAvailable:buffer count:count];
     }
 }

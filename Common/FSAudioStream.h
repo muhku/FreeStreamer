@@ -179,5 +179,5 @@ typedef struct {
 @protocol FSPCMAudioStreamDelegate <NSObject>
 
 @optional
-- (void)audioStream:(FSAudioStream *)audioStream samplesAvailable:(AudioBufferList)samples packetDescription:(AudioStreamPacketDescription)description;
+- (void)audioStream:(FSAudioStream *)audioStream samplesAvailable:(const int16_t *)samples count:(NSUInteger)count;
 @end
