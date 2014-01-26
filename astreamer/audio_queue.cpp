@@ -247,23 +247,6 @@ void Audio_Queue::handleAudioPackets(UInt32 inNumberBytes, UInt32 inNumberPacket
      queue */
     UInt32 i;
     
-    if (!inPacketDescriptions) {
-        AQ_TRACE("%s: notice: supplying the packet descriptions for a supposed CBR data.\n", __PRETTY_FUNCTION__);
-        
-        // If no packet descriptions are supplied, assume we are dealing with CBR data
-        UInt32 base = inNumberBytes / inNumberPackets;
-        AudioStreamPacketDescription *descriptions = new AudioStreamPacketDescription[inNumberPackets];
-        
-        for (i = 0; i < inNumberPackets; i++) {
-            descriptions[i].mStartOffset = (base * i);
-            descriptions[i].mDataByteSize = base;
-            descriptions[i].mVariableFramesInPacket = 0;
-        }
-        inPacketDescriptions = descriptions;
-        
-        m_cbrPacketDescriptions.push_back(descriptions);
-    }
-    
     for (i = 0; i < inNumberPackets && !m_waitingOnBuffer && m_queuedHead == NULL; i++) {
         AudioStreamPacketDescription *desc = &inPacketDescriptions[i];
         int ret = handlePacket((const char*)inInputData + desc->mStartOffset, desc);
@@ -373,12 +356,7 @@ void Audio_Queue::cleanup()
         free(cur);
         cur = tmp;
     }
-    m_queuedHead = m_queuedHead = 0;
-    
-    for (size_t i=0; i < m_cbrPacketDescriptions.size(); i++) {
-        delete[] m_cbrPacketDescriptions[i];
-    }
-    m_cbrPacketDescriptions.clear();
+    m_queuedHead = m_queuedTail = 0;
     
     m_waitingOnBuffer = false;
     m_lastError = noErr;

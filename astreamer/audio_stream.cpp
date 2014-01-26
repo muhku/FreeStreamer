@@ -627,6 +627,11 @@ void Audio_Stream::streamDataCallback(void *inClientData, UInt32 inNumberBytes, 
         outputBufferList.mBuffers[0].mDataByteSize = THIS->m_outputBufferSize;
         outputBufferList.mBuffers[0].mData = THIS->m_outputBuffer;
         
+        AudioStreamPacketDescription description;
+        description.mStartOffset = 0;
+        description.mDataByteSize = THIS->m_outputBufferSize;
+        description.mVariableFramesInPacket = 0;
+        
         UInt32 ioOutputDataPackets = THIS->m_outputBufferSize / THIS->m_dstFormat.mBytesPerPacket;
         
         AS_TRACE("calling AudioConverterFillComplexBuffer\n");
@@ -643,7 +648,7 @@ void Audio_Stream::streamDataCallback(void *inClientData, UInt32 inNumberBytes, 
             THIS->m_audioQueue->handleAudioPackets(outputBufferList.mBuffers[0].mDataByteSize,
                                                    outputBufferList.mNumberBuffers,
                                                    outputBufferList.mBuffers[0].mData,
-                                                   NULL);
+                                                   &description);
             
             for(std::list<queued_packet_t*>::iterator iter = THIS->m_processedPackets.begin();
                 iter != THIS->m_processedPackets.end(); iter++) {

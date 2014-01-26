@@ -77,8 +77,6 @@ private:
     struct queued_packet *m_queuedHead;
     struct queued_packet *m_queuedTail;
     
-    std::vector<AudioStreamPacketDescription*> m_cbrPacketDescriptions;
-    
 public:
     OSStatus m_lastError;
     AudioStreamBasicDescription m_streamDesc;
