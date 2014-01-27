@@ -88,7 +88,18 @@
  * @param notification The audio stream state notification.
  */
 - (void)audioStreamStateDidChange:(NSNotification *)notification;
-
+/**
+ * Handles the notification upon entering background.
+ *
+ * @param notification The notification.
+ */
+- (void)applicationDidEnterBackgroundNotification:(NSNotification *)notification;
+/**
+ * Handles the notification upon entering foreground.
+ *
+ * @param notification The notification.
+ */
+- (void)applicationWillEnterForegroundNotification:(NSNotification *)notification;
 /**
  * Handles remote control events.
  * @param receivedEvent The event received.

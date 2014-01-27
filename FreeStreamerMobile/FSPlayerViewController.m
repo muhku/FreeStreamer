@@ -53,6 +53,8 @@
     self.navigationController.navigationBarHidden = NO;
     
     self.view.backgroundColor = [UIColor clearColor];
+    
+    self.analyzer.enabled = YES;
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -91,6 +93,16 @@
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(audioStreamMetaDataAvailable:)
                                                  name:FSAudioStreamMetaDataNotification
+                                               object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(applicationDidEnterBackgroundNotification:)
+                                                 name:UIApplicationDidEnterBackgroundNotification
+                                               object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(applicationWillEnterForegroundNotification:)
+                                                 name:UIApplicationWillEnterForegroundNotification
                                                object:nil];
     
     // Hide the buttons as we display them based on the playback status (callback)
@@ -136,6 +148,8 @@
 - (void)viewDidDisappear:(BOOL)animated
 {
     [super viewDidDisappear:animated];
+    
+    self.analyzer.enabled = NO;
     
     if (_progressUpdateTimer) {
         [_progressUpdateTimer invalidate], _progressUpdateTimer = nil;
@@ -246,6 +260,16 @@
                 break;
         }
     }
+}
+
+- (void)applicationDidEnterBackgroundNotification:(NSNotification *)notification
+{
+    self.analyzer.enabled = NO;
+}
+
+- (void)applicationWillEnterForegroundNotification:(NSNotification *)notification
+{
+    self.analyzer.enabled = YES;
 }
 
 - (void)audioStreamErrorOccurred:(NSNotification *)notification

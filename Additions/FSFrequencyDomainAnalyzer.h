@@ -9,9 +9,11 @@
 @protocol FSFrequencyDomainAnalyzerDelegate;
 
 @interface FSFrequencyDomainAnalyzer : NSObject <FSPCMAudioStreamDelegate> {
+    BOOL _enabled;
 }
 
 @property (nonatomic,unsafe_unretained) IBOutlet id<FSFrequencyDomainAnalyzerDelegate> delegate;
+@property (nonatomic,assign) BOOL enabled;
 
 - (void)audioStream:(FSAudioStream *)audioStream samplesAvailable:(const int16_t *)samples count:(NSUInteger)count;
 

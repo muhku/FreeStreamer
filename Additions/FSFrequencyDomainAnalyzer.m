@@ -104,6 +104,10 @@
 - (void)audioStream:(FSAudioStream *)audioStream samplesAvailable:(const int16_t *)samples count:(NSUInteger)count
 {
    @synchronized (self) {
+       if (!_enabled) {
+           return;
+       }
+       
        if (_shouldExit) {
            return;
        }
@@ -133,6 +137,26 @@
        */
        _bufferModified = YES;
     }
+}
+
+/*
+ * ================================================================
+ * PROPERTIES
+ * ================================================================
+ */
+
+- (void)setEnabled:(BOOL)enabled
+{
+    if (enabled == _enabled) {
+        return;
+    }
+    
+    _enabled = enabled;
+}
+
+- (BOOL)enabled
+{
+    return _enabled;
 }
 
 /* 
