@@ -9,8 +9,10 @@
 #import "FSAudioStream.h"
 #import "FSAudioController.h"
 #import "FSPlaylistItem.h"
+#import "FSFrequencyDomainAnalyzer.h"
+#import "FSFrequencyPlotView.h"
 
-@interface FSPlayerViewController (PrivateMethods)
+@interface FSPlayerViewController ()
 
 - (void)updatePlaybackProgress;
 - (void)seekToNewTime;
@@ -94,6 +96,10 @@
     // Hide the buttons as we display them based on the playback status (callback)
     self.playButton.hidden = YES;
     self.pauseButton.hidden = YES;
+    
+    self.analyzer = [[FSFrequencyDomainAnalyzer alloc] init];
+    self.audioController.stream.delegate = self.analyzer;
+    self.analyzer.delegate = self.frequencyPlotView;
 }
 
 - (void)viewDidUnload

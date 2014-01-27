@@ -71,6 +71,8 @@
 		609F6DAB18295F54000E45B2 /* FSParsePlaylistRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 609F6DA918295F54000E45B2 /* FSParsePlaylistRequest.m */; };
 		609F6DAC182962C4000E45B2 /* FSCheckContentTypeRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 609F6DA618295684000E45B2 /* FSCheckContentTypeRequest.m */; };
 		609F6DB218296EBF000E45B2 /* FSParsePlaylistFeedRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 609F6DB118296EBF000E45B2 /* FSParsePlaylistFeedRequest.m */; };
+		60E750BC1896A7E000BAC7C8 /* FSFrequencyDomainAnalyzer.m in Sources */ = {isa = PBXBuildFile; fileRef = 60E750B71896A7BA00BAC7C8 /* FSFrequencyDomainAnalyzer.m */; };
+		60E750BD1896A7E500BAC7C8 /* FSFrequencyPlotView.m in Sources */ = {isa = PBXBuildFile; fileRef = 60E750B91896A7BA00BAC7C8 /* FSFrequencyPlotView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -153,6 +155,10 @@
 		60CF9E571824156F00999FDF /* FSPlaylistItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSPlaylistItem.h; sourceTree = "<group>"; };
 		60CF9E581824156F00999FDF /* FSPlaylistItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSPlaylistItem.m; sourceTree = "<group>"; };
 		60CF9E601824158C00999FDF /* libxml2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.dylib; path = usr/lib/libxml2.dylib; sourceTree = SDKROOT; };
+		60E750B61896A7BA00BAC7C8 /* FSFrequencyDomainAnalyzer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FSFrequencyDomainAnalyzer.h; path = Additions/FSFrequencyDomainAnalyzer.h; sourceTree = "<group>"; };
+		60E750B71896A7BA00BAC7C8 /* FSFrequencyDomainAnalyzer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FSFrequencyDomainAnalyzer.m; path = Additions/FSFrequencyDomainAnalyzer.m; sourceTree = "<group>"; };
+		60E750B81896A7BA00BAC7C8 /* FSFrequencyPlotView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FSFrequencyPlotView.h; path = Additions/FSFrequencyPlotView.h; sourceTree = "<group>"; };
+		60E750B91896A7BA00BAC7C8 /* FSFrequencyPlotView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FSFrequencyPlotView.m; path = Additions/FSFrequencyPlotView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -190,6 +196,7 @@
 		60322851182411B500B7027B = {
 			isa = PBXGroup;
 			children = (
+				60E750B51896A7B000BAC7C8 /* Additions */,
 				60CF9E501824156F00999FDF /* Common */,
 				60322891182411F000B7027B /* astreamer */,
 				60322863182411B500B7027B /* FreeStreamerDesktop */,
@@ -354,6 +361,17 @@
 			path = Common;
 			sourceTree = SOURCE_ROOT;
 		};
+		60E750B51896A7B000BAC7C8 /* Additions */ = {
+			isa = PBXGroup;
+			children = (
+				60E750B61896A7BA00BAC7C8 /* FSFrequencyDomainAnalyzer.h */,
+				60E750B71896A7BA00BAC7C8 /* FSFrequencyDomainAnalyzer.m */,
+				60E750B81896A7BA00BAC7C8 /* FSFrequencyPlotView.h */,
+				60E750B91896A7BA00BAC7C8 /* FSFrequencyPlotView.m */,
+			);
+			name = Additions;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -490,6 +508,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				60E750BD1896A7E500BAC7C8 /* FSFrequencyPlotView.m in Sources */,
+				60E750BC1896A7E000BAC7C8 /* FSFrequencyDomainAnalyzer.m in Sources */,
 				600507D6184E1FE10002314D /* FSParseRssPodcastFeedRequest.m in Sources */,
 				600507D2184E1E3D0002314D /* FSXMLHttpRequest.m in Sources */,
 				602C629C1847961A00EA657D /* Reachability.m in Sources */,
