@@ -44,6 +44,13 @@
     [self setNeedsDisplay];
 }
 
+- (void)reset
+{
+    _count = 0;
+    
+    [self setNeedsDisplay];
+}
+
 - (void)drawRect:(CGRect)rect
 {
     if (_count == 0) {

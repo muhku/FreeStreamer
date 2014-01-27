@@ -15,5 +15,6 @@
 }
 
 - (void)frequenceAnalyzer:(FSFrequencyDomainAnalyzer *)analyzer levelsAvailable:(float *)levels count:(NSUInteger)count;
+- (void)reset;
 
 @end

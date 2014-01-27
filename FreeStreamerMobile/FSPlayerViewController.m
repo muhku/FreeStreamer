@@ -150,6 +150,7 @@
     [super viewDidDisappear:animated];
     
     self.analyzer.enabled = NO;
+    [self.frequencyPlotView reset];
     
     if (_progressUpdateTimer) {
         [_progressUpdateTimer invalidate], _progressUpdateTimer = nil;
