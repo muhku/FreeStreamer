@@ -51,7 +51,8 @@ Audio_Stream::Audio_Stream() :
     m_queuedHead(0),
     m_queuedTail(0),
     m_processedPacketsSizeTotal(0),
-    m_processedPacketsCount(0)
+    m_processedPacketsCount(0),
+    m_audioDataByteCount(0)
 {
     m_httpStream->m_delegate = this;
     m_audioQueue->m_delegate = this;
@@ -183,7 +184,15 @@ unsigned Audio_Stream::durationInSeconds()
         goto out;
     }
     
-    duration = contentLength() / (bitrate * 0.125);
+    double d;
+    
+    if (m_audioDataByteCount > 0) {
+        d = m_audioDataByteCount;
+    } else {
+        d = contentLength();
+    }
+    
+    duration = d / (bitrate * 0.125);
     
 out:
     return duration;
@@ -394,6 +403,8 @@ void Audio_Stream::streamIsReadyRead()
             contentType = m_defaultContentType;
         }
     }
+    
+    m_audioDataByteCount = 0;
     
     /* OK, it should be an audio stream, let's try to open it */
     OSStatus result = AudioFileStreamOpen(this,
@@ -621,6 +632,16 @@ void Audio_Stream::propertyValueCallback(void *inClientData, AudioFileStreamID i
                 AS_TRACE("%s: reading kAudioFileStreamProperty_DataOffset property failed\n", __PRETTY_FUNCTION__);
             }
             
+            break;
+        }
+        case kAudioFileStreamProperty_AudioDataByteCount: {
+            UInt32 byteCountSize = sizeof(UInt64);
+            OSStatus err = AudioFileStreamGetProperty(inAudioFileStream,
+                                                      kAudioFileStreamProperty_AudioDataByteCount,
+                                                      &byteCountSize, &THIS->m_audioDataByteCount);
+            if (err) {
+                THIS->m_audioDataByteCount = 0;
+            }
             break;
         }
         case kAudioFileStreamProperty_ReadyToProducePackets: {
