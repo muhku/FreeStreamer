@@ -700,10 +700,11 @@ void Audio_Stream::streamDataCallback(void *inClientData, UInt32 inNumberBytes, 
         UInt32 size = inPacketDescriptions[i].mDataByteSize;
         queued_packet_t *packet = (queued_packet_t *)malloc(sizeof(queued_packet_t) + size);
         
-        THIS->m_bitrateBuffer[THIS->m_bitrateBufferIndex++] = 8 * inPacketDescriptions[i].mDataByteSize / THIS->m_packetDuration;
-        
-        if (THIS->m_bitrateBufferIndex >= kAudioStreamBitrateBufferSize) {
-            THIS->m_bitrateBufferIndex = 0;
+        if (THIS->m_bitrateBufferIndex < kAudioStreamBitrateBufferSize) {
+            // Only keep sampling for one buffer cycle; this is to keep the counters (for instance) duration
+            // stable.
+            
+            THIS->m_bitrateBuffer[THIS->m_bitrateBufferIndex++] = 8 * inPacketDescriptions[i].mDataByteSize / THIS->m_packetDuration;
         }
         
         

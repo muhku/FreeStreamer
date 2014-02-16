@@ -32,7 +32,7 @@ enum Audio_Stream_Error {
 class Audio_Stream_Delegate;
 class File_Output;
     
-#define kAudioStreamBitrateBufferSize 100
+#define kAudioStreamBitrateBufferSize 50
 	
 class Audio_Stream : public HTTP_Stream_Delegate, public Audio_Queue_Delegate {    
 public:
