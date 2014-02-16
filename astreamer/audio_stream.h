@@ -31,6 +31,8 @@ enum Audio_Stream_Error {
     
 class Audio_Stream_Delegate;
 class File_Output;
+    
+#define kAudioStreamBitrateBufferSize 100
 	
 class Audio_Stream : public HTTP_Stream_Delegate, public Audio_Queue_Delegate {    
 public:
@@ -120,6 +122,10 @@ private:
     UInt32 m_processedPacketsSizeTotal;  // global packet statistics: total size
     UInt32 m_processedPacketsCount;      // global packet statistics: count
     UInt64 m_audioDataByteCount;
+    
+    double m_packetDuration;
+    double m_bitrateBuffer[kAudioStreamBitrateBufferSize];
+    size_t m_bitrateBufferIndex;
     
     size_t contentLength();
     void closeAndSignalError(int error);

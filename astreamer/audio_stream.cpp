@@ -52,7 +52,9 @@ Audio_Stream::Audio_Stream() :
     m_queuedTail(0),
     m_processedPacketsSizeTotal(0),
     m_processedPacketsCount(0),
-    m_audioDataByteCount(0)
+    m_audioDataByteCount(0),
+    m_packetDuration(0),
+    m_bitrateBufferIndex(0)
 {
     m_httpStream->m_delegate = this;
     m_audioQueue->m_delegate = this;
@@ -103,6 +105,7 @@ void Audio_Stream::open()
     m_seekTime = 0;
     m_processedPacketsSizeTotal = 0;
     m_processedPacketsCount = 0;
+    m_bitrateBufferIndex = 0;
     
     if (m_httpStream->open()) {
         AS_TRACE("%s: HTTP stream opened, buffering...\n", __PRETTY_FUNCTION__);
@@ -554,16 +557,16 @@ void Audio_Stream::setCookiesForStream(AudioFileStreamID inAudioFileStream)
     
 unsigned Audio_Stream::bitrate()
 {
-    unsigned bitrate = 0;
+    if (m_processedPacketsCount < kAudioStreamBitrateBufferSize) {
+        return 0;
+    }
+    double sum = 0;
     
-    double packetDuration = m_srcFormat.mFramesPerPacket / m_srcFormat.mSampleRate;
-    
-    if (packetDuration > 0 && m_processedPacketsCount > 50) {
-        double averagePacketByteSize = m_processedPacketsSizeTotal / m_processedPacketsCount;
-        bitrate = 8 * averagePacketByteSize / packetDuration;
+    for (size_t i=0; i < kAudioStreamBitrateBufferSize; i++) {
+        sum += m_bitrateBuffer[i];
     }
     
-    return bitrate;
+    return sum / kAudioStreamBitrateBufferSize;
 }
 
 OSStatus Audio_Stream::encoderDataCallback(AudioConverterRef inAudioConverter, UInt32 *ioNumberDataPackets, AudioBufferList *ioData, AudioStreamPacketDescription **outDataPacketDescription, void *inUserData)
@@ -653,6 +656,8 @@ void Audio_Stream::propertyValueCallback(void *inClientData, AudioFileStreamID i
                 break;
             }
             
+            THIS->m_packetDuration = THIS->m_srcFormat.mFramesPerPacket / THIS->m_srcFormat.mSampleRate;
+            
             AS_TRACE("srcFormat, bytes per packet %i\n", (unsigned int)THIS->m_srcFormat.mBytesPerPacket);
             
             if (THIS->m_audioConverter) {
@@ -694,6 +699,13 @@ void Audio_Stream::streamDataCallback(void *inClientData, UInt32 inNumberBytes, 
         /* Allocate the packet */
         UInt32 size = inPacketDescriptions[i].mDataByteSize;
         queued_packet_t *packet = (queued_packet_t *)malloc(sizeof(queued_packet_t) + size);
+        
+        THIS->m_bitrateBuffer[THIS->m_bitrateBufferIndex++] = 8 * inPacketDescriptions[i].mDataByteSize / THIS->m_packetDuration;
+        
+        if (THIS->m_bitrateBufferIndex >= kAudioStreamBitrateBufferSize) {
+            THIS->m_bitrateBufferIndex = 0;
+        }
+        
         
         /* Prepare the packet */
         packet->next = NULL;
