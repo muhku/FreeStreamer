@@ -18,8 +18,8 @@ namespace astreamer {
 class HTTP_Stream_Delegate;
     
 struct HTTP_Stream_Position {
-    size_t start;
-    size_t end;
+    UInt64 start;
+    UInt64 end;
 };
 
 class HTTP_Stream : public ID3_Parser_Delegate {

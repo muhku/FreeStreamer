@@ -236,7 +236,7 @@ CFReadStreamRef HTTP_Stream::createReadStream(CFURLRef url)
     if (m_position.start > 0 && m_position.end > m_position.start) {
         CFStringRef rangeHeaderValue = CFStringCreateWithFormat(NULL,
                                                                 NULL,
-                                                                CFSTR("bytes=%lu-%lu"),
+                                                                CFSTR("bytes=%llu-%llu"),
                                                                 m_position.start,
                                                                 m_position.end);
         

@@ -50,6 +50,7 @@ public:
     
     void open();
     void close();
+    void close(bool cleanupStreamParser);
     void pause();
     
     unsigned timePlayedInSeconds();
@@ -101,8 +102,8 @@ private:
     UInt32 m_outputBufferSize;
     UInt8 *m_outputBuffer;
     
-    SInt64 m_dataOffset;
-    unsigned m_seekTime;
+    UInt64 m_dataOffset;
+    double m_seekTime;
     
     bool m_strictContentTypeChecking;
     std::string m_defaultContentType;

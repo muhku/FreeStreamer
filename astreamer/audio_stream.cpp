@@ -115,6 +115,11 @@ void Audio_Stream::open()
     
 void Audio_Stream::close()
 {
+    close(true);
+}
+    
+void Audio_Stream::close(bool cleanupStreamParser)
+{
     AS_TRACE("%s: enter\n", __PRETTY_FUNCTION__);
     
     /* Close the HTTP stream first so that the audio stream parser
@@ -122,6 +127,10 @@ void Audio_Stream::close()
     if (m_httpStreamRunning) {
         m_httpStream->close();
         m_httpStreamRunning = false;
+    }
+    
+    if (!cleanupStreamParser) {
+        goto done;
     }
     
     if (m_audioStreamParserRunning) {
@@ -134,8 +143,9 @@ void Audio_Stream::close()
         m_audioStreamParserRunning = false;
     }
     
+done:
+    
     m_audioQueue->stop();
-    m_dataOffset = 0;
     
     /*
      * Free any remaining queud packets for encoding.
@@ -158,7 +168,10 @@ void Audio_Stream::pause()
     
 unsigned Audio_Stream::timePlayedInSeconds()
 {
-    return m_seekTime + m_audioQueue->timePlayedInSeconds();
+    if (m_audioStreamParserRunning) {
+        return m_seekTime + m_audioQueue->timePlayedInSeconds();
+    }
+    return 0;
 }
     
 unsigned Audio_Stream::durationInSeconds()
@@ -183,22 +196,39 @@ void Audio_Stream::seekToTime(unsigned newSeekTime)
         return;
     }
     
-    close();
-    
     setState(SEEKING);
     
-    HTTP_Stream_Position position;
+    m_seekTime = newSeekTime;
+    
     double offset = (double)newSeekTime / (double)duration;
-    position.start = m_dataOffset + offset * (contentLength() - m_dataOffset);
+    UInt64 seekByteOffset = m_dataOffset + offset * (contentLength() - m_dataOffset);
+    
+    HTTP_Stream_Position position;
+
+    position.start = seekByteOffset;
     position.end = contentLength();
     
-    m_seekTime = newSeekTime;
+    double packetDuration = m_srcFormat.mFramesPerPacket / m_srcFormat.mSampleRate;
+    
+    if (packetDuration > 0 && bitrate() > 0) {
+        UInt32 ioFlags = 0;
+        SInt64 packetAlignedByteOffset;
+        SInt64 seekPacket = floor(newSeekTime / packetDuration);
+        
+        OSStatus err = AudioFileStreamSeek(m_audioFileStream, seekPacket, &packetAlignedByteOffset, &ioFlags);
+        if (!err) {
+            position.start = packetAlignedByteOffset + m_dataOffset;
+        }
+    }
+    
+    // Don't clean up the stream parser
+    close(false);
     
     if (m_httpStream->open(position)) {
         AS_TRACE("%s: HTTP stream opened, buffering...\n", __PRETTY_FUNCTION__);
         m_httpStreamRunning = true;
     } else {
-        AS_TRACE("%s: failed to open the HTTP stream\n", __PRETTY_FUNCTION__);
+        AS_TRACE("%s: failed to open the fHTTP stream\n", __PRETTY_FUNCTION__);
         setState(FAILED);
     }
 }
@@ -602,7 +632,7 @@ void Audio_Stream::propertyValueCallback(void *inClientData, AudioFileStreamID i
                 break;
             }
             
-            AS_TRACE("srcFormat, bytes per packet %i\n", THIS->m_srcFormat.mBytesPerPacket);
+            AS_TRACE("srcFormat, bytes per packet %i\n", (unsigned int)THIS->m_srcFormat.mBytesPerPacket);
             
             if (THIS->m_audioConverter) {
                 AudioConverterDispose(THIS->m_audioConverter);
@@ -667,6 +697,8 @@ void Audio_Stream::streamDataCallback(void *inClientData, UInt32 inNumberBytes, 
     }
     
     if (count > 10) {
+        THIS->setState(PLAYING);
+        
         AudioBufferList outputBufferList;
         outputBufferList.mNumberBuffers = 1;
         outputBufferList.mBuffers[0].mNumberChannels = THIS->m_dstFormat.mChannelsPerFrame;
@@ -689,7 +721,7 @@ void Audio_Stream::streamDataCallback(void *inClientData, UInt32 inNumberBytes, 
                                                        &outputBufferList,
                                                        NULL);
         if (err == noErr) {
-            AS_TRACE("%i output bytes available for the audio queue\n", ioOutputDataPackets);
+            AS_TRACE("%i output bytes available for the audio queue\n", (unsigned int)ioOutputDataPackets);
             
             THIS->m_audioQueue->handleAudioPackets(outputBufferList.mBuffers[0].mDataByteSize,
                                                    outputBufferList.mNumberBuffers,
