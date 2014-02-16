@@ -213,7 +213,7 @@ void Audio_Stream::seekToTime(unsigned newSeekTime)
     if (packetDuration > 0 && bitrate() > 0) {
         UInt32 ioFlags = 0;
         SInt64 packetAlignedByteOffset;
-        SInt64 seekPacket = floor(newSeekTime / packetDuration);
+        SInt64 seekPacket = floor((double)newSeekTime / packetDuration);
         
         OSStatus err = AudioFileStreamSeek(m_audioFileStream, seekPacket, &packetAlignedByteOffset, &ioFlags);
         if (!err) {
