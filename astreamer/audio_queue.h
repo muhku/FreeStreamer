@@ -80,7 +80,6 @@ private:
     void setCookiesForStream(AudioFileStreamID inAudioFileStream);
     void setState(State state);
     bool enqueueBuffer();
-    int findQueueBuffer(AudioQueueBufferRef inBuffer);
     void enqueueCachedData();
     
     static void audioQueueOutputCallback(void *inClientData, AudioQueueRef inAQ, AudioQueueBufferRef inBuffer);

@@ -414,17 +414,6 @@ bool Audio_Queue::enqueueBuffer()
     return true;
 }
     
-int Audio_Queue::findQueueBuffer(AudioQueueBufferRef inBuffer)
-{
-    for (unsigned int i = 0; i < AQ_BUFFERS; ++i) {
-        if (inBuffer == m_audioQueueBuffer[i]) {
-            AQ_TRACE("findQueueBuffer %i\n", i);
-            return i;
-        }
-    }
-    return -1;
-}
-    
 void Audio_Queue::enqueueCachedData()
 {
     assert(!m_waitingOnBuffer);
@@ -456,14 +445,17 @@ void Audio_Queue::enqueueCachedData()
 // The buffer is now free to be reused.
 void Audio_Queue::audioQueueOutputCallback(void *inClientData, AudioQueueRef inAQ, AudioQueueBufferRef inBuffer)
 {
-    Audio_Queue *audioQueue = static_cast<Audio_Queue*>(inClientData);    
-    unsigned int bufIndex = audioQueue->findQueueBuffer(inBuffer);
+    Audio_Queue *audioQueue = static_cast<Audio_Queue*>(inClientData);
     
-    assert(audioQueue->m_bufferInUse[bufIndex]);
-    
-    audioQueue->m_bufferInUse[bufIndex] = false;
-    audioQueue->m_buffersUsed--;
-    
+    for (UInt32 bufIndex = 0; bufIndex < AQ_BUFFERS; ++bufIndex) {
+        if (inBuffer == audioQueue->m_audioQueueBuffer[bufIndex]) {
+            assert(audioQueue->m_bufferInUse[bufIndex]);
+            
+            audioQueue->m_bufferInUse[bufIndex] = false;
+            audioQueue->m_buffersUsed--;
+        }
+    }
+
     if (audioQueue->m_buffersUsed == 0 && !audioQueue->m_queuedHead && audioQueue->m_delegate) {
         audioQueue->m_delegate->audioQueueBuffersEmpty();
     } else if (audioQueue->m_waitingOnBuffer) {
