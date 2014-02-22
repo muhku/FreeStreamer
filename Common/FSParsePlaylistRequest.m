@@ -88,8 +88,24 @@
     
     if (_format == kFSPlaylistFormatM3U) {
         [self parsePlaylistM3U:playlistData];
+        
+        if ([_playlistItems count] == 0) {
+            // If we failed to grab any playlist items, still try
+            // to parse it in another format; perhaps the server
+            // mistakingly identified the playlist format
+            
+            [self parsePlaylistPLS:playlistData];
+        }
     } else if (_format == kFSPlaylistFormatPLS) {
         [self parsePlaylistPLS:playlistData];
+        
+        if ([_playlistItems count] == 0) {
+            // If we failed to grab any playlist items, still try
+            // to parse it in another format; perhaps the server
+            // mistakingly identified the playlist format
+            
+            [self parsePlaylistM3U:playlistData];
+        }
     }
 }
 
