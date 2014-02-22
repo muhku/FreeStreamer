@@ -90,6 +90,10 @@
         _checkContentTypeRequest.onFailure = ^() {
             // Failed to check the format; try playing anyway
             
+#if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
+            NSLog(@"Failed to check the format, trying to play anyway, URL: %@", weakSelf.audioStream.url);
+#endif
+            
             weakSelf.readyToPlay = YES;
             [weakSelf.audioStream play];
         };
@@ -122,6 +126,10 @@
         };
         _parsePlaylistRequest.onFailure = ^() {
             // Failed to parse the playlist; try playing anyway
+
+#if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
+            NSLog(@"Playlist parsing failed, trying to play anyway, URL: %@", weakSelf.audioStream.url);
+#endif
             
             weakSelf.readyToPlay = YES;
             [weakSelf.audioStream play];
@@ -155,6 +163,10 @@
         };
         _parseRssPodcastFeedRequest.onFailure = ^() {
             // Failed to parse the XML file; try playing anyway
+            
+#if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
+            NSLog(@"Failed to parse the RSS feed, trying to play anyway, URL: %@", weakSelf.audioStream.url);
+#endif
             
             weakSelf.readyToPlay = YES;
             [weakSelf.audioStream play];
