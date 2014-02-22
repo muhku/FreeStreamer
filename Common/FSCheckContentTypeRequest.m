@@ -159,7 +159,7 @@
         self.onCompletion();
     } else {
 #if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
-        NSLog(@"FSCheckContentTypeRequest: Unable to determine content-type for the URL: %@", _url);
+        NSLog(@"FSCheckContentTypeRequest: Unable to determine content-type for the URL: %@, error %@", _url, [error localizedDescription]);
 #endif
         
         self.onFailure();

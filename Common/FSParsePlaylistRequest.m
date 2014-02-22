@@ -262,7 +262,7 @@
     }
     
 #if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
-    NSLog(@"FSParsePlaylistRequest: Connection failed for URL: %@", _url);
+    NSLog(@"FSParsePlaylistRequest: Connection failed for URL: %@, error %@", _url, [error localizedDescription]);
 #endif
     
     self.onFailure();
