@@ -107,6 +107,13 @@
             [self parsePlaylistM3U:playlistData];
         }
     }
+    
+    if ([_playlistItems count] == 0) {
+        /*
+         * Fail if we failed to parse any items from the playlist.
+         */
+        self.onFailure();
+    }
 }
 
 - (void)parsePlaylistM3U:(NSString *)playlist
