@@ -228,9 +228,8 @@ void Audio_Queue::handleAudioPackets(UInt32 inNumberBytes, UInt32 inNumberPacket
     
     for (i = 0; i < inNumberPackets && !m_waitingOnBuffer && m_queuedHead == NULL; i++) {
         AudioStreamPacketDescription *desc = &inPacketDescriptions[i];
-        if (!handlePacket((const char*)inInputData + desc->mStartOffset, desc)) {
-            break;
-        }
+        int ret = handlePacket((const char*)inInputData + desc->mStartOffset, desc);
+        if (!ret) break;
     }
     if (i == inNumberPackets) {
         return;
@@ -257,12 +256,12 @@ void Audio_Queue::handleAudioPackets(UInt32 inNumberBytes, UInt32 inNumberPacket
     }
 }
     
-bool Audio_Queue::handlePacket(const void *data, AudioStreamPacketDescription *desc)
+int Audio_Queue::handlePacket(const void *data, AudioStreamPacketDescription *desc)
 {
     if (!initialized()) {
         AQ_TRACE("%s: warning: attempt to handle audio packets with uninitialized audio queue. return.\n", __PRETTY_FUNCTION__);
         
-        return false;
+        return -1;
     }
     
     AQ_TRACE("%s: enter\n", __PRETTY_FUNCTION__);
@@ -274,14 +273,15 @@ bool Audio_Queue::handlePacket(const void *data, AudioStreamPacketDescription *d
      come up too small here */
     if (packetSize > AQ_BUFSIZ) {
         AQ_TRACE("%s: packetSize %u > AQ_BUFSIZ %li\n", __PRETTY_FUNCTION__, (unsigned int)packetSize, AQ_BUFSIZ);
-        return false;
+        return -1;
     }
     
     // if the space remaining in the buffer is not enough for this packet, then
     // enqueue the buffer and wait for another to become available.
     if (AQ_BUFSIZ - m_bytesFilled < packetSize) {
-        if (!enqueueBuffer()) {
-            return false;
+        int hasFreeBuffer = enqueueBuffer();
+        if (hasFreeBuffer <= 0) {
+            return hasFreeBuffer;
         }
     } else {
         AQ_TRACE("%s: skipped enqueueBuffer AQ_BUFSIZ - m_bytesFilled %lu, packetSize %u\n", __PRETTY_FUNCTION__, (AQ_BUFSIZ - m_bytesFilled), (unsigned int)packetSize);
@@ -303,7 +303,7 @@ bool Audio_Queue::handlePacket(const void *data, AudioStreamPacketDescription *d
     if (m_packetsFilled >= AQ_MAX_PACKET_DESCS) {
         return enqueueBuffer();
     }
-    return true;
+    return 1;
 }
 
 /* private */
@@ -365,7 +365,7 @@ void Audio_Queue::setState(State state)
     }
 }
 
-bool Audio_Queue::enqueueBuffer()
+int Audio_Queue::enqueueBuffer()
 {
     assert(!m_bufferInUse[m_fillBufferIndex]);
     
@@ -388,7 +388,7 @@ bool Audio_Queue::enqueueBuffer()
            running */
         AQ_TRACE("%s: error in AudioQueueEnqueueBuffer\n", __PRETTY_FUNCTION__);
         m_lastError = err;
-        return false;
+        return 1;
     }
     
     // go to next buffer
@@ -408,56 +408,68 @@ bool Audio_Queue::enqueueBuffer()
             m_delegate->audioQueueOverflow();
         }
         m_waitingOnBuffer = true;
-        return false;
+        return 0;
     }
     
-    return true;
+    return 1;
+}
+    
+int Audio_Queue::findQueueBuffer(AudioQueueBufferRef inBuffer)
+{
+    for (unsigned int i = 0; i < AQ_BUFFERS; ++i) {
+        if (inBuffer == m_audioQueueBuffer[i]) {
+            AQ_TRACE("findQueueBuffer %i\n", i);
+            return i;
+        }
+    }
+    return -1;
+}
+    
+void Audio_Queue::enqueueCachedData()
+{
+    assert(!m_waitingOnBuffer);
+    assert(!m_bufferInUse[m_fillBufferIndex]);
+    
+    /* Queue up as many packets as possible into the buffers */
+    queued_packet_t *cur = m_queuedHead;
+    while (cur) {
+        int ret = handlePacket(cur->data, &cur->desc);
+        if (ret == 0) {
+           break; 
+        }
+        queued_packet_t *next = cur->next;
+        free(cur);
+        cur = next;
+    }
+    m_queuedHead = cur;
+    
+    /* If we finished queueing all our saved packets, we can re-schedule the
+     * stream to run */
+    if (cur == NULL) {
+        m_queuedTail = NULL;
+        if (m_delegate) {
+            m_delegate->audioQueueUnderflow();
+        }
+    }
 }
     
 // this is called by the audio queue when it has finished decoding our data. 
 // The buffer is now free to be reused.
 void Audio_Queue::audioQueueOutputCallback(void *inClientData, AudioQueueRef inAQ, AudioQueueBufferRef inBuffer)
 {
-    Audio_Queue *audioQueue = static_cast<Audio_Queue*>(inClientData);
+    Audio_Queue *audioQueue = static_cast<Audio_Queue*>(inClientData);    
+    unsigned int bufIndex = audioQueue->findQueueBuffer(inBuffer);
     
-    for (UInt32 bufIndex = 0; bufIndex < AQ_BUFFERS; ++bufIndex) {
-        if (inBuffer == audioQueue->m_audioQueueBuffer[bufIndex]) {
-            assert(audioQueue->m_bufferInUse[bufIndex]);
-            
-            audioQueue->m_bufferInUse[bufIndex] = false;
-            audioQueue->m_buffersUsed--;
-        }
-    }
-
+    assert(audioQueue->m_bufferInUse[bufIndex]);
+    
+    audioQueue->m_bufferInUse[bufIndex] = false;
+    audioQueue->m_buffersUsed--;
+    
     if (audioQueue->m_buffersUsed == 0 && !audioQueue->m_queuedHead && audioQueue->m_delegate) {
         audioQueue->m_delegate->audioQueueBuffersEmpty();
     } else if (audioQueue->m_waitingOnBuffer) {
         audioQueue->m_waitingOnBuffer = false;
-
-        // Enqueue cached data
-        assert(!audioQueue->m_waitingOnBuffer);
-        assert(!audioQueue->m_bufferInUse[audioQueue->m_fillBufferIndex]);
-        
-        /* Queue up as many packets as possible into the buffers */
-        queued_packet_t *cur = audioQueue->m_queuedHead;
-        while (cur) {
-            if (!audioQueue->handlePacket(cur->data, &cur->desc)) {
-                break;
-            }
-            queued_packet_t *next = cur->next;
-            free(cur);
-            cur = next;
-        }
-        audioQueue->m_queuedHead = cur;
-        
-        /* If we finished queueing all our saved packets, we can re-schedule the
-         * stream to run */
-        if (cur == NULL) {
-            audioQueue->m_queuedTail = NULL;
-            if (audioQueue->m_delegate) {
-                audioQueue->m_delegate->audioQueueUnderflow();
-            }
-        }
+        audioQueue->enqueueCachedData();
     }
 }
 
