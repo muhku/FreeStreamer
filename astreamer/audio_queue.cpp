@@ -414,33 +414,6 @@ bool Audio_Queue::enqueueBuffer()
     return true;
 }
     
-void Audio_Queue::enqueueCachedData()
-{
-    assert(!m_waitingOnBuffer);
-    assert(!m_bufferInUse[m_fillBufferIndex]);
-    
-    /* Queue up as many packets as possible into the buffers */
-    queued_packet_t *cur = m_queuedHead;
-    while (cur) {
-        if (!handlePacket(cur->data, &cur->desc)) {
-            break;
-        }
-        queued_packet_t *next = cur->next;
-        free(cur);
-        cur = next;
-    }
-    m_queuedHead = cur;
-    
-    /* If we finished queueing all our saved packets, we can re-schedule the
-     * stream to run */
-    if (cur == NULL) {
-        m_queuedTail = NULL;
-        if (m_delegate) {
-            m_delegate->audioQueueUnderflow();
-        }
-    }
-}
-    
 // this is called by the audio queue when it has finished decoding our data. 
 // The buffer is now free to be reused.
 void Audio_Queue::audioQueueOutputCallback(void *inClientData, AudioQueueRef inAQ, AudioQueueBufferRef inBuffer)
@@ -460,7 +433,31 @@ void Audio_Queue::audioQueueOutputCallback(void *inClientData, AudioQueueRef inA
         audioQueue->m_delegate->audioQueueBuffersEmpty();
     } else if (audioQueue->m_waitingOnBuffer) {
         audioQueue->m_waitingOnBuffer = false;
-        audioQueue->enqueueCachedData();
+
+        // Enqueue cached data
+        assert(!audioQueue->m_waitingOnBuffer);
+        assert(!audioQueue->m_bufferInUse[audioQueue->m_fillBufferIndex]);
+        
+        /* Queue up as many packets as possible into the buffers */
+        queued_packet_t *cur = audioQueue->m_queuedHead;
+        while (cur) {
+            if (!audioQueue->handlePacket(cur->data, &cur->desc)) {
+                break;
+            }
+            queued_packet_t *next = cur->next;
+            free(cur);
+            cur = next;
+        }
+        audioQueue->m_queuedHead = cur;
+        
+        /* If we finished queueing all our saved packets, we can re-schedule the
+         * stream to run */
+        if (cur == NULL) {
+            audioQueue->m_queuedTail = NULL;
+            if (audioQueue->m_delegate) {
+                audioQueue->m_delegate->audioQueueUnderflow();
+            }
+        }
     }
 }
 
