@@ -43,6 +43,10 @@
     }
     
     if (!_connection) {
+#if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
+        NSLog(@"FSCheckContentTypeRequest: Unable to open connection for URL: %@", _url);
+#endif
+        
         self.onFailure();
         return;
     }
@@ -154,6 +158,10 @@
     if ([self guessContentTypeByUrl:nil]) {
         self.onCompletion();
     } else {
+#if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
+        NSLog(@"FSCheckContentTypeRequest: Unable to determine content-type for the URL: %@", _url);
+#endif
+        
         self.onFailure();
     }
 }

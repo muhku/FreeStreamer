@@ -507,15 +507,36 @@ void AudioStreamStateObserver::audioStreamErrorOccurred(int errorCode)
     switch (errorCode) {
         case kFsAudioStreamErrorOpen:
             priv.lastError = kFsAudioStreamErrorOpen;
+            
+#if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
+            NSLog(@"FSAudioStream: Error opening the stream: %@", priv.url);
+#endif
+            
             break;
         case kFsAudioStreamErrorStreamParse:
             priv.lastError = kFsAudioStreamErrorStreamParse;
+            
+#if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
+            NSLog(@"FSAudioStream: Error parsing the stream: %@", priv.url);
+#endif
+            
             break;
         case kFsAudioStreamErrorNetwork:
             priv.lastError = kFsAudioStreamErrorNetwork;
+        
+#if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
+            NSLog(@"FSAudioStream: Network error: %@", priv.url);
+#endif
+            
             break;
         case kFsAudioStreamErrorUnsupportedFormat:
             priv.lastError = kFsAudioStreamErrorUnsupportedFormat;
+    
+#if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
+            NSLog(@"FSAudioStream: Unsupported format error: %@", priv.url);
+#endif
+            
+            break;
         default:
             break;
     }

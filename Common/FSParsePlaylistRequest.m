@@ -238,6 +238,11 @@
     
     if (_format == kFSPlaylistFormatNone) {
         [_connection cancel];
+
+#if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
+        NSLog(@"FSParsePlaylistRequest: Unable to determine the type of the playlist for URL: %@", _url);
+#endif
+        
         self.onFailure();
     }
 
@@ -256,7 +261,11 @@
         _receivedData = nil;
     }
     
-   self.onFailure();
+#if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
+    NSLog(@"FSParsePlaylistRequest: Connection failed for URL: %@", _url);
+#endif
+    
+    self.onFailure();
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection
@@ -268,6 +277,10 @@
     }
     
     if (_httpStatus != 200) {
+#if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
+        NSLog(@"FSParsePlaylistRequest: Unable to receive playlist from URL: %@", _url);
+#endif
+        
         self.onFailure();
         return;
     }

@@ -52,6 +52,10 @@
     }
     
     if (!_connection) {
+#if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
+        NSLog(@"FSXMLHttpRequest: Unable to open connection for URL: %@", _url);
+#endif
+        
         self.onFailure();
         return;
     }
@@ -96,6 +100,11 @@
     }
     
     _lastError = FSXMLHttpRequestError_Connection_Failed;
+ 
+#if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
+    NSLog(@"FSXMLHttpRequest: Request failed for URL: %@, error %@", _url, [error localizedDescription]);
+#endif
+    
     self.onFailure();
 }
 
@@ -109,6 +118,11 @@
     
     if (_httpStatus != 200) {
         _lastError = FSXMLHttpRequestError_Invalid_Http_Status;
+        
+#if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
+        NSLog(@"FSXMLHttpRequest: Unable to receive content for URL: %@", _url);
+#endif
+        
         self.onFailure();
         return;
     }
@@ -123,6 +137,11 @@
     
     if (!_xmlDocument) {
         _lastError = FSXMLHttpRequestError_XML_Parser_Failed;
+        
+#if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
+        NSLog(@"FSXMLHttpRequest: Unable to parse the content for URL: %@", _url);
+#endif
+        
         self.onFailure();
         return;
     }
