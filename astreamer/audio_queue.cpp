@@ -228,8 +228,9 @@ void Audio_Queue::handleAudioPackets(UInt32 inNumberBytes, UInt32 inNumberPacket
     
     for (i = 0; i < inNumberPackets && !m_waitingOnBuffer && m_queuedHead == NULL; i++) {
         AudioStreamPacketDescription *desc = &inPacketDescriptions[i];
-        int ret = handlePacket((const char*)inInputData + desc->mStartOffset, desc);
-        if (!ret) break;
+        if (!handlePacket((const char*)inInputData + desc->mStartOffset, desc)) {
+            break;
+        }
     }
     if (i == inNumberPackets) {
         return;
@@ -256,12 +257,12 @@ void Audio_Queue::handleAudioPackets(UInt32 inNumberBytes, UInt32 inNumberPacket
     }
 }
     
-int Audio_Queue::handlePacket(const void *data, AudioStreamPacketDescription *desc)
+bool Audio_Queue::handlePacket(const void *data, AudioStreamPacketDescription *desc)
 {
     if (!initialized()) {
         AQ_TRACE("%s: warning: attempt to handle audio packets with uninitialized audio queue. return.\n", __PRETTY_FUNCTION__);
         
-        return -1;
+        return false;
     }
     
     AQ_TRACE("%s: enter\n", __PRETTY_FUNCTION__);
@@ -273,15 +274,14 @@ int Audio_Queue::handlePacket(const void *data, AudioStreamPacketDescription *de
      come up too small here */
     if (packetSize > AQ_BUFSIZ) {
         AQ_TRACE("%s: packetSize %u > AQ_BUFSIZ %li\n", __PRETTY_FUNCTION__, (unsigned int)packetSize, AQ_BUFSIZ);
-        return -1;
+        return false;
     }
     
     // if the space remaining in the buffer is not enough for this packet, then
     // enqueue the buffer and wait for another to become available.
     if (AQ_BUFSIZ - m_bytesFilled < packetSize) {
-        int hasFreeBuffer = enqueueBuffer();
-        if (hasFreeBuffer <= 0) {
-            return hasFreeBuffer;
+        if (!enqueueBuffer()) {
+            return false;
         }
     } else {
         AQ_TRACE("%s: skipped enqueueBuffer AQ_BUFSIZ - m_bytesFilled %lu, packetSize %u\n", __PRETTY_FUNCTION__, (AQ_BUFSIZ - m_bytesFilled), (unsigned int)packetSize);
@@ -303,7 +303,7 @@ int Audio_Queue::handlePacket(const void *data, AudioStreamPacketDescription *de
     if (m_packetsFilled >= AQ_MAX_PACKET_DESCS) {
         return enqueueBuffer();
     }
-    return 1;
+    return true;
 }
 
 /* private */
@@ -365,7 +365,7 @@ void Audio_Queue::setState(State state)
     }
 }
 
-int Audio_Queue::enqueueBuffer()
+bool Audio_Queue::enqueueBuffer()
 {
     assert(!m_bufferInUse[m_fillBufferIndex]);
     
@@ -388,7 +388,7 @@ int Audio_Queue::enqueueBuffer()
            running */
         AQ_TRACE("%s: error in AudioQueueEnqueueBuffer\n", __PRETTY_FUNCTION__);
         m_lastError = err;
-        return 1;
+        return false;
     }
     
     // go to next buffer
@@ -408,10 +408,10 @@ int Audio_Queue::enqueueBuffer()
             m_delegate->audioQueueOverflow();
         }
         m_waitingOnBuffer = true;
-        return 0;
+        return false;
     }
     
-    return 1;
+    return true;
 }
     
 int Audio_Queue::findQueueBuffer(AudioQueueBufferRef inBuffer)
@@ -433,9 +433,8 @@ void Audio_Queue::enqueueCachedData()
     /* Queue up as many packets as possible into the buffers */
     queued_packet_t *cur = m_queuedHead;
     while (cur) {
-        int ret = handlePacket(cur->data, &cur->desc);
-        if (ret == 0) {
-           break; 
+        if (!handlePacket(cur->data, &cur->desc)) {
+            break;
         }
         queued_packet_t *next = cur->next;
         free(cur);

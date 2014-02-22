@@ -39,7 +39,7 @@ public:
     
     void handlePropertyChange(AudioFileStreamID inAudioFileStream, AudioFileStreamPropertyID inPropertyID, UInt32 *ioFlags);
     void handleAudioPackets(UInt32 inNumberBytes, UInt32 inNumberPackets, const void *inInputData, AudioStreamPacketDescription *inPacketDescriptions);
-    int handlePacket(const void *data, AudioStreamPacketDescription *desc);
+    bool handlePacket(const void *data, AudioStreamPacketDescription *desc);
     
     void start();
     void pause();
@@ -79,7 +79,7 @@ private:
     void cleanup();
     void setCookiesForStream(AudioFileStreamID inAudioFileStream);
     void setState(State state);
-    int enqueueBuffer();
+    bool enqueueBuffer();
     int findQueueBuffer(AudioQueueBufferRef inBuffer);
     void enqueueCachedData();
     
