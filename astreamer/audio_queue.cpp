@@ -316,6 +316,19 @@ void Audio_Queue::cleanup()
         return;
     }
     
+    if (m_state != IDLE) {
+        AQ_TRACE("%s: attemping to cleanup the audio queue when it is still playing, force stopping\n",
+                 __PRETTY_FUNCTION__);
+        
+        AudioQueueRemovePropertyListener(m_outAQ,
+                                         kAudioQueueProperty_IsRunning,
+                                         audioQueueIsRunningCallback,
+                                         this);
+        
+        AudioQueueStop(m_outAQ, true);
+        setState(IDLE);
+    }
+    
     if (AudioQueueDispose(m_outAQ, true) != 0) {
         AQ_TRACE("%s: AudioQueueDispose failed!\n", __PRETTY_FUNCTION__);
     }
