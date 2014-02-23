@@ -30,10 +30,11 @@ Audio_Stream::Audio_Stream() :
     m_delegate(0),
     m_httpStreamRunning(false),
     m_audioStreamParserRunning(false),
+    m_needNewQueue(false),
     m_contentLength(0),
     m_state(STOPPED),
     m_httpStream(new HTTP_Stream()),
-    m_audioQueue(new Audio_Queue()),
+    m_audioQueue(0),
     m_audioFileStream(0),
     m_audioConverter(0),
     m_outputBufferSize(Audio_Queue::AQ_BUFSIZ),
@@ -57,20 +58,17 @@ Audio_Stream::Audio_Stream() :
     m_bitrateBufferIndex(0)
 {
     m_httpStream->m_delegate = this;
-    m_audioQueue->m_delegate = this;
     
     memset(&m_dstFormat, 0, sizeof m_dstFormat);
     
     m_dstFormat.mSampleRate = 44100;
-	m_dstFormat.mFormatID = kAudioFormatLinearPCM;
-	m_dstFormat.mFormatFlags = kLinearPCMFormatFlagIsSignedInteger | kAudioFormatFlagsNativeEndian | kAudioFormatFlagIsPacked;
-	m_dstFormat.mBytesPerPacket = 4;
-	m_dstFormat.mFramesPerPacket = 1;
-	m_dstFormat.mBytesPerFrame = 4;
-	m_dstFormat.mChannelsPerFrame = 2;
-	m_dstFormat.mBitsPerChannel = 16;
-    
-    m_audioQueue->m_streamDesc = m_dstFormat;
+    m_dstFormat.mFormatID = kAudioFormatLinearPCM;
+    m_dstFormat.mFormatFlags = kLinearPCMFormatFlagIsSignedInteger | kAudioFormatFlagsNativeEndian | kAudioFormatFlagIsPacked;
+    m_dstFormat.mBytesPerPacket = 4;
+    m_dstFormat.mFramesPerPacket = 1;
+    m_dstFormat.mBytesPerFrame = 4;
+    m_dstFormat.mChannelsPerFrame = 2;
+    m_dstFormat.mBitsPerChannel = 16;
 }
 
 Audio_Stream::~Audio_Stream()
@@ -81,9 +79,6 @@ Audio_Stream::~Audio_Stream()
     
     m_httpStream->m_delegate = 0;
     delete m_httpStream, m_httpStream = 0;
-    
-    m_audioQueue->m_delegate = 0;
-    delete m_audioQueue, m_audioQueue = 0;
     
     if (m_audioConverter) {
         AudioConverterDispose(m_audioConverter), m_audioConverter = 0;
@@ -99,6 +94,12 @@ void Audio_Stream::open()
     if (m_httpStreamRunning) {
         AS_TRACE("%s: already running: return\n", __PRETTY_FUNCTION__);
         return;
+    }
+    
+    if (m_needNewQueue && m_audioQueue) {
+        m_needNewQueue = false;
+        
+        closeAudioQueue();
     }
     
     m_contentLength = 0;
@@ -119,11 +120,6 @@ void Audio_Stream::open()
     
 void Audio_Stream::close()
 {
-    close(true);
-}
-    
-void Audio_Stream::close(bool cleanupStreamParser)
-{
     AS_TRACE("%s: enter\n", __PRETTY_FUNCTION__);
     
     /* Close the HTTP stream first so that the audio stream parser
@@ -131,10 +127,6 @@ void Audio_Stream::close(bool cleanupStreamParser)
     if (m_httpStreamRunning) {
         m_httpStream->close();
         m_httpStreamRunning = false;
-    }
-    
-    if (!cleanupStreamParser) {
-        goto done;
     }
     
     if (m_audioStreamParserRunning) {
@@ -147,9 +139,9 @@ void Audio_Stream::close(bool cleanupStreamParser)
         m_audioStreamParserRunning = false;
     }
     
-done:
+    closeAudioQueue();
     
-    m_audioQueue->stop();
+    setState(STOPPED);
     
     /*
      * Free any remaining queud packets for encoding.
@@ -167,13 +159,13 @@ done:
     
 void Audio_Stream::pause()
 {
-    m_audioQueue->pause();
+    audioQueue()->pause();
 }
     
 unsigned Audio_Stream::timePlayedInSeconds()
 {
     if (m_audioStreamParserRunning) {
-        return m_seekTime + m_audioQueue->timePlayedInSeconds();
+        return m_seekTime + audioQueue()->timePlayedInSeconds();
     }
     return 0;
 }
@@ -233,8 +225,9 @@ void Audio_Stream::seekToTime(unsigned newSeekTime)
         }
     }
     
-    // Don't clean up the stream parser
-    close(false);
+    close();
+    
+    AS_TRACE("Seeking position %llu\n", position.start);
     
     if (m_httpStream->open(position)) {
         AS_TRACE("%s: HTTP stream opened, buffering...\n", __PRETTY_FUNCTION__);
@@ -352,7 +345,8 @@ void Audio_Stream::audioQueueBuffersEmpty()
     }
     
     // Keep the audio queue running until it has finished playing
-    m_audioQueue->stop(false);
+    audioQueue()->stop(false);
+    m_needNewQueue = true;
     
     AS_TRACE("%s: leave\n", __PRETTY_FUNCTION__);
 }
@@ -377,7 +371,7 @@ void Audio_Stream::audioQueueInitializationFailed()
     setState(FAILED);
     
     if (m_delegate) {
-        if (m_audioQueue->m_lastError == kAudioFormatUnsupportedDataFormatError) {
+        if (audioQueue()->m_lastError == kAudioFormatUnsupportedDataFormatError) {
             m_delegate->audioStreamErrorOccurred(AS_ERR_UNSUPPORTED_FORMAT);
         } else {
             m_delegate->audioStreamErrorOccurred(AS_ERR_STREAM_PARSE);
@@ -460,16 +454,6 @@ void Audio_Stream::streamEndEncountered()
     
     m_httpStream->close();
     m_httpStreamRunning = false;
-    
-    /*
-     * When the audio playback is fine, the queue will signal
-     * back that the playback has ended. However, if there was
-     * a problem with the playback (a corrupted audio file for instance),
-     * the queue will not signal back.
-     */
-    if (!m_audioQueue->initialized()) {
-        closeAndSignalError(AS_ERR_STREAM_PARSE);
-    }
 }
 
 void Audio_Stream::streamErrorOccurred()
@@ -492,6 +476,31 @@ void Audio_Stream::streamMetaDataAvailable(std::map<CFStringRef,CFStringRef> met
 }
     
 /* private */
+    
+Audio_Queue* Audio_Stream::audioQueue()
+{
+    if (!m_audioQueue) {
+        AS_TRACE("No audio queue, creating\n");
+        
+        m_audioQueue = new Audio_Queue();
+        
+        m_audioQueue->m_delegate = this;
+        m_audioQueue->m_streamDesc = m_dstFormat;
+    }
+    return m_audioQueue;
+}
+    
+void Audio_Stream::closeAudioQueue()
+{
+    if (!m_audioQueue) {
+        return;
+    }
+    
+    AS_TRACE("Releasing audio queue\n");
+    
+    m_audioQueue->m_delegate = 0;
+    delete m_audioQueue, m_audioQueue = 0;
+}
     
 size_t Audio_Stream::contentLength()
 {
@@ -674,11 +683,11 @@ void Audio_Stream::propertyValueCallback(void *inClientData, AudioFileStreamID i
             
             THIS->setCookiesForStream(inAudioFileStream);
             
-            THIS->m_audioQueue->handlePropertyChange(inAudioFileStream, inPropertyID, ioFlags);
+            THIS->audioQueue()->handlePropertyChange(inAudioFileStream, inPropertyID, ioFlags);
             break;
         }
         default: {
-            THIS->m_audioQueue->handlePropertyChange(inAudioFileStream, inPropertyID, ioFlags);
+            THIS->audioQueue()->handlePropertyChange(inAudioFileStream, inPropertyID, ioFlags);
             break;
         }
     }
@@ -757,7 +766,7 @@ void Audio_Stream::streamDataCallback(void *inClientData, UInt32 inNumberBytes, 
         if (err == noErr) {
             AS_TRACE("%i output bytes available for the audio queue\n", (unsigned int)ioOutputDataPackets);
             
-            THIS->m_audioQueue->handleAudioPackets(outputBufferList.mBuffers[0].mDataByteSize,
+            THIS->audioQueue()->handleAudioPackets(outputBufferList.mBuffers[0].mDataByteSize,
                                                    outputBufferList.mNumberBuffers,
                                                    outputBufferList.mBuffers[0].mData,
                                                    &description);

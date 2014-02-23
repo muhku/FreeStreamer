@@ -52,7 +52,6 @@ public:
     
     void open();
     void close();
-    void close(bool cleanupStreamParser);
     void pause();
     
     unsigned timePlayedInSeconds();
@@ -89,6 +88,7 @@ private:
     
     bool m_httpStreamRunning;
     bool m_audioStreamParserRunning;
+    bool m_needNewQueue;
     
     size_t m_contentLength;
     
@@ -126,6 +126,9 @@ private:
     double m_packetDuration;
     double m_bitrateBuffer[kAudioStreamBitrateBufferSize];
     size_t m_bitrateBufferIndex;
+    
+    Audio_Queue *audioQueue();
+    void closeAudioQueue();
     
     size_t contentLength();
     void closeAndSignalError(int error);
