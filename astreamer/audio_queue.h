@@ -46,6 +46,8 @@ public:
     void stop(bool stopImmediately);
     void stop();
     
+    void setVolume(float volume);
+    
     unsigned timePlayedInSeconds();
 	
 private:

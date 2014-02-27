@@ -87,6 +87,8 @@ public:
 - (void)seekToTime:(unsigned)newSeekTime;
 - (unsigned)timePlayedInSeconds;
 - (unsigned)durationInSeconds;
+- (void)setVolume:(float)volume;
+- (NSString *)getContentType;
 @end
 
 @implementation FSAudioStreamPrivate
@@ -327,6 +329,73 @@ public:
     return _audioStream->durationInSeconds();
 }
 
+- (void)setVolume:(float)volume
+{
+    _audioStream->setVolume(volume);
+}
+
+- (NSString *)getContentType
+{
+    std::string param = _audioStream->getContentType();
+    
+    return [NSString stringWithUTF8String:param.c_str()];
+}
+
+- (NSString *)getFileExtension
+{
+    NSString *contentType = [self getContentType];
+    NSString *fileExtension;
+    
+    if ([contentType isEqualToString:@"audio/mpeg"])
+    {
+        fileExtension = @"mp3";
+        NSLog(@"kAudioFileMP3Type detected\n");
+    }
+    else if ([contentType isEqualToString:@"audio/x-wav"])
+    {
+        fileExtension = @"wav";
+        NSLog(@"kAudioFileWAVEType detected\n");
+    }
+    else if ([contentType isEqualToString:@"audio/x-aifc"])
+    {
+        fileExtension = @"aifc";
+        NSLog(@"kAudioFileAIFCType detected\n");
+    }
+    else if ([contentType isEqualToString:@"audio/x-aiff"])
+    {
+        fileExtension = @"aiff";
+        NSLog(@"kAudioFileAIFFType detected\n");
+    }
+    else if ([contentType isEqualToString:@"audio/x-m4a"])
+    {
+        fileExtension = @"m4a";
+        NSLog(@"kAudioFileM4AType detected\n");
+    }
+    else if ([contentType isEqualToString:@"audio/mp4"])
+    {
+        fileExtension = @"mp4";
+        NSLog(@"kAudioFileMPEG4Type detected\n");
+    }
+    else if ([contentType isEqualToString:@"audio/x-caf"])
+    {
+        fileExtension = @"caf";
+        NSLog(@"kAudioFileCAFType detected\n");
+    }
+    else if ([contentType isEqualToString:@"audio/aac"] ||
+             [contentType isEqualToString:@"audio/aacp"])
+    {
+        fileExtension = @"aac";
+        NSLog(@"kAudioFileAAC_ADTSType detected\n");
+    }
+    else
+    {
+        fileExtension = nil;
+        NSLog(@"Unable to detect the audio stream type from content-type %@\n", contentType);
+    }
+    
+    return fileExtension;
+}
+
 @end
 
 /*
@@ -451,6 +520,21 @@ public:
     
     FSStreamPosition pos = {.minute = m, .second = s};
     return pos;
+}
+
+- (void)setVolume:(float)volume
+{
+    [_private setVolume:volume];
+}
+
+- (NSString *)getContentType
+{
+    return [_private getContentType];
+}
+
+- (NSString *)getFileExtension
+{
+    return [_private getFileExtension];
 }
 
 - (BOOL)continuous

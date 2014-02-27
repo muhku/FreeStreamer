@@ -98,6 +98,11 @@ void Audio_Queue::stop()
 {
     stop(true);
 }
+    
+void Audio_Queue::setVolume(float volume)
+{
+    AudioQueueSetParameter(m_outAQ, kAudioQueueParam_Volume, volume);
+}
 
 void Audio_Queue::stop(bool stopImmediately)
 {
