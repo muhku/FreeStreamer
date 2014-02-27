@@ -109,6 +109,21 @@ typedef struct {
 - (void)pause;
 
 /**
+ * Set audio stream volume from 0.0 to 1.0.
+ */
+- (void)setVolume:(float)volume;
+
+/**
+ * Receive content type of audio stream like @"audio/mpeg"
+ */
+- (NSString *)getContentType;
+
+/**
+ * Receive file extension of audio stream like @"mp3"
+ */
+- (NSString *)getFileExtension;
+
+/**
  * Seeks the stream to a given position. Requires a non-continuous stream
  * (a stream with a known duration).
  *

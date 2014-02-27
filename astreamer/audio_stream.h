@@ -58,6 +58,9 @@ public:
     unsigned durationInSeconds();
     void seekToTime(unsigned newSeekTime);
     
+    void setVolume(float volume);
+    std::string getContentType();
+    
     void setUrl(CFURLRef url);
     void setStrictContentTypeChecking(bool strictChecking);
     void setDefaultContentType(std::string& defaultContentType);
@@ -109,6 +112,7 @@ private:
     
     bool m_strictContentTypeChecking;
     std::string m_defaultContentType;
+    std::string m_contentType;
     
     File_Output *m_fileOutput;
     

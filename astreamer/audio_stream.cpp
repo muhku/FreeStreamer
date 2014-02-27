@@ -238,6 +238,16 @@ void Audio_Stream::seekToTime(unsigned newSeekTime)
     }
 }
     
+void Audio_Stream::setVolume(float volume)
+{
+    if (m_audioQueue) m_audioQueue->setVolume(volume);
+}
+    
+std::string Audio_Stream::getContentType()
+{
+    return m_contentType;
+}
+    
 void Audio_Stream::setUrl(CFURLRef url)
 {
     m_httpStream->setUrl(url);
@@ -311,6 +321,8 @@ AudioFileTypeID Audio_Stream::audioStreamTypeFromContentType(std::string content
     } else {
         AS_TRACE("***** Unable to detect the audio stream type from content-type %s *****\n", contentType.c_str());
     }
+    
+    m_contentType = contentType;
     
 out:
     return fileTypeHint;        
