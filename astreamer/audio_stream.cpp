@@ -107,6 +107,7 @@ void Audio_Stream::open()
     m_processedPacketsSizeTotal = 0;
     m_processedPacketsCount = 0;
     m_bitrateBufferIndex = 0;
+    m_contentType = "";
     
     if (m_httpStream->open()) {
         AS_TRACE("%s: HTTP stream opened, buffering...\n", __PRETTY_FUNCTION__);
@@ -280,6 +281,11 @@ Audio_Stream::State Audio_Stream::state()
 {
     return m_state;
 }
+
+std::string Audio_Stream::contentType()
+{
+    return m_contentType;
+}
     
 AudioFileTypeID Audio_Stream::audioStreamTypeFromContentType(std::string contentType)
 {
@@ -395,6 +401,8 @@ void Audio_Stream::streamIsReadyRead()
     
     /* Check if the stream's MIME type begins with audio/ */
     std::string contentType = m_httpStream->contentType();
+    
+    m_contentType = contentType;
     
     const char *audioContentType = "audio/";
     size_t audioContentTypeLength = strlen(audioContentType);

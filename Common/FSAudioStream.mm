@@ -68,6 +68,8 @@ public:
 @property (nonatomic,assign) NSURL *url;
 @property (nonatomic,assign) BOOL strictContentTypeChecking;
 @property (nonatomic,assign) NSString *defaultContentType;
+@property (nonatomic,assign) NSString *contentType;
+@property (nonatomic,assign) NSString *suggestedFileExtension;
 @property (nonatomic,assign) NSURL *outputFile;
 @property (nonatomic,assign) BOOL wasInterrupted;
 @property (copy) void (^onCompletion)();
@@ -209,6 +211,38 @@ public:
     
     NSString *copyOfDefaultContentType = [_defaultContentType copy];
     return copyOfDefaultContentType;
+}
+
+- (NSString*)contentType
+{
+    return [NSString stringWithUTF8String:_audioStream->contentType().c_str()];
+}
+
+- (NSString*)suggestedFileExtension
+{
+    NSString *contentType = [self contentType];
+    NSString *suggestedFileExtension = nil;
+    
+    if ([contentType isEqualToString:@"audio/mpeg"]) {
+        suggestedFileExtension = @"mp3";
+    } else if ([contentType isEqualToString:@"audio/x-wav"]) {
+        suggestedFileExtension = @"wav";
+    } else if ([contentType isEqualToString:@"audio/x-aifc"]) {
+        suggestedFileExtension = @"aifc";
+    } else if ([contentType isEqualToString:@"audio/x-aiff"]) {
+        suggestedFileExtension = @"aiff";
+    } else if ([contentType isEqualToString:@"audio/x-m4a"]) {
+        suggestedFileExtension = @"m4a";
+    } else if ([contentType isEqualToString:@"audio/mp4"]) {
+        suggestedFileExtension = @"mp4";
+    } else if ([contentType isEqualToString:@"audio/x-caf"]) {
+        suggestedFileExtension = @"caf";
+    }
+    else if ([contentType isEqualToString:@"audio/aac"] ||
+             [contentType isEqualToString:@"audio/aacp"]) {
+        suggestedFileExtension = @"aac";
+    }
+    return suggestedFileExtension;
 }
 
 - (NSURL*)outputFile
@@ -399,6 +433,16 @@ public:
 - (NSString*)defaultContentType
 {
     return [_private defaultContentType];
+}
+
+- (NSString*)contentType
+{
+    return [_private contentType];
+}
+
+- (NSString*)suggestedFileExtension
+{
+    return [_private suggestedFileExtension];
 }
 
 - (void)play

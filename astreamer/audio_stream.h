@@ -69,6 +69,8 @@ public:
     
     State state();
     
+    std::string contentType();
+    
     /* Audio_Queue_Delegate */
     void audioQueueStateChanged(Audio_Queue::State state);
     void audioQueueBuffersEmpty();
@@ -111,6 +113,7 @@ private:
     
     bool m_strictContentTypeChecking;
     std::string m_defaultContentType;
+    std::string m_contentType;
     
     File_Output *m_fileOutput;
     
