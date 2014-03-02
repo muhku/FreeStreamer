@@ -104,7 +104,7 @@
     unsigned index = 0;
     
     do {
-        fileName = [[NSString alloc] initWithFormat:@"%@-%i.mp3", basePath, index];
+        fileName = [[NSString alloc] initWithFormat:@"%@-%i.%@", basePath, index, self.audioController.stream.suggestedFileExtension];
         index++;
     } while ([[NSFileManager defaultManager] fileExistsAtPath:fileName]);
     
