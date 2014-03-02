@@ -58,6 +58,8 @@ public:
     unsigned durationInSeconds();
     void seekToTime(unsigned newSeekTime);
     
+    void setVolume(float volume);
+    
     void setUrl(CFURLRef url);
     void setStrictContentTypeChecking(bool strictChecking);
     void setDefaultContentType(std::string& defaultContentType);

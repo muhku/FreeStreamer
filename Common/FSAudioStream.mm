@@ -85,6 +85,7 @@ public:
 - (BOOL)isPlaying;
 - (void)pause;
 - (void)seekToTime:(unsigned)newSeekTime;
+- (void)setVolume:(float)volume;
 - (unsigned)timePlayedInSeconds;
 - (unsigned)durationInSeconds;
 @end
@@ -317,6 +318,11 @@ public:
     _audioStream->seekToTime(newSeekTime);
 }
 
+- (void)setVolume:(float)volume
+{
+    _audioStream->setVolume(volume);
+}
+
 - (unsigned)timePlayedInSeconds
 {
     return _audioStream->timePlayedInSeconds();
@@ -420,6 +426,11 @@ public:
     unsigned seekTime = position.minute * 60 + position.second;
     
     [_private seekToTime:seekTime];
+}
+
+- (void)setVolume:(float)volume
+{
+    [_private setVolume:volume];
 }
 
 - (BOOL)isPlaying

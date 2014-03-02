@@ -238,6 +238,13 @@ void Audio_Stream::seekToTime(unsigned newSeekTime)
     }
 }
     
+void Audio_Stream::setVolume(float volume)
+{
+    if (m_audioQueue) {
+        m_audioQueue->setVolume(volume);
+    }
+}
+    
 void Audio_Stream::setUrl(CFURLRef url)
 {
     m_httpStream->setUrl(url);

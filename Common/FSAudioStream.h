@@ -117,6 +117,16 @@ typedef struct {
 - (void)seekToPosition:(FSStreamPosition)position;
 
 /**
+ * Sets the audio stream volume from 0.0 to 1.0.
+ * Note that the overall volume is still constrained by the volume
+ * set by the user! So the actual volume cannot be higher
+ * than the volume currently set by the user. For example, if
+ * requesting a volume of 0.5, then the volume will be 50%
+ * lower than the current playback volume set by the user.
+ */
+- (void)setVolume:(float)volume;
+
+/**
  * Returns the playback status: YES if the stream is playing, NO otherwise.
  */
 - (BOOL)isPlaying;
