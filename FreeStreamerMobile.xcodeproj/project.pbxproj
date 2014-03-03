@@ -7,23 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		600032771847CF94001C83BE /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 600032761847CF94001C83BE /* SystemConfiguration.framework */; };
-		600507D0184E1DCF0002314D /* FSXMLHttpRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 600507CF184E1DCF0002314D /* FSXMLHttpRequest.m */; };
 		600507D2184E1E3D0002314D /* FSXMLHttpRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 600507CF184E1DCF0002314D /* FSXMLHttpRequest.m */; };
-		600507D5184E1FC60002314D /* FSParseRssPodcastFeedRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 600507D4184E1FC60002314D /* FSParseRssPodcastFeedRequest.m */; };
 		600507D6184E1FE10002314D /* FSParseRssPodcastFeedRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 600507D4184E1FC60002314D /* FSParseRssPodcastFeedRequest.m */; };
-		600507D7184E25690002314D /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 60CF9E601824158C00999FDF /* libxml2.dylib */; };
-		601369D2182C36AA001819D6 /* id3_parser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 601369D0182C36AA001819D6 /* id3_parser.cpp */; };
 		601369D3182C36AA001819D6 /* id3_parser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 601369D0182C36AA001819D6 /* id3_parser.cpp */; };
 		60228FC51850A9F400627B46 /* player-bg-image.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 60228FC41850A9F400627B46 /* player-bg-image.jpg */; };
 		60228FC71850B1AD00627B46 /* player-bg-image-pad.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 60228FC61850B1AD00627B46 /* player-bg-image-pad.jpg */; };
-		602C629B1847936B00EA657D /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 602C629A1847936B00EA657D /* Reachability.m */; };
 		602C629C1847961A00EA657D /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 602C629A1847936B00EA657D /* Reachability.m */; };
-		6032285E182411B500B7027B /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6032285D182411B500B7027B /* Cocoa.framework */; };
-		6032289C1824121800B7027B /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6032289B1824121800B7027B /* AVFoundation.framework */; };
-		6032289E1824122700B7027B /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6032289D1824122700B7027B /* AudioToolbox.framework */; };
-		603228A01824123100B7027B /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6032289F1824123100B7027B /* CFNetwork.framework */; };
-		604849E018662FE100E8F808 /* file_output.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 604849DE18662FE100E8F808 /* file_output.cpp */; };
 		604849E118662FE100E8F808 /* file_output.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 604849DE18662FE100E8F808 /* file_output.cpp */; };
 		6066DA38182422430005E1A2 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6066DA37182422430005E1A2 /* Foundation.framework */; };
 		6066DA3A182422430005E1A2 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6066DA39182422430005E1A2 /* CoreGraphics.framework */; };
@@ -32,10 +21,6 @@
 		6066DA44182422430005E1A2 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6066DA43182422430005E1A2 /* main.m */; };
 		6066DA48182422430005E1A2 /* FSAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 6066DA47182422430005E1A2 /* FSAppDelegate.m */; };
 		6066DA4A182422430005E1A2 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6066DA49182422430005E1A2 /* Images.xcassets */; };
-		6066DA6B182422C40005E1A2 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6066DA69182422C40005E1A2 /* MainMenu.xib */; };
-		6066DA6D182422CC0005E1A2 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6066DA6C182422CC0005E1A2 /* Images.xcassets */; };
-		6066DA74182422E00005E1A2 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 6066DA70182422E00005E1A2 /* Credits.rtf */; };
-		6066DA75182422E00005E1A2 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6066DA72182422E00005E1A2 /* InfoPlist.strings */; };
 		6066DA83182424860005E1A2 /* button-pause.png in Resources */ = {isa = PBXBuildFile; fileRef = 6066DA7F182424860005E1A2 /* button-pause.png */; };
 		6066DA84182424860005E1A2 /* button-play.png in Resources */ = {isa = PBXBuildFile; fileRef = 6066DA80182424860005E1A2 /* button-play.png */; };
 		6066DA85182424860005E1A2 /* player-bg-bottom.png in Resources */ = {isa = PBXBuildFile; fileRef = 6066DA81182424860005E1A2 /* player-bg-bottom.png */; };
@@ -57,17 +42,6 @@
 		6066DAC31824273A0005E1A2 /* audio_queue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60AA8F70182412F9001DE57B /* audio_queue.cpp */; };
 		6066DAC51824273A0005E1A2 /* audio_stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60AA8F72182412F9001DE57B /* audio_stream.cpp */; };
 		6066DAC71824273A0005E1A2 /* http_stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60AA8F74182412F9001DE57B /* http_stream.cpp */; };
-		6066DAD2182427A30005E1A2 /* FSAudioController.m in Sources */ = {isa = PBXBuildFile; fileRef = 60CF9E521824156F00999FDF /* FSAudioController.m */; };
-		6066DAD4182427A30005E1A2 /* FSAudioStream.mm in Sources */ = {isa = PBXBuildFile; fileRef = 60CF9E541824156F00999FDF /* FSAudioStream.mm */; };
-		6066DAD8182427A30005E1A2 /* FSPlaylistItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 60CF9E581824156F00999FDF /* FSPlaylistItem.m */; };
-		6066DADB182427A30005E1A2 /* audio_queue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60AA8F70182412F9001DE57B /* audio_queue.cpp */; };
-		6066DADD182427A30005E1A2 /* audio_stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60AA8F72182412F9001DE57B /* audio_stream.cpp */; };
-		6066DADF182427A30005E1A2 /* http_stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60AA8F74182412F9001DE57B /* http_stream.cpp */; };
-		6066DAE2182427A30005E1A2 /* FSXAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 6066DA64182422A50005E1A2 /* FSXAppDelegate.m */; };
-		6066DAE4182427A30005E1A2 /* FSXPlayerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6066DA66182422A50005E1A2 /* FSXPlayerViewController.m */; };
-		6066DAE5182427A30005E1A2 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6066DA6E182422D70005E1A2 /* main.m */; };
-		609F6DA718295684000E45B2 /* FSCheckContentTypeRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 609F6DA618295684000E45B2 /* FSCheckContentTypeRequest.m */; };
-		609F6DAA18295F54000E45B2 /* FSParsePlaylistRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 609F6DA918295F54000E45B2 /* FSParsePlaylistRequest.m */; };
 		609F6DAB18295F54000E45B2 /* FSParsePlaylistRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 609F6DA918295F54000E45B2 /* FSParsePlaylistRequest.m */; };
 		609F6DAC182962C4000E45B2 /* FSCheckContentTypeRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 609F6DA618295684000E45B2 /* FSCheckContentTypeRequest.m */; };
 		609F6DB218296EBF000E45B2 /* FSParsePlaylistFeedRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 609F6DB118296EBF000E45B2 /* FSParsePlaylistFeedRequest.m */; };
@@ -87,7 +61,6 @@
 		60228FC61850B1AD00627B46 /* player-bg-image-pad.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = "player-bg-image-pad.jpg"; path = "Assets/Images/player-bg-image-pad.jpg"; sourceTree = "<group>"; };
 		602C62991847936B00EA657D /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
 		602C629A1847936B00EA657D /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
-		6032285A182411B500B7027B /* FreeStreamerDesktop.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FreeStreamerDesktop.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6032285D182411B500B7027B /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		60322860182411B500B7027B /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		60322861182411B500B7027B /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
@@ -109,16 +82,6 @@
 		6066DA46182422430005E1A2 /* FSAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FSAppDelegate.h; sourceTree = "<group>"; };
 		6066DA47182422430005E1A2 /* FSAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FSAppDelegate.m; sourceTree = "<group>"; };
 		6066DA49182422430005E1A2 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
-		6066DA63182422A50005E1A2 /* FSXAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FSXAppDelegate.h; path = FreeStreamerDesktop/FSXAppDelegate.h; sourceTree = SOURCE_ROOT; };
-		6066DA64182422A50005E1A2 /* FSXAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FSXAppDelegate.m; path = FreeStreamerDesktop/FSXAppDelegate.m; sourceTree = SOURCE_ROOT; };
-		6066DA65182422A50005E1A2 /* FSXPlayerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FSXPlayerViewController.h; path = FreeStreamerDesktop/FSXPlayerViewController.h; sourceTree = SOURCE_ROOT; };
-		6066DA66182422A50005E1A2 /* FSXPlayerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FSXPlayerViewController.m; path = FreeStreamerDesktop/FSXPlayerViewController.m; sourceTree = SOURCE_ROOT; };
-		6066DA6A182422C40005E1A2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = FreeStreamerDesktop/Base.lproj/MainMenu.xib; sourceTree = SOURCE_ROOT; };
-		6066DA6C182422CC0005E1A2 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = FreeStreamerDesktop/Images.xcassets; sourceTree = SOURCE_ROOT; };
-		6066DA6E182422D70005E1A2 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = FreeStreamerDesktop/main.m; sourceTree = SOURCE_ROOT; };
-		6066DA71182422E00005E1A2 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = en; path = FreeStreamerDesktop/en.lproj/Credits.rtf; sourceTree = SOURCE_ROOT; };
-		6066DA73182422E00005E1A2 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = FreeStreamerDesktop/en.lproj/InfoPlist.strings; sourceTree = SOURCE_ROOT; };
-		6066DA76182422F20005E1A2 /* FreeStreamer-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "FreeStreamer-Info.plist"; path = "FreeStreamerDesktop/FreeStreamer-Info.plist"; sourceTree = SOURCE_ROOT; };
 		6066DA7F182424860005E1A2 /* button-pause.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "button-pause.png"; path = "Assets/Images/button-pause.png"; sourceTree = "<group>"; };
 		6066DA80182424860005E1A2 /* button-play.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "button-play.png"; path = "Assets/Images/button-play.png"; sourceTree = "<group>"; };
 		6066DA81182424860005E1A2 /* player-bg-bottom.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "player-bg-bottom.png"; path = "Assets/Images/player-bg-bottom.png"; sourceTree = "<group>"; };
@@ -162,19 +125,6 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		60322857182411B500B7027B /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				600507D7184E25690002314D /* libxml2.dylib in Frameworks */,
-				600032771847CF94001C83BE /* SystemConfiguration.framework in Frameworks */,
-				603228A01824123100B7027B /* CFNetwork.framework in Frameworks */,
-				6032289E1824122700B7027B /* AudioToolbox.framework in Frameworks */,
-				6032289C1824121800B7027B /* AVFoundation.framework in Frameworks */,
-				6032285E182411B500B7027B /* Cocoa.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		6066DA33182422430005E1A2 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -199,7 +149,6 @@
 				60E750B51896A7B000BAC7C8 /* Additions */,
 				60CF9E501824156F00999FDF /* Common */,
 				60322891182411F000B7027B /* astreamer */,
-				60322863182411B500B7027B /* FreeStreamerDesktop */,
 				6066DA3D182422430005E1A2 /* FreeStreamerMobile */,
 				6032285C182411B500B7027B /* Frameworks */,
 				6032285B182411B500B7027B /* Products */,
@@ -209,7 +158,6 @@
 		6032285B182411B500B7027B /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				6032285A182411B500B7027B /* FreeStreamerDesktop.app */,
 				6066DA36182422430005E1A2 /* FreeStreamerMobile.app */,
 			);
 			name = Products;
@@ -246,32 +194,6 @@
 				60322862182411B500B7027B /* Foundation.framework */,
 			);
 			name = "Other Frameworks";
-			sourceTree = "<group>";
-		};
-		60322863182411B500B7027B /* FreeStreamerDesktop */ = {
-			isa = PBXGroup;
-			children = (
-				6066DA63182422A50005E1A2 /* FSXAppDelegate.h */,
-				6066DA64182422A50005E1A2 /* FSXAppDelegate.m */,
-				6066DA65182422A50005E1A2 /* FSXPlayerViewController.h */,
-				6066DA66182422A50005E1A2 /* FSXPlayerViewController.m */,
-				6066DA69182422C40005E1A2 /* MainMenu.xib */,
-				6066DA6C182422CC0005E1A2 /* Images.xcassets */,
-				60322864182411B500B7027B /* Supporting Files */,
-			);
-			name = FreeStreamerDesktop;
-			path = FreeStreamer;
-			sourceTree = "<group>";
-		};
-		60322864182411B500B7027B /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				6066DA70182422E00005E1A2 /* Credits.rtf */,
-				6066DA72182422E00005E1A2 /* InfoPlist.strings */,
-				6066DA6E182422D70005E1A2 /* main.m */,
-				6066DA76182422F20005E1A2 /* FreeStreamer-Info.plist */,
-			);
-			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
 		60322891182411F000B7027B /* astreamer */ = {
@@ -375,23 +297,6 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		60322859182411B500B7027B /* FreeStreamerDesktop */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 6032288B182411B500B7027B /* Build configuration list for PBXNativeTarget "FreeStreamerDesktop" */;
-			buildPhases = (
-				60322856182411B500B7027B /* Sources */,
-				60322857182411B500B7027B /* Frameworks */,
-				60322858182411B500B7027B /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = FreeStreamerDesktop;
-			productName = FreeStreamer;
-			productReference = 6032285A182411B500B7027B /* FreeStreamerDesktop.app */;
-			productType = "com.apple.product-type.application";
-		};
 		6066DA35182422430005E1A2 /* FreeStreamerMobile */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 6066DA61182422430005E1A2 /* Build configuration list for PBXNativeTarget "FreeStreamerMobile" */;
@@ -428,7 +333,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 60322855182411B500B7027B /* Build configuration list for PBXProject "FreeStreamer" */;
+			buildConfigurationList = 60322855182411B500B7027B /* Build configuration list for PBXProject "FreeStreamerMobile" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -441,24 +346,12 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				60322859182411B500B7027B /* FreeStreamerDesktop */,
 				6066DA35182422430005E1A2 /* FreeStreamerMobile */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		60322858182411B500B7027B /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				6066DA6D182422CC0005E1A2 /* Images.xcassets in Resources */,
-				6066DA75182422E00005E1A2 /* InfoPlist.strings in Resources */,
-				6066DA74182422E00005E1A2 /* Credits.rtf in Resources */,
-				6066DA6B182422C40005E1A2 /* MainMenu.xib in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		6066DA34182422430005E1A2 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -481,29 +374,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		60322856182411B500B7027B /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				604849E018662FE100E8F808 /* file_output.cpp in Sources */,
-				602C629B1847936B00EA657D /* Reachability.m in Sources */,
-				6066DAD2182427A30005E1A2 /* FSAudioController.m in Sources */,
-				6066DAD4182427A30005E1A2 /* FSAudioStream.mm in Sources */,
-				6066DAD8182427A30005E1A2 /* FSPlaylistItem.m in Sources */,
-				600507D5184E1FC60002314D /* FSParseRssPodcastFeedRequest.m in Sources */,
-				600507D0184E1DCF0002314D /* FSXMLHttpRequest.m in Sources */,
-				6066DADB182427A30005E1A2 /* audio_queue.cpp in Sources */,
-				6066DADD182427A30005E1A2 /* audio_stream.cpp in Sources */,
-				6066DADF182427A30005E1A2 /* http_stream.cpp in Sources */,
-				6066DAE2182427A30005E1A2 /* FSXAppDelegate.m in Sources */,
-				601369D2182C36AA001819D6 /* id3_parser.cpp in Sources */,
-				609F6DAA18295F54000E45B2 /* FSParsePlaylistRequest.m in Sources */,
-				6066DAE4182427A30005E1A2 /* FSXPlayerViewController.m in Sources */,
-				609F6DA718295684000E45B2 /* FSCheckContentTypeRequest.m in Sources */,
-				6066DAE5182427A30005E1A2 /* main.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		6066DA32182422430005E1A2 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -538,30 +408,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				6066DA41182422430005E1A2 /* en */,
-			);
-			name = InfoPlist.strings;
-			sourceTree = "<group>";
-		};
-		6066DA69182422C40005E1A2 /* MainMenu.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				6066DA6A182422C40005E1A2 /* Base */,
-			);
-			name = MainMenu.xib;
-			sourceTree = "<group>";
-		};
-		6066DA70182422E00005E1A2 /* Credits.rtf */ = {
-			isa = PBXVariantGroup;
-			children = (
-				6066DA71182422E00005E1A2 /* en */,
-			);
-			name = Credits.rtf;
-			sourceTree = "<group>";
-		};
-		6066DA72182422E00005E1A2 /* InfoPlist.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				6066DA73182422E00005E1A2 /* en */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -637,42 +483,6 @@
 			};
 			name = Release;
 		};
-		6032288C182411B500B7027B /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				COMBINE_HIDPI_IMAGES = YES;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "";
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-					"$(SDKROOT)/usr/include/libxml2",
-				);
-				INFOPLIST_FILE = "$(SRCROOT)/FreeStreamerDesktop/FreeStreamer-Info.plist";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				WRAPPER_EXTENSION = app;
-			};
-			name = Debug;
-		};
-		6032288D182411B500B7027B /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				COMBINE_HIDPI_IMAGES = YES;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "";
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-					"$(SDKROOT)/usr/include/libxml2",
-				);
-				INFOPLIST_FILE = "$(SRCROOT)/FreeStreamerDesktop/FreeStreamer-Info.plist";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				WRAPPER_EXTENSION = app;
-			};
-			name = Release;
-		};
 		6066DA5D182422430005E1A2 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -739,20 +549,11 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		60322855182411B500B7027B /* Build configuration list for PBXProject "FreeStreamer" */ = {
+		60322855182411B500B7027B /* Build configuration list for PBXProject "FreeStreamerMobile" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				60322889182411B500B7027B /* Debug */,
 				6032288A182411B500B7027B /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		6032288B182411B500B7027B /* Build configuration list for PBXNativeTarget "FreeStreamerDesktop" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				6032288C182411B500B7027B /* Debug */,
-				6032288D182411B500B7027B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
