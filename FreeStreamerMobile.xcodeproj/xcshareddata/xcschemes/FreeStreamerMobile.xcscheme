@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "6066DA35182422430005E1A2"
+               BlueprintIdentifier = "60B813D118C532F8001CC5A7"
                BuildableName = "FreeStreamerMobile.app"
                BlueprintName = "FreeStreamerMobile"
                ReferencedContainer = "container:FreeStreamerMobile.xcodeproj">
@@ -28,11 +28,21 @@
       shouldUseLaunchSchemeArgsEnv = "YES"
       buildConfiguration = "Debug">
       <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "60B813EC18C532F8001CC5A7"
+               BuildableName = "FreeStreamerMobileTests.xctest"
+               BlueprintName = "FreeStreamerMobileTests"
+               ReferencedContainer = "container:FreeStreamerMobile.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "6066DA35182422430005E1A2"
+            BlueprintIdentifier = "60B813D118C532F8001CC5A7"
             BuildableName = "FreeStreamerMobile.app"
             BlueprintName = "FreeStreamerMobile"
             ReferencedContainer = "container:FreeStreamerMobile.xcodeproj">
@@ -51,7 +61,7 @@
       <BuildableProductRunnable>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "6066DA35182422430005E1A2"
+            BlueprintIdentifier = "60B813D118C532F8001CC5A7"
             BuildableName = "FreeStreamerMobile.app"
             BlueprintName = "FreeStreamerMobile"
             ReferencedContainer = "container:FreeStreamerMobile.xcodeproj">
@@ -69,7 +79,7 @@
       <BuildableProductRunnable>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "6066DA35182422430005E1A2"
+            BlueprintIdentifier = "60B813D118C532F8001CC5A7"
             BuildableName = "FreeStreamerMobile.app"
             BlueprintName = "FreeStreamerMobile"
             ReferencedContainer = "container:FreeStreamerMobile.xcodeproj">

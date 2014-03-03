@@ -7,303 +7,290 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		600507D2184E1E3D0002314D /* FSXMLHttpRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 600507CF184E1DCF0002314D /* FSXMLHttpRequest.m */; };
-		600507D6184E1FE10002314D /* FSParseRssPodcastFeedRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 600507D4184E1FC60002314D /* FSParseRssPodcastFeedRequest.m */; };
-		601369D3182C36AA001819D6 /* id3_parser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 601369D0182C36AA001819D6 /* id3_parser.cpp */; };
-		60228FC51850A9F400627B46 /* player-bg-image.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 60228FC41850A9F400627B46 /* player-bg-image.jpg */; };
-		60228FC71850B1AD00627B46 /* player-bg-image-pad.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 60228FC61850B1AD00627B46 /* player-bg-image-pad.jpg */; };
-		602C629C1847961A00EA657D /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 602C629A1847936B00EA657D /* Reachability.m */; };
-		604849E118662FE100E8F808 /* file_output.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 604849DE18662FE100E8F808 /* file_output.cpp */; };
-		6066DA38182422430005E1A2 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6066DA37182422430005E1A2 /* Foundation.framework */; };
-		6066DA3A182422430005E1A2 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6066DA39182422430005E1A2 /* CoreGraphics.framework */; };
-		6066DA3C182422430005E1A2 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6066DA3B182422430005E1A2 /* UIKit.framework */; };
-		6066DA42182422430005E1A2 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6066DA40182422430005E1A2 /* InfoPlist.strings */; };
-		6066DA44182422430005E1A2 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6066DA43182422430005E1A2 /* main.m */; };
-		6066DA48182422430005E1A2 /* FSAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 6066DA47182422430005E1A2 /* FSAppDelegate.m */; };
-		6066DA4A182422430005E1A2 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6066DA49182422430005E1A2 /* Images.xcassets */; };
-		6066DA83182424860005E1A2 /* button-pause.png in Resources */ = {isa = PBXBuildFile; fileRef = 6066DA7F182424860005E1A2 /* button-pause.png */; };
-		6066DA84182424860005E1A2 /* button-play.png in Resources */ = {isa = PBXBuildFile; fileRef = 6066DA80182424860005E1A2 /* button-play.png */; };
-		6066DA85182424860005E1A2 /* player-bg-bottom.png in Resources */ = {isa = PBXBuildFile; fileRef = 6066DA81182424860005E1A2 /* player-bg-bottom.png */; };
-		6066DA86182424860005E1A2 /* player-top-bg.png in Resources */ = {isa = PBXBuildFile; fileRef = 6066DA82182424860005E1A2 /* player-top-bg.png */; };
-		6066DA8A182424990005E1A2 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6066DA87182424990005E1A2 /* Default-568h@2x.png */; };
-		6066DA8B182424990005E1A2 /* Default.png in Resources */ = {isa = PBXBuildFile; fileRef = 6066DA88182424990005E1A2 /* Default.png */; };
-		6066DA8C182424990005E1A2 /* Default@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6066DA89182424990005E1A2 /* Default@2x.png */; };
-		6066DA8E182424B70005E1A2 /* FSMainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6066DA8D182424B70005E1A2 /* FSMainWindow.xib */; };
-		6066DA93182424C10005E1A2 /* FSPlayerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6066DA90182424C10005E1A2 /* FSPlayerViewController.m */; };
-		6066DA94182424C10005E1A2 /* FSPlaylistViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6066DA92182424C10005E1A2 /* FSPlaylistViewController.m */; };
-		6066DA96182424F20005E1A2 /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 6066DA95182424F20005E1A2 /* libxml2.dylib */; };
-		6066DA98182425000005E1A2 /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6066DA97182425000005E1A2 /* MediaPlayer.framework */; };
-		6066DA9A182425090005E1A2 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6066DA99182425090005E1A2 /* AudioToolbox.framework */; };
-		6066DA9C182425150005E1A2 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6066DA9B182425150005E1A2 /* CFNetwork.framework */; };
-		6066DA9E182425240005E1A2 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6066DA9D182425240005E1A2 /* AVFoundation.framework */; };
-		6066DABA182427330005E1A2 /* FSAudioController.m in Sources */ = {isa = PBXBuildFile; fileRef = 60CF9E521824156F00999FDF /* FSAudioController.m */; };
-		6066DABC182427330005E1A2 /* FSAudioStream.mm in Sources */ = {isa = PBXBuildFile; fileRef = 60CF9E541824156F00999FDF /* FSAudioStream.mm */; };
-		6066DAC0182427330005E1A2 /* FSPlaylistItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 60CF9E581824156F00999FDF /* FSPlaylistItem.m */; };
-		6066DAC31824273A0005E1A2 /* audio_queue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60AA8F70182412F9001DE57B /* audio_queue.cpp */; };
-		6066DAC51824273A0005E1A2 /* audio_stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60AA8F72182412F9001DE57B /* audio_stream.cpp */; };
-		6066DAC71824273A0005E1A2 /* http_stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60AA8F74182412F9001DE57B /* http_stream.cpp */; };
-		609F6DAB18295F54000E45B2 /* FSParsePlaylistRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 609F6DA918295F54000E45B2 /* FSParsePlaylistRequest.m */; };
-		609F6DAC182962C4000E45B2 /* FSCheckContentTypeRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 609F6DA618295684000E45B2 /* FSCheckContentTypeRequest.m */; };
-		609F6DB218296EBF000E45B2 /* FSParsePlaylistFeedRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 609F6DB118296EBF000E45B2 /* FSParsePlaylistFeedRequest.m */; };
-		60E750BC1896A7E000BAC7C8 /* FSFrequencyDomainAnalyzer.m in Sources */ = {isa = PBXBuildFile; fileRef = 60E750B71896A7BA00BAC7C8 /* FSFrequencyDomainAnalyzer.m */; };
-		60E750BD1896A7E500BAC7C8 /* FSFrequencyPlotView.m in Sources */ = {isa = PBXBuildFile; fileRef = 60E750B91896A7BA00BAC7C8 /* FSFrequencyPlotView.m */; };
+		60B813D618C532F8001CC5A7 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60B813D518C532F8001CC5A7 /* Foundation.framework */; };
+		60B813D818C532F8001CC5A7 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60B813D718C532F8001CC5A7 /* CoreGraphics.framework */; };
+		60B813DA18C532F8001CC5A7 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60B813D918C532F8001CC5A7 /* UIKit.framework */; };
+		60B813E018C532F8001CC5A7 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 60B813DE18C532F8001CC5A7 /* InfoPlist.strings */; };
+		60B813E218C532F8001CC5A7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 60B813E118C532F8001CC5A7 /* main.m */; };
+		60B813E618C532F8001CC5A7 /* FSAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 60B813E518C532F8001CC5A7 /* FSAppDelegate.m */; };
+		60B813E818C532F8001CC5A7 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 60B813E718C532F8001CC5A7 /* Images.xcassets */; };
+		60B813EF18C532F8001CC5A7 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60B813EE18C532F8001CC5A7 /* XCTest.framework */; };
+		60B813F018C532F8001CC5A7 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60B813D518C532F8001CC5A7 /* Foundation.framework */; };
+		60B813F118C532F8001CC5A7 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60B813D918C532F8001CC5A7 /* UIKit.framework */; };
+		60B813F918C532F8001CC5A7 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 60B813F718C532F8001CC5A7 /* InfoPlist.strings */; };
+		60B813FB18C532F8001CC5A7 /* FreeStreamerMobileTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 60B813FA18C532F8001CC5A7 /* FreeStreamerMobileTests.m */; };
+		60CF8BD518C5332F00C657A8 /* audio_queue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CF8BCB18C5332F00C657A8 /* audio_queue.cpp */; };
+		60CF8BD618C5332F00C657A8 /* audio_stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CF8BCD18C5332F00C657A8 /* audio_stream.cpp */; };
+		60CF8BD718C5332F00C657A8 /* file_output.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CF8BCF18C5332F00C657A8 /* file_output.cpp */; };
+		60CF8BD818C5332F00C657A8 /* http_stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CF8BD118C5332F00C657A8 /* http_stream.cpp */; };
+		60CF8BD918C5332F00C657A8 /* id3_parser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CF8BD318C5332F00C657A8 /* id3_parser.cpp */; };
+		60CF8BDF18C5333B00C657A8 /* FSFrequencyDomainAnalyzer.m in Sources */ = {isa = PBXBuildFile; fileRef = 60CF8BDC18C5333B00C657A8 /* FSFrequencyDomainAnalyzer.m */; };
+		60CF8BE018C5333B00C657A8 /* FSFrequencyPlotView.m in Sources */ = {isa = PBXBuildFile; fileRef = 60CF8BDE18C5333B00C657A8 /* FSFrequencyPlotView.m */; };
+		60CF8BE818C5335200C657A8 /* FSMainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 60CF8BE118C5335200C657A8 /* FSMainWindow.xib */; };
+		60CF8BE918C5335200C657A8 /* FSParsePlaylistFeedRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 60CF8BE318C5335200C657A8 /* FSParsePlaylistFeedRequest.m */; };
+		60CF8BEA18C5335200C657A8 /* FSPlayerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 60CF8BE518C5335200C657A8 /* FSPlayerViewController.m */; };
+		60CF8BEB18C5335200C657A8 /* FSPlaylistViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 60CF8BE718C5335200C657A8 /* FSPlaylistViewController.m */; };
+		60CF8BFD18C5337000C657A8 /* FSAudioController.m in Sources */ = {isa = PBXBuildFile; fileRef = 60CF8BEE18C5337000C657A8 /* FSAudioController.m */; };
+		60CF8BFE18C5337000C657A8 /* FSAudioStream.mm in Sources */ = {isa = PBXBuildFile; fileRef = 60CF8BF018C5337000C657A8 /* FSAudioStream.mm */; };
+		60CF8BFF18C5337000C657A8 /* FSCheckContentTypeRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 60CF8BF218C5337000C657A8 /* FSCheckContentTypeRequest.m */; };
+		60CF8C0018C5337000C657A8 /* FSParsePlaylistRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 60CF8BF418C5337000C657A8 /* FSParsePlaylistRequest.m */; };
+		60CF8C0118C5337000C657A8 /* FSParseRssPodcastFeedRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 60CF8BF618C5337000C657A8 /* FSParseRssPodcastFeedRequest.m */; };
+		60CF8C0218C5337000C657A8 /* FSPlaylistItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 60CF8BF818C5337000C657A8 /* FSPlaylistItem.m */; };
+		60CF8C0318C5337000C657A8 /* FSXMLHttpRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 60CF8BFA18C5337000C657A8 /* FSXMLHttpRequest.m */; };
+		60CF8C0418C5337000C657A8 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 60CF8BFC18C5337000C657A8 /* Reachability.m */; };
+		60CF8C0618C5339900C657A8 /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 60CF8C0518C5339900C657A8 /* libxml2.dylib */; };
+		60CF8C0818C5345A00C657A8 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60CF8C0718C5345A00C657A8 /* CFNetwork.framework */; };
+		60CF8C0A18C5345F00C657A8 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60CF8C0918C5345F00C657A8 /* AudioToolbox.framework */; };
+		60CF8C0C18C5346700C657A8 /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60CF8C0B18C5346700C657A8 /* MediaPlayer.framework */; };
+		60CF8C0E18C5346F00C657A8 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60CF8C0D18C5346F00C657A8 /* AVFoundation.framework */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		60B813F218C532F8001CC5A7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 60B813CA18C532F8001CC5A7 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 60B813D118C532F8001CC5A7;
+			remoteInfo = FreeStreamerMobile;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
-		600032761847CF94001C83BE /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
-		600507CE184E1DCF0002314D /* FSXMLHttpRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSXMLHttpRequest.h; sourceTree = "<group>"; };
-		600507CF184E1DCF0002314D /* FSXMLHttpRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSXMLHttpRequest.m; sourceTree = "<group>"; };
-		600507D3184E1FC60002314D /* FSParseRssPodcastFeedRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSParseRssPodcastFeedRequest.h; sourceTree = "<group>"; };
-		600507D4184E1FC60002314D /* FSParseRssPodcastFeedRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSParseRssPodcastFeedRequest.m; sourceTree = "<group>"; };
-		601369D0182C36AA001819D6 /* id3_parser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = id3_parser.cpp; path = astreamer/id3_parser.cpp; sourceTree = SOURCE_ROOT; };
-		601369D1182C36AA001819D6 /* id3_parser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = id3_parser.h; path = astreamer/id3_parser.h; sourceTree = SOURCE_ROOT; };
-		60228FC41850A9F400627B46 /* player-bg-image.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = "player-bg-image.jpg"; path = "Assets/Images/player-bg-image.jpg"; sourceTree = "<group>"; };
-		60228FC61850B1AD00627B46 /* player-bg-image-pad.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = "player-bg-image-pad.jpg"; path = "Assets/Images/player-bg-image-pad.jpg"; sourceTree = "<group>"; };
-		602C62991847936B00EA657D /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
-		602C629A1847936B00EA657D /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
-		6032285D182411B500B7027B /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
-		60322860182411B500B7027B /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
-		60322861182411B500B7027B /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
-		60322862182411B500B7027B /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		6032287C182411B500B7027B /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
-		6032289B1824121800B7027B /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
-		6032289D1824122700B7027B /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
-		6032289F1824123100B7027B /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
-		604849DE18662FE100E8F808 /* file_output.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = file_output.cpp; path = astreamer/file_output.cpp; sourceTree = SOURCE_ROOT; };
-		604849DF18662FE100E8F808 /* file_output.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = file_output.h; path = astreamer/file_output.h; sourceTree = SOURCE_ROOT; };
-		6066DA36182422430005E1A2 /* FreeStreamerMobile.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FreeStreamerMobile.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		6066DA37182422430005E1A2 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
-		6066DA39182422430005E1A2 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
-		6066DA3B182422430005E1A2 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
-		6066DA3F182422430005E1A2 /* FreeStreamerMobile-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "FreeStreamerMobile-Info.plist"; sourceTree = "<group>"; };
-		6066DA41182422430005E1A2 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		6066DA43182422430005E1A2 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		6066DA45182422430005E1A2 /* FreeStreamerMobile-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FreeStreamerMobile-Prefix.pch"; sourceTree = "<group>"; };
-		6066DA46182422430005E1A2 /* FSAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FSAppDelegate.h; sourceTree = "<group>"; };
-		6066DA47182422430005E1A2 /* FSAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FSAppDelegate.m; sourceTree = "<group>"; };
-		6066DA49182422430005E1A2 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
-		6066DA7F182424860005E1A2 /* button-pause.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "button-pause.png"; path = "Assets/Images/button-pause.png"; sourceTree = "<group>"; };
-		6066DA80182424860005E1A2 /* button-play.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "button-play.png"; path = "Assets/Images/button-play.png"; sourceTree = "<group>"; };
-		6066DA81182424860005E1A2 /* player-bg-bottom.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "player-bg-bottom.png"; path = "Assets/Images/player-bg-bottom.png"; sourceTree = "<group>"; };
-		6066DA82182424860005E1A2 /* player-top-bg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "player-top-bg.png"; path = "Assets/Images/player-top-bg.png"; sourceTree = "<group>"; };
-		6066DA87182424990005E1A2 /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
-		6066DA88182424990005E1A2 /* Default.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Default.png; sourceTree = "<group>"; };
-		6066DA89182424990005E1A2 /* Default@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default@2x.png"; sourceTree = "<group>"; };
-		6066DA8D182424B70005E1A2 /* FSMainWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = FSMainWindow.xib; sourceTree = "<group>"; };
-		6066DA8F182424C10005E1A2 /* FSPlayerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSPlayerViewController.h; sourceTree = "<group>"; };
-		6066DA90182424C10005E1A2 /* FSPlayerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSPlayerViewController.m; sourceTree = "<group>"; };
-		6066DA91182424C10005E1A2 /* FSPlaylistViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSPlaylistViewController.h; sourceTree = "<group>"; };
-		6066DA92182424C10005E1A2 /* FSPlaylistViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSPlaylistViewController.m; sourceTree = "<group>"; };
-		6066DA95182424F20005E1A2 /* libxml2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.dylib; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.0.sdk/usr/lib/libxml2.dylib; sourceTree = DEVELOPER_DIR; };
-		6066DA97182425000005E1A2 /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.0.sdk/System/Library/Frameworks/MediaPlayer.framework; sourceTree = DEVELOPER_DIR; };
-		6066DA99182425090005E1A2 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.0.sdk/System/Library/Frameworks/AudioToolbox.framework; sourceTree = DEVELOPER_DIR; };
-		6066DA9B182425150005E1A2 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.0.sdk/System/Library/Frameworks/CFNetwork.framework; sourceTree = DEVELOPER_DIR; };
-		6066DA9D182425240005E1A2 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.0.sdk/System/Library/Frameworks/AVFoundation.framework; sourceTree = DEVELOPER_DIR; };
-		609F6DA518295684000E45B2 /* FSCheckContentTypeRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSCheckContentTypeRequest.h; sourceTree = "<group>"; };
-		609F6DA618295684000E45B2 /* FSCheckContentTypeRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSCheckContentTypeRequest.m; sourceTree = "<group>"; };
-		609F6DA818295F54000E45B2 /* FSParsePlaylistRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSParsePlaylistRequest.h; sourceTree = "<group>"; };
-		609F6DA918295F54000E45B2 /* FSParsePlaylistRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSParsePlaylistRequest.m; sourceTree = "<group>"; };
-		609F6DB018296EBF000E45B2 /* FSParsePlaylistFeedRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSParsePlaylistFeedRequest.h; sourceTree = "<group>"; };
-		609F6DB118296EBF000E45B2 /* FSParsePlaylistFeedRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSParsePlaylistFeedRequest.m; sourceTree = "<group>"; };
-		60AA8F70182412F9001DE57B /* audio_queue.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = audio_queue.cpp; path = astreamer/audio_queue.cpp; sourceTree = SOURCE_ROOT; };
-		60AA8F71182412F9001DE57B /* audio_queue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = audio_queue.h; path = astreamer/audio_queue.h; sourceTree = SOURCE_ROOT; };
-		60AA8F72182412F9001DE57B /* audio_stream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = audio_stream.cpp; path = astreamer/audio_stream.cpp; sourceTree = SOURCE_ROOT; };
-		60AA8F73182412F9001DE57B /* audio_stream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = audio_stream.h; path = astreamer/audio_stream.h; sourceTree = SOURCE_ROOT; };
-		60AA8F74182412F9001DE57B /* http_stream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = http_stream.cpp; path = astreamer/http_stream.cpp; sourceTree = SOURCE_ROOT; };
-		60AA8F75182412F9001DE57B /* http_stream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = http_stream.h; path = astreamer/http_stream.h; sourceTree = SOURCE_ROOT; };
-		60CF9E511824156F00999FDF /* FSAudioController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSAudioController.h; sourceTree = "<group>"; };
-		60CF9E521824156F00999FDF /* FSAudioController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSAudioController.m; sourceTree = "<group>"; };
-		60CF9E531824156F00999FDF /* FSAudioStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSAudioStream.h; sourceTree = "<group>"; };
-		60CF9E541824156F00999FDF /* FSAudioStream.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = FSAudioStream.mm; sourceTree = "<group>"; };
-		60CF9E571824156F00999FDF /* FSPlaylistItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSPlaylistItem.h; sourceTree = "<group>"; };
-		60CF9E581824156F00999FDF /* FSPlaylistItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSPlaylistItem.m; sourceTree = "<group>"; };
-		60CF9E601824158C00999FDF /* libxml2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.dylib; path = usr/lib/libxml2.dylib; sourceTree = SDKROOT; };
-		60E750B61896A7BA00BAC7C8 /* FSFrequencyDomainAnalyzer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FSFrequencyDomainAnalyzer.h; path = Additions/FSFrequencyDomainAnalyzer.h; sourceTree = "<group>"; };
-		60E750B71896A7BA00BAC7C8 /* FSFrequencyDomainAnalyzer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FSFrequencyDomainAnalyzer.m; path = Additions/FSFrequencyDomainAnalyzer.m; sourceTree = "<group>"; };
-		60E750B81896A7BA00BAC7C8 /* FSFrequencyPlotView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FSFrequencyPlotView.h; path = Additions/FSFrequencyPlotView.h; sourceTree = "<group>"; };
-		60E750B91896A7BA00BAC7C8 /* FSFrequencyPlotView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FSFrequencyPlotView.m; path = Additions/FSFrequencyPlotView.m; sourceTree = "<group>"; };
+		60B813D218C532F8001CC5A7 /* FreeStreamerMobile.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FreeStreamerMobile.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		60B813D518C532F8001CC5A7 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		60B813D718C532F8001CC5A7 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		60B813D918C532F8001CC5A7 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		60B813DD18C532F8001CC5A7 /* FreeStreamerMobile-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "FreeStreamerMobile-Info.plist"; sourceTree = "<group>"; };
+		60B813DF18C532F8001CC5A7 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		60B813E118C532F8001CC5A7 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		60B813E318C532F8001CC5A7 /* FreeStreamerMobile-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FreeStreamerMobile-Prefix.pch"; sourceTree = "<group>"; };
+		60B813E418C532F8001CC5A7 /* FSAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FSAppDelegate.h; sourceTree = "<group>"; };
+		60B813E518C532F8001CC5A7 /* FSAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FSAppDelegate.m; sourceTree = "<group>"; };
+		60B813E718C532F8001CC5A7 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		60B813ED18C532F8001CC5A7 /* FreeStreamerMobileTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FreeStreamerMobileTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		60B813EE18C532F8001CC5A7 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
+		60B813F618C532F8001CC5A7 /* FreeStreamerMobileTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "FreeStreamerMobileTests-Info.plist"; sourceTree = "<group>"; };
+		60B813F818C532F8001CC5A7 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		60B813FA18C532F8001CC5A7 /* FreeStreamerMobileTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FreeStreamerMobileTests.m; sourceTree = "<group>"; };
+		60CF8BCB18C5332F00C657A8 /* audio_queue.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = audio_queue.cpp; sourceTree = "<group>"; };
+		60CF8BCC18C5332F00C657A8 /* audio_queue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = audio_queue.h; sourceTree = "<group>"; };
+		60CF8BCD18C5332F00C657A8 /* audio_stream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = audio_stream.cpp; sourceTree = "<group>"; };
+		60CF8BCE18C5332F00C657A8 /* audio_stream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = audio_stream.h; sourceTree = "<group>"; };
+		60CF8BCF18C5332F00C657A8 /* file_output.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = file_output.cpp; sourceTree = "<group>"; };
+		60CF8BD018C5332F00C657A8 /* file_output.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = file_output.h; sourceTree = "<group>"; };
+		60CF8BD118C5332F00C657A8 /* http_stream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = http_stream.cpp; sourceTree = "<group>"; };
+		60CF8BD218C5332F00C657A8 /* http_stream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = http_stream.h; sourceTree = "<group>"; };
+		60CF8BD318C5332F00C657A8 /* id3_parser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = id3_parser.cpp; sourceTree = "<group>"; };
+		60CF8BD418C5332F00C657A8 /* id3_parser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = id3_parser.h; sourceTree = "<group>"; };
+		60CF8BDB18C5333B00C657A8 /* FSFrequencyDomainAnalyzer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSFrequencyDomainAnalyzer.h; sourceTree = "<group>"; };
+		60CF8BDC18C5333B00C657A8 /* FSFrequencyDomainAnalyzer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSFrequencyDomainAnalyzer.m; sourceTree = "<group>"; };
+		60CF8BDD18C5333B00C657A8 /* FSFrequencyPlotView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSFrequencyPlotView.h; sourceTree = "<group>"; };
+		60CF8BDE18C5333B00C657A8 /* FSFrequencyPlotView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSFrequencyPlotView.m; sourceTree = "<group>"; };
+		60CF8BE118C5335200C657A8 /* FSMainWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = FSMainWindow.xib; sourceTree = "<group>"; };
+		60CF8BE218C5335200C657A8 /* FSParsePlaylistFeedRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSParsePlaylistFeedRequest.h; sourceTree = "<group>"; };
+		60CF8BE318C5335200C657A8 /* FSParsePlaylistFeedRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSParsePlaylistFeedRequest.m; sourceTree = "<group>"; };
+		60CF8BE418C5335200C657A8 /* FSPlayerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSPlayerViewController.h; sourceTree = "<group>"; };
+		60CF8BE518C5335200C657A8 /* FSPlayerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSPlayerViewController.m; sourceTree = "<group>"; };
+		60CF8BE618C5335200C657A8 /* FSPlaylistViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSPlaylistViewController.h; sourceTree = "<group>"; };
+		60CF8BE718C5335200C657A8 /* FSPlaylistViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSPlaylistViewController.m; sourceTree = "<group>"; };
+		60CF8BED18C5337000C657A8 /* FSAudioController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSAudioController.h; sourceTree = "<group>"; };
+		60CF8BEE18C5337000C657A8 /* FSAudioController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSAudioController.m; sourceTree = "<group>"; };
+		60CF8BEF18C5337000C657A8 /* FSAudioStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSAudioStream.h; sourceTree = "<group>"; };
+		60CF8BF018C5337000C657A8 /* FSAudioStream.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = FSAudioStream.mm; sourceTree = "<group>"; };
+		60CF8BF118C5337000C657A8 /* FSCheckContentTypeRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSCheckContentTypeRequest.h; sourceTree = "<group>"; };
+		60CF8BF218C5337000C657A8 /* FSCheckContentTypeRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSCheckContentTypeRequest.m; sourceTree = "<group>"; };
+		60CF8BF318C5337000C657A8 /* FSParsePlaylistRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSParsePlaylistRequest.h; sourceTree = "<group>"; };
+		60CF8BF418C5337000C657A8 /* FSParsePlaylistRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSParsePlaylistRequest.m; sourceTree = "<group>"; };
+		60CF8BF518C5337000C657A8 /* FSParseRssPodcastFeedRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSParseRssPodcastFeedRequest.h; sourceTree = "<group>"; };
+		60CF8BF618C5337000C657A8 /* FSParseRssPodcastFeedRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSParseRssPodcastFeedRequest.m; sourceTree = "<group>"; };
+		60CF8BF718C5337000C657A8 /* FSPlaylistItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSPlaylistItem.h; sourceTree = "<group>"; };
+		60CF8BF818C5337000C657A8 /* FSPlaylistItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSPlaylistItem.m; sourceTree = "<group>"; };
+		60CF8BF918C5337000C657A8 /* FSXMLHttpRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSXMLHttpRequest.h; sourceTree = "<group>"; };
+		60CF8BFA18C5337000C657A8 /* FSXMLHttpRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSXMLHttpRequest.m; sourceTree = "<group>"; };
+		60CF8BFB18C5337000C657A8 /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
+		60CF8BFC18C5337000C657A8 /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
+		60CF8C0518C5339900C657A8 /* libxml2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.dylib; path = usr/lib/libxml2.dylib; sourceTree = SDKROOT; };
+		60CF8C0718C5345A00C657A8 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
+		60CF8C0918C5345F00C657A8 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
+		60CF8C0B18C5346700C657A8 /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
+		60CF8C0D18C5346F00C657A8 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		6066DA33182422430005E1A2 /* Frameworks */ = {
+		60B813CF18C532F8001CC5A7 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6066DA9E182425240005E1A2 /* AVFoundation.framework in Frameworks */,
-				6066DA9C182425150005E1A2 /* CFNetwork.framework in Frameworks */,
-				6066DA9A182425090005E1A2 /* AudioToolbox.framework in Frameworks */,
-				6066DA98182425000005E1A2 /* MediaPlayer.framework in Frameworks */,
-				6066DA96182424F20005E1A2 /* libxml2.dylib in Frameworks */,
-				6066DA3A182422430005E1A2 /* CoreGraphics.framework in Frameworks */,
-				6066DA3C182422430005E1A2 /* UIKit.framework in Frameworks */,
-				6066DA38182422430005E1A2 /* Foundation.framework in Frameworks */,
+				60CF8C0E18C5346F00C657A8 /* AVFoundation.framework in Frameworks */,
+				60CF8C0C18C5346700C657A8 /* MediaPlayer.framework in Frameworks */,
+				60CF8C0A18C5345F00C657A8 /* AudioToolbox.framework in Frameworks */,
+				60CF8C0818C5345A00C657A8 /* CFNetwork.framework in Frameworks */,
+				60CF8C0618C5339900C657A8 /* libxml2.dylib in Frameworks */,
+				60B813D818C532F8001CC5A7 /* CoreGraphics.framework in Frameworks */,
+				60B813DA18C532F8001CC5A7 /* UIKit.framework in Frameworks */,
+				60B813D618C532F8001CC5A7 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		60B813EA18C532F8001CC5A7 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				60B813EF18C532F8001CC5A7 /* XCTest.framework in Frameworks */,
+				60B813F118C532F8001CC5A7 /* UIKit.framework in Frameworks */,
+				60B813F018C532F8001CC5A7 /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		60322851182411B500B7027B = {
+		60B813C918C532F8001CC5A7 = {
 			isa = PBXGroup;
 			children = (
-				60E750B51896A7B000BAC7C8 /* Additions */,
-				60CF9E501824156F00999FDF /* Common */,
-				60322891182411F000B7027B /* astreamer */,
-				6066DA3D182422430005E1A2 /* FreeStreamerMobile */,
-				6032285C182411B500B7027B /* Frameworks */,
-				6032285B182411B500B7027B /* Products */,
+				60CF8BEC18C5337000C657A8 /* Common */,
+				60CF8BDA18C5333B00C657A8 /* Additions */,
+				60CF8BCA18C5332F00C657A8 /* astreamer */,
+				60B813DB18C532F8001CC5A7 /* FreeStreamerMobile */,
+				60B813F418C532F8001CC5A7 /* FreeStreamerMobileTests */,
+				60B813D418C532F8001CC5A7 /* Frameworks */,
+				60B813D318C532F8001CC5A7 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		6032285B182411B500B7027B /* Products */ = {
+		60B813D318C532F8001CC5A7 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				6066DA36182422430005E1A2 /* FreeStreamerMobile.app */,
+				60B813D218C532F8001CC5A7 /* FreeStreamerMobile.app */,
+				60B813ED18C532F8001CC5A7 /* FreeStreamerMobileTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		6032285C182411B500B7027B /* Frameworks */ = {
+		60B813D418C532F8001CC5A7 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				600032761847CF94001C83BE /* SystemConfiguration.framework */,
-				6066DA9D182425240005E1A2 /* AVFoundation.framework */,
-				6066DA9B182425150005E1A2 /* CFNetwork.framework */,
-				6066DA99182425090005E1A2 /* AudioToolbox.framework */,
-				6066DA97182425000005E1A2 /* MediaPlayer.framework */,
-				6066DA95182424F20005E1A2 /* libxml2.dylib */,
-				60CF9E601824158C00999FDF /* libxml2.dylib */,
-				6032289F1824123100B7027B /* CFNetwork.framework */,
-				6032289D1824122700B7027B /* AudioToolbox.framework */,
-				6032289B1824121800B7027B /* AVFoundation.framework */,
-				6032285D182411B500B7027B /* Cocoa.framework */,
-				6032287C182411B500B7027B /* XCTest.framework */,
-				6066DA37182422430005E1A2 /* Foundation.framework */,
-				6066DA39182422430005E1A2 /* CoreGraphics.framework */,
-				6066DA3B182422430005E1A2 /* UIKit.framework */,
-				6032285F182411B500B7027B /* Other Frameworks */,
+				60CF8C0D18C5346F00C657A8 /* AVFoundation.framework */,
+				60CF8C0B18C5346700C657A8 /* MediaPlayer.framework */,
+				60CF8C0918C5345F00C657A8 /* AudioToolbox.framework */,
+				60CF8C0718C5345A00C657A8 /* CFNetwork.framework */,
+				60CF8C0518C5339900C657A8 /* libxml2.dylib */,
+				60B813D518C532F8001CC5A7 /* Foundation.framework */,
+				60B813D718C532F8001CC5A7 /* CoreGraphics.framework */,
+				60B813D918C532F8001CC5A7 /* UIKit.framework */,
+				60B813EE18C532F8001CC5A7 /* XCTest.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		6032285F182411B500B7027B /* Other Frameworks */ = {
+		60B813DB18C532F8001CC5A7 /* FreeStreamerMobile */ = {
 			isa = PBXGroup;
 			children = (
-				60322860182411B500B7027B /* AppKit.framework */,
-				60322861182411B500B7027B /* CoreData.framework */,
-				60322862182411B500B7027B /* Foundation.framework */,
-			);
-			name = "Other Frameworks";
-			sourceTree = "<group>";
-		};
-		60322891182411F000B7027B /* astreamer */ = {
-			isa = PBXGroup;
-			children = (
-				604849DE18662FE100E8F808 /* file_output.cpp */,
-				604849DF18662FE100E8F808 /* file_output.h */,
-				601369D0182C36AA001819D6 /* id3_parser.cpp */,
-				601369D1182C36AA001819D6 /* id3_parser.h */,
-				60AA8F70182412F9001DE57B /* audio_queue.cpp */,
-				60AA8F71182412F9001DE57B /* audio_queue.h */,
-				60AA8F72182412F9001DE57B /* audio_stream.cpp */,
-				60AA8F73182412F9001DE57B /* audio_stream.h */,
-				60AA8F74182412F9001DE57B /* http_stream.cpp */,
-				60AA8F75182412F9001DE57B /* http_stream.h */,
-			);
-			name = astreamer;
-			path = FreeStreamer/astreamer;
-			sourceTree = "<group>";
-		};
-		6066DA3D182422430005E1A2 /* FreeStreamerMobile */ = {
-			isa = PBXGroup;
-			children = (
-				609F6DB018296EBF000E45B2 /* FSParsePlaylistFeedRequest.h */,
-				609F6DB118296EBF000E45B2 /* FSParsePlaylistFeedRequest.m */,
-				6066DA8F182424C10005E1A2 /* FSPlayerViewController.h */,
-				6066DA90182424C10005E1A2 /* FSPlayerViewController.m */,
-				6066DA91182424C10005E1A2 /* FSPlaylistViewController.h */,
-				6066DA92182424C10005E1A2 /* FSPlaylistViewController.m */,
-				6066DA8D182424B70005E1A2 /* FSMainWindow.xib */,
-				6066DA46182422430005E1A2 /* FSAppDelegate.h */,
-				6066DA47182422430005E1A2 /* FSAppDelegate.m */,
-				6066DA49182422430005E1A2 /* Images.xcassets */,
-				6066DA3E182422430005E1A2 /* Supporting Files */,
+				60CF8BE118C5335200C657A8 /* FSMainWindow.xib */,
+				60CF8BE218C5335200C657A8 /* FSParsePlaylistFeedRequest.h */,
+				60CF8BE318C5335200C657A8 /* FSParsePlaylistFeedRequest.m */,
+				60CF8BE418C5335200C657A8 /* FSPlayerViewController.h */,
+				60CF8BE518C5335200C657A8 /* FSPlayerViewController.m */,
+				60CF8BE618C5335200C657A8 /* FSPlaylistViewController.h */,
+				60CF8BE718C5335200C657A8 /* FSPlaylistViewController.m */,
+				60B813E418C532F8001CC5A7 /* FSAppDelegate.h */,
+				60B813E518C532F8001CC5A7 /* FSAppDelegate.m */,
+				60B813E718C532F8001CC5A7 /* Images.xcassets */,
+				60B813DC18C532F8001CC5A7 /* Supporting Files */,
 			);
 			path = FreeStreamerMobile;
 			sourceTree = "<group>";
 		};
-		6066DA3E182422430005E1A2 /* Supporting Files */ = {
+		60B813DC18C532F8001CC5A7 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				6066DA78182424550005E1A2 /* Images */,
-				6066DA87182424990005E1A2 /* Default-568h@2x.png */,
-				6066DA88182424990005E1A2 /* Default.png */,
-				6066DA89182424990005E1A2 /* Default@2x.png */,
-				6066DA3F182422430005E1A2 /* FreeStreamerMobile-Info.plist */,
-				6066DA40182422430005E1A2 /* InfoPlist.strings */,
-				6066DA43182422430005E1A2 /* main.m */,
-				6066DA45182422430005E1A2 /* FreeStreamerMobile-Prefix.pch */,
+				60B813DD18C532F8001CC5A7 /* FreeStreamerMobile-Info.plist */,
+				60B813DE18C532F8001CC5A7 /* InfoPlist.strings */,
+				60B813E118C532F8001CC5A7 /* main.m */,
+				60B813E318C532F8001CC5A7 /* FreeStreamerMobile-Prefix.pch */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		6066DA78182424550005E1A2 /* Images */ = {
+		60B813F418C532F8001CC5A7 /* FreeStreamerMobileTests */ = {
 			isa = PBXGroup;
 			children = (
-				60228FC61850B1AD00627B46 /* player-bg-image-pad.jpg */,
-				60228FC41850A9F400627B46 /* player-bg-image.jpg */,
-				6066DA7F182424860005E1A2 /* button-pause.png */,
-				6066DA80182424860005E1A2 /* button-play.png */,
-				6066DA81182424860005E1A2 /* player-bg-bottom.png */,
-				6066DA82182424860005E1A2 /* player-top-bg.png */,
+				60B813FA18C532F8001CC5A7 /* FreeStreamerMobileTests.m */,
+				60B813F518C532F8001CC5A7 /* Supporting Files */,
 			);
-			name = Images;
+			path = FreeStreamerMobileTests;
 			sourceTree = "<group>";
 		};
-		60CF9E501824156F00999FDF /* Common */ = {
+		60B813F518C532F8001CC5A7 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				600507D3184E1FC60002314D /* FSParseRssPodcastFeedRequest.h */,
-				600507D4184E1FC60002314D /* FSParseRssPodcastFeedRequest.m */,
-				600507CE184E1DCF0002314D /* FSXMLHttpRequest.h */,
-				600507CF184E1DCF0002314D /* FSXMLHttpRequest.m */,
-				602C62991847936B00EA657D /* Reachability.h */,
-				602C629A1847936B00EA657D /* Reachability.m */,
-				60CF9E511824156F00999FDF /* FSAudioController.h */,
-				60CF9E521824156F00999FDF /* FSAudioController.m */,
-				60CF9E531824156F00999FDF /* FSAudioStream.h */,
-				60CF9E541824156F00999FDF /* FSAudioStream.mm */,
-				60CF9E571824156F00999FDF /* FSPlaylistItem.h */,
-				60CF9E581824156F00999FDF /* FSPlaylistItem.m */,
-				609F6DA518295684000E45B2 /* FSCheckContentTypeRequest.h */,
-				609F6DA618295684000E45B2 /* FSCheckContentTypeRequest.m */,
-				609F6DA818295F54000E45B2 /* FSParsePlaylistRequest.h */,
-				609F6DA918295F54000E45B2 /* FSParsePlaylistRequest.m */,
+				60B813F618C532F8001CC5A7 /* FreeStreamerMobileTests-Info.plist */,
+				60B813F718C532F8001CC5A7 /* InfoPlist.strings */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		60CF8BCA18C5332F00C657A8 /* astreamer */ = {
+			isa = PBXGroup;
+			children = (
+				60CF8BCB18C5332F00C657A8 /* audio_queue.cpp */,
+				60CF8BCC18C5332F00C657A8 /* audio_queue.h */,
+				60CF8BCD18C5332F00C657A8 /* audio_stream.cpp */,
+				60CF8BCE18C5332F00C657A8 /* audio_stream.h */,
+				60CF8BCF18C5332F00C657A8 /* file_output.cpp */,
+				60CF8BD018C5332F00C657A8 /* file_output.h */,
+				60CF8BD118C5332F00C657A8 /* http_stream.cpp */,
+				60CF8BD218C5332F00C657A8 /* http_stream.h */,
+				60CF8BD318C5332F00C657A8 /* id3_parser.cpp */,
+				60CF8BD418C5332F00C657A8 /* id3_parser.h */,
+			);
+			path = astreamer;
+			sourceTree = "<group>";
+		};
+		60CF8BDA18C5333B00C657A8 /* Additions */ = {
+			isa = PBXGroup;
+			children = (
+				60CF8BDB18C5333B00C657A8 /* FSFrequencyDomainAnalyzer.h */,
+				60CF8BDC18C5333B00C657A8 /* FSFrequencyDomainAnalyzer.m */,
+				60CF8BDD18C5333B00C657A8 /* FSFrequencyPlotView.h */,
+				60CF8BDE18C5333B00C657A8 /* FSFrequencyPlotView.m */,
+			);
+			path = Additions;
+			sourceTree = "<group>";
+		};
+		60CF8BEC18C5337000C657A8 /* Common */ = {
+			isa = PBXGroup;
+			children = (
+				60CF8BED18C5337000C657A8 /* FSAudioController.h */,
+				60CF8BEE18C5337000C657A8 /* FSAudioController.m */,
+				60CF8BEF18C5337000C657A8 /* FSAudioStream.h */,
+				60CF8BF018C5337000C657A8 /* FSAudioStream.mm */,
+				60CF8BF118C5337000C657A8 /* FSCheckContentTypeRequest.h */,
+				60CF8BF218C5337000C657A8 /* FSCheckContentTypeRequest.m */,
+				60CF8BF318C5337000C657A8 /* FSParsePlaylistRequest.h */,
+				60CF8BF418C5337000C657A8 /* FSParsePlaylistRequest.m */,
+				60CF8BF518C5337000C657A8 /* FSParseRssPodcastFeedRequest.h */,
+				60CF8BF618C5337000C657A8 /* FSParseRssPodcastFeedRequest.m */,
+				60CF8BF718C5337000C657A8 /* FSPlaylistItem.h */,
+				60CF8BF818C5337000C657A8 /* FSPlaylistItem.m */,
+				60CF8BF918C5337000C657A8 /* FSXMLHttpRequest.h */,
+				60CF8BFA18C5337000C657A8 /* FSXMLHttpRequest.m */,
+				60CF8BFB18C5337000C657A8 /* Reachability.h */,
+				60CF8BFC18C5337000C657A8 /* Reachability.m */,
 			);
 			path = Common;
-			sourceTree = SOURCE_ROOT;
-		};
-		60E750B51896A7B000BAC7C8 /* Additions */ = {
-			isa = PBXGroup;
-			children = (
-				60E750B61896A7BA00BAC7C8 /* FSFrequencyDomainAnalyzer.h */,
-				60E750B71896A7BA00BAC7C8 /* FSFrequencyDomainAnalyzer.m */,
-				60E750B81896A7BA00BAC7C8 /* FSFrequencyPlotView.h */,
-				60E750B91896A7BA00BAC7C8 /* FSFrequencyPlotView.m */,
-			);
-			name = Additions;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		6066DA35182422430005E1A2 /* FreeStreamerMobile */ = {
+		60B813D118C532F8001CC5A7 /* FreeStreamerMobile */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 6066DA61182422430005E1A2 /* Build configuration list for PBXNativeTarget "FreeStreamerMobile" */;
+			buildConfigurationList = 60B813FE18C532F8001CC5A7 /* Build configuration list for PBXNativeTarget "FreeStreamerMobile" */;
 			buildPhases = (
-				6066DA32182422430005E1A2 /* Sources */,
-				6066DA33182422430005E1A2 /* Frameworks */,
-				6066DA34182422430005E1A2 /* Resources */,
+				60B813CE18C532F8001CC5A7 /* Sources */,
+				60B813CF18C532F8001CC5A7 /* Frameworks */,
+				60B813D018C532F8001CC5A7 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -311,103 +298,140 @@
 			);
 			name = FreeStreamerMobile;
 			productName = FreeStreamerMobile;
-			productReference = 6066DA36182422430005E1A2 /* FreeStreamerMobile.app */;
+			productReference = 60B813D218C532F8001CC5A7 /* FreeStreamerMobile.app */;
 			productType = "com.apple.product-type.application";
+		};
+		60B813EC18C532F8001CC5A7 /* FreeStreamerMobileTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 60B8140118C532F8001CC5A7 /* Build configuration list for PBXNativeTarget "FreeStreamerMobileTests" */;
+			buildPhases = (
+				60B813E918C532F8001CC5A7 /* Sources */,
+				60B813EA18C532F8001CC5A7 /* Frameworks */,
+				60B813EB18C532F8001CC5A7 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				60B813F318C532F8001CC5A7 /* PBXTargetDependency */,
+			);
+			name = FreeStreamerMobileTests;
+			productName = FreeStreamerMobileTests;
+			productReference = 60B813ED18C532F8001CC5A7 /* FreeStreamerMobileTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		60322852182411B500B7027B /* Project object */ = {
+		60B813CA18C532F8001CC5A7 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				CLASSPREFIX = FS;
 				LastUpgradeCheck = 0500;
 				ORGANIZATIONNAME = "Matias Muhonen";
 				TargetAttributes = {
-					6066DA35182422430005E1A2 = {
-						SystemCapabilities = {
-							com.apple.BackgroundModes = {
-								enabled = 1;
-							};
-						};
+					60B813EC18C532F8001CC5A7 = {
+						TestTargetID = 60B813D118C532F8001CC5A7;
 					};
 				};
 			};
-			buildConfigurationList = 60322855182411B500B7027B /* Build configuration list for PBXProject "FreeStreamerMobile" */;
+			buildConfigurationList = 60B813CD18C532F8001CC5A7 /* Build configuration list for PBXProject "FreeStreamerMobile" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
-				Base,
 			);
-			mainGroup = 60322851182411B500B7027B;
-			productRefGroup = 6032285B182411B500B7027B /* Products */;
+			mainGroup = 60B813C918C532F8001CC5A7;
+			productRefGroup = 60B813D318C532F8001CC5A7 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				6066DA35182422430005E1A2 /* FreeStreamerMobile */,
+				60B813D118C532F8001CC5A7 /* FreeStreamerMobile */,
+				60B813EC18C532F8001CC5A7 /* FreeStreamerMobileTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		6066DA34182422430005E1A2 /* Resources */ = {
+		60B813D018C532F8001CC5A7 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6066DA42182422430005E1A2 /* InfoPlist.strings in Resources */,
-				6066DA84182424860005E1A2 /* button-play.png in Resources */,
-				6066DA4A182422430005E1A2 /* Images.xcassets in Resources */,
-				6066DA8C182424990005E1A2 /* Default@2x.png in Resources */,
-				6066DA8B182424990005E1A2 /* Default.png in Resources */,
-				6066DA85182424860005E1A2 /* player-bg-bottom.png in Resources */,
-				6066DA83182424860005E1A2 /* button-pause.png in Resources */,
-				6066DA8A182424990005E1A2 /* Default-568h@2x.png in Resources */,
-				6066DA86182424860005E1A2 /* player-top-bg.png in Resources */,
-				6066DA8E182424B70005E1A2 /* FSMainWindow.xib in Resources */,
-				60228FC51850A9F400627B46 /* player-bg-image.jpg in Resources */,
-				60228FC71850B1AD00627B46 /* player-bg-image-pad.jpg in Resources */,
+				60B813E018C532F8001CC5A7 /* InfoPlist.strings in Resources */,
+				60CF8BE818C5335200C657A8 /* FSMainWindow.xib in Resources */,
+				60B813E818C532F8001CC5A7 /* Images.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		60B813EB18C532F8001CC5A7 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				60B813F918C532F8001CC5A7 /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		6066DA32182422430005E1A2 /* Sources */ = {
+		60B813CE18C532F8001CC5A7 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				60E750BD1896A7E500BAC7C8 /* FSFrequencyPlotView.m in Sources */,
-				60E750BC1896A7E000BAC7C8 /* FSFrequencyDomainAnalyzer.m in Sources */,
-				600507D6184E1FE10002314D /* FSParseRssPodcastFeedRequest.m in Sources */,
-				600507D2184E1E3D0002314D /* FSXMLHttpRequest.m in Sources */,
-				602C629C1847961A00EA657D /* Reachability.m in Sources */,
-				609F6DAC182962C4000E45B2 /* FSCheckContentTypeRequest.m in Sources */,
-				6066DAC31824273A0005E1A2 /* audio_queue.cpp in Sources */,
-				6066DAC51824273A0005E1A2 /* audio_stream.cpp in Sources */,
-				601369D3182C36AA001819D6 /* id3_parser.cpp in Sources */,
-				6066DAC71824273A0005E1A2 /* http_stream.cpp in Sources */,
-				6066DABA182427330005E1A2 /* FSAudioController.m in Sources */,
-				6066DABC182427330005E1A2 /* FSAudioStream.mm in Sources */,
-				6066DAC0182427330005E1A2 /* FSPlaylistItem.m in Sources */,
-				609F6DB218296EBF000E45B2 /* FSParsePlaylistFeedRequest.m in Sources */,
-				604849E118662FE100E8F808 /* file_output.cpp in Sources */,
-				6066DA44182422430005E1A2 /* main.m in Sources */,
-				609F6DAB18295F54000E45B2 /* FSParsePlaylistRequest.m in Sources */,
-				6066DA48182422430005E1A2 /* FSAppDelegate.m in Sources */,
-				6066DA93182424C10005E1A2 /* FSPlayerViewController.m in Sources */,
-				6066DA94182424C10005E1A2 /* FSPlaylistViewController.m in Sources */,
+				60CF8BFF18C5337000C657A8 /* FSCheckContentTypeRequest.m in Sources */,
+				60CF8C0318C5337000C657A8 /* FSXMLHttpRequest.m in Sources */,
+				60CF8BE918C5335200C657A8 /* FSParsePlaylistFeedRequest.m in Sources */,
+				60CF8C0018C5337000C657A8 /* FSParsePlaylistRequest.m in Sources */,
+				60B813E218C532F8001CC5A7 /* main.m in Sources */,
+				60CF8BE018C5333B00C657A8 /* FSFrequencyPlotView.m in Sources */,
+				60CF8BD818C5332F00C657A8 /* http_stream.cpp in Sources */,
+				60CF8BD918C5332F00C657A8 /* id3_parser.cpp in Sources */,
+				60CF8C0218C5337000C657A8 /* FSPlaylistItem.m in Sources */,
+				60B813E618C532F8001CC5A7 /* FSAppDelegate.m in Sources */,
+				60CF8BEA18C5335200C657A8 /* FSPlayerViewController.m in Sources */,
+				60CF8BD618C5332F00C657A8 /* audio_stream.cpp in Sources */,
+				60CF8C0118C5337000C657A8 /* FSParseRssPodcastFeedRequest.m in Sources */,
+				60CF8BD518C5332F00C657A8 /* audio_queue.cpp in Sources */,
+				60CF8C0418C5337000C657A8 /* Reachability.m in Sources */,
+				60CF8BD718C5332F00C657A8 /* file_output.cpp in Sources */,
+				60CF8BDF18C5333B00C657A8 /* FSFrequencyDomainAnalyzer.m in Sources */,
+				60CF8BFE18C5337000C657A8 /* FSAudioStream.mm in Sources */,
+				60CF8BFD18C5337000C657A8 /* FSAudioController.m in Sources */,
+				60CF8BEB18C5335200C657A8 /* FSPlaylistViewController.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		60B813E918C532F8001CC5A7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				60B813FB18C532F8001CC5A7 /* FreeStreamerMobileTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		60B813F318C532F8001CC5A7 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 60B813D118C532F8001CC5A7 /* FreeStreamerMobile */;
+			targetProxy = 60B813F218C532F8001CC5A7 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin PBXVariantGroup section */
-		6066DA40182422430005E1A2 /* InfoPlist.strings */ = {
+		60B813DE18C532F8001CC5A7 /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
-				6066DA41182422430005E1A2 /* en */,
+				60B813DF18C532F8001CC5A7 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		60B813F718C532F8001CC5A7 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				60B813F818C532F8001CC5A7 /* en */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -415,12 +439,14 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
-		60322889182411B500B7027B /* Debug */ = {
+		60B813FC18C532F8001CC5A7 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
@@ -430,10 +456,10 @@
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -446,18 +472,21 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				ONLY_ACTIVE_ARCH = YES;
-				SDKROOT = macosx;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
-		6032288A182411B500B7027B /* Release */ = {
+		60B813FD18C532F8001CC5A7 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
@@ -467,31 +496,66 @@
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				SDKROOT = macosx;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
 		};
-		6066DA5D182422430005E1A2 /* Debug */ = {
+		60B813FF18C532F8001CC5A7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "FreeStreamerMobile/FreeStreamerMobile-Prefix.pch";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					"$(SDKROOT)/usr/include/libxml2",
+				);
+				INFOPLIST_FILE = "FreeStreamerMobile/FreeStreamerMobile-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		60B8140018C532F8001CC5A7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "FreeStreamerMobile/FreeStreamerMobile-Prefix.pch";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					"$(SDKROOT)/usr/include/libxml2",
+				);
+				INFOPLIST_FILE = "FreeStreamerMobile/FreeStreamerMobile-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+		60B8140218C532F8001CC5A7 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				CLANG_ENABLE_MODULES = YES;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/FreeStreamerMobile.app/FreeStreamerMobile";
 				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
 					"$(inherited)",
 					"$(DEVELOPER_FRAMEWORKS_DIR)",
 				);
@@ -501,73 +565,63 @@
 					"DEBUG=1",
 					"$(inherited)",
 				);
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-					"$(SDKROOT)/usr/include/libxml2",
-				);
-				INFOPLIST_FILE = "FreeStreamerMobile/FreeStreamerMobile-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				INFOPLIST_FILE = "FreeStreamerMobileTests/FreeStreamerMobileTests-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				USER_HEADER_SEARCH_PATHS = "";
-				WRAPPER_EXTENSION = app;
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = xctest;
 			};
 			name = Debug;
 		};
-		6066DA5E182422430005E1A2 /* Release */ = {
+		60B8140318C532F8001CC5A7 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				CLANG_ENABLE_MODULES = YES;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/FreeStreamerMobile.app/FreeStreamerMobile";
 				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
 					"$(inherited)",
 					"$(DEVELOPER_FRAMEWORKS_DIR)",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "FreeStreamerMobile/FreeStreamerMobile-Prefix.pch";
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-					"$(SDKROOT)/usr/include/libxml2",
-				);
-				INFOPLIST_FILE = "FreeStreamerMobile/FreeStreamerMobile-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				INFOPLIST_FILE = "FreeStreamerMobileTests/FreeStreamerMobileTests-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				USER_HEADER_SEARCH_PATHS = "";
-				VALIDATE_PRODUCT = YES;
-				WRAPPER_EXTENSION = app;
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = xctest;
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		60322855182411B500B7027B /* Build configuration list for PBXProject "FreeStreamerMobile" */ = {
+		60B813CD18C532F8001CC5A7 /* Build configuration list for PBXProject "FreeStreamerMobile" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				60322889182411B500B7027B /* Debug */,
-				6032288A182411B500B7027B /* Release */,
+				60B813FC18C532F8001CC5A7 /* Debug */,
+				60B813FD18C532F8001CC5A7 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		6066DA61182422430005E1A2 /* Build configuration list for PBXNativeTarget "FreeStreamerMobile" */ = {
+		60B813FE18C532F8001CC5A7 /* Build configuration list for PBXNativeTarget "FreeStreamerMobile" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				6066DA5D182422430005E1A2 /* Debug */,
-				6066DA5E182422430005E1A2 /* Release */,
+				60B813FF18C532F8001CC5A7 /* Debug */,
+				60B8140018C532F8001CC5A7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		60B8140118C532F8001CC5A7 /* Build configuration list for PBXNativeTarget "FreeStreamerMobileTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				60B8140218C532F8001CC5A7 /* Debug */,
+				60B8140318C532F8001CC5A7 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = 60322852182411B500B7027B /* Project object */;
+	rootObject = 60B813CA18C532F8001CC5A7 /* Project object */;
 }
