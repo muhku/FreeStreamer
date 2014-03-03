@@ -2,4 +2,4 @@
 language: objective-c
 
 script:
-  - xctool project FreeStreamer.xcodeproj -scheme "FreeStreamerMobile" build -sdk iphonesimulator7.0 -arch i386 ONLY_ACTIVE_ARCH=NO
+  - xctool project FreeStreamerMobile.xcodeproj -scheme "FreeStreamerMobile" build -sdk iphonesimulator7.0 -arch i386 ONLY_ACTIVE_ARCH=NO
