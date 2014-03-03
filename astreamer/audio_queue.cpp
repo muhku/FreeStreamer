@@ -297,7 +297,7 @@ int Audio_Queue::handlePacket(const void *data, AudioStreamPacketDescription *de
     
     // copy data to the audio queue buffer
     AudioQueueBufferRef buf = m_audioQueueBuffer[m_fillBufferIndex];
-    memcpy((char*)buf->mAudioData + m_bytesFilled, data, packetSize);
+    memcpy((char*)buf->mAudioData, data, packetSize);
     
     // fill out packet description to pass to enqueue() later on
     m_packetDescs[m_packetsFilled] = *desc;
