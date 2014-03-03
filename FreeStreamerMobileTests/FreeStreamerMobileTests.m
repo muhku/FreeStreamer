@@ -6,9 +6,11 @@
 
 #import <XCTest/XCTest.h>
 #import "FSAudioStream.h"
+#import "FSAudioController.h"
 
 @interface FreeStreamerMobileTests : XCTestCase {
     FSAudioStream *_stream;
+    FSAudioController *_controller;
     BOOL _keepRunning;
     BOOL _checkStreamState;
 }
@@ -24,6 +26,7 @@
     // Put setup code here. This method is called before the invocation of each test method in the class.
     
     _stream = [[FSAudioStream alloc] init];
+    _controller = [[FSAudioController alloc] init];
     _keepRunning = YES;
     _checkStreamState = NO;
 }
@@ -33,10 +36,59 @@
     // Put teardown code here. This method is called after the invocation of each test method in the class.
     
     [_stream stop];
+    [_controller stop];
     _keepRunning = NO;
     _checkStreamState = NO;
     
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:FSAudioStreamStateChangeNotification
+                                                  object:nil];
+    
     [super tearDown];
+}
+
+- (void)testSomaGrooveSaladPlays
+{
+    [[NSNotificationCenter defaultCenter] addObserverForName:FSAudioStreamStateChangeNotification
+                                                      object:nil
+                                                       queue:nil
+                                                  usingBlock:^(NSNotification *notification) {
+                                                      
+            NSLog(@"FSAudioStreamStateChangeNotification received!");
+                                                  
+            int state = [[notification.userInfo valueForKey:FSAudioStreamNotificationKey_State] intValue];
+                                                  
+            if (state == kFsAudioStreamPlaying) {
+                _checkStreamState = YES;
+                [_stream setVolume:0];
+            }
+    }];
+    
+    _controller.url = @"http://somafm.com/groovesalad56.pls";
+    [_controller play];
+    
+    NSTimeInterval timeout = 15.0;
+    NSTimeInterval idle = 0.1;
+    BOOL timedOut = NO;
+    
+    NSDate *timeoutDate = [[NSDate alloc] initWithTimeIntervalSinceNow:timeout];
+    while (!timedOut && _keepRunning) {
+        NSDate *tick = [[NSDate alloc] initWithTimeIntervalSinceNow:idle];
+        [[NSRunLoop currentRunLoop] runUntilDate:tick];
+        timedOut = ([tick compare:timeoutDate] == NSOrderedDescending);
+        
+        if (_checkStreamState) {
+            // Stream started playing.
+            return;
+        }
+    }
+    XCTAssertFalse(timedOut, @"Timed out - the stream did not start playing");
+    
+done:
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:FSAudioStreamStateChangeNotification
+                                                  object:nil];
 }
 
 - (void)testFileLength
@@ -82,19 +134,13 @@
                 // Checks done, we are done.
                 _keepRunning = NO;
             
-                goto done;
+                return;
             } else {
                 tickCounter++;
             }
         }
     }
     XCTAssertFalse(timedOut, @"Timed out - the stream did not start playing");
-    
-done:
-    
-    [[NSNotificationCenter defaultCenter] removeObserver:self
-                                                    name:FSAudioStreamStateChangeNotification
-                                                  object:nil];
 }
 
 @end
