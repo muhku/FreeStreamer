@@ -79,6 +79,9 @@
         
         if (_checkStreamState) {
             // Stream started playing.
+            XCTAssertTrue(([_controller.stream.contentType isEqualToString:@"audio/mpeg"]), @"Invalid content type");
+            XCTAssertTrue(([_controller.stream.suggestedFileExtension isEqualToString:@"mp3"]), @"Invalid file extension");
+            
             return;
         }
     }
