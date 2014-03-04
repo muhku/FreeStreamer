@@ -83,12 +83,6 @@
         }
     }
     XCTAssertFalse(timedOut, @"Timed out - the stream did not start playing");
-    
-done:
-    
-    [[NSNotificationCenter defaultCenter] removeObserver:self
-                                                    name:FSAudioStreamStateChangeNotification
-                                                  object:nil];
 }
 
 - (void)testFileLength
