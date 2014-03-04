@@ -84,7 +84,6 @@
     }
     
     XCTAssertFalse(timedOut, @"Timed out - failed to retrieve the playlist");
-    
 }
 
 - (void)testSomaGrooveSaladPlays
