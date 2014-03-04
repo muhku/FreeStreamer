@@ -10,11 +10,6 @@
 #import "FSParsePlaylistRequest.h"
 
 @interface FreeStreamerMobileTests : XCTestCase {
-    //FSAudioStream *_stream;
-    //FSAudioController *_controller;
-    //BOOL _keepRunning;
-    //BOOL _checkStreamState;
-    //FSParsePlaylistRequest *_request;
 }
 
 @property (nonatomic,strong) FSAudioStream *stream;
