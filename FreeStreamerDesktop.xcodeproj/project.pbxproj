@@ -18,7 +18,6 @@
 		6032289E1824122700B7027B /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6032289D1824122700B7027B /* AudioToolbox.framework */; };
 		603228A01824123100B7027B /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6032289F1824123100B7027B /* CFNetwork.framework */; };
 		604849E018662FE100E8F808 /* file_output.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 604849DE18662FE100E8F808 /* file_output.cpp */; };
-		6066DA6B182422C40005E1A2 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6066DA69182422C40005E1A2 /* MainMenu.xib */; };
 		6066DA6D182422CC0005E1A2 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6066DA6C182422CC0005E1A2 /* Images.xcassets */; };
 		6066DA74182422E00005E1A2 /* Credits.rtf in Resources */ = {isa = PBXBuildFile; fileRef = 6066DA70182422E00005E1A2 /* Credits.rtf */; };
 		6066DA75182422E00005E1A2 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6066DA72182422E00005E1A2 /* InfoPlist.strings */; };
@@ -63,7 +62,6 @@
 		6066DA64182422A50005E1A2 /* FSXAppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FSXAppDelegate.m; path = FreeStreamerDesktop/FSXAppDelegate.m; sourceTree = SOURCE_ROOT; };
 		6066DA65182422A50005E1A2 /* FSXPlayerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FSXPlayerViewController.h; path = FreeStreamerDesktop/FSXPlayerViewController.h; sourceTree = SOURCE_ROOT; };
 		6066DA66182422A50005E1A2 /* FSXPlayerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FSXPlayerViewController.m; path = FreeStreamerDesktop/FSXPlayerViewController.m; sourceTree = SOURCE_ROOT; };
-		6066DA6A182422C40005E1A2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = FreeStreamerDesktop/Base.lproj/MainMenu.xib; sourceTree = SOURCE_ROOT; };
 		6066DA6C182422CC0005E1A2 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = FreeStreamerDesktop/Images.xcassets; sourceTree = SOURCE_ROOT; };
 		6066DA6E182422D70005E1A2 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = FreeStreamerDesktop/main.m; sourceTree = SOURCE_ROOT; };
 		6066DA71182422E00005E1A2 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = en; path = FreeStreamerDesktop/en.lproj/Credits.rtf; sourceTree = SOURCE_ROOT; };
@@ -169,7 +167,6 @@
 				6066DA64182422A50005E1A2 /* FSXAppDelegate.m */,
 				6066DA65182422A50005E1A2 /* FSXPlayerViewController.h */,
 				6066DA66182422A50005E1A2 /* FSXPlayerViewController.m */,
-				6066DA69182422C40005E1A2 /* MainMenu.xib */,
 				6066DA6C182422CC0005E1A2 /* Images.xcassets */,
 				60322864182411B500B7027B /* Supporting Files */,
 			);
@@ -285,7 +282,6 @@
 				6066DA6D182422CC0005E1A2 /* Images.xcassets in Resources */,
 				6066DA75182422E00005E1A2 /* InfoPlist.strings in Resources */,
 				6066DA74182422E00005E1A2 /* Credits.rtf in Resources */,
-				6066DA6B182422C40005E1A2 /* MainMenu.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -318,14 +314,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
-		6066DA69182422C40005E1A2 /* MainMenu.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				6066DA6A182422C40005E1A2 /* Base */,
-			);
-			name = MainMenu.xib;
-			sourceTree = "<group>";
-		};
 		6066DA70182422E00005E1A2 /* Credits.rtf */ = {
 			isa = PBXVariantGroup;
 			children = (
