@@ -201,7 +201,11 @@ void Audio_Stream::seekToTime(unsigned newSeekTime)
         return;
     }
     
-    setState(SEEKING);
+    if (state() == SEEKING) {
+        return;
+    } else {
+        setState(SEEKING);
+    }
     
     m_seekTime = newSeekTime;
     
