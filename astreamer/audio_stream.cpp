@@ -758,7 +758,7 @@ void Audio_Stream::streamDataCallback(void *inClientData, UInt32 inNumberBytes, 
         count++;
     }
     
-    if (count > 10) {
+    if (count > kAudioStreamDecodeQueueSize) {
         THIS->setState(PLAYING);
         
         AudioBufferList outputBufferList;
@@ -802,7 +802,7 @@ void Audio_Stream::streamDataCallback(void *inClientData, UInt32 inNumberBytes, 
             THIS->m_processedPackets.clear();
         }
     } else {
-        AS_TRACE("Less than 10 packets queued, returning...\n");
+        AS_TRACE("Less than %i packets queued, returning...\n", kAudioStreamDecodeQueueSize);
     }
 }
 

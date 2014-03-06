@@ -33,6 +33,7 @@ class Audio_Stream_Delegate;
 class File_Output;
     
 #define kAudioStreamBitrateBufferSize 50
+#define kAudioStreamDecodeQueueSize 10
 	
 class Audio_Stream : public HTTP_Stream_Delegate, public Audio_Queue_Delegate {    
 public:
