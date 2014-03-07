@@ -306,6 +306,12 @@
     
     NSMutableString *streamInfo = [[NSMutableString alloc] init];
     
+    if (metaData[@"StreamUrl"]) {
+        if ([metaData[@"StreamUrl"] length] > 0) {
+            [streamInfo appendFormat:@"%@ - ", metaData[@"StreamUrl"]];
+        }
+    }
+    
     if (metaData[@"MPMediaItemPropertyArtist"] &&
         metaData[@"MPMediaItemPropertyTitle"]) {
         [streamInfo appendString:metaData[@"MPMediaItemPropertyArtist"]];
