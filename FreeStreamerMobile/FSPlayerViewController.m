@@ -393,7 +393,7 @@
     
     self.navigationItem.title = self.selectedPlaylistItem.title;
     
-    self.audioController.url = self.selectedPlaylistItem.url;
+    self.audioController.url = self.selectedPlaylistItem.nsURL;
 }
 
 - (FSPlaylistItem *)selectedPlaylistItem

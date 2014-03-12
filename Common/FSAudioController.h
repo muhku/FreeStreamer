@@ -22,7 +22,7 @@
  * content type is checked for each URL.
  */
 @interface FSAudioController : NSObject {
-    NSString *_url;
+    NSURL *_url;
     FSAudioStream *_audioStream;
     
     BOOL _readyToPlay;
@@ -37,7 +37,7 @@
  *
  * @param url The URL from which the stream data is retrieved.
  */
-- (id)initWithUrl:(NSString *)url;
+- (id)initWithUrl:(NSURL *)url;
 
 /**
  * Starts playing the stream. Before the playback starts,
@@ -51,7 +51,7 @@
  *
  * @param url The URL from which the stream data is retrieved.
  */
-- (void)playFromURL:(NSString*)url;
+- (void)playFromURL:(NSURL *)url;
 
 /**
  * Stops the stream playback.
@@ -72,7 +72,7 @@
 /**
  * The stream URL.
  */
-@property (nonatomic,assign) NSString *url;
+@property (nonatomic,assign) NSURL *url;
 /**
  * The audio stream.
  */

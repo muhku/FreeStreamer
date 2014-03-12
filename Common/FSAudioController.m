@@ -35,7 +35,7 @@
     return self;
 }
 
-- (id)initWithUrl:(NSString *)url
+- (id)initWithUrl:(NSURL *)url
 {
     if (self = [self init]) {
         self.url = url;
@@ -215,7 +215,7 @@
     }
 }
 
-- (void)playFromURL:(NSString*)url
+- (void)playFromURL:(NSURL*)url
 {
     self.url = url;
         
@@ -239,7 +239,7 @@
  * =======================================
  */
 
-- (void)setUrl:(NSString *)url
+- (void)setUrl:(NSURL *)url
 {
     @synchronized (self) {
         /*
@@ -270,7 +270,7 @@
             self.parsePlaylistRequest.url = url;
             self.parseRssPodcastFeedRequest.url = url;
             
-            NSString *copyOfURL = [url copy];
+            NSURL *copyOfURL = [url copy];
             _url = copyOfURL;
             
             /*
@@ -281,17 +281,17 @@
         }
     
         self.currentPlaylistItemIndex = 0;
-        self.audioStream.url = [NSURL URLWithString:_url];
+        self.audioStream.url = _url;
     }
 }
 
-- (NSString*)url
+- (NSURL* )url
 {
     if (!_url) {
         return nil;
     }
     
-    NSString *copyOfURL = [_url copy];
+    NSURL *copyOfURL = [_url copy];
     return copyOfURL;
 }
 

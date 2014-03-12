@@ -33,7 +33,7 @@
     _playlist = NO;
     _contentType = @"";
     
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:_url]
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:_url
                                                            cachePolicy:NSURLRequestReloadIgnoringCacheData
                                                        timeoutInterval:30.0];
     [request setHTTPMethod:@"HEAD"];
@@ -187,7 +187,7 @@
     if (response) {
         absoluteUrl = [response.URL absoluteString];
     } else {
-        absoluteUrl = _url;
+        absoluteUrl = [_url absoluteString];
     }
     
     if ([absoluteUrl hasSuffix:@".mp3"]) {

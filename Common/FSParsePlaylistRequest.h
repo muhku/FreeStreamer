@@ -34,7 +34,7 @@ typedef enum {
 /**
  * The URL of this request.
  */
-@property (nonatomic,copy) NSString *url;
+@property (nonatomic,copy) NSURL *url;
 /**
  * Called when the playlist parsing is completed.
  */

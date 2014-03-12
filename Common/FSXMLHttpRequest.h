@@ -42,7 +42,7 @@ typedef enum {
 /**
  * The URL of the request.
  */
-@property (nonatomic,copy) NSString *url;
+@property (nonatomic,copy) NSURL *url;
 /**
  * Called upon completion of the request.
  */

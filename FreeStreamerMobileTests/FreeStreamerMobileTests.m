@@ -61,7 +61,7 @@
     _playlistRequest.onFailure = ^() {
         weakSelf.keepRunning = NO;
     };
-    _playlistRequest.url = @"http://www.radioswissclassic.ch/live/mp3.m3u";
+    _playlistRequest.url = [NSURL URLWithString:@"http://www.radioswissclassic.ch/live/mp3.m3u"];
     
     [_playlistRequest start];
     
@@ -103,7 +103,7 @@
                                                       }
                                                   }];
     
-    _controller.url = @"http://somafm.com/groovesalad56.pls";
+    _controller.url = [NSURL URLWithString:@"http://somafm.com/groovesalad56.pls"];
     [_controller play];
     
     NSTimeInterval timeout = 15.0;

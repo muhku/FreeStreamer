@@ -32,7 +32,7 @@
         return;
     }
     
-    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:self.url]
+    NSURLRequest *request = [NSURLRequest requestWithURL:self.url
                                              cachePolicy:NSURLRequestUseProtocolCachePolicy
                                          timeoutInterval:60.0];
     
