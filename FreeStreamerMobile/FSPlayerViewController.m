@@ -306,9 +306,9 @@
     
     NSMutableString *streamInfo = [[NSMutableString alloc] init];
     
-    if (metaData[@"StreamUrl"]) {
-        if ([metaData[@"StreamUrl"] length] > 0) {
-            [streamInfo appendFormat:@"%@ - ", metaData[@"StreamUrl"]];
+    if (metaData[@"IcecastStationName"]) {
+        if ([metaData[@"IcecastStationName"] length] > 0) {
+            [streamInfo appendFormat:@"%@ - ", metaData[@"IcecastStationName"]];
         }
     }
     

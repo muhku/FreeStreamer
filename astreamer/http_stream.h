@@ -54,6 +54,8 @@ private:
     bool m_icyHeadersRead;
     bool m_icyHeadersParsed;
     
+    CFStringRef m_icyName;
+    
     std::vector<std::string> m_icyHeaderLines;
     size_t m_icyMetaDataInterval;
     size_t m_dataByteReadCount;

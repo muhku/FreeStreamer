@@ -40,6 +40,8 @@ HTTP_Stream::HTTP_Stream() :
     m_icyHeadersRead(false),
     m_icyHeadersParsed(false),
     
+    m_icyName(0),
+    
     m_icyMetaDataInterval(0),
     m_dataByteReadCount(0),
     m_metaDataBytesRemaining(0),
@@ -55,6 +57,10 @@ HTTP_Stream::HTTP_Stream() :
 HTTP_Stream::~HTTP_Stream()
 {
     close();
+    
+    if (m_icyName) {
+        CFRelease(m_icyName), m_icyName = 0;
+    }
     
     if (m_httpReadBuffer) {
         delete m_httpReadBuffer, m_httpReadBuffer = 0;
@@ -119,6 +125,10 @@ bool HTTP_Stream::open(const HTTP_Stream_Position& position)
     m_icyHeaderCR = false;
     m_icyHeadersRead = false;
     m_icyHeadersParsed = false;
+    
+    if (m_icyName) {
+        CFRelease(m_icyName), m_icyName = 0;
+    }
     
     m_icyHeaderLines.clear();
     m_icyMetaDataInterval = 0;
@@ -309,6 +319,14 @@ void HTTP_Stream::parseHttpHeadersIfNeeded(UInt8 *buf, CFIndex bufSize)
             CFRelease(icyMetaIntString);
         }
         
+        CFStringRef icyNameString = CFHTTPMessageCopyHeaderFieldValue(response, CFSTR("icy-name"));
+        if (icyNameString) {
+            if (m_icyName) {
+                CFRelease(m_icyName);
+            }
+            m_icyName = icyNameString;
+        }
+        
         CFStringRef contentTypeString = CFHTTPMessageCopyHeaderFieldValue(response, CFSTR("Content-Type"));
         if (contentTypeString) {
             CFIndex len = CFStringGetMaximumSizeForEncoding(CFStringGetLength(contentTypeString), kCFStringEncodingUTF8) + 1;
@@ -458,6 +476,10 @@ void HTTP_Stream::parseICYStream(UInt8 *buf, CFIndex bufSize)
                     
                     CFRelease(tokens);
                     CFRelease(metaData);
+                    
+                    if (m_icyName) {
+                        metadataMap[CFSTR("IcecastStationName")] = CFStringCreateCopy(kCFAllocatorDefault, m_icyName);
+                    }
                     
                     m_delegate->streamMetaDataAvailable(metadataMap);
                 }
