@@ -53,6 +53,9 @@
     self.navigationController.navigationBar.barStyle = UIBarStyleBlack;
     self.navigationController.navigationBarHidden = NO;
     
+    _stationURL = nil;
+    self.navigationItem.rightBarButtonItem = nil;
+    
     self.view.backgroundColor = [UIColor clearColor];
     
     self.analyzer.enabled = YES;
@@ -109,6 +112,8 @@
     // Hide the buttons as we display them based on the playback status (callback)
     self.playButton.hidden = YES;
     self.pauseButton.hidden = YES;
+    
+    _infoButton = self.navigationItem.rightBarButtonItem;
     
     self.analyzer = [[FSFrequencyDomainAnalyzer alloc] init];
     self.audioController.stream.delegate = self.analyzer;
@@ -320,6 +325,12 @@
         [streamInfo appendString:metaData[@"StreamTitle"]];
     }
     
+    if (metaData[@"StreamUrl"] && [metaData[@"StreamUrl"] length] > 0) {
+        _stationURL = [NSURL URLWithString:metaData[@"StreamUrl"]];
+        
+        self.navigationItem.rightBarButtonItem = _infoButton;
+    }
+    
     [_statusLabel setHidden:NO];
     self.statusLabel.text = streamInfo;
 }
@@ -371,6 +382,11 @@
                                                                                          selector:@selector(seekToNewTime)
                                                                                            userInfo:nil
                                                                                             repeats:NO];
+}
+
+- (IBAction)openStationUrl:(id)sender
+{
+    [[UIApplication sharedApplication] openURL:_stationURL];
 }
 
 /*

@@ -30,6 +30,9 @@
     NSTimer *_progressUpdateTimer;
     NSTimer *_playbackSeekTimer;
     double _seekToPoint;
+    
+    NSURL *_stationURL;
+    UIBarButtonItem *_infoButton;
 }
 
 /**
@@ -123,5 +126,11 @@
  * @param sender The sender of the action.
  */
 - (IBAction)seek:(id)sender;
+/**
+ * An action for opening the station URL.
+ *
+ * @param sender The sender of the action.
+ */
+- (IBAction)openStationUrl:(id)sender;
 
 @end
