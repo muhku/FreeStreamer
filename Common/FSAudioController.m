@@ -195,9 +195,7 @@
              * Start playback.
              */
             if ([self.playlistItems count] > 0) {
-                FSPlaylistItem *playlistItem = (self.playlistItems)[self.currentPlaylistItemIndex];
-                
-                self.audioStream.url = playlistItem.nsURL;
+                self.audioStream.url = self.currentPlaylistItem.nsURL;
             }
             
             [self.audioStream play];
@@ -298,6 +296,17 @@
 - (FSAudioStream *)stream
 {
     return self.audioStream;
+}
+
+- (FSPlaylistItem *)currentPlaylistItem
+{
+    if (self.readyToPlay) {
+        if ([self.playlistItems count] > 0) {
+            FSPlaylistItem *playlistItem = (self.playlistItems)[self.currentPlaylistItemIndex];
+            return playlistItem;
+        }
+    }
+    return nil;
 }
 
 @end

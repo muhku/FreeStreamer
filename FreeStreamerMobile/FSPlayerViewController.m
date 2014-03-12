@@ -309,9 +309,16 @@
     if (metaData[@"IcecastStationName"] && [metaData[@"IcecastStationName"] length] > 0) {
         self.navigationController.navigationBar.topItem.title = metaData[@"IcecastStationName"];
     } else {
-        /* No icecast station name given - use the URL as the title, if available */
-        if (metaData[@"StreamUrl"] && [metaData[@"StreamUrl"] length] > 0) {
-            self.navigationController.navigationBar.topItem.title = metaData[@"StreamUrl"];
+        FSPlaylistItem *playlistItem = self.audioController.currentPlaylistItem;
+        NSString *title = playlistItem.title;
+        
+        if ([playlistItem.title length] > 0) {
+            self.navigationController.navigationBar.topItem.title = title;
+        } else {
+            /* The last resort - use the URL as the title, if available */
+            if (metaData[@"StreamUrl"] && [metaData[@"StreamUrl"] length] > 0) {
+                self.navigationController.navigationBar.topItem.title = metaData[@"StreamUrl"];
+            }
         }
     }
     

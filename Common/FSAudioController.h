@@ -10,6 +10,7 @@
 @class FSCheckContentTypeRequest;
 @class FSParsePlaylistRequest;
 @class FSParseRssPodcastFeedRequest;
+@class FSPlaylistItem;
 
 /**
  * FSAudioController is functionally equivalent to FSAudioStream with
@@ -77,5 +78,9 @@
  * The audio stream.
  */
 @property (readonly) FSAudioStream *stream;
+/**
+ * The playlist item the controller is currently using.
+ */
+@property (nonatomic,readonly) FSPlaylistItem *currentPlaylistItem;
 
 @end
