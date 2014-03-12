@@ -50,7 +50,7 @@
     if (![self.audioController.url isEqual:url]) {
         [self.audioController stop];
         
-        self.audioController.url = url;
+        self.audioController.url = [NSURL URLWithString:url];
     }
     
     if (_paused) {
