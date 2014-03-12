@@ -16,6 +16,7 @@
 
 - (void)updatePlaybackProgress;
 - (void)seekToNewTime;
+- (void)determineStationNameWithMetaData:(NSDictionary *)metaData;
 
 @end
 
@@ -214,6 +215,8 @@
             break;
             
         case kFsAudioStreamPlaying:
+            [self determineStationNameWithMetaData:nil];
+            
             [_activityIndicator stopAnimating];
             if ([self.statusLabel.text isEqualToString:statusBuffering] ||
                 [self.statusLabel.text isEqualToString:statusRetrievingURL] ||
@@ -306,21 +309,7 @@
     
     NSMutableString *streamInfo = [[NSMutableString alloc] init];
     
-    if (metaData[@"IcecastStationName"] && [metaData[@"IcecastStationName"] length] > 0) {
-        self.navigationController.navigationBar.topItem.title = metaData[@"IcecastStationName"];
-    } else {
-        FSPlaylistItem *playlistItem = self.audioController.currentPlaylistItem;
-        NSString *title = playlistItem.title;
-        
-        if ([playlistItem.title length] > 0) {
-            self.navigationController.navigationBar.topItem.title = title;
-        } else {
-            /* The last resort - use the URL as the title, if available */
-            if (metaData[@"StreamUrl"] && [metaData[@"StreamUrl"] length] > 0) {
-                self.navigationController.navigationBar.topItem.title = metaData[@"StreamUrl"];
-            }
-        }
-    }
+    [self determineStationNameWithMetaData:metaData];
     
     if (metaData[@"MPMediaItemPropertyArtist"] &&
         metaData[@"MPMediaItemPropertyTitle"]) {
@@ -452,6 +441,25 @@
     pos.second = s;
     
     [self.audioController.stream seekToPosition:pos];
+}
+
+- (void)determineStationNameWithMetaData:(NSDictionary *)metaData
+{
+    if (metaData[@"IcecastStationName"] && [metaData[@"IcecastStationName"] length] > 0) {
+        self.navigationController.navigationBar.topItem.title = metaData[@"IcecastStationName"];
+    } else {
+        FSPlaylistItem *playlistItem = self.audioController.currentPlaylistItem;
+        NSString *title = playlistItem.title;
+        
+        if ([playlistItem.title length] > 0) {
+            self.navigationController.navigationBar.topItem.title = title;
+        } else {
+            /* The last resort - use the URL as the title, if available */
+            if (metaData[@"StreamUrl"] && [metaData[@"StreamUrl"] length] > 0) {
+                self.navigationController.navigationBar.topItem.title = metaData[@"StreamUrl"];
+            }
+        }
+    }
 }
 
 @end
