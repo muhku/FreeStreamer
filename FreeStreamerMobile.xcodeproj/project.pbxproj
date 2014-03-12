@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		60412CD218D0B150007A0277 /* button-pause.png in Resources */ = {isa = PBXBuildFile; fileRef = 60412CCC18D0B150007A0277 /* button-pause.png */; };
+		60412CD318D0B150007A0277 /* button-play.png in Resources */ = {isa = PBXBuildFile; fileRef = 60412CCD18D0B150007A0277 /* button-play.png */; };
+		60412CD418D0B150007A0277 /* player-bg-bottom.png in Resources */ = {isa = PBXBuildFile; fileRef = 60412CCE18D0B150007A0277 /* player-bg-bottom.png */; };
+		60412CD518D0B150007A0277 /* player-bg-image-pad.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 60412CCF18D0B150007A0277 /* player-bg-image-pad.jpg */; };
+		60412CD618D0B150007A0277 /* player-bg-image.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 60412CD018D0B150007A0277 /* player-bg-image.jpg */; };
+		60412CD718D0B150007A0277 /* player-top-bg.png in Resources */ = {isa = PBXBuildFile; fileRef = 60412CD118D0B150007A0277 /* player-top-bg.png */; };
 		60B813D618C532F8001CC5A7 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60B813D518C532F8001CC5A7 /* Foundation.framework */; };
 		60B813D818C532F8001CC5A7 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60B813D718C532F8001CC5A7 /* CoreGraphics.framework */; };
 		60B813DA18C532F8001CC5A7 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60B813D918C532F8001CC5A7 /* UIKit.framework */; };
@@ -56,6 +62,12 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		60412CCC18D0B150007A0277 /* button-pause.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "button-pause.png"; path = "Assets/Images/button-pause.png"; sourceTree = "<group>"; };
+		60412CCD18D0B150007A0277 /* button-play.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "button-play.png"; path = "Assets/Images/button-play.png"; sourceTree = "<group>"; };
+		60412CCE18D0B150007A0277 /* player-bg-bottom.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "player-bg-bottom.png"; path = "Assets/Images/player-bg-bottom.png"; sourceTree = "<group>"; };
+		60412CCF18D0B150007A0277 /* player-bg-image-pad.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = "player-bg-image-pad.jpg"; path = "Assets/Images/player-bg-image-pad.jpg"; sourceTree = "<group>"; };
+		60412CD018D0B150007A0277 /* player-bg-image.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = "player-bg-image.jpg"; path = "Assets/Images/player-bg-image.jpg"; sourceTree = "<group>"; };
+		60412CD118D0B150007A0277 /* player-top-bg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "player-top-bg.png"; path = "Assets/Images/player-top-bg.png"; sourceTree = "<group>"; };
 		60B813D218C532F8001CC5A7 /* FreeStreamerMobile.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FreeStreamerMobile.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		60B813D518C532F8001CC5A7 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		60B813D718C532F8001CC5A7 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -145,6 +157,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		60412CCB18D0B144007A0277 /* Images */ = {
+			isa = PBXGroup;
+			children = (
+				60412CCC18D0B150007A0277 /* button-pause.png */,
+				60412CCD18D0B150007A0277 /* button-play.png */,
+				60412CCE18D0B150007A0277 /* player-bg-bottom.png */,
+				60412CCF18D0B150007A0277 /* player-bg-image-pad.jpg */,
+				60412CD018D0B150007A0277 /* player-bg-image.jpg */,
+				60412CD118D0B150007A0277 /* player-top-bg.png */,
+			);
+			name = Images;
+			sourceTree = "<group>";
+		};
 		60B813C918C532F8001CC5A7 = {
 			isa = PBXGroup;
 			children = (
@@ -204,6 +229,7 @@
 		60B813DC18C532F8001CC5A7 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				60412CCB18D0B144007A0277 /* Images */,
 				60B813DD18C532F8001CC5A7 /* FreeStreamerMobile-Info.plist */,
 				60B813DE18C532F8001CC5A7 /* InfoPlist.strings */,
 				60B813E118C532F8001CC5A7 /* main.m */,
@@ -358,8 +384,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				60B813E018C532F8001CC5A7 /* InfoPlist.strings in Resources */,
+				60412CD318D0B150007A0277 /* button-play.png in Resources */,
 				60CF8BE818C5335200C657A8 /* FSMainWindow.xib in Resources */,
+				60412CD218D0B150007A0277 /* button-pause.png in Resources */,
+				60412CD418D0B150007A0277 /* player-bg-bottom.png in Resources */,
+				60412CD618D0B150007A0277 /* player-bg-image.jpg in Resources */,
 				60B813E818C532F8001CC5A7 /* Images.xcassets in Resources */,
+				60412CD518D0B150007A0277 /* player-bg-image-pad.jpg in Resources */,
+				60412CD718D0B150007A0277 /* player-top-bg.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
