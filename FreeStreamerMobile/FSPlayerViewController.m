@@ -306,10 +306,8 @@
     
     NSMutableString *streamInfo = [[NSMutableString alloc] init];
     
-    if (metaData[@"IcecastStationName"]) {
-        if ([metaData[@"IcecastStationName"] length] > 0) {
-            [streamInfo appendFormat:@"%@ - ", metaData[@"IcecastStationName"]];
-        }
+    if (metaData[@"IcecastStationName"] && [metaData[@"IcecastStationName"] length] > 0) {
+        self.navigationController.navigationBar.topItem.title = metaData[@"IcecastStationName"];
     }
     
     if (metaData[@"MPMediaItemPropertyArtist"] &&

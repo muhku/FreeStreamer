@@ -325,6 +325,14 @@ void HTTP_Stream::parseHttpHeadersIfNeeded(UInt8 *buf, CFIndex bufSize)
                 CFRelease(m_icyName);
             }
             m_icyName = icyNameString;
+            
+            if (m_delegate) {
+                std::map<CFStringRef,CFStringRef> metadataMap;
+                
+                metadataMap[CFSTR("IcecastStationName")] = CFStringCreateCopy(kCFAllocatorDefault, m_icyName);
+                
+                m_delegate->streamMetaDataAvailable(metadataMap);
+            }
         }
         
         CFStringRef contentTypeString = CFHTTPMessageCopyHeaderFieldValue(response, CFSTR("Content-Type"));
