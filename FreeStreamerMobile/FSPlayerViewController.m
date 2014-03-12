@@ -308,6 +308,11 @@
     
     if (metaData[@"IcecastStationName"] && [metaData[@"IcecastStationName"] length] > 0) {
         self.navigationController.navigationBar.topItem.title = metaData[@"IcecastStationName"];
+    } else {
+        /* No icecast station name given - use the URL as the title, if available */
+        if (metaData[@"StreamUrl"]) {
+            self.navigationController.navigationBar.topItem.title = metaData[@"StreamUrl"];
+        }
     }
     
     if (metaData[@"MPMediaItemPropertyArtist"] &&
