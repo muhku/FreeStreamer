@@ -15,7 +15,7 @@
 
 namespace astreamer {
 
-const size_t HTTP_Stream::STREAM_BUFSIZ = Audio_Queue::AQ_BUFSIZ;
+const size_t HTTP_Stream::STREAM_BUFSIZ = 2048;
 
 CFStringRef HTTP_Stream::httpRequestMethod   = CFSTR("GET");
 CFStringRef HTTP_Stream::httpUserAgentHeader = CFSTR("User-Agent");
