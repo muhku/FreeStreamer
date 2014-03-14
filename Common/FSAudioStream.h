@@ -123,6 +123,8 @@ typedef struct {
  * than the volume currently set by the user. For example, if
  * requesting a volume of 0.5, then the volume will be 50%
  * lower than the current playback volume set by the user.
+ *
+ * @param volume The audio stream volume.
  */
 - (void)setVolume:(float)volume;
 
@@ -204,6 +206,10 @@ typedef struct {
  * Called when there are PCM audio samples available. Do not do any blocking operations
  * when you receive the data. Instead, copy the data and process it so that the
  * main event loop doesn't block. Failing to do so may cause glitches to the audio playback.
+ *
+ * @param audioStream The audio stream the samples are from.
+ * @param samples The PCM audio samples.
+ * @param count The number of samples available.
  */
 - (void)audioStream:(FSAudioStream *)audioStream samplesAvailable:(const int16_t *)samples count:(NSUInteger)count;
 @end
