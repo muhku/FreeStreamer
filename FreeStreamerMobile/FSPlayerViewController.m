@@ -13,7 +13,11 @@
 #import "FSFrequencyPlotView.h"
 
 /*
- * Comment the following line, if you want to disable the frequency analyzer:
+ * Comment the following line, if you want to disable the frequency analyzer.
+ *
+ * Do not unnecesarilly enable the analyzer, as it will consume considerable
+ * amount of CPU, thus, battery. It is enabled by default as a sake of
+ * demonstration.
  */
 #define ENABLE_ANALYZER 1
 
