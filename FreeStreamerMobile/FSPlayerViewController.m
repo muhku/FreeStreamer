@@ -12,6 +12,11 @@
 #import "FSFrequencyDomainAnalyzer.h"
 #import "FSFrequencyPlotView.h"
 
+/*
+ * Comment the following line, if you want to disable the frequency analyzer:
+ */
+#define ENABLE_ANALYZER 1
+
 @interface FSPlayerViewController ()
 
 - (void)updatePlaybackProgress;
@@ -58,7 +63,11 @@
     
     self.view.backgroundColor = [UIColor clearColor];
     
+#if ENABLE_ANALYZER
     self.analyzer.enabled = YES;
+#else
+    self.frequencyPlotView.hidden = YES;
+#endif
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -115,9 +124,11 @@
     
     _infoButton = self.navigationItem.rightBarButtonItem;
     
+#if ENABLE_ANALYZER
     self.analyzer = [[FSFrequencyDomainAnalyzer alloc] init];
     self.audioController.stream.delegate = self.analyzer;
     self.analyzer.delegate = self.frequencyPlotView;
+#endif
 }
 
 - (void)viewDidUnload
@@ -155,8 +166,10 @@
 {
     [super viewDidDisappear:animated];
     
+#if ENABLE_ANALYZER
     self.analyzer.enabled = NO;
     [self.frequencyPlotView reset];
+#endif
     
     if (_progressUpdateTimer) {
         [_progressUpdateTimer invalidate], _progressUpdateTimer = nil;
@@ -273,12 +286,16 @@
 
 - (void)applicationDidEnterBackgroundNotification:(NSNotification *)notification
 {
+#if ENABLE_ANALYZER
     self.analyzer.enabled = NO;
+#endif
 }
 
 - (void)applicationWillEnterForegroundNotification:(NSNotification *)notification
 {
+#if ENABLE_ANALYZER
     self.analyzer.enabled = YES;
+#endif
 }
 
 - (void)audioStreamErrorOccurred:(NSNotification *)notification
