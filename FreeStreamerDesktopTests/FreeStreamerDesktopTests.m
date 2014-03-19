@@ -146,7 +146,7 @@
                                                       }
                                                   }];
     
-    _stream.url = [NSURL URLWithString:@"http://www.tonycuffe.com/mp3/tail%20toddle.mp3"];
+    _stream.url = [NSURL URLWithString:@"https://dl.dropboxusercontent.com/u/995250/FreeStreamer/As%20long%20as%20the%20stars%20shine.mp3"];
     [_stream play];
     
     NSTimeInterval timeout = 15.0;
@@ -164,8 +164,8 @@
             if (tickCounter > 20) {
                 NSLog(@"2 seconds passed since the stream started playing, checking the state");
                 
-                XCTAssertTrue((_stream.duration.minute == 1), @"Invalid stream duration (minutes)");
-                XCTAssertTrue((_stream.duration.second == 28), @"Invalid stream duration (seconds)");
+                XCTAssertTrue((_stream.duration.minute == 4), @"Invalid stream duration (minutes)");
+                XCTAssertTrue((_stream.duration.second == 17), @"Invalid stream duration (seconds)");
                 
                 // Checks done, we are done.
                 _keepRunning = NO;
