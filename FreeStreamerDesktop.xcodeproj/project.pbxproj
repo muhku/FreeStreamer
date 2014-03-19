@@ -11,6 +11,9 @@
 		600507D0184E1DCF0002314D /* FSXMLHttpRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 600507CF184E1DCF0002314D /* FSXMLHttpRequest.m */; };
 		600507D5184E1FC60002314D /* FSParseRssPodcastFeedRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 600507D4184E1FC60002314D /* FSParseRssPodcastFeedRequest.m */; };
 		600507D7184E25690002314D /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 60CF9E601824158C00999FDF /* libxml2.dylib */; };
+		601121B518DA3C1D00B5E913 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6032287C182411B500B7027B /* XCTest.framework */; };
+		601121BB18DA3C1D00B5E913 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 601121B918DA3C1D00B5E913 /* InfoPlist.strings */; };
+		601121BD18DA3C1D00B5E913 /* FreeStreamerDesktopTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 601121BC18DA3C1D00B5E913 /* FreeStreamerDesktopTests.m */; };
 		601369D2182C36AA001819D6 /* id3_parser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 601369D0182C36AA001819D6 /* id3_parser.cpp */; };
 		601C7D0618DA34C400ABBBB2 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 601C7D0518DA34C400ABBBB2 /* MainMenu.xib */; };
 		602C629B1847936B00EA657D /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 602C629A1847936B00EA657D /* Reachability.m */; };
@@ -35,12 +38,27 @@
 		609F6DAA18295F54000E45B2 /* FSParsePlaylistRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 609F6DA918295F54000E45B2 /* FSParsePlaylistRequest.m */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		601121BF18DA3C1D00B5E913 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 60322852182411B500B7027B /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 60322859182411B500B7027B;
+			remoteInfo = FreeStreamerDesktop;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		600032761847CF94001C83BE /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		600507CE184E1DCF0002314D /* FSXMLHttpRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSXMLHttpRequest.h; sourceTree = "<group>"; };
 		600507CF184E1DCF0002314D /* FSXMLHttpRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSXMLHttpRequest.m; sourceTree = "<group>"; };
 		600507D3184E1FC60002314D /* FSParseRssPodcastFeedRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSParseRssPodcastFeedRequest.h; sourceTree = "<group>"; };
 		600507D4184E1FC60002314D /* FSParseRssPodcastFeedRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSParseRssPodcastFeedRequest.m; sourceTree = "<group>"; };
+		601121B418DA3C1D00B5E913 /* FreeStreamerDesktopTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FreeStreamerDesktopTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		601121B818DA3C1D00B5E913 /* FreeStreamerDesktopTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "FreeStreamerDesktopTests-Info.plist"; sourceTree = "<group>"; };
+		601121BA18DA3C1D00B5E913 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		601121BC18DA3C1D00B5E913 /* FreeStreamerDesktopTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FreeStreamerDesktopTests.m; sourceTree = "<group>"; };
+		601121BE18DA3C1D00B5E913 /* FreeStreamerDesktopTests-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FreeStreamerDesktopTests-Prefix.pch"; sourceTree = "<group>"; };
 		601369D0182C36AA001819D6 /* id3_parser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = id3_parser.cpp; path = astreamer/id3_parser.cpp; sourceTree = SOURCE_ROOT; };
 		601369D1182C36AA001819D6 /* id3_parser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = id3_parser.h; path = astreamer/id3_parser.h; sourceTree = SOURCE_ROOT; };
 		601C7D0518DA34C400ABBBB2 /* MainMenu.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = MainMenu.xib; path = FreeStreamerDesktop/MainMenu.xib; sourceTree = SOURCE_ROOT; };
@@ -94,6 +112,14 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		601121B118DA3C1C00B5E913 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				601121B518DA3C1D00B5E913 /* XCTest.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		60322857182411B500B7027B /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -110,12 +136,32 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		601121B618DA3C1D00B5E913 /* FreeStreamerDesktopTests */ = {
+			isa = PBXGroup;
+			children = (
+				601121BC18DA3C1D00B5E913 /* FreeStreamerDesktopTests.m */,
+				601121B718DA3C1D00B5E913 /* Supporting Files */,
+			);
+			path = FreeStreamerDesktopTests;
+			sourceTree = "<group>";
+		};
+		601121B718DA3C1D00B5E913 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				601121B818DA3C1D00B5E913 /* FreeStreamerDesktopTests-Info.plist */,
+				601121B918DA3C1D00B5E913 /* InfoPlist.strings */,
+				601121BE18DA3C1D00B5E913 /* FreeStreamerDesktopTests-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
 		60322851182411B500B7027B = {
 			isa = PBXGroup;
 			children = (
 				60CF9E501824156F00999FDF /* Common */,
 				60322891182411F000B7027B /* astreamer */,
 				60322863182411B500B7027B /* FreeStreamerDesktop */,
+				601121B618DA3C1D00B5E913 /* FreeStreamerDesktopTests */,
 				6032285C182411B500B7027B /* Frameworks */,
 				6032285B182411B500B7027B /* Products */,
 			);
@@ -125,6 +171,7 @@
 			isa = PBXGroup;
 			children = (
 				6032285A182411B500B7027B /* FreeStreamerDesktop.app */,
+				601121B418DA3C1D00B5E913 /* FreeStreamerDesktopTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -232,6 +279,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		601121B318DA3C1C00B5E913 /* FreeStreamerDesktopTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 601121C318DA3C1D00B5E913 /* Build configuration list for PBXNativeTarget "FreeStreamerDesktopTests" */;
+			buildPhases = (
+				601121B018DA3C1C00B5E913 /* Sources */,
+				601121B118DA3C1C00B5E913 /* Frameworks */,
+				601121B218DA3C1C00B5E913 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				601121C018DA3C1D00B5E913 /* PBXTargetDependency */,
+			);
+			name = FreeStreamerDesktopTests;
+			productName = FreeStreamerDesktopTests;
+			productReference = 601121B418DA3C1D00B5E913 /* FreeStreamerDesktopTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		60322859182411B500B7027B /* FreeStreamerDesktop */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 6032288B182411B500B7027B /* Build configuration list for PBXNativeTarget "FreeStreamerDesktop" */;
@@ -258,6 +323,11 @@
 				CLASSPREFIX = FS;
 				LastUpgradeCheck = 0500;
 				ORGANIZATIONNAME = "Matias Muhonen";
+				TargetAttributes = {
+					601121B318DA3C1C00B5E913 = {
+						TestTargetID = 60322859182411B500B7027B;
+					};
+				};
 			};
 			buildConfigurationList = 60322855182411B500B7027B /* Build configuration list for PBXProject "FreeStreamerDesktop" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -273,11 +343,20 @@
 			projectRoot = "";
 			targets = (
 				60322859182411B500B7027B /* FreeStreamerDesktop */,
+				601121B318DA3C1C00B5E913 /* FreeStreamerDesktopTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		601121B218DA3C1C00B5E913 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				601121BB18DA3C1D00B5E913 /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		60322858182411B500B7027B /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -292,6 +371,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		601121B018DA3C1C00B5E913 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				601121BD18DA3C1D00B5E913 /* FreeStreamerDesktopTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		60322856182411B500B7027B /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -317,7 +404,23 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		601121C018DA3C1D00B5E913 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 60322859182411B500B7027B /* FreeStreamerDesktop */;
+			targetProxy = 601121BF18DA3C1D00B5E913 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin PBXVariantGroup section */
+		601121B918DA3C1D00B5E913 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				601121BA18DA3C1D00B5E913 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
 		6066DA70182422E00005E1A2 /* Credits.rtf */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -337,6 +440,48 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		601121C118DA3C1D00B5E913 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/FreeStreamerDesktop.app/Contents/MacOS/FreeStreamerDesktop";
+				CLANG_ENABLE_MODULES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(inherited)",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "FreeStreamerDesktopTests/FreeStreamerDesktopTests-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				INFOPLIST_FILE = "FreeStreamerDesktopTests/FreeStreamerDesktopTests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Debug;
+		};
+		601121C218DA3C1D00B5E913 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/FreeStreamerDesktop.app/Contents/MacOS/FreeStreamerDesktop";
+				CLANG_ENABLE_MODULES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(inherited)",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "FreeStreamerDesktopTests/FreeStreamerDesktopTests-Prefix.pch";
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				INFOPLIST_FILE = "FreeStreamerDesktopTests/FreeStreamerDesktopTests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Release;
+		};
 		60322889182411B500B7027B /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -446,6 +591,14 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		601121C318DA3C1D00B5E913 /* Build configuration list for PBXNativeTarget "FreeStreamerDesktopTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				601121C118DA3C1D00B5E913 /* Debug */,
+				601121C218DA3C1D00B5E913 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
 		60322855182411B500B7027B /* Build configuration list for PBXProject "FreeStreamerDesktop" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

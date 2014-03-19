@@ -28,6 +28,16 @@
       shouldUseLaunchSchemeArgsEnv = "YES"
       buildConfiguration = "Debug">
       <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "601121B318DA3C1C00B5E913"
+               BuildableName = "FreeStreamerDesktopTests.xctest"
+               BlueprintName = "FreeStreamerDesktopTests"
+               ReferencedContainer = "container:FreeStreamerDesktop.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
       <MacroExpansion>
          <BuildableReference
