@@ -146,7 +146,7 @@
                                                       }
                                                   }];
     
-    _stream.url = [NSURL URLWithString:@"ttps://dl.dropboxusercontent.com/u/995250/FreeStreamer/As%20long%20as%20the%20stars%20shine.mp3"];
+    _stream.url = [NSURL URLWithString:@"https://dl.dropboxusercontent.com/u/995250/FreeStreamer/As%20long%20as%20the%20stars%20shine.mp3"];
     [_stream play];
     
     NSTimeInterval timeout = 15.0;
