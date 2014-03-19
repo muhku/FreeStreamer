@@ -12,6 +12,7 @@
 		600507D5184E1FC60002314D /* FSParseRssPodcastFeedRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 600507D4184E1FC60002314D /* FSParseRssPodcastFeedRequest.m */; };
 		600507D7184E25690002314D /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 60CF9E601824158C00999FDF /* libxml2.dylib */; };
 		601369D2182C36AA001819D6 /* id3_parser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 601369D0182C36AA001819D6 /* id3_parser.cpp */; };
+		601C7D0618DA34C400ABBBB2 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 601C7D0518DA34C400ABBBB2 /* MainMenu.xib */; };
 		602C629B1847936B00EA657D /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 602C629A1847936B00EA657D /* Reachability.m */; };
 		6032285E182411B500B7027B /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6032285D182411B500B7027B /* Cocoa.framework */; };
 		6032289C1824121800B7027B /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6032289B1824121800B7027B /* AVFoundation.framework */; };
@@ -42,6 +43,7 @@
 		600507D4184E1FC60002314D /* FSParseRssPodcastFeedRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSParseRssPodcastFeedRequest.m; sourceTree = "<group>"; };
 		601369D0182C36AA001819D6 /* id3_parser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = id3_parser.cpp; path = astreamer/id3_parser.cpp; sourceTree = SOURCE_ROOT; };
 		601369D1182C36AA001819D6 /* id3_parser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = id3_parser.h; path = astreamer/id3_parser.h; sourceTree = SOURCE_ROOT; };
+		601C7D0518DA34C400ABBBB2 /* MainMenu.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = MainMenu.xib; path = FreeStreamerDesktop/MainMenu.xib; sourceTree = SOURCE_ROOT; };
 		602C62991847936B00EA657D /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
 		602C629A1847936B00EA657D /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
 		6032285A182411B500B7027B /* FreeStreamerDesktop.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FreeStreamerDesktop.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -177,6 +179,7 @@
 		60322864182411B500B7027B /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				601C7D0518DA34C400ABBBB2 /* MainMenu.xib */,
 				6066DA70182422E00005E1A2 /* Credits.rtf */,
 				6066DA72182422E00005E1A2 /* InfoPlist.strings */,
 				6066DA6E182422D70005E1A2 /* main.m */,
@@ -282,6 +285,7 @@
 				6066DA6D182422CC0005E1A2 /* Images.xcassets in Resources */,
 				6066DA75182422E00005E1A2 /* InfoPlist.strings in Resources */,
 				6066DA74182422E00005E1A2 /* Credits.rtf in Resources */,
+				601C7D0618DA34C400ABBBB2 /* MainMenu.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
