@@ -23,8 +23,8 @@ public:
     Audio_Queue_Delegate *m_delegate;
     
     static const size_t AQ_BUFFERS = 16;            // number of audio queue buffers we allocate
-    static const size_t AQ_BUFSIZ = 131072;           // number of bytes in each audio queue buffer
-    static const size_t AQ_MAX_PACKET_DESCS = 2048;  // Maximum number of packets which can be contained in one buffer
+    static const size_t AQ_BUFSIZ = 32768;          // number of bytes in each audio queue buffer
+    static const size_t AQ_MAX_PACKET_DESCS = 512;  // Maximum number of packets which can be contained in one buffer
     
     enum State {
         IDLE,
