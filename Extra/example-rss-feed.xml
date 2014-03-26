@@ -26,5 +26,9 @@
     	<title>BBC</title>
     	<link>http://www.bbc.co.uk/radio/listen/live/r5l_aaclca.pls</link>
     </item>
+    <item>
+    	<title>BBC Sports</title>
+    	<link>http://www.bbc.co.uk/radio/listen/live/r5lsp_aaclca.pls</link>
+    </item>
   </channel>
 </rss>
