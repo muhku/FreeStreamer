@@ -95,7 +95,7 @@ typedef struct {
 - (id)initWithUrl:(NSURL *)url;
 
 /**
- * Initializes the straem with a configuration.
+ * Initializes the stream with a configuration.
  *
  * @param configuration The stream configuration.
  */
