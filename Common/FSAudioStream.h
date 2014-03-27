@@ -61,6 +61,16 @@ typedef struct {
 } FSStreamPosition;
 
 /**
+ * The low-level stream configuration.
+ */
+typedef struct {
+    unsigned bufferCount;
+    unsigned bufferSize;
+    unsigned maxPacketDescs;
+    unsigned decodeQueueSize;
+} FSStreamConfiguration;
+
+/**
  * FSAudioStream is a class for streaming audio files from an URL.
  * It must be directly fed with an URL, which contains audio. That is,
  * playlists or other non-audio formats yield an error.
@@ -83,6 +93,13 @@ typedef struct {
  * @param url The URL from which the stream data is retrieved.
  */
 - (id)initWithUrl:(NSURL *)url;
+
+/**
+ * Initializes the straem with a configuration.
+ *
+ * @param configuration The stream configuration.
+ */
+- (id)initWithConfiguration:(FSStreamConfiguration)configuration;
 
 /**
  * Starts playing the stream. If no playback URL is
@@ -185,6 +202,10 @@ typedef struct {
  * Called upon a failure.
  */
 @property (copy) void (^onFailure)();
+/**
+ * The property has the low-level stream configuration.
+ */
+@property (readonly) FSStreamConfiguration configuration;
 /**
  * The last stream error.
  */

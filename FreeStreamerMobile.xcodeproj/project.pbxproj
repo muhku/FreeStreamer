@@ -25,6 +25,7 @@
 		60B813F118C532F8001CC5A7 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60B813D918C532F8001CC5A7 /* UIKit.framework */; };
 		60B813F918C532F8001CC5A7 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 60B813F718C532F8001CC5A7 /* InfoPlist.strings */; };
 		60B813FB18C532F8001CC5A7 /* FreeStreamerMobileTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 60B813FA18C532F8001CC5A7 /* FreeStreamerMobileTests.m */; };
+		60BCF70918E49B16007B243E /* stream_configuration.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60BCF70718E49B16007B243E /* stream_configuration.cpp */; };
 		60CF8BD518C5332F00C657A8 /* audio_queue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CF8BCB18C5332F00C657A8 /* audio_queue.cpp */; };
 		60CF8BD618C5332F00C657A8 /* audio_stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CF8BCD18C5332F00C657A8 /* audio_stream.cpp */; };
 		60CF8BD718C5332F00C657A8 /* file_output.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60CF8BCF18C5332F00C657A8 /* file_output.cpp */; };
@@ -84,6 +85,8 @@
 		60B813F618C532F8001CC5A7 /* FreeStreamerMobileTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "FreeStreamerMobileTests-Info.plist"; sourceTree = "<group>"; };
 		60B813F818C532F8001CC5A7 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		60B813FA18C532F8001CC5A7 /* FreeStreamerMobileTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FreeStreamerMobileTests.m; sourceTree = "<group>"; };
+		60BCF70718E49B16007B243E /* stream_configuration.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = stream_configuration.cpp; sourceTree = "<group>"; };
+		60BCF70818E49B16007B243E /* stream_configuration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stream_configuration.h; sourceTree = "<group>"; };
 		60CF8BCB18C5332F00C657A8 /* audio_queue.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = audio_queue.cpp; sourceTree = "<group>"; };
 		60CF8BCC18C5332F00C657A8 /* audio_queue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = audio_queue.h; sourceTree = "<group>"; };
 		60CF8BCD18C5332F00C657A8 /* audio_stream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = audio_stream.cpp; sourceTree = "<group>"; };
@@ -269,6 +272,8 @@
 				60CF8BD218C5332F00C657A8 /* http_stream.h */,
 				60CF8BD318C5332F00C657A8 /* id3_parser.cpp */,
 				60CF8BD418C5332F00C657A8 /* id3_parser.h */,
+				60BCF70718E49B16007B243E /* stream_configuration.cpp */,
+				60BCF70818E49B16007B243E /* stream_configuration.h */,
 			);
 			path = astreamer;
 			sourceTree = "<group>";
@@ -418,6 +423,7 @@
 				60CF8BE018C5333B00C657A8 /* FSFrequencyPlotView.m in Sources */,
 				60CF8BD818C5332F00C657A8 /* http_stream.cpp in Sources */,
 				60CF8BD918C5332F00C657A8 /* id3_parser.cpp in Sources */,
+				60BCF70918E49B16007B243E /* stream_configuration.cpp in Sources */,
 				60CF8C0218C5337000C657A8 /* FSPlaylistItem.m in Sources */,
 				60B813E618C532F8001CC5A7 /* FSAppDelegate.m in Sources */,
 				60CF8BEA18C5335200C657A8 /* FSPlayerViewController.m in Sources */,

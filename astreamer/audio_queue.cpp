@@ -12,6 +12,7 @@
  */
 
 #include "audio_queue.h"
+#include "stream_configuration.h"
 
 #include <cassert>
 
@@ -47,7 +48,13 @@ Audio_Queue::Audio_Queue()
     m_queuedTail(0),
     m_lastError(noErr)
 {
-    for (size_t i=0; i < AQ_BUFFERS; i++) {
+    Stream_Configuration *config = Stream_Configuration::configuration();
+    
+    m_audioQueueBuffer = new AudioQueueBufferRef[config->bufferCount];
+    m_packetDescs = new AudioStreamPacketDescription[config->maxPacketDescs];
+    m_bufferInUse = new bool[config->bufferCount];
+    
+    for (size_t i=0; i < config->bufferCount; i++) {
         m_bufferInUse[i] = false;
     }
 }
@@ -57,6 +64,10 @@ Audio_Queue::~Audio_Queue()
     stop(true);
     
     cleanup();
+    
+    delete [] m_audioQueueBuffer;
+    delete [] m_packetDescs;
+    delete [] m_bufferInUse;
 }
     
 bool Audio_Queue::initialized()
@@ -182,9 +193,11 @@ void Audio_Queue::handlePropertyChange(AudioFileStreamID inAudioFileStream, Audi
                 break;
             }
             
+            Stream_Configuration *configuration = Stream_Configuration::configuration();
+            
             // allocate audio queue buffers
-            for (unsigned int i = 0; i < AQ_BUFFERS; ++i) {
-                err = AudioQueueAllocateBuffer(m_outAQ, AQ_BUFSIZ, &m_audioQueueBuffer[i]);
+            for (unsigned int i = 0; i < configuration->bufferCount; ++i) {
+                err = AudioQueueAllocateBuffer(m_outAQ, configuration->bufferSize, &m_audioQueueBuffer[i]);
                 if (err) {
                     /* If allocating the buffers failed, everything else will fail, too.
                      *  Dispose the queue so that we can later on detect that this
@@ -272,6 +285,8 @@ int Audio_Queue::handlePacket(const void *data, AudioStreamPacketDescription *de
         return -1;
     }
     
+    Stream_Configuration *config = Stream_Configuration::configuration();
+    
     AQ_TRACE("%s: enter\n", __PRETTY_FUNCTION__);
     
     UInt32 packetSize = desc->mDataByteSize;
@@ -279,14 +294,14 @@ int Audio_Queue::handlePacket(const void *data, AudioStreamPacketDescription *de
     /* This shouldn't happen because most of the time we read the packet buffer
      size from the file stream, but if we restored to guessing it we could
      come up too small here */
-    if (packetSize > AQ_BUFSIZ) {
+    if (packetSize > config->bufferSize) {
         AQ_TRACE("%s: packetSize %u > AQ_BUFSIZ %li\n", __PRETTY_FUNCTION__, (unsigned int)packetSize, AQ_BUFSIZ);
         return -1;
     }
     
     // if the space remaining in the buffer is not enough for this packet, then
     // enqueue the buffer and wait for another to become available.
-    if (AQ_BUFSIZ - m_bytesFilled < packetSize) {
+    if (config->bufferSize - m_bytesFilled < packetSize) {
         int hasFreeBuffer = enqueueBuffer();
         if (hasFreeBuffer <= 0) {
             return hasFreeBuffer;
@@ -308,7 +323,7 @@ int Audio_Queue::handlePacket(const void *data, AudioStreamPacketDescription *de
     m_packetsFilled++;
     
     /* If filled our buffer with packets, then commit it to the system */
-    if (m_packetsFilled >= AQ_MAX_PACKET_DESCS) {
+    if (m_packetsFilled >= config->maxPacketDescs) {
         return enqueueBuffer();
     }
     return 1;
@@ -323,6 +338,8 @@ void Audio_Queue::cleanup()
         
         return;
     }
+    
+    Stream_Configuration *config = Stream_Configuration::configuration();
     
     if (m_state != IDLE) {
         AQ_TRACE("%s: attemping to cleanup the audio queue when it is still playing, force stopping\n",
@@ -343,7 +360,7 @@ void Audio_Queue::cleanup()
     m_outAQ = 0;
     m_fillBufferIndex = m_bytesFilled = m_packetsFilled = m_buffersUsed = 0;
     
-    for (size_t i=0; i < AQ_BUFFERS; i++) {
+    for (size_t i=0; i < config->bufferCount; i++) {
         m_bufferInUse[i] = false;
     }
     
@@ -377,6 +394,8 @@ int Audio_Queue::enqueueBuffer()
 {
     assert(!m_bufferInUse[m_fillBufferIndex]);
     
+    Stream_Configuration *config = Stream_Configuration::configuration();
+    
     AQ_TRACE("%s: enter\n", __PRETTY_FUNCTION__);
     
     m_bufferInUse[m_fillBufferIndex] = true;
@@ -400,7 +419,7 @@ int Audio_Queue::enqueueBuffer()
     }
     
     // go to next buffer
-    if (++m_fillBufferIndex >= AQ_BUFFERS) {
+    if (++m_fillBufferIndex >= config->bufferCount) {
         m_fillBufferIndex = 0; 
     }
     // reset bytes filled
@@ -424,7 +443,9 @@ int Audio_Queue::enqueueBuffer()
     
 int Audio_Queue::findQueueBuffer(AudioQueueBufferRef inBuffer)
 {
-    for (unsigned int i = 0; i < AQ_BUFFERS; ++i) {
+    Stream_Configuration *config = Stream_Configuration::configuration();
+    
+    for (unsigned int i = 0; i < config->bufferCount; ++i) {
         if (inBuffer == m_audioQueueBuffer[i]) {
             AQ_TRACE("findQueueBuffer %i\n", i);
             return i;

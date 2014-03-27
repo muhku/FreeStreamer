@@ -36,6 +36,7 @@
 		6066DAE5182427A30005E1A2 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6066DA6E182422D70005E1A2 /* main.m */; };
 		609F6DA718295684000E45B2 /* FSCheckContentTypeRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 609F6DA618295684000E45B2 /* FSCheckContentTypeRequest.m */; };
 		609F6DAA18295F54000E45B2 /* FSParsePlaylistRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 609F6DA918295F54000E45B2 /* FSParsePlaylistRequest.m */; };
+		60BCF70C18E4A400007B243E /* stream_configuration.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60BCF70A18E4A400007B243E /* stream_configuration.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -102,6 +103,8 @@
 		60AA8F73182412F9001DE57B /* audio_stream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = audio_stream.h; path = astreamer/audio_stream.h; sourceTree = SOURCE_ROOT; };
 		60AA8F74182412F9001DE57B /* http_stream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = http_stream.cpp; path = astreamer/http_stream.cpp; sourceTree = SOURCE_ROOT; };
 		60AA8F75182412F9001DE57B /* http_stream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = http_stream.h; path = astreamer/http_stream.h; sourceTree = SOURCE_ROOT; };
+		60BCF70A18E4A400007B243E /* stream_configuration.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = stream_configuration.cpp; path = astreamer/stream_configuration.cpp; sourceTree = SOURCE_ROOT; };
+		60BCF70B18E4A400007B243E /* stream_configuration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = stream_configuration.h; path = astreamer/stream_configuration.h; sourceTree = SOURCE_ROOT; };
 		60CF9E511824156F00999FDF /* FSAudioController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSAudioController.h; sourceTree = "<group>"; };
 		60CF9E521824156F00999FDF /* FSAudioController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSAudioController.m; sourceTree = "<group>"; };
 		60CF9E531824156F00999FDF /* FSAudioStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSAudioStream.h; sourceTree = "<group>"; };
@@ -238,6 +241,8 @@
 		60322891182411F000B7027B /* astreamer */ = {
 			isa = PBXGroup;
 			children = (
+				60BCF70A18E4A400007B243E /* stream_configuration.cpp */,
+				60BCF70B18E4A400007B243E /* stream_configuration.h */,
 				604849DE18662FE100E8F808 /* file_output.cpp */,
 				604849DF18662FE100E8F808 /* file_output.h */,
 				601369D0182C36AA001819D6 /* id3_parser.cpp */,
@@ -389,6 +394,7 @@
 				6066DAD4182427A30005E1A2 /* FSAudioStream.mm in Sources */,
 				6066DAD8182427A30005E1A2 /* FSPlaylistItem.m in Sources */,
 				600507D5184E1FC60002314D /* FSParseRssPodcastFeedRequest.m in Sources */,
+				60BCF70C18E4A400007B243E /* stream_configuration.cpp in Sources */,
 				600507D0184E1DCF0002314D /* FSXMLHttpRequest.m in Sources */,
 				6066DADB182427A30005E1A2 /* audio_queue.cpp in Sources */,
 				6066DADD182427A30005E1A2 /* audio_stream.cpp in Sources */,
@@ -598,6 +604,7 @@
 				601121C218DA3C1D00B5E913 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		60322855182411B500B7027B /* Build configuration list for PBXProject "FreeStreamerDesktop" */ = {
 			isa = XCConfigurationList;

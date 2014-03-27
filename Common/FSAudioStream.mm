@@ -9,6 +9,7 @@
 #import "Reachability.h"
 
 #include "audio_stream.h"
+#include "stream_configuration.h"
 
 #import <AVFoundation/AVFoundation.h>
 
@@ -72,6 +73,7 @@ public:
 @property (nonatomic,assign) NSString *suggestedFileExtension;
 @property (nonatomic,assign) NSURL *outputFile;
 @property (nonatomic,assign) BOOL wasInterrupted;
+@property (readonly) FSStreamConfiguration configuration;
 @property (copy) void (^onCompletion)();
 @property (copy) void (^onFailure)();
 @property (nonatomic,assign) FSAudioStreamError lastError;
@@ -265,6 +267,20 @@ public:
     _audioStream->setOutputFile((__bridge CFURLRef)copyOfURL);
 }
 
+- (FSStreamConfiguration)configuration
+{
+    FSStreamConfiguration config;
+    
+    astreamer::Stream_Configuration *c = astreamer::Stream_Configuration::configuration();
+    
+    config.bufferCount     = c->bufferCount;
+    config.bufferSize      = c->bufferSize;
+    config.maxPacketDescs  = c->maxPacketDescs;
+    config.decodeQueueSize = c->decodeQueueSize;
+
+    return config;
+}
+
 - (void)reachabilityChanged:(NSNotification *)note
 {
     Reachability *reach = [note object];
@@ -380,9 +396,14 @@ public:
 
 -(id)init
 {
-    if (self = [super init]) {
-        _private = [[FSAudioStreamPrivate alloc] init];
-        _private.stream = self;
+    FSStreamConfiguration defaultConfiguration;
+    
+    defaultConfiguration.bufferCount    = 16;
+    defaultConfiguration.bufferSize     = 65536;
+    defaultConfiguration.maxPacketDescs = 1024;
+    defaultConfiguration.decodeQueueSize = 32;
+    
+    if (self = [self initWithConfiguration:defaultConfiguration]) {
     }
     return self;
 }
@@ -391,6 +412,22 @@ public:
 {
     if (self = [self init]) {
         _private.url = url;
+    }
+    return self;
+}
+
+- (id)initWithConfiguration:(FSStreamConfiguration)configuration
+{
+    if (self = [super init]) {
+        astreamer::Stream_Configuration *c = astreamer::Stream_Configuration::configuration();
+        
+        c->bufferCount     = configuration.bufferCount;
+        c->bufferSize      = configuration.bufferSize;
+        c->maxPacketDescs  = configuration.maxPacketDescs;
+        c->decodeQueueSize = configuration.decodeQueueSize;
+        
+        _private = [[FSAudioStreamPrivate alloc] init];
+        _private.stream = self;
     }
     return self;
 }
@@ -534,6 +571,11 @@ public:
     _private.onFailure = onFailure;
 }
 
+- (FSStreamConfiguration)configuration
+{
+    return _private.configuration;
+}
+
 - (FSAudioStreamError)lastError
 {
     return _private.lastError;
@@ -547,6 +589,15 @@ public:
 - (id<FSPCMAudioStreamDelegate>)delegate
 {
     return _private.delegate;
+}
+
+-(NSString *)description
+{
+    return [NSString stringWithFormat:@"bufferCount: %i, bufferSize: %i, maxPacketDescs: %i, decodeQueueSize: %i",
+            self.configuration.bufferCount,
+            self.configuration.bufferSize,
+            self.configuration.maxPacketDescs,
+            self.configuration.decodeQueueSize];
 }
 
 @end

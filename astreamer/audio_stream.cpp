@@ -6,6 +6,7 @@
 
 #include "audio_stream.h"
 #include "file_output.h"
+#include "stream_configuration.h"
 
 /*
  * Some servers may send an incorrect MIME type for the audio stream.
@@ -37,7 +38,7 @@ Audio_Stream::Audio_Stream() :
     m_audioQueue(0),
     m_audioFileStream(0),
     m_audioConverter(0),
-    m_outputBufferSize(Audio_Queue::AQ_BUFSIZ),
+    m_outputBufferSize(Stream_Configuration::configuration()->bufferSize),
     m_outputBuffer(new UInt8[m_outputBufferSize]),
     m_dataOffset(0),
     m_seekTime(0),
@@ -758,7 +759,9 @@ void Audio_Stream::streamDataCallback(void *inClientData, UInt32 inNumberBytes, 
         count++;
     }
     
-    if (count > kAudioStreamDecodeQueueSize) {
+    Stream_Configuration *config = Stream_Configuration::configuration();
+    
+    if (count > config->decodeQueueSize) {
         THIS->setState(PLAYING);
         
         AudioBufferList outputBufferList;
@@ -802,7 +805,7 @@ void Audio_Stream::streamDataCallback(void *inClientData, UInt32 inNumberBytes, 
             THIS->m_processedPackets.clear();
         }
     } else {
-        AS_TRACE("Less than %i packets queued, returning...\n", kAudioStreamDecodeQueueSize);
+        AS_TRACE("Less than %i packets queued, returning...\n", config->decodeQueueSize);
     }
 }
 

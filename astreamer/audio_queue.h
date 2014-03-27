@@ -22,10 +22,6 @@ class Audio_Queue {
 public:
     Audio_Queue_Delegate *m_delegate;
     
-    static const size_t AQ_BUFFERS = 16;            // number of audio queue buffers we allocate
-    static const size_t AQ_BUFSIZ = 131072;           // number of bytes in each audio queue buffer
-    static const size_t AQ_MAX_PACKET_DESCS = 2048;  // Maximum number of packets which can be contained in one buffer
-    
     enum State {
         IDLE,
         RUNNING,
@@ -58,8 +54,8 @@ private:
     
     AudioQueueRef m_outAQ;                                           // the audio queue
     
-    AudioQueueBufferRef m_audioQueueBuffer[AQ_BUFFERS];              // audio queue buffers	
-    AudioStreamPacketDescription m_packetDescs[AQ_MAX_PACKET_DESCS]; // packet descriptions for enqueuing audio
+    AudioQueueBufferRef *m_audioQueueBuffer;              // audio queue buffers
+    AudioStreamPacketDescription *m_packetDescs; // packet descriptions for enqueuing audio
     
     UInt32 m_fillBufferIndex;                                        // the index of the audioQueueBuffer that is being filled
     UInt32 m_bytesFilled;                                            // how many bytes have been filled
@@ -67,7 +63,7 @@ private:
     UInt32 m_buffersUsed;                                            // how many buffers are used
     
     bool m_audioQueueStarted;                                        // flag to indicate that the queue has been started
-    bool m_bufferInUse[AQ_BUFFERS];                                  // flags to indicate that a buffer is still in use
+    bool *m_bufferInUse;                                  // flags to indicate that a buffer is still in use
     bool m_waitingOnBuffer;
     
     struct queued_packet *m_queuedHead;
