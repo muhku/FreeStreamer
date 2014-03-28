@@ -41,6 +41,9 @@ FSStreamConfiguration makeFreeStreamerDefaultConfiguration()
     #else
         /* 32-bit CPU, a bit older iPhone/iPad, increase
          *  the buffer sizes a bit.
+         *
+         * Discussed here:
+         * https://github.com/muhku/FreeStreamer/issues/41
          */
         int scale = 2;
     
