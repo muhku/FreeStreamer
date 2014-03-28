@@ -21,6 +21,40 @@
 #import <MediaPlayer/MediaPlayer.h>
 #endif
 
+FSStreamConfiguration makeFreeStreamerDefaultConfiguration()
+{
+    FSStreamConfiguration defaultConfiguration;
+    
+#if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
+    /* iOS */
+    
+    #ifdef __LP64__
+        /* Running on iPhone 5s or later, need less juice for the buffers */
+        defaultConfiguration.bufferCount    = 8;
+        defaultConfiguration.bufferSize     = 32768;
+        defaultConfiguration.maxPacketDescs = 512;
+        defaultConfiguration.decodeQueueSize = 32;
+        defaultConfiguration.httpConnectionBufferSize = 2048;
+    #else
+        /* 32-bit CPU, a bit older model */
+        defaultConfiguration.bufferCount    = 16;
+        defaultConfiguration.bufferSize     = 65536;
+        defaultConfiguration.maxPacketDescs = 1024;
+        defaultConfiguration.decodeQueueSize = 32;
+        defaultConfiguration.httpConnectionBufferSize = 2048;
+    #endif
+#else
+    /* OS X */
+    defaultConfiguration.bufferCount    = 8;
+    defaultConfiguration.bufferSize     = 32768;
+    defaultConfiguration.maxPacketDescs = 512;
+    defaultConfiguration.decodeQueueSize = 32;
+    defaultConfiguration.httpConnectionBufferSize = 2048;
+#endif
+    
+    return defaultConfiguration;
+}
+
 NSString* const FSAudioStreamStateChangeNotification = @"FSAudioStreamStateChangeNotification";
 NSString* const FSAudioStreamNotificationKey_Stream = @"stream";
 NSString* const FSAudioStreamNotificationKey_State = @"state";
@@ -397,34 +431,7 @@ public:
 
 -(id)init
 {
-    FSStreamConfiguration defaultConfiguration;
-
-#if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
-    /* iOS */
-    
-    #ifdef __LP64__
-        /* Running on iPhone 5s or later, need less juice for the buffers */
-        defaultConfiguration.bufferCount    = 8;
-        defaultConfiguration.bufferSize     = 32768;
-        defaultConfiguration.maxPacketDescs = 512;
-        defaultConfiguration.decodeQueueSize = 32;
-        defaultConfiguration.httpConnectionBufferSize = 2048;
-    #else
-        /* 32-bit CPU, a bit older model */
-        defaultConfiguration.bufferCount    = 16;
-        defaultConfiguration.bufferSize     = 65536;
-        defaultConfiguration.maxPacketDescs = 1024;
-        defaultConfiguration.decodeQueueSize = 32;
-        defaultConfiguration.httpConnectionBufferSize = 2048;
-    #endif
-#else
-    /* OS X */
-    defaultConfiguration.bufferCount    = 8;
-    defaultConfiguration.bufferSize     = 32768;
-    defaultConfiguration.maxPacketDescs = 512;
-    defaultConfiguration.decodeQueueSize = 32;
-    defaultConfiguration.httpConnectionBufferSize = 2048;
-#endif
+    FSStreamConfiguration defaultConfiguration = makeFreeStreamerDefaultConfiguration();
     
     if (self = [self initWithConfiguration:defaultConfiguration]) {
     }

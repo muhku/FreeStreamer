@@ -71,6 +71,8 @@ typedef struct {
     unsigned httpConnectionBufferSize;
 } FSStreamConfiguration;
 
+FSStreamConfiguration makeFreeStreamerDefaultConfiguration();
+
 /**
  * FSAudioStream is a class for streaming audio files from an URL.
  * It must be directly fed with an URL, which contains audio. That is,
