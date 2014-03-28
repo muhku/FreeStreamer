@@ -28,8 +28,6 @@ private:
     HTTP_Stream(const HTTP_Stream&);
     HTTP_Stream& operator=(const HTTP_Stream&);
     
-    static const size_t STREAM_BUFSIZ;
-    
     static CFStringRef httpRequestMethod;
     static CFStringRef httpUserAgentHeader;
     static CFStringRef httpUserAgentValue;

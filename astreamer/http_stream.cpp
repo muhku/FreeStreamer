@@ -7,6 +7,7 @@
 #include "http_stream.h"
 #include "audio_queue.h"
 #include "id3_parser.h"
+#include "stream_configuration.h"
 
 /*
  * Comment the following line to disable ID3 tag support:
@@ -14,8 +15,6 @@
 #define INCLUDE_ID3TAG_SUPPORT 1
 
 namespace astreamer {
-
-const size_t HTTP_Stream::STREAM_BUFSIZ = 2048;
 
 CFStringRef HTTP_Stream::httpRequestMethod   = CFSTR("GET");
 CFStringRef HTTP_Stream::httpUserAgentHeader = CFSTR("User-Agent");
@@ -425,8 +424,10 @@ void HTTP_Stream::parseICYStream(UInt8 *buf, CFIndex bufSize)
         }
     }
     
+    Stream_Configuration *config = Stream_Configuration::configuration();
+    
     if (!m_icyReadBuffer) {
-        m_icyReadBuffer = new UInt8[STREAM_BUFSIZ];
+        m_icyReadBuffer = new UInt8[config->httpConnectionBufferSize];
     }
     
     UInt32 i=0;
@@ -562,10 +563,12 @@ void HTTP_Stream::readCallBack(CFReadStreamRef stream, CFStreamEventType eventTy
 {
     HTTP_Stream *THIS = static_cast<HTTP_Stream*>(clientCallBackInfo);
     
+    Stream_Configuration *config = Stream_Configuration::configuration();
+    
     switch (eventType) {
         case kCFStreamEventHasBytesAvailable: {
             if (!THIS->m_httpReadBuffer) {
-                THIS->m_httpReadBuffer = new UInt8[STREAM_BUFSIZ];
+                THIS->m_httpReadBuffer = new UInt8[config->httpConnectionBufferSize];
             }
             
             while (CFReadStreamHasBytesAvailable(stream)) {
@@ -580,7 +583,7 @@ void HTTP_Stream::readCallBack(CFReadStreamRef stream, CFStreamEventType eventTy
                     break;
                 }
                 
-                CFIndex bytesRead = CFReadStreamRead(stream, THIS->m_httpReadBuffer, STREAM_BUFSIZ);
+                CFIndex bytesRead = CFReadStreamRead(stream, THIS->m_httpReadBuffer, config->httpConnectionBufferSize);
                 
                 if (CFReadStreamGetStatus(stream) == kCFStreamStatusError ||
                     bytesRead < 0) {

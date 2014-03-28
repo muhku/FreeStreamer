@@ -273,10 +273,11 @@ public:
     
     astreamer::Stream_Configuration *c = astreamer::Stream_Configuration::configuration();
     
-    config.bufferCount     = c->bufferCount;
-    config.bufferSize      = c->bufferSize;
-    config.maxPacketDescs  = c->maxPacketDescs;
-    config.decodeQueueSize = c->decodeQueueSize;
+    config.bufferCount              = c->bufferCount;
+    config.bufferSize               = c->bufferSize;
+    config.maxPacketDescs           = c->maxPacketDescs;
+    config.decodeQueueSize          = c->decodeQueueSize;
+    config.httpConnectionBufferSize = c->httpConnectionBufferSize;
 
     return config;
 }
@@ -407,12 +408,14 @@ public:
         defaultConfiguration.bufferSize     = 32768;
         defaultConfiguration.maxPacketDescs = 512;
         defaultConfiguration.decodeQueueSize = 32;
+        defaultConfiguration.httpConnectionBufferSize = 2048;
     #else
         /* 32-bit CPU, a bit older model */
         defaultConfiguration.bufferCount    = 16;
         defaultConfiguration.bufferSize     = 65536;
         defaultConfiguration.maxPacketDescs = 1024;
         defaultConfiguration.decodeQueueSize = 32;
+        defaultConfiguration.httpConnectionBufferSize = 2048;
     #endif
 #else
     /* OS X */
@@ -420,6 +423,7 @@ public:
     defaultConfiguration.bufferSize     = 32768;
     defaultConfiguration.maxPacketDescs = 512;
     defaultConfiguration.decodeQueueSize = 32;
+    defaultConfiguration.httpConnectionBufferSize = 2048;
 #endif
     
     if (self = [self initWithConfiguration:defaultConfiguration]) {
@@ -440,10 +444,11 @@ public:
     if (self = [super init]) {
         astreamer::Stream_Configuration *c = astreamer::Stream_Configuration::configuration();
         
-        c->bufferCount     = configuration.bufferCount;
-        c->bufferSize      = configuration.bufferSize;
-        c->maxPacketDescs  = configuration.maxPacketDescs;
-        c->decodeQueueSize = configuration.decodeQueueSize;
+        c->bufferCount              = configuration.bufferCount;
+        c->bufferSize               = configuration.bufferSize;
+        c->maxPacketDescs           = configuration.maxPacketDescs;
+        c->decodeQueueSize          = configuration.decodeQueueSize;
+        c->httpConnectionBufferSize = configuration.httpConnectionBufferSize;
         
         _private = [[FSAudioStreamPrivate alloc] init];
         _private.stream = self;
@@ -612,11 +617,12 @@ public:
 
 -(NSString *)description
 {
-    return [NSString stringWithFormat:@"bufferCount: %i, bufferSize: %i, maxPacketDescs: %i, decodeQueueSize: %i",
+    return [NSString stringWithFormat:@"bufferCount: %i, bufferSize: %i, maxPacketDescs: %i, decodeQueueSize: %i, httpConnectionBufferSize: %i",
             self.configuration.bufferCount,
             self.configuration.bufferSize,
             self.configuration.maxPacketDescs,
-            self.configuration.decodeQueueSize];
+            self.configuration.decodeQueueSize,
+            self.configuration.httpConnectionBufferSize];
 }
 
 @end

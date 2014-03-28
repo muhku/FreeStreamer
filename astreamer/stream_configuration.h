@@ -14,6 +14,7 @@ struct Stream_Configuration {
     unsigned bufferSize;
     unsigned maxPacketDescs;
     unsigned decodeQueueSize;
+    unsigned httpConnectionBufferSize;
     
     static Stream_Configuration *configuration();
     

@@ -68,6 +68,7 @@ typedef struct {
     unsigned bufferSize;
     unsigned maxPacketDescs;
     unsigned decodeQueueSize;
+    unsigned httpConnectionBufferSize;
 } FSStreamConfiguration;
 
 /**
