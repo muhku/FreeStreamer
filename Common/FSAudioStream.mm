@@ -25,31 +25,33 @@ FSStreamConfiguration makeFreeStreamerDefaultConfiguration()
 {
     FSStreamConfiguration defaultConfiguration;
     
-#if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
-    /* iOS */
-    
-    #ifdef __LP64__
-        /* Running on iPhone 5s or later, need less juice for the buffers */
-        defaultConfiguration.bufferCount    = 8;
-        defaultConfiguration.bufferSize     = 32768;
-        defaultConfiguration.maxPacketDescs = 512;
-        defaultConfiguration.decodeQueueSize = 32;
-        defaultConfiguration.httpConnectionBufferSize = 1024;
-    #else
-        /* 32-bit CPU, a bit older model */
-        defaultConfiguration.bufferCount    = 16;
-        defaultConfiguration.bufferSize     = 65536;
-        defaultConfiguration.maxPacketDescs = 1024;
-        defaultConfiguration.decodeQueueSize = 32;
-        defaultConfiguration.httpConnectionBufferSize = 1024;
-    #endif
-#else
-    /* OS X */
     defaultConfiguration.bufferCount    = 8;
     defaultConfiguration.bufferSize     = 32768;
     defaultConfiguration.maxPacketDescs = 512;
     defaultConfiguration.decodeQueueSize = 32;
     defaultConfiguration.httpConnectionBufferSize = 1024;
+    
+#if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
+    /* iOS */
+    
+    #ifdef __LP64__
+        /* Running on iPhone 5s or later,
+         * so the default configuration is OK
+         */
+    #else
+        /* 32-bit CPU, a bit older iPhone/iPad, increase
+         *  the buffer sizes a bit.
+         */
+        int scale = 2;
+    
+        defaultConfiguration.bufferCount    *= scale;
+        defaultConfiguration.bufferSize     *= scale;
+        defaultConfiguration.maxPacketDescs *= scale;
+    #endif
+#else
+    /* OS X */
+    
+    // Default configuration is OK
 #endif
     
     return defaultConfiguration;
