@@ -34,14 +34,14 @@ FSStreamConfiguration makeFreeStreamerDefaultConfiguration()
         defaultConfiguration.bufferSize     = 32768;
         defaultConfiguration.maxPacketDescs = 512;
         defaultConfiguration.decodeQueueSize = 32;
-        defaultConfiguration.httpConnectionBufferSize = 2048;
+        defaultConfiguration.httpConnectionBufferSize = 1024;
     #else
         /* 32-bit CPU, a bit older model */
         defaultConfiguration.bufferCount    = 16;
         defaultConfiguration.bufferSize     = 65536;
         defaultConfiguration.maxPacketDescs = 1024;
         defaultConfiguration.decodeQueueSize = 32;
-        defaultConfiguration.httpConnectionBufferSize = 2048;
+        defaultConfiguration.httpConnectionBufferSize = 1024;
     #endif
 #else
     /* OS X */
@@ -49,7 +49,7 @@ FSStreamConfiguration makeFreeStreamerDefaultConfiguration()
     defaultConfiguration.bufferSize     = 32768;
     defaultConfiguration.maxPacketDescs = 512;
     defaultConfiguration.decodeQueueSize = 32;
-    defaultConfiguration.httpConnectionBufferSize = 2048;
+    defaultConfiguration.httpConnectionBufferSize = 1024;
 #endif
     
     return defaultConfiguration;
