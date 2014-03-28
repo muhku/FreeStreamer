@@ -403,8 +403,11 @@ void HTTP_Stream::parseICYStream(UInt8 *buf, CFIndex bufSize)
     } else if (!m_icyHeadersParsed) {
         const char *icyContentTypeHeader = "content-type:";
         const char *icyMetaDataHeader = "icy-metaint:";
+        const char *icyNameHeader = "icy-name:";
+
         size_t icyContenTypeHeaderLength = strlen(icyContentTypeHeader);
         size_t icyMetaDataHeaderLength = strlen(icyMetaDataHeader);
+        size_t icyNameHeaderLength = strlen(icyNameHeader);
         
         for (std::vector<std::string>::iterator h = m_icyHeaderLines.begin(); h != m_icyHeaderLines.end(); ++h) {
             if (h->compare(0, icyContenTypeHeaderLength, icyContentTypeHeader) == 0) {
@@ -413,6 +416,15 @@ void HTTP_Stream::parseICYStream(UInt8 *buf, CFIndex bufSize)
             
             if (h->compare(0, icyMetaDataHeaderLength, icyMetaDataHeader) == 0) {
                 m_icyMetaDataInterval = atoi(h->substr(icyMetaDataHeaderLength, h->length() - icyMetaDataHeaderLength).c_str());
+            }
+            
+            if (h->compare(0, icyNameHeaderLength, icyNameHeader) == 0) {
+                if (m_icyName) {
+                    CFRelease(m_icyName);
+                }
+                std::string icyName = h->substr(icyNameHeaderLength, h->length() - icyNameHeaderLength);
+                
+                m_icyName = CFStringCreateWithCString(kCFAllocatorDefault, icyName.c_str(), kCFStringEncodingUTF8);
             }
         }
         
