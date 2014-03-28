@@ -179,6 +179,47 @@
     XCTAssertFalse(timedOut, @"Timed out - the stream did not start playing");
 }
 
+- (void)testRadioHelsinkiPodcast
+{
+    [[NSNotificationCenter defaultCenter] addObserverForName:FSAudioStreamStateChangeNotification
+                                                      object:nil
+                                                       queue:nil
+                                                  usingBlock:^(NSNotification *notification) {
+                                                      
+                                                      NSLog(@"FSAudioStreamStateChangeNotification received!");
+                                                      
+                                                      int state = [[notification.userInfo valueForKey:FSAudioStreamNotificationKey_State] intValue];
+                                                      
+                                                      if (state == kFsAudioStreamPlaying) {
+                                                          _checkStreamState = YES;
+                                                          [_stream setVolume:0];
+                                                      }
+                                                  }];
+    
+    _controller.url = [NSURL URLWithString:@"http://www.radiohelsinki.fi/feed/podcast/"];
+    [_controller play];
+    
+    NSTimeInterval timeout = 15.0;
+    NSTimeInterval idle = 0.1;
+    BOOL timedOut = NO;
+    
+    NSDate *timeoutDate = [[NSDate alloc] initWithTimeIntervalSinceNow:timeout];
+    while (!timedOut && _keepRunning) {
+        NSDate *tick = [[NSDate alloc] initWithTimeIntervalSinceNow:idle];
+        [[NSRunLoop currentRunLoop] runUntilDate:tick];
+        timedOut = ([tick compare:timeoutDate] == NSOrderedDescending);
+        
+        if (_checkStreamState) {
+            // Stream started playing.
+            XCTAssertTrue(([_controller.stream.contentType isEqualToString:@"audio/mpeg"]), @"Invalid content type");
+            XCTAssertTrue(([_controller.stream.suggestedFileExtension isEqualToString:@"mp3"]), @"Invalid file extension");
+            
+            return;
+        }
+    }
+    XCTAssertFalse(timedOut, @"Timed out - the stream did not start playing");
+}
+
 - (void)testMetaData
 {
     [[NSNotificationCenter defaultCenter] addObserverForName:FSAudioStreamStateChangeNotification
