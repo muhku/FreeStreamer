@@ -179,4 +179,69 @@
     XCTAssertFalse(timedOut, @"Timed out - the stream did not start playing");
 }
 
+- (void)testMetaData
+{
+    [[NSNotificationCenter defaultCenter] addObserverForName:FSAudioStreamStateChangeNotification
+                                                      object:nil
+                                                       queue:nil
+                                                  usingBlock:^(NSNotification *notification) {
+                                                      
+                                                      NSLog(@"FSAudioStreamStateChangeNotification received!");
+                                                      
+                                                      int state = [[notification.userInfo valueForKey:FSAudioStreamNotificationKey_State] intValue];
+                                                      
+                                                      if (state == kFsAudioStreamPlaying) {
+                                                          _checkStreamState = YES;
+                                                          
+                                                          // Set the stream silent, better for testing
+                                                          [_controller.stream setVolume:0];
+                                                      }
+                                                  }];
+    
+    
+    [[NSNotificationCenter defaultCenter] addObserverForName:FSAudioStreamMetaDataNotification
+                                                      object:nil
+                                                       queue:nil
+                                                  usingBlock:^(NSNotification *notification) {
+                                                      
+                                                      NSDictionary *dict = [notification userInfo];
+                                                      NSDictionary *metaData = [dict valueForKey:FSAudioStreamNotificationKey_MetaData];
+                                                      
+                                                      NSLog(@"FSAudioStreamMetaDataNotification received!");
+                                                      
+                                                      NSString *stationName = metaData[@"IcecastStationName"];
+                                                      
+                                                      XCTAssertTrue([stationName isEqualToString:@"BBC 5Live"], @"Station name does not match.");
+                                                  }];
+    
+    _controller.url = [NSURL URLWithString:@"http://www.bbc.co.uk/radio/listen/live/r5l_aaclca.pls"];
+    [_controller play];
+    
+    NSTimeInterval timeout = 15.0;
+    NSTimeInterval idle = 0.1;
+    NSUInteger tickCounter = 0;
+    BOOL timedOut = NO;
+    
+    NSDate *timeoutDate = [[NSDate alloc] initWithTimeIntervalSinceNow:timeout];
+    while (!timedOut && _keepRunning) {
+        NSDate *tick = [[NSDate alloc] initWithTimeIntervalSinceNow:idle];
+        [[NSRunLoop currentRunLoop] runUntilDate:tick];
+        timedOut = ([tick compare:timeoutDate] == NSOrderedDescending);
+        
+        if (_checkStreamState) {
+            if (tickCounter > 20) {
+                NSLog(@"2 seconds passed since the stream started playing, checking the state");
+                
+                // Checks done, we are done.
+                _keepRunning = NO;
+                
+                return;
+            } else {
+                tickCounter++;
+            }
+        }
+    }
+    XCTAssertFalse(timedOut, @"Timed out - the stream did not start playing");
+}
+
 @end
