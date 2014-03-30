@@ -61,7 +61,9 @@ Audio_Stream::Audio_Stream() :
     
     memset(&m_dstFormat, 0, sizeof m_dstFormat);
     
-    m_dstFormat.mSampleRate = 44100;
+    Stream_Configuration *config = Stream_Configuration::configuration();
+    
+    m_dstFormat.mSampleRate = config->outputSampleRate;
     m_dstFormat.mFormatID = kAudioFormatLinearPCM;
     m_dstFormat.mFormatFlags = kLinearPCMFormatFlagIsSignedInteger | kAudioFormatFlagsNativeEndian | kAudioFormatFlagIsPacked;
     m_dstFormat.mBytesPerPacket = 4;

@@ -30,6 +30,15 @@ FSStreamConfiguration makeFreeStreamerDefaultConfiguration()
     defaultConfiguration.maxPacketDescs = 512;
     defaultConfiguration.decodeQueueSize = 32;
     defaultConfiguration.httpConnectionBufferSize = 1024;
+    defaultConfiguration.outputSampleRate = 44100;
+    
+#if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
+    AVAudioSession *session = [AVAudioSession sharedInstance];
+    double sampleRate = session.sampleRate;
+    if (sampleRate > 0) {
+        defaultConfiguration.outputSampleRate = sampleRate;
+    }
+#endif
     
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
     /* iOS */
@@ -317,6 +326,7 @@ public:
     config.maxPacketDescs           = c->maxPacketDescs;
     config.decodeQueueSize          = c->decodeQueueSize;
     config.httpConnectionBufferSize = c->httpConnectionBufferSize;
+    config.outputSampleRate         = c->outputSampleRate;
 
     return config;
 }
@@ -461,6 +471,7 @@ public:
         c->maxPacketDescs           = configuration.maxPacketDescs;
         c->decodeQueueSize          = configuration.decodeQueueSize;
         c->httpConnectionBufferSize = configuration.httpConnectionBufferSize;
+        c->outputSampleRate         = configuration.outputSampleRate;
         
         _private = [[FSAudioStreamPrivate alloc] init];
         _private.stream = self;
@@ -629,12 +640,13 @@ public:
 
 -(NSString *)description
 {
-    return [NSString stringWithFormat:@"bufferCount: %i, bufferSize: %i, maxPacketDescs: %i, decodeQueueSize: %i, httpConnectionBufferSize: %i",
+    return [NSString stringWithFormat:@"bufferCount: %i, bufferSize: %i, maxPacketDescs: %i, decodeQueueSize: %i, httpConnectionBufferSize: %i, outputSampleRate: %f",
             self.configuration.bufferCount,
             self.configuration.bufferSize,
             self.configuration.maxPacketDescs,
             self.configuration.decodeQueueSize,
-            self.configuration.httpConnectionBufferSize];
+            self.configuration.httpConnectionBufferSize,
+            self.configuration.outputSampleRate];
 }
 
 @end
