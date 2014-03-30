@@ -143,9 +143,9 @@ NSLog(@"Last error code: %i", audioController.stream.lastError);
 Reporting bugs and contributing
 ====================
 
-Your contributions are most welcome. If you want to send code, please a send a patch and make sure it can be merged to the master branch without conflicts.
+For code contributions, please create a pull request in Github.
 
-If you have anything to ask, you can use email.
+For bugs, please create a Github issue. I don't have time for private email support, so usually the best way to get help is to interact in Github.
 
 License
 ====================
