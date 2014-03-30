@@ -32,7 +32,7 @@ FSStreamConfiguration makeFreeStreamerDefaultConfiguration()
     defaultConfiguration.httpConnectionBufferSize = 1024;
     defaultConfiguration.outputSampleRate = 44100;
     
-#if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
+#if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 60000)
     AVAudioSession *session = [AVAudioSession sharedInstance];
     double sampleRate = session.sampleRate;
     if (sampleRate > 0) {
