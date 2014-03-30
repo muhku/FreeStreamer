@@ -60,11 +60,6 @@
  */
 @property (nonatomic,strong) IBOutlet UISlider *progressSlider;
 /**
- * Reference to the activity indicator. When the stream is buffering,
- * displays to the user.
- */
-@property (nonatomic,strong) IBOutlet UIActivityIndicatorView *activityIndicator;
-/**
  * Reference to the status label.
  */
 @property (nonatomic,strong) IBOutlet UILabel *statusLabel;

@@ -145,7 +145,6 @@
     
     self.selectedPlaylistItem = nil;
     
-    self.activityIndicator = nil;
     self.statusLabel = nil;
 }
 
@@ -198,7 +197,7 @@
     
     switch (state) {
         case kFsAudioStreamRetrievingURL:
-            [_activityIndicator startAnimating];
+            [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
             self.statusLabel.text = statusRetrievingURL;
             [_statusLabel setHidden:NO];
             self.progressSlider.enabled = NO;
@@ -208,7 +207,7 @@
             break;
             
         case kFsAudioStreamStopped:
-            [_activityIndicator stopAnimating];
+            [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
             self.statusLabel.text = statusEmpty;
             self.progressSlider.enabled = NO;
             self.playButton.hidden = NO;
@@ -218,7 +217,7 @@
             
         case kFsAudioStreamBuffering:
             self.statusLabel.text = statusBuffering;
-            [_activityIndicator startAnimating];
+            [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
             [_statusLabel setHidden:NO];
             self.progressSlider.enabled = NO;
             self.playButton.hidden = YES;
@@ -228,7 +227,7 @@
             
         case kFsAudioStreamSeeking:
             self.statusLabel.text = statusSeeking;
-            [_activityIndicator startAnimating];
+            [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
             [_statusLabel setHidden:NO];
             self.progressSlider.enabled = NO;
             self.playButton.hidden = YES;
@@ -239,7 +238,7 @@
         case kFsAudioStreamPlaying:
             [self determineStationNameWithMetaData:nil];
             
-            [_activityIndicator stopAnimating];
+            [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
             if ([self.statusLabel.text isEqualToString:statusBuffering] ||
                 [self.statusLabel.text isEqualToString:statusRetrievingURL] ||
                 [self.statusLabel.text isEqualToString:statusSeeking]) {
@@ -262,7 +261,7 @@
             break;
             
         case kFsAudioStreamFailed:
-            [_activityIndicator stopAnimating];
+            [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
             self.progressSlider.enabled = NO;
             self.playButton.hidden = NO;
             self.pauseButton.hidden = YES;
