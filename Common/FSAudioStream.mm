@@ -31,12 +31,17 @@ FSStreamConfiguration makeFreeStreamerDefaultConfiguration()
     defaultConfiguration.decodeQueueSize = 32;
     defaultConfiguration.httpConnectionBufferSize = 1024;
     defaultConfiguration.outputSampleRate = 44100;
+    defaultConfiguration.outputNumChannels = 2;
     
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 60000)
     AVAudioSession *session = [AVAudioSession sharedInstance];
     double sampleRate = session.sampleRate;
     if (sampleRate > 0) {
         defaultConfiguration.outputSampleRate = sampleRate;
+    }
+    NSInteger channels = session.outputNumberOfChannels;
+    if (channels > 0) {
+        defaultConfiguration.outputNumChannels = channels;
     }
 #endif
     
@@ -327,6 +332,7 @@ public:
     config.decodeQueueSize          = c->decodeQueueSize;
     config.httpConnectionBufferSize = c->httpConnectionBufferSize;
     config.outputSampleRate         = c->outputSampleRate;
+    config.outputNumChannels        = c->outputNumChannels;
 
     return config;
 }
@@ -472,6 +478,7 @@ public:
         c->decodeQueueSize          = configuration.decodeQueueSize;
         c->httpConnectionBufferSize = configuration.httpConnectionBufferSize;
         c->outputSampleRate         = configuration.outputSampleRate;
+        c->outputNumChannels        = configuration.outputNumChannels;
         
         _private = [[FSAudioStreamPrivate alloc] init];
         _private.stream = self;
@@ -640,13 +647,14 @@ public:
 
 -(NSString *)description
 {
-    return [NSString stringWithFormat:@"bufferCount: %i, bufferSize: %i, maxPacketDescs: %i, decodeQueueSize: %i, httpConnectionBufferSize: %i, outputSampleRate: %f",
+    return [NSString stringWithFormat:@"bufferCount: %i, bufferSize: %i, maxPacketDescs: %i, decodeQueueSize: %i, httpConnectionBufferSize: %i, outputSampleRate: %f, outputNumChannels: %ld",
             self.configuration.bufferCount,
             self.configuration.bufferSize,
             self.configuration.maxPacketDescs,
             self.configuration.decodeQueueSize,
             self.configuration.httpConnectionBufferSize,
-            self.configuration.outputSampleRate];
+            self.configuration.outputSampleRate,
+            self.configuration.outputNumChannels];
 }
 
 @end

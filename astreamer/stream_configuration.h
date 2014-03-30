@@ -16,6 +16,7 @@ struct Stream_Configuration {
     unsigned decodeQueueSize;
     unsigned httpConnectionBufferSize;
     double outputSampleRate;
+    long outputNumChannels;
     
     static Stream_Configuration *configuration();
     

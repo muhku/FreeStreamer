@@ -70,6 +70,7 @@ typedef struct {
     unsigned decodeQueueSize;
     unsigned httpConnectionBufferSize;
     double   outputSampleRate;
+    long     outputNumChannels;
 } FSStreamConfiguration;
 
 FSStreamConfiguration makeFreeStreamerDefaultConfiguration();
