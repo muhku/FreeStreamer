@@ -52,7 +52,6 @@ Audio_Stream::Audio_Stream() :
     m_outputFile(NULL),
     m_queuedHead(0),
     m_queuedTail(0),
-    m_processedPacketsSizeTotal(0),
     m_processedPacketsCount(0),
     m_audioDataByteCount(0),
     m_packetDuration(0),
@@ -105,7 +104,6 @@ void Audio_Stream::open()
     
     m_contentLength = 0;
     m_seekTime = 0;
-    m_processedPacketsSizeTotal = 0;
     m_processedPacketsCount = 0;
     m_bitrateBufferIndex = 0;
     m_contentType = "";
@@ -636,7 +634,6 @@ OSStatus Audio_Stream::encoderDataCallback(AudioConverterRef inAudioConverter, U
     front->next = NULL;
     THIS->m_processedPackets.push_front(front);
     
-    THIS->m_processedPacketsSizeTotal += front->desc.mDataByteSize;
     THIS->m_processedPacketsCount++;
     
     return noErr;

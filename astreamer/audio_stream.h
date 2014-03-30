@@ -124,7 +124,6 @@ private:
     
     std::list <queued_packet_t*> m_processedPackets;
     
-    UInt32 m_processedPacketsSizeTotal;  // global packet statistics: total size
     UInt32 m_processedPacketsCount;      // global packet statistics: count
     UInt64 m_audioDataByteCount;
     
