@@ -69,7 +69,7 @@ Audio_Stream::Audio_Stream() :
     m_dstFormat.mBytesPerPacket = 4;
     m_dstFormat.mFramesPerPacket = 1;
     m_dstFormat.mBytesPerFrame = 4;
-    m_dstFormat.mChannelsPerFrame = (int) config->outputNumChannels;
+    m_dstFormat.mChannelsPerFrame = 2;
     m_dstFormat.mBitsPerChannel = 16;
 }
 
