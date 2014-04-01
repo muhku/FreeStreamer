@@ -295,7 +295,7 @@ int Audio_Queue::handlePacket(const void *data, AudioStreamPacketDescription *de
      size from the file stream, but if we restored to guessing it we could
      come up too small here */
     if (packetSize > config->bufferSize) {
-        AQ_TRACE("%s: packetSize %u > AQ_BUFSIZ %li\n", __PRETTY_FUNCTION__, (unsigned int)packetSize, AQ_BUFSIZ);
+        AQ_TRACE("%s: packetSize %u > AQ_BUFSIZ %li\n", __PRETTY_FUNCTION__, (unsigned int)packetSize, config->bufferSize);
         return -1;
     }
     
@@ -307,7 +307,7 @@ int Audio_Queue::handlePacket(const void *data, AudioStreamPacketDescription *de
             return hasFreeBuffer;
         }
     } else {
-        AQ_TRACE("%s: skipped enqueueBuffer AQ_BUFSIZ - m_bytesFilled %lu, packetSize %u\n", __PRETTY_FUNCTION__, (AQ_BUFSIZ - m_bytesFilled), (unsigned int)packetSize);
+        AQ_TRACE("%s: skipped enqueueBuffer AQ_BUFSIZ - m_bytesFilled %lu, packetSize %u\n", __PRETTY_FUNCTION__, (config->bufferSize - m_bytesFilled), (unsigned int)packetSize);
     }
     
     // copy data to the audio queue buffer
