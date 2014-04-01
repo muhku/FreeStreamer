@@ -350,6 +350,8 @@ void Audio_Stream::audioQueueBuffersEmpty()
     if (m_httpStreamRunning) {
         /* Still feeding the audio queue with data,
            don't stop yet */
+        setState(BUFFERING);
+        
         return;
     }
     
