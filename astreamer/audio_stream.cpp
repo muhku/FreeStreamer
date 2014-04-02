@@ -312,7 +312,7 @@ CFStringRef Audio_Stream::contentType()
     
 AudioFileTypeID Audio_Stream::audioStreamTypeFromContentType(CFStringRef contentType)
 {
-    AudioFileTypeID fileTypeHint = kAudioFileAAC_ADTSType;
+    AudioFileTypeID fileTypeHint = kAudioFileMP3Type;
     
     if (!contentType) {
         AS_TRACE("***** Unable to detect the audio stream type: missing content-type! *****\n");
