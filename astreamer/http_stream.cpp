@@ -102,11 +102,7 @@ HTTP_Stream_Position HTTP_Stream::position()
     
 CFStringRef HTTP_Stream::contentType()
 {
-    if (m_contentType) {
-        return m_contentType;
-    } else {
-        return CFSTR("");
-    }
+    return m_contentType;
 }
     
 size_t HTTP_Stream::contentLength()

@@ -120,9 +120,8 @@ void Audio_Stream::open()
     m_bitrateBufferIndex = 0;
     
     if (m_contentType) {
-        CFRelease(m_contentType);
+        CFRelease(m_contentType), m_contentType = NULL;
     }
-    m_contentType = CFSTR("");
     
     if (m_httpStream->open()) {
         AS_TRACE("%s: HTTP stream opened, buffering...\n", __PRETTY_FUNCTION__);
