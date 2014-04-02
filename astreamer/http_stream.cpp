@@ -83,10 +83,10 @@ HTTP_Stream::~HTTP_Stream()
     }
     
     if (m_httpReadBuffer) {
-        delete m_httpReadBuffer, m_httpReadBuffer = 0;
+        delete [] m_httpReadBuffer, m_httpReadBuffer = 0;
     }
     if (m_icyReadBuffer) {
-        delete m_icyReadBuffer, m_icyReadBuffer = 0;
+        delete [] m_icyReadBuffer, m_icyReadBuffer = 0;
     }
     if (m_url) {
         CFRelease(m_url), m_url = 0;
