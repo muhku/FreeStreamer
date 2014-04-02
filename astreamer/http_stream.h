@@ -67,9 +67,9 @@ private:
     ID3_Parser *m_id3Parser;
     
     CFReadStreamRef createReadStream(CFURLRef url);
-    void parseHttpHeadersIfNeeded(UInt8 *buf, CFIndex bufSize);
-    void parseICYStream(UInt8 *buf, CFIndex bufSize);
-    CFStringRef createMetaDataStringWithMostReasonableEncoding(const UInt8 *bytes, CFIndex numBytes);
+    void parseHttpHeadersIfNeeded(const UInt8 *buf, const CFIndex bufSize);
+    void parseICYStream(const UInt8 *buf, const CFIndex bufSize);
+    CFStringRef createMetaDataStringWithMostReasonableEncoding(const UInt8 *bytes, const CFIndex numBytes);
     
     static void readCallBack(CFReadStreamRef stream, CFStreamEventType eventType, void *clientCallBackInfo);
 

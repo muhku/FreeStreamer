@@ -305,7 +305,7 @@ out:
     return readStream;
 }
     
-void HTTP_Stream::parseHttpHeadersIfNeeded(UInt8 *buf, CFIndex bufSize)
+void HTTP_Stream::parseHttpHeadersIfNeeded(const UInt8 *buf, const CFIndex bufSize)
 {
     if (m_httpHeadersParsed) {
         return;
@@ -388,7 +388,7 @@ void HTTP_Stream::parseHttpHeadersIfNeeded(UInt8 *buf, CFIndex bufSize)
     }
 }
     
-void HTTP_Stream::parseICYStream(UInt8 *buf, CFIndex bufSize)
+void HTTP_Stream::parseICYStream(const UInt8 *buf, const CFIndex bufSize)
 {
     HS_TRACE("Parsing an IceCast stream, received %li bytes\n", bufSize);
     
@@ -608,7 +608,7 @@ void HTTP_Stream::parseICYStream(UInt8 *buf, CFIndex bufSize)
 #define TRY_ENCODING(STR,ENC) STR = CFStringCreateWithBytes(kCFAllocatorDefault, bytes, numBytes, ENC, false); \
     if (STR != NULL) { return STR; }
     
-CFStringRef HTTP_Stream::createMetaDataStringWithMostReasonableEncoding(const UInt8 *bytes, CFIndex numBytes)
+CFStringRef HTTP_Stream::createMetaDataStringWithMostReasonableEncoding(const UInt8 *bytes, const CFIndex numBytes)
 {
     CFStringRef metaData;
     
