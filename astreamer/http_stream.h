@@ -8,7 +8,6 @@
 #define ASTREAMER_HTTP_STREAM_H
 
 #import <CFNetwork/CFNetwork.h>
-#import <string>
 #import <vector>
 #import <map>
 #import "id3_parser.h"
@@ -43,7 +42,7 @@ private:
     
     /* HTTP headers */
     bool m_httpHeadersParsed;
-    std::string m_contentType;
+    CFStringRef m_contentType;
     size_t m_contentLength;
     
     /* ICY protocol */
@@ -54,7 +53,7 @@ private:
     
     CFStringRef m_icyName;
     
-    std::vector<std::string> m_icyHeaderLines;
+    std::vector<CFMutableStringRef> m_icyHeaderLines;
     size_t m_icyMetaDataInterval;
     size_t m_dataByteReadCount;
     size_t m_metaDataBytesRemaining;
@@ -83,7 +82,7 @@ public:
     
     HTTP_Stream_Position position();
     
-    std::string contentType();
+    CFStringRef contentType();
     size_t contentLength();
     
     bool open();

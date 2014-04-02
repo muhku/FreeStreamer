@@ -47,7 +47,9 @@ Audio_Stream::Audio_Stream() :
 #else
     m_strictContentTypeChecking(true),
 #endif
-    m_defaultContentType("audio/mpeg"),
+    m_defaultContentType(CFSTR("audio/mpeg")),
+    m_contentType(NULL),
+    
     m_fileOutput(0),
     m_outputFile(NULL),
     m_queuedHead(0),
@@ -75,6 +77,14 @@ Audio_Stream::Audio_Stream() :
 
 Audio_Stream::~Audio_Stream()
 {
+    if (m_defaultContentType) {
+        CFRelease(m_defaultContentType), m_defaultContentType = NULL;
+    }
+    
+    if (m_contentType) {
+        CFRelease(m_contentType), m_contentType = NULL;
+    }
+    
     close();
     
     delete [] m_outputBuffer, m_outputBuffer = 0;
@@ -108,7 +118,11 @@ void Audio_Stream::open()
     m_seekTime = 0;
     m_processedPacketsCount = 0;
     m_bitrateBufferIndex = 0;
-    m_contentType = "";
+    
+    if (m_contentType) {
+        CFRelease(m_contentType);
+    }
+    m_contentType = CFSTR("");
     
     if (m_httpStream->open()) {
         AS_TRACE("%s: HTTP stream opened, buffering...\n", __PRETTY_FUNCTION__);
@@ -261,9 +275,14 @@ void Audio_Stream::setStrictContentTypeChecking(bool strictChecking)
     m_strictContentTypeChecking = strictChecking;
 }
 
-void Audio_Stream::setDefaultContentType(std::string& defaultContentType)
+void Audio_Stream::setDefaultContentType(CFStringRef defaultContentType)
 {
-    m_defaultContentType = defaultContentType;
+    if (m_defaultContentType) {
+        CFRelease(m_defaultContentType), m_defaultContentType = 0;
+    }
+    if (defaultContentType) {
+        m_defaultContentType = CFStringCreateCopy(kCFAllocatorDefault, defaultContentType);
+    }
 }
     
 void Audio_Stream::setOutputFile(CFURLRef url)
@@ -287,47 +306,47 @@ Audio_Stream::State Audio_Stream::state()
     return m_state;
 }
 
-std::string Audio_Stream::contentType()
+CFStringRef Audio_Stream::contentType()
 {
     return m_contentType;
 }
     
-AudioFileTypeID Audio_Stream::audioStreamTypeFromContentType(std::string contentType)
+AudioFileTypeID Audio_Stream::audioStreamTypeFromContentType(CFStringRef contentType)
 {
     AudioFileTypeID fileTypeHint = kAudioFileAAC_ADTSType;
     
-    if (contentType.compare("") == 0) {
+    if (CFStringCompare(contentType, CFSTR(""), 0) == kCFCompareEqualTo) {
         AS_TRACE("***** Unable to detect the audio stream type: missing content-type! *****\n");
         goto out;
     }
     
-    if (contentType.compare("audio/mpeg") == 0) {
+    if (CFStringCompare(contentType, CFSTR("audio/mpeg"), 0) == kCFCompareEqualTo) {
         fileTypeHint = kAudioFileMP3Type;
         AS_TRACE("kAudioFileMP3Type detected\n");
-    } else if (contentType.compare("audio/x-wav") == 0) {
+    } else if (CFStringCompare(contentType, CFSTR("audio/x-wav"), 0) == kCFCompareEqualTo) {
         fileTypeHint = kAudioFileWAVEType;
         AS_TRACE("kAudioFileWAVEType detected\n");
-    } else if (contentType.compare("audio/x-aifc") == 0) {
+    } else if (CFStringCompare(contentType, CFSTR("audio/x-aifc"), 0) == kCFCompareEqualTo) {
         fileTypeHint = kAudioFileAIFCType;
         AS_TRACE("kAudioFileAIFCType detected\n");
-    } else if (contentType.compare("audio/x-aiff") == 0) {
+    } else if (CFStringCompare(contentType, CFSTR("audio/x-aiff"), 0) == kCFCompareEqualTo) {
         fileTypeHint = kAudioFileAIFFType;
         AS_TRACE("kAudioFileAIFFType detected\n");
-    } else if (contentType.compare("audio/x-m4a") == 0) {
+    } else if (CFStringCompare(contentType, CFSTR("audio/x-m4a"), 0) == kCFCompareEqualTo) {
         fileTypeHint = kAudioFileM4AType;
         AS_TRACE("kAudioFileM4AType detected\n");
-    } else if (contentType.compare("audio/mp4") == 0) {
+    } else if (CFStringCompare(contentType, CFSTR("audio/mp4"), 0) == kCFCompareEqualTo) {
         fileTypeHint = kAudioFileMPEG4Type;
         AS_TRACE("kAudioFileMPEG4Type detected\n");
-    } else if (contentType.compare("audio/x-caf") == 0) {
+    } else if (CFStringCompare(contentType, CFSTR("audio/x-caf"), 0) == kCFCompareEqualTo) {
         fileTypeHint = kAudioFileCAFType;
         AS_TRACE("kAudioFileCAFType detected\n");
-    } else if (contentType.compare("audio/aac") == 0 ||
-               contentType.compare("audio/aacp") == 0) {
+    } else if (CFStringCompare(contentType, CFSTR("audio/aac"), 0) == kCFCompareEqualTo ||
+               CFStringCompare(contentType, CFSTR("audio/aacp"), 0) == kCFCompareEqualTo) {
         fileTypeHint = kAudioFileAAC_ADTSType;
         AS_TRACE("kAudioFileAAC_ADTSType detected\n");
     } else {
-        AS_TRACE("***** Unable to detect the audio stream type from content-type %s *****\n", contentType.c_str());
+        AS_TRACE("***** Unable to detect the audio stream type *****\n");
     }
     
 out:
@@ -406,21 +425,25 @@ void Audio_Stream::streamIsReadyRead()
         return;
     }
     
+    CFStringRef audioContentType = CFSTR("audio/");
+    const CFIndex audioContentTypeLength = CFStringGetLength(audioContentType);
+    
+    CFStringRef contentType = m_httpStream->contentType();
+    
+    if (m_contentType) {
+        CFRelease(m_contentType);
+    }
+    m_contentType = CFStringCreateCopy(kCFAllocatorDefault, contentType);
+    
     /* Check if the stream's MIME type begins with audio/ */
-    std::string contentType = m_httpStream->contentType();
+    bool matchesAudioContentType = (kCFCompareEqualTo ==
+                                    CFStringCompareWithOptions(contentType, CFSTR("audio/"),
+                                                               CFRangeMake(0, audioContentTypeLength),
+                                                               0));
     
-    m_contentType = contentType;
-    
-    const char *audioContentType = "audio/";
-    size_t audioContentTypeLength = strlen(audioContentType);
-    
-    if (contentType.compare(0, audioContentTypeLength, audioContentType) != 0) {
-        if (m_strictContentTypeChecking) {
-            closeAndSignalError(AS_ERR_OPEN);
-            return;
-        } else {
-            contentType = m_defaultContentType;
-        }
+    if (m_strictContentTypeChecking && !matchesAudioContentType) {
+        closeAndSignalError(AS_ERR_OPEN);
+        return;
     }
     
     m_audioDataByteCount = 0;

@@ -11,7 +11,6 @@
 #include "audio_queue.h"
 
 #include <AudioToolbox/AudioToolbox.h>
-#include <string>
 #include <list>
 
 namespace astreamer {
@@ -62,14 +61,14 @@ public:
     
     void setUrl(CFURLRef url);
     void setStrictContentTypeChecking(bool strictChecking);
-    void setDefaultContentType(std::string& defaultContentType);
+    void setDefaultContentType(CFStringRef defaultContentType);
     
     void setOutputFile(CFURLRef url);
     CFURLRef outputFile();
     
     State state();
     
-    std::string contentType();
+    CFStringRef contentType();
     
     /* Audio_Queue_Delegate */
     void audioQueueStateChanged(Audio_Queue::State state);
@@ -112,8 +111,8 @@ private:
     double m_seekTime;
     
     bool m_strictContentTypeChecking;
-    std::string m_defaultContentType;
-    std::string m_contentType;
+    CFStringRef m_defaultContentType;
+    CFStringRef m_contentType;
     
     File_Output *m_fileOutput;
     
@@ -144,7 +143,7 @@ private:
     static void propertyValueCallback(void *inClientData, AudioFileStreamID inAudioFileStream, AudioFileStreamPropertyID inPropertyID, UInt32 *ioFlags);
     static void streamDataCallback(void *inClientData, UInt32 inNumberBytes, UInt32 inNumberPackets, const void *inInputData, AudioStreamPacketDescription *inPacketDescriptions);
     
-    AudioFileTypeID audioStreamTypeFromContentType(std::string contentType);    
+    AudioFileTypeID audioStreamTypeFromContentType(CFStringRef contentType);
 };
     
 class Audio_Stream_Delegate {

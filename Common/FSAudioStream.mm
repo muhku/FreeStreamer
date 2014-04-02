@@ -253,9 +253,12 @@ public:
 
 - (void)setDefaultContentType:(NSString *)defaultContentType
 {
-    _defaultContentType = [defaultContentType copy];
-    std::string contentType([_defaultContentType UTF8String]);
-    _audioStream->setDefaultContentType(contentType);
+    if (defaultContentType) {
+        _defaultContentType = [defaultContentType copy];
+        _audioStream->setDefaultContentType((__bridge CFStringRef)_defaultContentType);
+    } else {
+        _audioStream->setDefaultContentType(NULL);
+    }
 }
 
 - (NSString*)defaultContentType
@@ -270,7 +273,11 @@ public:
 
 - (NSString*)contentType
 {
-    return [NSString stringWithUTF8String:_audioStream->contentType().c_str()];
+    CFStringRef c = _audioStream->contentType();
+    if (c) {
+        return CFBridgingRelease(CFStringCreateCopy(kCFAllocatorDefault, c));
+    }
+    return nil;
 }
 
 - (NSString*)suggestedFileExtension

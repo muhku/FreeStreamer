@@ -9,6 +9,16 @@
 #include "id3_parser.h"
 #include "stream_configuration.h"
 
+//#define HS_DEBUG 1
+
+#if !defined (HS_DEBUG)
+#define HS_TRACE(...) do {} while (0)
+#define HS_TRACE_CFSTRING(X) do {} while (0)
+#else
+#define HS_TRACE(...) printf(__VA_ARGS__)
+#define HS_TRACE_CFSTRING(X) HS_TRACE("%s\n", CFStringGetCStringPtr(X, kCFStringEncodingMacRoman))
+#endif
+
 /*
  * Comment the following line to disable ID3 tag support:
  */
@@ -32,6 +42,7 @@ HTTP_Stream::HTTP_Stream() :
     m_delegate(0),
     m_url(0),
     m_httpHeadersParsed(false),
+    m_contentType(0),
     m_contentLength(0),
     
     m_icyStream(false),
@@ -57,6 +68,16 @@ HTTP_Stream::~HTTP_Stream()
 {
     close();
     
+    for (std::vector<CFMutableStringRef>::iterator h = m_icyHeaderLines.begin(); h != m_icyHeaderLines.end(); ++h) {
+        CFRelease(*h);
+    }
+    
+    m_icyHeaderLines.clear();
+    
+    if (m_contentType) {
+        CFRelease(m_contentType), m_contentType = 0;
+    }
+    
     if (m_icyName) {
         CFRelease(m_icyName), m_icyName = 0;
     }
@@ -79,9 +100,13 @@ HTTP_Stream_Position HTTP_Stream::position()
     return m_position;
 }
     
-std::string HTTP_Stream::contentType()
+CFStringRef HTTP_Stream::contentType()
 {
-    return m_contentType;
+    if (m_contentType) {
+        return m_contentType;
+    } else {
+        return CFSTR("");
+    }
 }
     
 size_t HTTP_Stream::contentLength()
@@ -118,7 +143,10 @@ bool HTTP_Stream::open(const HTTP_Stream_Position& position)
     
     m_readPending = false;
     m_httpHeadersParsed = false;
-    m_contentType = "";
+    
+    if (m_contentType) {
+        CFRelease(m_contentType), m_contentType = NULL;
+    }
     
     m_icyStream = false;
     m_icyHeaderCR = false;
@@ -127,6 +155,10 @@ bool HTTP_Stream::open(const HTTP_Stream_Position& position)
     
     if (m_icyName) {
         CFRelease(m_icyName), m_icyName = 0;
+    }
+    
+    for (std::vector<CFMutableStringRef>::iterator h = m_icyHeaderLines.begin(); h != m_icyHeaderLines.end(); ++h) {
+        CFRelease(*h);
     }
     
     m_icyHeaderLines.clear();
@@ -284,24 +316,20 @@ void HTTP_Stream::parseHttpHeadersIfNeeded(UInt8 *buf, CFIndex bufSize)
      * we are dealing with the ShoutCast protocol.
      * The HTTP headers won't be available.
      */
-    std::string header;
-    
-    for (CFIndex k=0; k < bufSize; k++) {
-        UInt8 c = buf[k];
-        // Ignore non-ASCII chars
-        if (c < 32 || c > 126) {
-            continue;
-        }
-        header.push_back(c);
-    }
-    
-    char *p = strstr(header.c_str(), "ICY 200 OK");
-    
-    // This is an ICY stream, don't try to parse the HTTP headers
-    if (p) {
+    if (bufSize >= 10 &&
+        buf[0] == 0x49 && buf[1] == 0x43 && buf[2] == 0x59 &&
+        buf[3] == 0x20 && buf[4] == 0x32 && buf[5] == 0x30 &&
+        buf[6] == 0x30 && buf[7] == 0x20 && buf[8] == 0x4F &&
+        buf[9] == 0x4B) {
         m_icyStream = true;
+        
+        HS_TRACE("Detected an IceCast stream\n");
+        
+        // This is an ICY stream, don't try to parse the HTTP headers
         return;
     }
+    
+    HS_TRACE("A regular HTTP stream\n");
     
     CFHTTPMessageRef response = (CFHTTPMessageRef)CFReadStreamCopyProperty(m_readStream, kCFStreamPropertyHTTPResponseHeader);
     if (response) {
@@ -317,6 +345,8 @@ void HTTP_Stream::parseHttpHeadersIfNeeded(UInt8 *buf, CFIndex bufSize)
             m_icyMetaDataInterval = CFStringGetIntValue(icyMetaIntString);
             CFRelease(icyMetaIntString);
         }
+        
+        HS_TRACE("icy-metaint: %zu\n", m_icyMetaDataInterval);
         
         CFStringRef icyNameString = CFHTTPMessageCopyHeaderFieldValue(response, CFSTR("icy-name"));
         if (icyNameString) {
@@ -334,17 +364,14 @@ void HTTP_Stream::parseHttpHeadersIfNeeded(UInt8 *buf, CFIndex bufSize)
             }
         }
         
-        CFStringRef contentTypeString = CFHTTPMessageCopyHeaderFieldValue(response, CFSTR("Content-Type"));
-        if (contentTypeString) {
-            CFIndex len = CFStringGetMaximumSizeForEncoding(CFStringGetLength(contentTypeString), kCFStringEncodingUTF8) + 1;
-            char *buf = new char[len];
-            if (CFStringGetCString(contentTypeString, buf, len, kCFStringEncodingUTF8)) {
-                m_contentType.append(buf);
-            }
-            delete[] buf;
-        
-            CFRelease(contentTypeString);
+        if (m_contentType) {
+            CFRelease(m_contentType);
         }
+        
+        m_contentType = CFHTTPMessageCopyHeaderFieldValue(response, CFSTR("Content-Type"));
+        
+        HS_TRACE("Content-type: ");
+        HS_TRACE_CFSTRING(m_contentType);
         
         CFStringRef contentLengthString = CFHTTPMessageCopyHeaderFieldValue(response, CFSTR("Content-Length"));
         if (contentLengthString) {
@@ -363,21 +390,23 @@ void HTTP_Stream::parseHttpHeadersIfNeeded(UInt8 *buf, CFIndex bufSize)
     
 void HTTP_Stream::parseICYStream(UInt8 *buf, CFIndex bufSize)
 {
+    HS_TRACE("Parsing an IceCast stream, received %li bytes\n", bufSize);
+    
     CFIndex offset = 0;
     if (!m_icyHeadersRead) {
-        // TODO: fail after n tries?
+        HS_TRACE("ICY headers not read, reading\n");
         
         for (; offset < bufSize; offset++) {
             if (m_icyHeaderCR && buf[offset] == '\n') {
-                m_icyHeaderLines.push_back(std::string(""));
+                m_icyHeaderLines.push_back(CFStringCreateMutable(kCFAllocatorDefault, 0));
                 
                 size_t n = m_icyHeaderLines.size();
                 
                 /* If the last two lines were empty, we have reached
                  the end of the headers */
                 if (n >= 2) {                    
-                    if (m_icyHeaderLines[n-2].empty() &&
-                        m_icyHeaderLines[n-1].empty()) {
+                    if (CFStringGetLength(m_icyHeaderLines[n-2]) == 0 &&
+                        CFStringGetLength(m_icyHeaderLines[n-1]) == 0) {
                         m_icyHeadersRead = true;
                         break;
                     }
@@ -393,38 +422,80 @@ void HTTP_Stream::parseICYStream(UInt8 *buf, CFIndex bufSize)
                 m_icyHeaderCR = false;
             }
             
-            size_t numberOfLines = m_icyHeaderLines.size();
+            const size_t numberOfLines = m_icyHeaderLines.size();
             
             if (numberOfLines == 0) {
                 continue;
             }
-            m_icyHeaderLines[numberOfLines - 1].push_back(buf[offset]);
+            
+            char s[2];
+            s[0] = buf[offset];
+            s[1] = 0;
+            
+            CFStringAppendCString(m_icyHeaderLines[numberOfLines - 1], s, kCFStringEncodingISOLatin1);
         }
     } else if (!m_icyHeadersParsed) {
-        const char *icyContentTypeHeader = "content-type:";
-        const char *icyMetaDataHeader = "icy-metaint:";
-        const char *icyNameHeader = "icy-name:";
-
-        size_t icyContenTypeHeaderLength = strlen(icyContentTypeHeader);
-        size_t icyMetaDataHeaderLength = strlen(icyMetaDataHeader);
-        size_t icyNameHeaderLength = strlen(icyNameHeader);
+        HS_TRACE("ICY headers not parsed, parsing\n");
         
-        for (std::vector<std::string>::iterator h = m_icyHeaderLines.begin(); h != m_icyHeaderLines.end(); ++h) {
-            if (h->compare(0, icyContenTypeHeaderLength, icyContentTypeHeader) == 0) {
-                m_contentType = h->substr(icyContenTypeHeaderLength, h->length() - icyContenTypeHeaderLength);
+        const CFStringRef icyContentTypeHeader = CFSTR("content-type:");
+        const CFStringRef icyMetaDataHeader    =  CFSTR("icy-metaint:");
+        const CFStringRef icyNameHeader        = CFSTR("icy-name:");
+
+        const CFIndex icyContenTypeHeaderLength = CFStringGetLength(icyContentTypeHeader);
+        const CFIndex icyMetaDataHeaderLength   = CFStringGetLength(icyMetaDataHeader);
+        const CFIndex icyNameHeaderLength       = CFStringGetLength(icyNameHeader);
+        
+        for (std::vector<CFMutableStringRef>::iterator h = m_icyHeaderLines.begin(); h != m_icyHeaderLines.end(); ++h) {
+            CFMutableStringRef line = *h;
+            const CFIndex lineLength = CFStringGetLength(line);
+            
+            if (lineLength == 0) {
+                continue;
             }
             
-            if (h->compare(0, icyMetaDataHeaderLength, icyMetaDataHeader) == 0) {
-                m_icyMetaDataInterval = atoi(h->substr(icyMetaDataHeaderLength, h->length() - icyMetaDataHeaderLength).c_str());
+            HS_TRACE_CFSTRING(line);
+            
+            if (CFStringCompareWithOptions(line,
+                                           icyContentTypeHeader,
+                                           CFRangeMake(0, icyContenTypeHeaderLength),
+                                           0) == kCFCompareEqualTo) {
+                if (m_contentType) {
+                    CFRelease(m_contentType), m_contentType = 0;
+                }
+                m_contentType = CFStringCreateWithSubstring(kCFAllocatorDefault,
+                                                            line,
+                                                            CFRangeMake(icyContenTypeHeaderLength, lineLength - icyContenTypeHeaderLength));
+                
             }
             
-            if (h->compare(0, icyNameHeaderLength, icyNameHeader) == 0) {
+            if (CFStringCompareWithOptions(line,
+                                           icyMetaDataHeader,
+                                           CFRangeMake(0, icyMetaDataHeaderLength),
+                                           0) == kCFCompareEqualTo) {
+                CFStringRef metadataInterval = CFStringCreateWithSubstring(kCFAllocatorDefault,
+                                                                           line,
+                                                                           CFRangeMake(icyMetaDataHeaderLength, lineLength - icyMetaDataHeaderLength));
+                
+                if (metadataInterval) {
+                    m_icyMetaDataInterval = CFStringGetIntValue(metadataInterval);
+                    
+                    CFRelease(metadataInterval);
+                } else {
+                    m_icyMetaDataInterval = 0;
+                }
+            }
+            
+            if (CFStringCompareWithOptions(line,
+                                           icyNameHeader,
+                                           CFRangeMake(0, icyNameHeaderLength),
+                                           0) == kCFCompareEqualTo) {
                 if (m_icyName) {
                     CFRelease(m_icyName);
                 }
-                std::string icyName = h->substr(icyNameHeaderLength, h->length() - icyNameHeaderLength);
                 
-                m_icyName = CFStringCreateWithCString(kCFAllocatorDefault, icyName.c_str(), kCFStringEncodingUTF8);
+                m_icyName = CFStringCreateWithSubstring(kCFAllocatorDefault,
+                                                        line,
+                                                        CFRangeMake(icyNameHeaderLength, lineLength - icyNameHeaderLength));
             }
         }
         
@@ -441,6 +512,8 @@ void HTTP_Stream::parseICYStream(UInt8 *buf, CFIndex bufSize)
     if (!m_icyReadBuffer) {
         m_icyReadBuffer = new UInt8[config->httpConnectionBufferSize];
     }
+    
+    HS_TRACE("Reading ICY stream for playback\n");
     
     UInt32 i=0;
     
@@ -606,18 +679,24 @@ void HTTP_Stream::readCallBack(CFReadStreamRef stream, CFStreamEventType eventTy
                 }
                 
                 if (bytesRead > 0) {
+                    HS_TRACE("Read %li bytes\n", bytesRead);
+                    
                     THIS->parseHttpHeadersIfNeeded(THIS->m_httpReadBuffer, bytesRead);
                     
     #ifdef INCLUDE_ID3TAG_SUPPORT
-                    if (THIS->m_id3Parser->wantData()) {
+                    if (!THIS->m_icyStream && THIS->m_id3Parser->wantData()) {
                         THIS->m_id3Parser->feedData(THIS->m_httpReadBuffer, (UInt32)bytesRead);
                     }
     #endif
                     
                     if (THIS->m_icyStream) {
+                        HS_TRACE("Parsing ICY stream\n");
+                        
                         THIS->parseICYStream(THIS->m_httpReadBuffer, bytesRead);
                     } else {
                         if (THIS->m_delegate) {
+                            HS_TRACE("Not an ICY stream; calling the delegate back\n");
+                            
                             THIS->m_delegate->streamHasBytesAvailable(THIS->m_httpReadBuffer, (UInt32)bytesRead);
                         }
                     }
