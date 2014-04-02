@@ -386,6 +386,10 @@ public:
         if ([self isPlaying]) {
             self.wasInterrupted = YES;
             
+#if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
+            NSLog(@"FSAudioStream: Interruption began. Pausing the stream.");
+#endif
+            
             [self pause];
         }
     } else if ([interruptionType intValue] == AVAudioSessionInterruptionTypeEnded) {
@@ -393,6 +397,10 @@ public:
             self.wasInterrupted = NO;
             
             [[AVAudioSession sharedInstance] setActive:YES error:nil];
+            
+#if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
+            NSLog(@"FSAudioStream: Interruption ended. Unpausing the stream.");
+#endif
             
             /*
              * Resume playing.
