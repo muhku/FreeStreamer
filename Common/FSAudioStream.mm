@@ -352,10 +352,18 @@ public:
     
     if ([self isPlaying] && !internetConnectionAvailable) {
         _wasDisconnected = YES;
+        
+#if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
+        NSLog(@"FSAudioStream: Error: Internet connection disconnected while playing a stream.");
+#endif
     }
     
     if (_wasDisconnected && internetConnectionAvailable) {
         _wasDisconnected = NO;
+        
+#if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
+        NSLog(@"FSAudioStream: Internet connection available again. Restarting stream playback.");
+#endif
         
         /*
          * If we call play immediately after the reachability notification,
