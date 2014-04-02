@@ -314,7 +314,7 @@ AudioFileTypeID Audio_Stream::audioStreamTypeFromContentType(CFStringRef content
 {
     AudioFileTypeID fileTypeHint = kAudioFileAAC_ADTSType;
     
-    if (CFStringCompare(contentType, CFSTR(""), 0) == kCFCompareEqualTo) {
+    if (!contentType) {
         AS_TRACE("***** Unable to detect the audio stream type: missing content-type! *****\n");
         goto out;
     }
@@ -426,19 +426,22 @@ void Audio_Stream::streamIsReadyRead()
     
     CFStringRef audioContentType = CFSTR("audio/");
     const CFIndex audioContentTypeLength = CFStringGetLength(audioContentType);
+    bool matchesAudioContentType = false;
     
     CFStringRef contentType = m_httpStream->contentType();
     
     if (m_contentType) {
-        CFRelease(m_contentType);
+        CFRelease(m_contentType), m_contentType = 0;
     }
-    m_contentType = CFStringCreateCopy(kCFAllocatorDefault, contentType);
+    if (contentType) {
+        m_contentType = CFStringCreateCopy(kCFAllocatorDefault, contentType);
     
-    /* Check if the stream's MIME type begins with audio/ */
-    bool matchesAudioContentType = (kCFCompareEqualTo ==
+        /* Check if the stream's MIME type begins with audio/ */
+        matchesAudioContentType = (kCFCompareEqualTo ==
                                     CFStringCompareWithOptions(contentType, CFSTR("audio/"),
                                                                CFRangeMake(0, audioContentTypeLength),
                                                                0));
+    }
     
     if (m_strictContentTypeChecking && !matchesAudioContentType) {
         closeAndSignalError(AS_ERR_OPEN);
