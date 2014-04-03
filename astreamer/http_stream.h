@@ -53,7 +53,7 @@ private:
     
     CFStringRef m_icyName;
     
-    std::vector<CFMutableStringRef> m_icyHeaderLines;
+    std::vector<CFStringRef> m_icyHeaderLines;
     size_t m_icyMetaDataInterval;
     size_t m_dataByteReadCount;
     size_t m_metaDataBytesRemaining;
