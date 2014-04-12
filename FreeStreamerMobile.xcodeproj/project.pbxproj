@@ -13,6 +13,7 @@
 		60412CD518D0B150007A0277 /* player-bg-image-pad.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 60412CCF18D0B150007A0277 /* player-bg-image-pad.jpg */; };
 		60412CD618D0B150007A0277 /* player-bg-image.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 60412CD018D0B150007A0277 /* player-bg-image.jpg */; };
 		60412CD718D0B150007A0277 /* player-top-bg.png in Resources */ = {isa = PBXBuildFile; fileRef = 60412CD118D0B150007A0277 /* player-top-bg.png */; };
+		60929A3B18F9907500A5BDEE /* AJNotificationView.m in Sources */ = {isa = PBXBuildFile; fileRef = 60929A3A18F9907500A5BDEE /* AJNotificationView.m */; };
 		60B813D618C532F8001CC5A7 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60B813D518C532F8001CC5A7 /* Foundation.framework */; };
 		60B813D818C532F8001CC5A7 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60B813D718C532F8001CC5A7 /* CoreGraphics.framework */; };
 		60B813DA18C532F8001CC5A7 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60B813D918C532F8001CC5A7 /* UIKit.framework */; };
@@ -68,6 +69,8 @@
 		60412CCF18D0B150007A0277 /* player-bg-image-pad.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = "player-bg-image-pad.jpg"; path = "Assets/Images/player-bg-image-pad.jpg"; sourceTree = "<group>"; };
 		60412CD018D0B150007A0277 /* player-bg-image.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = "player-bg-image.jpg"; path = "Assets/Images/player-bg-image.jpg"; sourceTree = "<group>"; };
 		60412CD118D0B150007A0277 /* player-top-bg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "player-top-bg.png"; path = "Assets/Images/player-top-bg.png"; sourceTree = "<group>"; };
+		60929A3918F9907500A5BDEE /* AJNotificationView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AJNotificationView.h; sourceTree = "<group>"; };
+		60929A3A18F9907500A5BDEE /* AJNotificationView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AJNotificationView.m; sourceTree = "<group>"; };
 		60B813D218C532F8001CC5A7 /* FreeStreamerMobile.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FreeStreamerMobile.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		60B813D518C532F8001CC5A7 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		60B813D718C532F8001CC5A7 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -211,6 +214,8 @@
 		60B813DB18C532F8001CC5A7 /* FreeStreamerMobile */ = {
 			isa = PBXGroup;
 			children = (
+				60929A3918F9907500A5BDEE /* AJNotificationView.h */,
+				60929A3A18F9907500A5BDEE /* AJNotificationView.m */,
 				60CF8BE118C5335200C657A8 /* FSMainWindow.xib */,
 				60CF8BE418C5335200C657A8 /* FSPlayerViewController.h */,
 				60CF8BE518C5335200C657A8 /* FSPlayerViewController.m */,
@@ -429,6 +434,7 @@
 				60CF8BDF18C5333B00C657A8 /* FSFrequencyDomainAnalyzer.m in Sources */,
 				60CF8BFE18C5337000C657A8 /* FSAudioStream.mm in Sources */,
 				60CF8BFD18C5337000C657A8 /* FSAudioController.m in Sources */,
+				60929A3B18F9907500A5BDEE /* AJNotificationView.m in Sources */,
 				60CF8BEB18C5335200C657A8 /* FSPlaylistViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
