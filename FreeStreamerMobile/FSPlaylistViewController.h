@@ -7,7 +7,7 @@
 #import <UIKit/UIKit.h>
 
 @class FSPlayerViewController;
-@class FSParsePlaylistFeedRequest;
+@class FSParseRssPodcastFeedRequest;
 
 /**
  * The playlist view controller of the iOS example application.
@@ -16,8 +16,7 @@
  * FSParsePlaylistFeedRequest class.
  */
 @interface FSPlaylistViewController : UITableViewController<UITableViewDataSource,UITableViewDelegate,UIAlertViewDelegate> {
-    
-    FSParsePlaylistFeedRequest *_request;
+    FSParseRssPodcastFeedRequest *_request;
 }
 
 /**

@@ -7,13 +7,13 @@
 #import "FSPlaylistViewController.h"
 #import "FSPlaylistItem.h"
 #import "FSPlayerViewController.h"
-#import "FSParsePlaylistFeedRequest.h"
+#import "FSParseRssPodcastFeedRequest.h"
 
 @interface FSPlaylistViewController (PrivateMethods)
 
 - (void)addUserPlaylistItems;
 
-@property (nonatomic,readonly) FSParsePlaylistFeedRequest *request;
+@property (nonatomic,readonly) FSParseRssPodcastFeedRequest *request;
 
 @end
 
@@ -57,7 +57,7 @@
     
     __weak FSPlaylistViewController *weakSelf = self;
     
-    _request = [[FSParsePlaylistFeedRequest alloc] init];
+    _request = [[FSParseRssPodcastFeedRequest alloc] init];
     _request.url = [NSURL URLWithString:@"https://raw.github.com/muhku/FreeStreamer/master/Extra/example-rss-feed.xml"];
     _request.onCompletion = ^() {
         [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
@@ -191,7 +191,7 @@
  * =======================================
  */
 
-- (FSParsePlaylistFeedRequest *)request
+- (FSParseRssPodcastFeedRequest *)request
 {
     return _request;
 }

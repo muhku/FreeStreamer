@@ -34,7 +34,6 @@
 		60CF8BDF18C5333B00C657A8 /* FSFrequencyDomainAnalyzer.m in Sources */ = {isa = PBXBuildFile; fileRef = 60CF8BDC18C5333B00C657A8 /* FSFrequencyDomainAnalyzer.m */; };
 		60CF8BE018C5333B00C657A8 /* FSFrequencyPlotView.m in Sources */ = {isa = PBXBuildFile; fileRef = 60CF8BDE18C5333B00C657A8 /* FSFrequencyPlotView.m */; };
 		60CF8BE818C5335200C657A8 /* FSMainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 60CF8BE118C5335200C657A8 /* FSMainWindow.xib */; };
-		60CF8BE918C5335200C657A8 /* FSParsePlaylistFeedRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 60CF8BE318C5335200C657A8 /* FSParsePlaylistFeedRequest.m */; };
 		60CF8BEA18C5335200C657A8 /* FSPlayerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 60CF8BE518C5335200C657A8 /* FSPlayerViewController.m */; };
 		60CF8BEB18C5335200C657A8 /* FSPlaylistViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 60CF8BE718C5335200C657A8 /* FSPlaylistViewController.m */; };
 		60CF8BFD18C5337000C657A8 /* FSAudioController.m in Sources */ = {isa = PBXBuildFile; fileRef = 60CF8BEE18C5337000C657A8 /* FSAudioController.m */; };
@@ -102,8 +101,6 @@
 		60CF8BDD18C5333B00C657A8 /* FSFrequencyPlotView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSFrequencyPlotView.h; sourceTree = "<group>"; };
 		60CF8BDE18C5333B00C657A8 /* FSFrequencyPlotView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSFrequencyPlotView.m; sourceTree = "<group>"; };
 		60CF8BE118C5335200C657A8 /* FSMainWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = FSMainWindow.xib; sourceTree = "<group>"; };
-		60CF8BE218C5335200C657A8 /* FSParsePlaylistFeedRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSParsePlaylistFeedRequest.h; sourceTree = "<group>"; };
-		60CF8BE318C5335200C657A8 /* FSParsePlaylistFeedRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSParsePlaylistFeedRequest.m; sourceTree = "<group>"; };
 		60CF8BE418C5335200C657A8 /* FSPlayerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSPlayerViewController.h; sourceTree = "<group>"; };
 		60CF8BE518C5335200C657A8 /* FSPlayerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSPlayerViewController.m; sourceTree = "<group>"; };
 		60CF8BE618C5335200C657A8 /* FSPlaylistViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSPlaylistViewController.h; sourceTree = "<group>"; };
@@ -215,8 +212,6 @@
 			isa = PBXGroup;
 			children = (
 				60CF8BE118C5335200C657A8 /* FSMainWindow.xib */,
-				60CF8BE218C5335200C657A8 /* FSParsePlaylistFeedRequest.h */,
-				60CF8BE318C5335200C657A8 /* FSParsePlaylistFeedRequest.m */,
 				60CF8BE418C5335200C657A8 /* FSPlayerViewController.h */,
 				60CF8BE518C5335200C657A8 /* FSPlayerViewController.m */,
 				60CF8BE618C5335200C657A8 /* FSPlaylistViewController.h */,
@@ -417,7 +412,6 @@
 			files = (
 				60CF8BFF18C5337000C657A8 /* FSCheckContentTypeRequest.m in Sources */,
 				60CF8C0318C5337000C657A8 /* FSXMLHttpRequest.m in Sources */,
-				60CF8BE918C5335200C657A8 /* FSParsePlaylistFeedRequest.m in Sources */,
 				60CF8C0018C5337000C657A8 /* FSParsePlaylistRequest.m in Sources */,
 				60B813E218C532F8001CC5A7 /* main.m in Sources */,
 				60CF8BE018C5333B00C657A8 /* FSFrequencyPlotView.m in Sources */,
