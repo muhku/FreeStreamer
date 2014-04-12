@@ -451,7 +451,7 @@
     [AJNotificationView showNoticeInView:[[[UIApplication sharedApplication] delegate] window]
                                     type:AJNotificationTypeDefault
                                    title:status
-                         linedBackground:AJLinedBackgroundTypeDisabled
+                         linedBackground:AJLinedBackgroundTypeAnimated
                                hideAfter:0];
 }
 

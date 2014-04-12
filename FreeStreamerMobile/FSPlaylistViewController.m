@@ -8,6 +8,7 @@
 #import "FSPlaylistItem.h"
 #import "FSPlayerViewController.h"
 #import "FSParseRssPodcastFeedRequest.h"
+#import "AJNotificationView.h"
 
 @interface FSPlaylistViewController (PrivateMethods)
 
@@ -71,12 +72,10 @@
     _request.onFailure = ^() {
         [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
         
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error"
-                                                        message:@"Failed to load playlists."
-                                                       delegate:nil
-                                              cancelButtonTitle:@"OK"
-                                              otherButtonTitles:nil];
-        [alert show];
+        [AJNotificationView showNoticeInView:[[[UIApplication sharedApplication] delegate] window]
+                                        type:AJNotificationTypeRed
+                                       title:@"Failed to load playlists."
+                                   hideAfter:10];
     };
 }
 
