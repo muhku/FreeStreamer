@@ -11,6 +11,7 @@
 #import "FSPlaylistItem.h"
 #import "FSFrequencyDomainAnalyzer.h"
 #import "FSFrequencyPlotView.h"
+#import "AJNotificationView.h"
 
 /*
  * Comment the following line, if you want to disable the frequency analyzer.
@@ -23,6 +24,9 @@
 
 @interface FSPlayerViewController ()
 
+- (void)clearStatus;
+- (void)showStatus:(NSString *)status;
+- (void)showErrorStatus:(NSString *)status;
 - (void)updatePlaybackProgress;
 - (void)seekToNewTime;
 - (void)determineStationNameWithMetaData:(NSDictionary *)metaData;
@@ -142,10 +146,6 @@
     // e.g. self.myOutlet = nil;
     
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    
-    self.selectedPlaylistItem = nil;
-    
-    self.statusLabel = nil;
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
@@ -187,19 +187,17 @@
 
 - (void)audioStreamStateDidChange:(NSNotification *)notification
 {
-    NSString *statusRetrievingURL = @"Retrieving stream URL";
-    NSString *statusBuffering = @"Buffering...";
-    NSString *statusSeeking = @"Seeking...";
-    NSString *statusEmpty = @"";
-    
     NSDictionary *dict = [notification userInfo];
     int state = [[dict valueForKey:FSAudioStreamNotificationKey_State] intValue];
     
     switch (state) {
         case kFsAudioStreamRetrievingURL:
             [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-            self.statusLabel.text = statusRetrievingURL;
-            [_statusLabel setHidden:NO];
+            
+            [self showStatus:@"Retrieving URL..."];
+            
+            self.statusLabel.text = @"";
+            
             self.progressSlider.enabled = NO;
             self.playButton.hidden = YES;
             self.pauseButton.hidden = NO;
@@ -208,7 +206,9 @@
             
         case kFsAudioStreamStopped:
             [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-            self.statusLabel.text = statusEmpty;
+            
+            self.statusLabel.text = @"";
+            
             self.progressSlider.enabled = NO;
             self.playButton.hidden = NO;
             self.pauseButton.hidden = YES;
@@ -216,9 +216,9 @@
             break;
             
         case kFsAudioStreamBuffering:
-            self.statusLabel.text = statusBuffering;
+            [self showStatus:@"Buffering..."];
+
             [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-            [_statusLabel setHidden:NO];
             self.progressSlider.enabled = NO;
             self.playButton.hidden = YES;
             self.pauseButton.hidden = NO;
@@ -226,9 +226,9 @@
             break;
             
         case kFsAudioStreamSeeking:
-            self.statusLabel.text = statusSeeking;
+            [self showStatus:@"Seeking..."];
+            
             [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-            [_statusLabel setHidden:NO];
             self.progressSlider.enabled = NO;
             self.playButton.hidden = YES;
             self.pauseButton.hidden = NO;
@@ -238,12 +238,10 @@
         case kFsAudioStreamPlaying:
             [self determineStationNameWithMetaData:nil];
             
+            [self clearStatus];
+            
             [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-            if ([self.statusLabel.text isEqualToString:statusBuffering] ||
-                [self.statusLabel.text isEqualToString:statusRetrievingURL] ||
-                [self.statusLabel.text isEqualToString:statusSeeking]) {
-                self.statusLabel.text = statusEmpty;
-            }
+            
             self.progressSlider.enabled = YES;
             
             if (!_progressUpdateTimer) {
@@ -303,28 +301,30 @@
 
 - (void)audioStreamErrorOccurred:(NSNotification *)notification
 {
-    [_statusLabel setHidden:NO];
-    
     NSDictionary *dict = [notification userInfo];
     int errorCode = [[dict valueForKey:FSAudioStreamNotificationKey_Error] intValue];
     
+    NSString *errorDescription;
+    
     switch (errorCode) {
         case kFsAudioStreamErrorOpen:
-            self.statusLabel.text = @"Cannot open the audio stream";
+            errorDescription = @"Cannot open the audio stream";
             break;
         case kFsAudioStreamErrorStreamParse:
-            self.statusLabel.text = @"Cannot read the audio stream";
+            errorDescription = @"Cannot read the audio stream";
             break;
         case kFsAudioStreamErrorNetwork:
-            self.statusLabel.text = @"Network failed: cannot play the audio stream";
+            errorDescription = @"Network failed: cannot play the audio stream";
             break;
         case kFsAudioStreamErrorUnsupportedFormat:
-            self.statusLabel.text = @"Unsupported format";
+            errorDescription = @"Unsupported format";
             break;
         default:
-            self.statusLabel.text = @"Unknown error occurred";
+            errorDescription = @"Unknown error occurred";
             break;
     }
+    
+    [self showErrorStatus:errorDescription];
 }
 
 - (void)audioStreamMetaDataAvailable:(NSNotification *)notification
@@ -438,6 +438,32 @@
  * Private
  * =======================================
  */
+
+- (void)clearStatus
+{
+    [AJNotificationView hideCurrentNotificationViewAndClearQueue];
+}
+
+- (void)showStatus:(NSString *)status
+{
+    [self clearStatus];
+    
+    [AJNotificationView showNoticeInView:[[[UIApplication sharedApplication] delegate] window]
+                                    type:AJNotificationTypeDefault
+                                   title:status
+                         linedBackground:AJLinedBackgroundTypeDisabled
+                               hideAfter:0];
+}
+
+- (void)showErrorStatus:(NSString *)status
+{
+    [self clearStatus];
+    
+    [AJNotificationView showNoticeInView:[[[UIApplication sharedApplication] delegate] window]
+                                    type:AJNotificationTypeRed
+                                   title:status
+                               hideAfter:10];
+}
 
 - (void)updatePlaybackProgress
 {
