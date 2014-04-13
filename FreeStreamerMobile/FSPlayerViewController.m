@@ -319,6 +319,9 @@
         case kFsAudioStreamErrorUnsupportedFormat:
             errorDescription = @"Unsupported format";
             break;
+        case kFsAudioStreamErrorStreamBouncing:
+            errorDescription = @"Network failed: cannot get enough data to play";
+            break;
         default:
             errorDescription = @"Unknown error occurred";
             break;

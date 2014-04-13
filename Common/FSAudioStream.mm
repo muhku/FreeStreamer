@@ -32,6 +32,8 @@ FSStreamConfiguration makeFreeStreamerDefaultConfiguration()
     defaultConfiguration.httpConnectionBufferSize = 1024;
     defaultConfiguration.outputSampleRate = 44100;
     defaultConfiguration.outputNumChannels = 2;
+    defaultConfiguration.bounceInterval    = 10;
+    defaultConfiguration.maxBounceCount    = 4;   // Max number of bufferings in bounceInterval seconds
     
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 60000)
     AVAudioSession *session = [AVAudioSession sharedInstance];
@@ -340,6 +342,8 @@ public:
     config.httpConnectionBufferSize = c->httpConnectionBufferSize;
     config.outputSampleRate         = c->outputSampleRate;
     config.outputNumChannels        = c->outputNumChannels;
+    config.bounceInterval           = c->bounceInterval;
+    config.maxBounceCount           = c->maxBounceCount;
 
     return config;
 }
@@ -502,6 +506,8 @@ public:
         c->httpConnectionBufferSize = configuration.httpConnectionBufferSize;
         c->outputSampleRate         = configuration.outputSampleRate;
         c->outputNumChannels        = configuration.outputNumChannels;
+        c->maxBounceCount           = configuration.maxBounceCount;
+        c->bounceInterval           = configuration.bounceInterval;
         
         _private = [[FSAudioStreamPrivate alloc] init];
         _private.stream = self;
@@ -670,14 +676,16 @@ public:
 
 -(NSString *)description
 {
-    return [NSString stringWithFormat:@"bufferCount: %i, bufferSize: %i, maxPacketDescs: %i, decodeQueueSize: %i, httpConnectionBufferSize: %i, outputSampleRate: %f, outputNumChannels: %ld",
+    return [NSString stringWithFormat:@"bufferCount: %i, bufferSize: %i, maxPacketDescs: %i, decodeQueueSize: %i, httpConnectionBufferSize: %i, outputSampleRate: %f, outputNumChannels: %ld, bounceInterval: %i, maxBounceCount: %i",
             self.configuration.bufferCount,
             self.configuration.bufferSize,
             self.configuration.maxPacketDescs,
             self.configuration.decodeQueueSize,
             self.configuration.httpConnectionBufferSize,
             self.configuration.outputSampleRate,
-            self.configuration.outputNumChannels];
+            self.configuration.outputNumChannels,
+            self.configuration.bounceInterval,
+            self.configuration.maxBounceCount];
 }
 
 @end
@@ -723,6 +731,16 @@ void AudioStreamStateObserver::audioStreamErrorOccurred(int errorCode)
 #endif
             
             break;
+            
+        case kFsAudioStreamErrorStreamBouncing:
+            priv.lastError = kFsAudioStreamErrorStreamBouncing;
+            
+#if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
+            NSLog(@"FSAudioStream: Stream bounced: %@", priv.url);
+#endif
+            
+            break;
+            
         default:
             break;
     }

@@ -46,7 +46,8 @@ typedef enum {
     kFsAudioStreamErrorOpen = 1,
     kFsAudioStreamErrorStreamParse = 2,
     kFsAudioStreamErrorNetwork = 3,
-    kFsAudioStreamErrorUnsupportedFormat = 4
+    kFsAudioStreamErrorUnsupportedFormat = 4,
+    kFsAudioStreamErrorStreamBouncing = 5
 } FSAudioStreamError;
 
 @protocol FSPCMAudioStreamDelegate;
@@ -71,6 +72,8 @@ typedef struct {
     unsigned httpConnectionBufferSize;
     double   outputSampleRate;
     long     outputNumChannels;
+    int      bounceInterval;
+    int      maxBounceCount;
 } FSStreamConfiguration;
 
 FSStreamConfiguration makeFreeStreamerDefaultConfiguration();

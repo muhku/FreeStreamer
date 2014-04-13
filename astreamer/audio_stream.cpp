@@ -42,6 +42,8 @@ Audio_Stream::Audio_Stream() :
     m_outputBuffer(new UInt8[m_outputBufferSize]),
     m_dataOffset(0),
     m_seekTime(0),
+    m_bounceCount(0),
+    m_firstBufferingTime(0),
 #if defined (AS_RELAX_CONTENT_TYPE_CHECK)
     m_strictContentTypeChecking(false),
 #else
@@ -116,6 +118,8 @@ void Audio_Stream::open()
     
     m_contentLength = 0;
     m_seekTime = 0;
+    m_bounceCount = 0;
+    m_firstBufferingTime = 0;
     m_processedPacketsCount = 0;
     m_bitrateBufferIndex = 0;
     
@@ -365,10 +369,44 @@ void Audio_Stream::audioQueueBuffersEmpty()
 {
     AS_TRACE("%s: enter\n", __PRETTY_FUNCTION__);
     
+    Stream_Configuration *config = Stream_Configuration::configuration();
+    
     if (m_httpStreamRunning) {
         /* Still feeding the audio queue with data,
            don't stop yet */
         setState(BUFFERING);
+        
+        if (m_firstBufferingTime == 0) {
+            // Never buffered, just increase the counter
+            m_firstBufferingTime = CFAbsoluteTimeGetCurrent();
+            m_bounceCount++;
+            
+            AS_TRACE("stream buffered, increasing bounce count %zu, interval %i\n", m_bounceCount, config->bounceInterval);
+        } else {
+            // Buffered before, calculate the difference
+            CFAbsoluteTime cur = CFAbsoluteTimeGetCurrent();
+            
+            int diff = cur - m_firstBufferingTime;
+            
+            if (diff >= config->bounceInterval) {
+                // More than bounceInterval seconds passed from the last
+                // buffering. So not a continuous bouncing. Reset the
+                // counters.
+                m_bounceCount = 0;
+                m_firstBufferingTime = 0;
+                
+                AS_TRACE("%i seconds passed from last buffering, resetting counters, interval %i\n", diff, config->bounceInterval);
+            } else {
+                m_bounceCount++;
+                
+                AS_TRACE("%i seconds passed from last buffering, increasing bounce count to %zu, interval %i\n", diff, m_bounceCount, config->bounceInterval);
+            }
+        }
+        
+        // Check if we have reached the bounce state
+        if (m_bounceCount >= config->maxBounceCount) {
+            closeAndSignalError(AS_ERR_BOUNCING);
+        }
         
         return;
     }

@@ -25,7 +25,8 @@ enum Audio_Stream_Error {
     AS_ERR_OPEN = 1,          // Cannot open the audio stream
     AS_ERR_STREAM_PARSE = 2,  // Parse error
     AS_ERR_NETWORK = 3,        // Network error
-    AS_ERR_UNSUPPORTED_FORMAT = 4
+    AS_ERR_UNSUPPORTED_FORMAT = 4,
+    AS_ERR_BOUNCING = 5
 };
     
 class Audio_Stream_Delegate;
@@ -109,6 +110,8 @@ private:
     
     UInt64 m_dataOffset;
     double m_seekTime;
+    size_t m_bounceCount;
+    CFAbsoluteTime m_firstBufferingTime;
     
     bool m_strictContentTypeChecking;
     CFStringRef m_defaultContentType;

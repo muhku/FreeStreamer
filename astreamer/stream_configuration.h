@@ -17,6 +17,8 @@ struct Stream_Configuration {
     unsigned httpConnectionBufferSize;
     double outputSampleRate;
     long outputNumChannels;
+    int bounceInterval;
+    int maxBounceCount;
     
     static Stream_Configuration *configuration();
     
