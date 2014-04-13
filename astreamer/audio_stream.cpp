@@ -63,6 +63,8 @@ Audio_Stream::Audio_Stream() :
 {
     m_httpStream->m_delegate = this;
     
+    memset(&m_srcFormat, 0, sizeof m_srcFormat);
+    
     memset(&m_dstFormat, 0, sizeof m_dstFormat);
     
     Stream_Configuration *config = Stream_Configuration::configuration();
@@ -307,6 +309,22 @@ CFURLRef Audio_Stream::outputFile()
 Audio_Stream::State Audio_Stream::state()
 {
     return m_state;
+}
+    
+CFStringRef Audio_Stream::sourceFormatDescription()
+{
+    unsigned char formatID[5];
+    *(UInt32 *)formatID = OSSwapHostToBigInt32(m_srcFormat.mFormatID);
+    
+    formatID[4] = '\0';
+    
+    CFStringRef formatDescription = CFStringCreateWithFormat(NULL,
+                                                            NULL,
+                                                            CFSTR("formatID: %s, sample rate: %f"),
+                                                            formatID,
+                                                            m_srcFormat.mSampleRate);
+    
+    return formatDescription;
 }
 
 CFStringRef Audio_Stream::contentType()

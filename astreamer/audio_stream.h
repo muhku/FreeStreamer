@@ -69,6 +69,7 @@ public:
     
     State state();
     
+    CFStringRef sourceFormatDescription();
     CFStringRef contentType();
     
     /* Audio_Queue_Delegate */

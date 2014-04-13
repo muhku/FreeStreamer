@@ -129,6 +129,7 @@ public:
 @property (nonatomic,assign) NSURL *outputFile;
 @property (nonatomic,assign) BOOL wasInterrupted;
 @property (readonly) FSStreamConfiguration configuration;
+@property (readonly) NSString *formatDescription;
 @property (copy) void (^onCompletion)();
 @property (copy) void (^onFailure)();
 @property (nonatomic,assign) FSAudioStreamError lastError;
@@ -346,6 +347,11 @@ public:
     config.maxBounceCount           = c->maxBounceCount;
 
     return config;
+}
+
+- (NSString *)formatDescription
+{
+    return CFBridgingRelease(_audioStream->sourceFormatDescription());
 }
 
 - (void)reachabilityChanged:(NSNotification *)note
@@ -676,7 +682,8 @@ public:
 
 -(NSString *)description
 {
-    return [NSString stringWithFormat:@"bufferCount: %i, bufferSize: %i, maxPacketDescs: %i, decodeQueueSize: %i, httpConnectionBufferSize: %i, outputSampleRate: %f, outputNumChannels: %ld, bounceInterval: %i, maxBounceCount: %i",
+    return [NSString stringWithFormat:@"URL: %@\nbufferCount: %i\nbufferSize: %i\nmaxPacketDescs: %i\ndecodeQueueSize: %i\nhttpConnectionBufferSize: %i\noutputSampleRate: %f\noutputNumChannels: %ld\nbounceInterval: %i\nmaxBounceCount: %i\nformat: %@",
+            self.url,
             self.configuration.bufferCount,
             self.configuration.bufferSize,
             self.configuration.maxPacketDescs,
@@ -685,7 +692,8 @@ public:
             self.configuration.outputSampleRate,
             self.configuration.outputNumChannels,
             self.configuration.bounceInterval,
-            self.configuration.maxBounceCount];
+            self.configuration.maxBounceCount,
+            _private.formatDescription];
 }
 
 @end
