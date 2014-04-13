@@ -472,6 +472,22 @@ public:
     return _audioStream->durationInSeconds();
 }
 
+-(NSString *)description
+{
+    return [NSString stringWithFormat:@"URL: %@\nbufferCount: %i\nbufferSize: %i\nmaxPacketDescs: %i\ndecodeQueueSize: %i\nhttpConnectionBufferSize: %i\noutputSampleRate: %f\noutputNumChannels: %ld\nbounceInterval: %i\nmaxBounceCount: %i\nformat: %@",
+            self.url,
+            self.configuration.bufferCount,
+            self.configuration.bufferSize,
+            self.configuration.maxPacketDescs,
+            self.configuration.decodeQueueSize,
+            self.configuration.httpConnectionBufferSize,
+            self.configuration.outputSampleRate,
+            self.configuration.outputNumChannels,
+            self.configuration.bounceInterval,
+            self.configuration.maxBounceCount,
+            self.formatDescription];
+}
+
 @end
 
 /*
@@ -682,18 +698,7 @@ public:
 
 -(NSString *)description
 {
-    return [NSString stringWithFormat:@"URL: %@\nbufferCount: %i\nbufferSize: %i\nmaxPacketDescs: %i\ndecodeQueueSize: %i\nhttpConnectionBufferSize: %i\noutputSampleRate: %f\noutputNumChannels: %ld\nbounceInterval: %i\nmaxBounceCount: %i\nformat: %@",
-            self.url,
-            self.configuration.bufferCount,
-            self.configuration.bufferSize,
-            self.configuration.maxPacketDescs,
-            self.configuration.decodeQueueSize,
-            self.configuration.httpConnectionBufferSize,
-            self.configuration.outputSampleRate,
-            self.configuration.outputNumChannels,
-            self.configuration.bounceInterval,
-            self.configuration.maxBounceCount,
-            _private.formatDescription];
+    return [_private description];
 }
 
 @end
@@ -711,7 +716,7 @@ void AudioStreamStateObserver::audioStreamErrorOccurred(int errorCode)
             priv.lastError = kFsAudioStreamErrorOpen;
             
 #if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
-            NSLog(@"FSAudioStream: Error opening the stream: %@", priv.url);
+            NSLog(@"FSAudioStream: Error opening the stream: %@", priv);
 #endif
             
             break;
@@ -719,7 +724,7 @@ void AudioStreamStateObserver::audioStreamErrorOccurred(int errorCode)
             priv.lastError = kFsAudioStreamErrorStreamParse;
             
 #if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
-            NSLog(@"FSAudioStream: Error parsing the stream: %@", priv.url);
+            NSLog(@"FSAudioStream: Error parsing the stream: %@", priv);
 #endif
             
             break;
@@ -727,7 +732,7 @@ void AudioStreamStateObserver::audioStreamErrorOccurred(int errorCode)
             priv.lastError = kFsAudioStreamErrorNetwork;
         
 #if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
-            NSLog(@"FSAudioStream: Network error: %@", priv.url);
+            NSLog(@"FSAudioStream: Network error: %@", priv);
 #endif
             
             break;
@@ -735,7 +740,7 @@ void AudioStreamStateObserver::audioStreamErrorOccurred(int errorCode)
             priv.lastError = kFsAudioStreamErrorUnsupportedFormat;
     
 #if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
-            NSLog(@"FSAudioStream: Unsupported format error: %@", priv.url);
+            NSLog(@"FSAudioStream: Unsupported format error: %@", priv);
 #endif
             
             break;
@@ -744,7 +749,7 @@ void AudioStreamStateObserver::audioStreamErrorOccurred(int errorCode)
             priv.lastError = kFsAudioStreamErrorStreamBouncing;
             
 #if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
-            NSLog(@"FSAudioStream: Stream bounced: %@", priv.url);
+            NSLog(@"FSAudioStream: Stream bounced: %@", priv);
 #endif
             
             break;
