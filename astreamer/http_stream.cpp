@@ -658,6 +658,23 @@ void HTTP_Stream::readCallBack(CFReadStreamRef stream, CFStreamEventType eventTy
                 
                 if (CFReadStreamGetStatus(stream) == kCFStreamStatusError ||
                     bytesRead < 0) {
+                    
+#if defined (HS_DEBUG)
+                    CFErrorRef streamError = CFReadStreamCopyError(stream);
+                    
+                    if (streamError) {
+                        CFStringRef errorDesc = CFErrorCopyDescription(streamError);
+                        
+                        if (errorDesc) {
+                            HS_TRACE_CFSTRING(errorDesc);
+                            
+                            CFRelease(errorDesc);
+                        }
+                        
+                        CFRelease(streamError);
+                    }
+#endif /* HS_DEBUG */
+                    
                     if (THIS->m_delegate) {
                         THIS->m_delegate->streamErrorOccurred();
                     }
