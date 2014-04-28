@@ -112,8 +112,6 @@ public:
     NSURL *_url;
     BOOL _strictContentTypeChecking;
 	AudioStreamStateObserver *_observer;
-    BOOL _wasInterrupted;
-    BOOL _wasDisconnected;
     NSString *_defaultContentType;
     Reachability *_reachability;
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
@@ -128,6 +126,8 @@ public:
 @property (nonatomic,assign) NSString *suggestedFileExtension;
 @property (nonatomic,assign) NSURL *outputFile;
 @property (nonatomic,assign) BOOL wasInterrupted;
+@property (nonatomic,assign) BOOL wasDisconnected;
+@property (nonatomic,assign) BOOL wasContinuousStream;
 @property (readonly) FSStreamConfiguration configuration;
 @property (readonly) NSString *formatDescription;
 @property (copy) void (^onCompletion)();
@@ -156,8 +156,6 @@ public:
 {
     if (self = [super init]) {
         _url = nil;
-        _wasInterrupted = NO;
-        _wasDisconnected = NO;
         
         _observer = new AudioStreamStateObserver();
         _observer->priv = self;
@@ -361,15 +359,15 @@ public:
     BOOL internetConnectionAvailable = (netStatus == ReachableViaWiFi || netStatus == ReachableViaWWAN);
     
     if ([self isPlaying] && !internetConnectionAvailable) {
-        _wasDisconnected = YES;
+        self.wasDisconnected = YES;
         
 #if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
         NSLog(@"FSAudioStream: Error: Internet connection disconnected while playing a stream.");
 #endif
     }
     
-    if (_wasDisconnected && internetConnectionAvailable) {
-        _wasDisconnected = NO;
+    if (self.wasDisconnected && internetConnectionAvailable) {
+        self.wasDisconnected = NO;
         
 #if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
         NSLog(@"FSAudioStream: Internet connection available again. Restarting stream playback.");
@@ -395,12 +393,20 @@ public:
     if ([interruptionType intValue] == AVAudioSessionInterruptionTypeBegan) {
         if ([self isPlaying]) {
             self.wasInterrupted = YES;
+            // Continuous streams do not have a duration.
+            self.wasContinuousStream = (0 == [self durationInSeconds]);
             
+            if (self.wasContinuousStream) {
 #if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
-            NSLog(@"FSAudioStream: Interruption began. Pausing the stream.");
+                NSLog(@"FSAudioStream: Interruption began. Continuous stream. Stopping the stream.");
 #endif
-            
-            [self pause];
+                [self stop];
+            } else {
+#if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
+                NSLog(@"FSAudioStream: Interruption began. Non-continuous stream. Pausing the stream.");
+#endif
+                [self pause];
+            }
         }
     } else if ([interruptionType intValue] == AVAudioSessionInterruptionTypeEnded) {
         if (self.wasInterrupted) {
@@ -408,14 +414,23 @@ public:
             
             [[AVAudioSession sharedInstance] setActive:YES error:nil];
             
+            if (self.wasContinuousStream) {
 #if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
-            NSLog(@"FSAudioStream: Interruption ended. Unpausing the stream.");
+                NSLog(@"FSAudioStream: Interruption ended. Continuous stream. Starting the playback.");
 #endif
-            
-            /*
-             * Resume playing.
-             */
-            [self pause];
+                /*
+                 * Resume playing.
+                 */
+                [self play];
+            } else {
+#if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
+                NSLog(@"FSAudioStream: Interruption ended. Continuous stream. Unpausing the stream.");
+#endif
+                /*
+                 * Resume playing.
+                 */
+                [self pause];
+            }
         }
     }
 #endif
