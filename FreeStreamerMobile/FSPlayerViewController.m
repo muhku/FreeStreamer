@@ -272,14 +272,7 @@
 {
     if (receivedEvent.type == UIEventTypeRemoteControl) {
         switch (receivedEvent.subtype) {
-            case UIEventSubtypeRemoteControlPause:
-                if (_paused) {
-                    [self play:self];
-                } else {
-                    [self pause:self];
-                }
-                break;
-            case UIEventSubtypeRemoteControlPlay:
+            case UIEventSubtypeRemoteControlTogglePlayPause:
                 if (_paused) {
                     [self play:self];
                 } else {
