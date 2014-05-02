@@ -162,7 +162,14 @@ void Audio_Stream::close()
     
     closeAudioQueue();
     
-    setState(STOPPED);
+    if (FAILED != state()) {
+        /*
+         * Set the stream state to stopped if the stream was stopped successfully.
+         * We don't want to cause a spurious stopped state as the fail state should
+         * be the final state in case the stream failed.
+         */
+        setState(STOPPED);
+    }
     
     /*
      * Free any remaining queud packets for encoding.
