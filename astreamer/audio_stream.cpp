@@ -396,7 +396,7 @@ void Audio_Stream::audioQueueBuffersEmpty()
     
     Stream_Configuration *config = Stream_Configuration::configuration();
     
-    if (m_httpStreamRunning) {
+    if (m_httpStreamRunning && FAILED != state()) {
         /* Still feeding the audio queue with data,
            don't stop yet */
         setState(BUFFERING);
