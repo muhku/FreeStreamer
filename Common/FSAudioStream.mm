@@ -34,6 +34,7 @@ FSStreamConfiguration makeFreeStreamerDefaultConfiguration()
     defaultConfiguration.outputNumChannels = 2;
     defaultConfiguration.bounceInterval    = 10;
     defaultConfiguration.maxBounceCount    = 4;   // Max number of bufferings in bounceInterval seconds
+    defaultConfiguration.startupWatchdogPeriod = 30; // If the stream doesn't start to play in this seconds, the watchdog will fail it
     
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 60000)
     AVAudioSession *session = [AVAudioSession sharedInstance];
@@ -343,6 +344,7 @@ public:
     config.outputNumChannels        = c->outputNumChannels;
     config.bounceInterval           = c->bounceInterval;
     config.maxBounceCount           = c->maxBounceCount;
+    config.startupWatchdogPeriod    = c->startupWatchdogPeriod;
 
     return config;
 }
@@ -489,7 +491,7 @@ public:
 
 -(NSString *)description
 {
-    return [NSString stringWithFormat:@"URL: %@\nbufferCount: %i\nbufferSize: %i\nmaxPacketDescs: %i\ndecodeQueueSize: %i\nhttpConnectionBufferSize: %i\noutputSampleRate: %f\noutputNumChannels: %ld\nbounceInterval: %i\nmaxBounceCount: %i\nformat: %@",
+    return [NSString stringWithFormat:@"URL: %@\nbufferCount: %i\nbufferSize: %i\nmaxPacketDescs: %i\ndecodeQueueSize: %i\nhttpConnectionBufferSize: %i\noutputSampleRate: %f\noutputNumChannels: %ld\nbounceInterval: %i\nmaxBounceCount: %i\nstartupWatchdogPeriod: %i\nformat: %@",
             self.url,
             self.configuration.bufferCount,
             self.configuration.bufferSize,
@@ -500,6 +502,7 @@ public:
             self.configuration.outputNumChannels,
             self.configuration.bounceInterval,
             self.configuration.maxBounceCount,
+            self.configuration.startupWatchdogPeriod,
             self.formatDescription];
 }
 
@@ -545,6 +548,7 @@ public:
         c->outputNumChannels        = configuration.outputNumChannels;
         c->maxBounceCount           = configuration.maxBounceCount;
         c->bounceInterval           = configuration.bounceInterval;
+        c->startupWatchdogPeriod    = configuration.startupWatchdogPeriod;
         
         _private = [[FSAudioStreamPrivate alloc] init];
         _private.stream = self;

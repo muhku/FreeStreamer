@@ -36,6 +36,7 @@ Audio_Stream::Audio_Stream() :
     m_state(STOPPED),
     m_httpStream(new HTTP_Stream()),
     m_audioQueue(0),
+    m_watchdogTimer(0),
     m_audioFileStream(0),
     m_audioConverter(0),
     m_outputBufferSize(Stream_Configuration::configuration()->bufferSize),
@@ -89,6 +90,11 @@ Audio_Stream::~Audio_Stream()
         CFRelease(m_contentType), m_contentType = NULL;
     }
     
+    if (m_watchdogTimer) {
+        CFRunLoopTimerInvalidate(m_watchdogTimer);
+        CFRelease(m_watchdogTimer), m_watchdogTimer = 0;
+    }
+    
     close();
     
     delete [] m_outputBuffer, m_outputBuffer = 0;
@@ -125,6 +131,13 @@ void Audio_Stream::open()
     m_processedPacketsCount = 0;
     m_bitrateBufferIndex = 0;
     
+    if (m_watchdogTimer) {
+        CFRunLoopTimerInvalidate(m_watchdogTimer);
+        CFRelease(m_watchdogTimer), m_watchdogTimer = 0;
+    }
+    
+    Stream_Configuration *config = Stream_Configuration::configuration();
+    
     if (m_contentType) {
         CFRelease(m_contentType), m_contentType = NULL;
     }
@@ -133,6 +146,28 @@ void Audio_Stream::open()
         AS_TRACE("%s: HTTP stream opened, buffering...\n", __PRETTY_FUNCTION__);
         m_httpStreamRunning = true;
         setState(BUFFERING);
+        
+        if (config->startupWatchdogPeriod > 0) {
+            /*
+             * Start the WD if we have one requested. In this way we can track
+             * that the stream doesn't stuck forever on the buffering state
+             * (for instance some network error condition)
+             */
+            
+            CFRunLoopTimerContext ctx = {0, this, NULL, NULL, NULL};
+            
+            m_watchdogTimer = CFRunLoopTimerCreate(NULL,
+                                                   CFAbsoluteTimeGetCurrent() + config->startupWatchdogPeriod,
+                                                   0,
+                                                   0,
+                                                   0,
+                                                   watchdogTimerCallback,
+                                                   &ctx);
+            
+            AS_TRACE("Starting the startup watchdog, period %i seconds\n", config->startupWatchdogPeriod);
+            
+            CFRunLoopAddTimer(CFRunLoopGetCurrent(), m_watchdogTimer, kCFRunLoopCommonModes);
+        }
     } else {
         AS_TRACE("%s: failed to open the HTTP stream\n", __PRETTY_FUNCTION__);
         closeAndSignalError(AS_ERR_OPEN);
@@ -687,6 +722,17 @@ unsigned Audio_Stream::bitrate()
     
     return sum / kAudioStreamBitrateBufferSize;
 }
+    
+void Audio_Stream::watchdogTimerCallback(CFRunLoopTimerRef timer, void *info)
+{
+    Audio_Stream *THIS = (Audio_Stream *)info;
+    
+    if (PLAYING != THIS->state()) {
+        AS_TRACE("The stream startup watchdog activated: stream didn't start to play soon enough\n");
+        
+        THIS->closeAndSignalError(AS_ERR_OPEN);
+    }
+}
 
 OSStatus Audio_Stream::encoderDataCallback(AudioConverterRef inAudioConverter, UInt32 *ioNumberDataPackets, AudioBufferList *ioData, AudioStreamPacketDescription **outDataPacketDescription, void *inUserData)
 {
@@ -851,6 +897,13 @@ void Audio_Stream::streamDataCallback(void *inClientData, UInt32 inNumberBytes, 
     Stream_Configuration *config = Stream_Configuration::configuration();
     
     if (count > config->decodeQueueSize) {
+        if (THIS->m_watchdogTimer) {
+            AS_TRACE("The stream started to play, canceling the watchdog\n");
+            
+            CFRunLoopTimerInvalidate(THIS->m_watchdogTimer);
+            CFRelease(THIS->m_watchdogTimer), THIS->m_watchdogTimer = 0;
+        }
+        
         THIS->setState(PLAYING);
         
         AudioBufferList outputBufferList;

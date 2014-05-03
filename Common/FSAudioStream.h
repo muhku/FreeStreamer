@@ -74,6 +74,7 @@ typedef struct {
     long     outputNumChannels;
     int      bounceInterval;
     int      maxBounceCount;
+    int      startupWatchdogPeriod;
 } FSStreamConfiguration;
 
 FSStreamConfiguration makeFreeStreamerDefaultConfiguration();

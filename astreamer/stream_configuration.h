@@ -19,6 +19,7 @@ struct Stream_Configuration {
     long outputNumChannels;
     int bounceInterval;
     int maxBounceCount;
+    int startupWatchdogPeriod;
     
     static Stream_Configuration *configuration();
     
