@@ -90,11 +90,6 @@ Audio_Stream::~Audio_Stream()
         CFRelease(m_contentType), m_contentType = NULL;
     }
     
-    if (m_watchdogTimer) {
-        CFRunLoopTimerInvalidate(m_watchdogTimer);
-        CFRelease(m_watchdogTimer), m_watchdogTimer = 0;
-    }
-    
     close();
     
     delete [] m_outputBuffer, m_outputBuffer = 0;
@@ -177,6 +172,11 @@ void Audio_Stream::open()
 void Audio_Stream::close()
 {
     AS_TRACE("%s: enter\n", __PRETTY_FUNCTION__);
+    
+    if (m_watchdogTimer) {
+        CFRunLoopTimerInvalidate(m_watchdogTimer);
+        CFRelease(m_watchdogTimer), m_watchdogTimer = 0;
+    }
     
     /* Close the HTTP stream first so that the audio stream parser
        isn't fed with more data to parse */
