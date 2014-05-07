@@ -39,6 +39,7 @@ Audio_Stream::Audio_Stream() :
     m_watchdogTimer(0),
     m_audioFileStream(0),
     m_audioConverter(0),
+    m_initializationError(noErr),
     m_outputBufferSize(Stream_Configuration::configuration()->bufferSize),
     m_outputBuffer(new UInt8[m_outputBufferSize]),
     m_dataOffset(0),
@@ -125,6 +126,7 @@ void Audio_Stream::open()
     m_firstBufferingTime = 0;
     m_processedPacketsCount = 0;
     m_bitrateBufferIndex = 0;
+    m_initializationError = noErr;
     
     if (m_watchdogTimer) {
         CFRunLoopTimerInvalidate(m_watchdogTimer);
@@ -582,6 +584,12 @@ void Audio_Stream::streamHasBytesAvailable(UInt8 *data, UInt32 numBytes)
         if (result != 0) {
             AS_TRACE("%s: AudioFileStreamParseBytes error %d\n", __PRETTY_FUNCTION__, (int)result);
             closeAndSignalError(AS_ERR_STREAM_PARSE);
+        } else if (m_initializationError == kAudioConverterErr_FormatNotSupported) {
+            AS_TRACE("Audio stream initialization failed due to unsupported format\n");
+            closeAndSignalError(AS_ERR_UNSUPPORTED_FORMAT);
+        } else if (m_initializationError != noErr) {
+            AS_TRACE("Audio stream initialization failed due to unknown error\n");
+            closeAndSignalError(AS_ERR_OPEN);
         }
     }
 }
@@ -833,7 +841,9 @@ void Audio_Stream::propertyValueCallback(void *inClientData, AudioFileStreamID i
                                     &(THIS->m_audioConverter));
             
             if (err) {
-                AS_TRACE("Error in creating an audio converter\n");
+                AS_TRACE("Error in creating an audio converter, error %i\n", err);
+                
+                THIS->m_initializationError = err;
             }
             
             THIS->setCookiesForStream(inAudioFileStream);

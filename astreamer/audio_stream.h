@@ -107,6 +107,7 @@ private:
     AudioConverterRef m_audioConverter;
     AudioStreamBasicDescription m_srcFormat;
     AudioStreamBasicDescription m_dstFormat;
+    OSStatus m_initializationError;
     
     UInt32 m_outputBufferSize;
     UInt8 *m_outputBuffer;
