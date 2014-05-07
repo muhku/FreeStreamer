@@ -897,15 +897,6 @@ void Audio_Stream::streamDataCallback(void *inClientData, UInt32 inNumberBytes, 
     Stream_Configuration *config = Stream_Configuration::configuration();
     
     if (count > config->decodeQueueSize) {
-        if (THIS->m_watchdogTimer) {
-            AS_TRACE("The stream started to play, canceling the watchdog\n");
-            
-            CFRunLoopTimerInvalidate(THIS->m_watchdogTimer);
-            CFRelease(THIS->m_watchdogTimer), THIS->m_watchdogTimer = 0;
-        }
-        
-        THIS->setState(PLAYING);
-        
         AudioBufferList outputBufferList;
         outputBufferList.mNumberBuffers = 1;
         outputBufferList.mBuffers[0].mNumberChannels = THIS->m_dstFormat.mChannelsPerFrame;
@@ -930,6 +921,15 @@ void Audio_Stream::streamDataCallback(void *inClientData, UInt32 inNumberBytes, 
         if (err == noErr) {
             AS_TRACE("%i output bytes available for the audio queue\n", (unsigned int)ioOutputDataPackets);
             
+            if (THIS->m_watchdogTimer) {
+                AS_TRACE("The stream started to play, canceling the watchdog\n");
+                
+                CFRunLoopTimerInvalidate(THIS->m_watchdogTimer);
+                CFRelease(THIS->m_watchdogTimer), THIS->m_watchdogTimer = 0;
+            }
+            
+            THIS->setState(PLAYING);
+            
             THIS->audioQueue()->handleAudioPackets(outputBufferList.mBuffers[0].mDataByteSize,
                                                    outputBufferList.mNumberBuffers,
                                                    outputBufferList.mBuffers[0].mData,
@@ -945,6 +945,8 @@ void Audio_Stream::streamDataCallback(void *inClientData, UInt32 inNumberBytes, 
                 free(cur);
             }
             THIS->m_processedPackets.clear();
+        } else {
+            AS_TRACE("AudioConverterFillComplexBuffer failed, error %i\n", err);
         }
     } else {
         AS_TRACE("Less than %i packets queued, returning...\n", config->decodeQueueSize);
