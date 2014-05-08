@@ -260,8 +260,8 @@ void HTTP_Stream::id3metaDataAvailable(std::map<CFStringRef,CFStringRef> metaDat
 CFReadStreamRef HTTP_Stream::createReadStream(CFURLRef url)
 {
     CFReadStreamRef readStream = 0;
-    CFHTTPMessageRef request;
-    CFDictionaryRef proxySettings;
+    CFHTTPMessageRef request = 0;
+    CFDictionaryRef proxySettings = 0;
     
     if (!(request = CFHTTPMessageCreateRequest(kCFAllocatorDefault, httpRequestMethod, url, kCFHTTPVersion1_1))) {
         goto out;
@@ -286,8 +286,10 @@ CFReadStreamRef HTTP_Stream::createReadStream(CFURLRef url)
     }
     
     proxySettings = CFNetworkCopySystemProxySettings();
-    CFReadStreamSetProperty(readStream, kCFStreamPropertyHTTPProxy, proxySettings);
-    CFRelease(proxySettings);
+    if (proxySettings) {
+        CFReadStreamSetProperty(readStream, kCFStreamPropertyHTTPProxy, proxySettings);
+        CFRelease(proxySettings);
+    }
     
 out:
     if (request) {
