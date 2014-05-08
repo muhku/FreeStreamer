@@ -285,10 +285,6 @@ CFReadStreamRef HTTP_Stream::createReadStream(CFURLRef url)
         goto out;
     }
     
-    CFReadStreamSetProperty(readStream,
-                            kCFStreamPropertyHTTPShouldAutoredirect,
-                            kCFBooleanTrue);
-    
     proxySettings = CFNetworkCopySystemProxySettings();
     CFReadStreamSetProperty(readStream, kCFStreamPropertyHTTPProxy, proxySettings);
     CFRelease(proxySettings);
