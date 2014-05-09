@@ -31,7 +31,7 @@ Audio_Stream::Audio_Stream() :
     m_delegate(0),
     m_httpStreamRunning(false),
     m_audioStreamParserRunning(false),
-    m_needNewQueue(false),
+    m_needsClosing(false),
     m_contentLength(0),
     m_state(STOPPED),
     m_httpStream(new HTTP_Stream()),
@@ -114,10 +114,9 @@ void Audio_Stream::open()
         return;
     }
     
-    if (m_needNewQueue && m_audioQueue) {
-        m_needNewQueue = false;
-        
-        closeAudioQueue();
+    if (m_needsClosing) {
+        m_needsClosing = false;
+        close();
     }
     
     m_contentLength = 0;
@@ -218,6 +217,8 @@ void Audio_Stream::close()
         cur = tmp;
     }
     m_queuedHead = m_queuedTail = 0;
+    
+    m_needsClosing = false;
     
     AS_TRACE("%s: leave\n", __PRETTY_FUNCTION__);
 }
@@ -421,9 +422,13 @@ out:
 void Audio_Stream::audioQueueStateChanged(Audio_Queue::State state)
 {
     if (state == Audio_Queue::RUNNING) {
+        AS_TRACE("audioQueueStateChanged: RUNNING\n");
         setState(PLAYING);
     } else if (state == Audio_Queue::IDLE) {
+        AS_TRACE("audioQueueStateChanged: IDLE\n");
         setState(STOPPED);
+        
+        m_needsClosing = true;
     }
 }
     
@@ -473,18 +478,8 @@ void Audio_Stream::audioQueueBuffersEmpty()
         return;
     }
     
-    AS_TRACE("%s: closing the audio queue\n", __PRETTY_FUNCTION__);
-    
-    if (m_audioStreamParserRunning) {
-        if (AudioFileStreamClose(m_audioFileStream) != 0) {
-            AS_TRACE("%s: AudioFileStreamClose failed\n", __PRETTY_FUNCTION__);
-        }
-        m_audioStreamParserRunning = false;
-    }
-    
     // Keep the audio queue running until it has finished playing
     audioQueue()->stop(false);
-    m_needNewQueue = true;
     
     AS_TRACE("%s: leave\n", __PRETTY_FUNCTION__);
 }

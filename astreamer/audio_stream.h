@@ -93,7 +93,7 @@ private:
     
     bool m_httpStreamRunning;
     bool m_audioStreamParserRunning;
-    bool m_needNewQueue;
+    bool m_needsClosing;
     
     size_t m_contentLength;
     
