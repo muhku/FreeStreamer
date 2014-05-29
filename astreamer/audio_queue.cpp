@@ -14,14 +14,16 @@
 #include "audio_queue.h"
 #include "stream_configuration.h"
 
-#include <cassert>
-
 //#define AQ_DEBUG 1
 
 #if !defined (AQ_DEBUG)
     #define AQ_TRACE(...) do {} while (0)
+    #define AQ_ASSERT(...) do {} while (0)
 #else
+    #include <cassert>
+
     #define AQ_TRACE(...) printf(__VA_ARGS__)
+    #define AQ_ASSERT(...) assert(__VA_ARGS__)
 #endif
 
 namespace astreamer {
@@ -392,7 +394,7 @@ void Audio_Queue::setState(State state)
 
 int Audio_Queue::enqueueBuffer()
 {
-    assert(!m_bufferInUse[m_fillBufferIndex]);
+    AQ_ASSERT(!m_bufferInUse[m_fillBufferIndex]);
     
     Stream_Configuration *config = Stream_Configuration::configuration();
     
@@ -405,7 +407,7 @@ int Audio_Queue::enqueueBuffer()
     AudioQueueBufferRef fillBuf = m_audioQueueBuffer[m_fillBufferIndex];
     fillBuf->mAudioDataByteSize = m_bytesFilled;
     
-    assert(m_packetsFilled > 0);
+    AQ_ASSERT(m_packetsFilled > 0);
     OSStatus err = AudioQueueEnqueueBuffer(m_outAQ, fillBuf, m_packetsFilled, m_packetDescs);
     if (!err) {
         m_lastError = noErr;
@@ -456,8 +458,8 @@ int Audio_Queue::findQueueBuffer(AudioQueueBufferRef inBuffer)
     
 void Audio_Queue::enqueueCachedData()
 {
-    assert(!m_waitingOnBuffer);
-    assert(!m_bufferInUse[m_fillBufferIndex]);
+    AQ_ASSERT(!m_waitingOnBuffer);
+    AQ_ASSERT(!m_bufferInUse[m_fillBufferIndex]);
     
     /* Queue up as many packets as possible into the buffers */
     queued_packet_t *cur = m_queuedHead;
@@ -489,7 +491,7 @@ void Audio_Queue::audioQueueOutputCallback(void *inClientData, AudioQueueRef inA
     Audio_Queue *audioQueue = static_cast<Audio_Queue*>(inClientData);    
     unsigned int bufIndex = audioQueue->findQueueBuffer(inBuffer);
     
-    assert(audioQueue->m_bufferInUse[bufIndex]);
+    AQ_ASSERT(audioQueue->m_bufferInUse[bufIndex]);
     
     audioQueue->m_bufferInUse[bufIndex] = false;
     audioQueue->m_buffersUsed--;
