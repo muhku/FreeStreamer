@@ -31,12 +31,12 @@ Audio_Stream::Audio_Stream() :
     m_delegate(0),
     m_httpStreamRunning(false),
     m_audioStreamParserRunning(false),
-    m_needNewQueue(false),
     m_contentLength(0),
     m_state(STOPPED),
     m_httpStream(new HTTP_Stream()),
     m_audioQueue(0),
     m_watchdogTimer(0),
+    m_playbackStopTimer(0),
     m_audioFileStream(0),
     m_audioConverter(0),
     m_initializationError(noErr),
@@ -114,12 +114,6 @@ void Audio_Stream::open()
         return;
     }
     
-    if (m_needNewQueue && m_audioQueue) {
-        m_needNewQueue = false;
-        
-        closeAudioQueue();
-    }
-    
     m_contentLength = 0;
     m_seekTime = 0;
     m_bounceCount = 0;
@@ -131,6 +125,10 @@ void Audio_Stream::open()
     if (m_watchdogTimer) {
         CFRunLoopTimerInvalidate(m_watchdogTimer);
         CFRelease(m_watchdogTimer), m_watchdogTimer = 0;
+    }
+    if (m_playbackStopTimer) {
+        CFRunLoopTimerInvalidate(m_playbackStopTimer);
+        CFRelease(m_playbackStopTimer), m_playbackStopTimer = 0;
     }
     
     Stream_Configuration *config = Stream_Configuration::configuration();
@@ -178,6 +176,10 @@ void Audio_Stream::close()
     if (m_watchdogTimer) {
         CFRunLoopTimerInvalidate(m_watchdogTimer);
         CFRelease(m_watchdogTimer), m_watchdogTimer = 0;
+    }
+    if (m_playbackStopTimer) {
+        CFRunLoopTimerInvalidate(m_playbackStopTimer);
+        CFRelease(m_playbackStopTimer), m_playbackStopTimer = 0;
     }
     
     /* Close the HTTP stream first so that the audio stream parser
@@ -473,20 +475,28 @@ void Audio_Stream::audioQueueBuffersEmpty()
         return;
     }
     
-    AS_TRACE("%s: closing the audio queue\n", __PRETTY_FUNCTION__);
-    
-    if (m_audioStreamParserRunning) {
-        if (AudioFileStreamClose(m_audioFileStream) != 0) {
-            AS_TRACE("%s: AudioFileStreamClose failed\n", __PRETTY_FUNCTION__);
-        }
-        m_audioStreamParserRunning = false;
-    }
-    
     // Keep the audio queue running until it has finished playing
-    audioQueue()->stop(false);
-    m_needNewQueue = true;
+    const unsigned timeLeft = durationInSeconds() - timePlayedInSeconds();
     
-    AS_TRACE("%s: leave\n", __PRETTY_FUNCTION__);
+    if (timeLeft > 0) {
+        CFRunLoopTimerContext ctx = {0, this, NULL, NULL, NULL};
+    
+        m_playbackStopTimer = CFRunLoopTimerCreate(NULL,
+                                                   CFAbsoluteTimeGetCurrent() + timeLeft,
+                                                   0,
+                                                   0,
+                                                   0,
+                                                   playbackStopTimerCallback,
+                                                   &ctx);
+    
+        AS_TRACE("Closing the audio queue after %i seconds\n", timeLeft);
+    
+        CFRunLoopAddTimer(CFRunLoopGetCurrent(), m_playbackStopTimer, kCFRunLoopCommonModes);
+    } else {
+        AS_TRACE("%s: closing the audio queue\n", __PRETTY_FUNCTION__);
+        
+        close();
+    }
 }
     
 void Audio_Stream::audioQueueOverflow()
@@ -740,6 +750,15 @@ void Audio_Stream::watchdogTimerCallback(CFRunLoopTimerRef timer, void *info)
         
         THIS->closeAndSignalError(AS_ERR_OPEN);
     }
+}
+    
+void Audio_Stream::playbackStopTimerCallback(CFRunLoopTimerRef timer, void *info)
+{
+    Audio_Stream *THIS = (Audio_Stream *)info;
+    
+    AS_TRACE("Time passed, closing the audio queue\n");
+    
+    THIS->close();
 }
 
 OSStatus Audio_Stream::encoderDataCallback(AudioConverterRef inAudioConverter, UInt32 *ioNumberDataPackets, AudioBufferList *ioData, AudioStreamPacketDescription **outDataPacketDescription, void *inUserData)
