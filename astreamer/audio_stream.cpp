@@ -109,7 +109,7 @@ Audio_Stream::~Audio_Stream()
 
 void Audio_Stream::open()
 {
-    if (m_httpStreamRunning) {
+    if (m_httpStreamRunning || m_audioStreamParserRunning) {
         AS_TRACE("%s: already running: return\n", __PRETTY_FUNCTION__);
         return;
     }
