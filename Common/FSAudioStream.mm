@@ -10,6 +10,7 @@
 
 #include "audio_stream.h"
 #include "stream_configuration.h"
+#include "http_stream.h"
 
 #import <AVFoundation/AVFoundation.h>
 
@@ -144,6 +145,7 @@ public:
 
 - (void)play;
 - (void)playFromURL:(NSURL*)url;
+- (void)playFromOffset:(FSSeekByteOffset)offset;
 - (void)stop;
 - (BOOL)isPlaying;
 - (void)pause;
@@ -151,6 +153,7 @@ public:
 - (void)setVolume:(float)volume;
 - (unsigned)timePlayedInSeconds;
 - (unsigned)durationInSeconds;
+- (astreamer::HTTP_Stream_Position)streamPositionForTime:(unsigned)newSeekTime;
 @end
 
 @implementation FSAudioStreamPrivate
@@ -260,6 +263,20 @@ public:
 {
    [self setUrl:url];
    [self play];
+}
+
+- (void)playFromOffset:(FSSeekByteOffset)offset
+{
+    astreamer::HTTP_Stream_Position position;
+    position.start = offset.start;
+    position.end   = offset.end;
+    
+    _audioStream->open(&position);
+    
+    _audioStream->setSeekPosition(offset.position);
+    _audioStream->setContentLength(offset.end);
+    
+    [_reachability startNotifier];
 }
 
 - (void)setDefaultContentType:(NSString *)defaultContentType
@@ -498,6 +515,11 @@ public:
     return _audioStream->durationInSeconds();
 }
 
+- (astreamer::HTTP_Stream_Position)streamPositionForTime:(unsigned)newSeekTime
+{
+    return _audioStream->streamPositionForTime(newSeekTime);
+}
+
 -(NSString *)description
 {
     return [NSString stringWithFormat:@"URL: %@\nbufferCount: %i\nbufferSize: %i\nmaxPacketDescs: %i\ndecodeQueueSize: %i\nhttpConnectionBufferSize: %i\noutputSampleRate: %f\noutputNumChannels: %ld\nbounceInterval: %i\nmaxBounceCount: %i\nstartupWatchdogPeriod: %i\nformat: %@",
@@ -638,6 +660,11 @@ public:
     [_private playFromURL:url];
 }
 
+- (void)playFromOffset:(FSSeekByteOffset)offset
+{
+    [_private playFromOffset:offset];
+}
+
 - (void)stop
 {
     [_private stop];
@@ -689,6 +716,27 @@ public:
     
     FSStreamPosition pos = {.minute = m, .second = s};
     return pos;
+}
+
+- (FSSeekByteOffset)currentSeekByteOffset
+{
+    FSSeekByteOffset offset;
+    offset.start    = 0;
+    offset.end      = 0;
+    offset.position = 0;
+    
+    if (self.continuous) {
+        return offset;
+    }
+    
+    offset.position = [_private timePlayedInSeconds];
+    
+    astreamer::HTTP_Stream_Position httpStreamPos = [_private streamPositionForTime:offset.position];
+    
+    offset.start = httpStreamPos.start;
+    offset.end   = httpStreamPos.end;
+    
+    return offset;
 }
 
 - (BOOL)continuous

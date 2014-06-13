@@ -62,6 +62,15 @@ typedef struct {
 } FSStreamPosition;
 
 /**
+ * The audio stream seek byte offset.
+ */
+typedef struct {
+    UInt64 start;
+    UInt64 end;
+    unsigned position;
+} FSSeekByteOffset;
+
+/**
  * The low-level stream configuration.
  */
 typedef struct {
@@ -122,6 +131,13 @@ FSStreamConfiguration makeFreeStreamerDefaultConfiguration();
  * @param url The URL from which the stream data is retrieved.
  */
 - (void)playFromURL:(NSURL*)url;
+
+/**
+ * Starts playing the stream from the given offset.
+ *
+ * @param offset The offset where to start playback from.
+ */
+- (void)playFromOffset:(FSSeekByteOffset)offset;
 
 /**
  * Stops the stream playback.
@@ -198,6 +214,11 @@ FSStreamConfiguration makeFreeStreamerDefaultConfiguration();
  * Continuous streams do not have a duration.
  */
 @property (nonatomic,readonly) FSStreamPosition duration;
+/**
+ * This property has the current seek byte offset of the stream, if the stream is non-continuous.
+ * Continuous streams do not have a seek byte offset.
+ */
+@property (nonatomic,readonly) FSSeekByteOffset currentSeekByteOffset;
 /**
  * The property is true if the stream is continuous (no known duration).
  */

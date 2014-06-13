@@ -66,7 +66,7 @@ public:
     void setUrl(CFURLRef url);
     void setStrictContentTypeChecking(bool strictChecking);
     void setDefaultContentType(CFStringRef defaultContentType);
-    void setSeekTime(double seekTime);
+    void setSeekPosition(unsigned seekPosition);
     void setContentLength(size_t contentLength);
     
     void setOutputFile(CFURLRef url);
@@ -118,7 +118,7 @@ private:
     UInt8 *m_outputBuffer;
     
     UInt64 m_dataOffset;
-    double m_seekTime;
+    unsigned m_seekPosition;
     size_t m_bounceCount;
     CFAbsoluteTime m_firstBufferingTime;
     

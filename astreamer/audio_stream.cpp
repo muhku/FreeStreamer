@@ -43,7 +43,7 @@ Audio_Stream::Audio_Stream() :
     m_outputBufferSize(Stream_Configuration::configuration()->bufferSize),
     m_outputBuffer(new UInt8[m_outputBufferSize]),
     m_dataOffset(0),
-    m_seekTime(0),
+    m_seekPosition(0),
     m_bounceCount(0),
     m_firstBufferingTime(0),
 #if defined (AS_RELAX_CONTENT_TYPE_CHECK)
@@ -120,7 +120,7 @@ void Audio_Stream::open(HTTP_Stream_Position *position)
     }
     
     m_contentLength = 0;
-    m_seekTime = 0;
+    m_seekPosition = 0;
     m_bounceCount = 0;
     m_firstBufferingTime = 0;
     m_processedPacketsCount = 0;
@@ -245,7 +245,7 @@ void Audio_Stream::pause()
 unsigned Audio_Stream::timePlayedInSeconds()
 {
     if (m_audioStreamParserRunning) {
-        return m_seekTime + audioQueue()->timePlayedInSeconds();
+        return m_seekPosition + audioQueue()->timePlayedInSeconds();
     }
     return 0;
 }
@@ -295,7 +295,7 @@ void Audio_Stream::seekToTime(unsigned newSeekTime)
     
     open(&position);
     
-    setSeekTime(newSeekTime);
+    setSeekPosition(newSeekTime);
     setContentLength(originalContentLength);
 }
     
@@ -359,9 +359,9 @@ void Audio_Stream::setDefaultContentType(CFStringRef defaultContentType)
     }
 }
     
-void Audio_Stream::setSeekTime(double seekTime)
+void Audio_Stream::setSeekPosition(unsigned seekPosition)
 {
-    m_seekTime = seekTime;
+    m_seekPosition = seekPosition;
 }
     
 void Audio_Stream::setContentLength(size_t contentLength)
