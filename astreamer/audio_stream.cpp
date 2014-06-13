@@ -262,24 +262,47 @@ out:
     
 void Audio_Stream::seekToTime(unsigned newSeekTime)
 {
-    unsigned duration = durationInSeconds();
-    if (!(duration > 0)) {
-        return;
-    }
-    
     if (state() == SEEKING) {
         return;
     } else {
         setState(SEEKING);
     }
     
+    HTTP_Stream_Position position = streamPositionForTime(newSeekTime);
+    
+    if (position.start == 0 && position.end == 0) {
+        return;
+    }
+    
     m_seekTime = newSeekTime;
+    
+    close();
+    
+    AS_TRACE("Seeking position %llu\n", position.start);
+    
+    if (m_httpStream->open(position)) {
+        AS_TRACE("%s: HTTP stream opened, buffering...\n", __PRETTY_FUNCTION__);
+        m_httpStreamRunning = true;
+    } else {
+        AS_TRACE("%s: failed to open the fHTTP stream\n", __PRETTY_FUNCTION__);
+        setState(FAILED);
+    }
+}
+    
+HTTP_Stream_Position Audio_Stream::streamPositionForTime(unsigned newSeekTime)
+{
+    HTTP_Stream_Position position;
+    position.start = 0;
+    position.end   = 0;
+    
+    unsigned duration = durationInSeconds();
+    if (!(duration > 0)) {
+        return position;
+    }
     
     double offset = (double)newSeekTime / (double)duration;
     UInt64 seekByteOffset = m_dataOffset + offset * (contentLength() - m_dataOffset);
     
-    HTTP_Stream_Position position;
-
     position.start = seekByteOffset;
     position.end = contentLength();
     
@@ -296,17 +319,7 @@ void Audio_Stream::seekToTime(unsigned newSeekTime)
         }
     }
     
-    close();
-    
-    AS_TRACE("Seeking position %llu\n", position.start);
-    
-    if (m_httpStream->open(position)) {
-        AS_TRACE("%s: HTTP stream opened, buffering...\n", __PRETTY_FUNCTION__);
-        m_httpStreamRunning = true;
-    } else {
-        AS_TRACE("%s: failed to open the fHTTP stream\n", __PRETTY_FUNCTION__);
-        setState(FAILED);
-    }
+    return position;
 }
     
 void Audio_Stream::setVolume(float volume)

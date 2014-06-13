@@ -58,6 +58,8 @@ public:
     unsigned durationInSeconds();
     void seekToTime(unsigned newSeekTime);
     
+    HTTP_Stream_Position streamPositionForTime(unsigned newSeekTime);
+    
     void setVolume(float volume);
     
     void setUrl(CFURLRef url);
