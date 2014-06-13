@@ -33,6 +33,8 @@
     
     NSURL *_stationURL;
     UIBarButtonItem *_infoButton;
+    
+    FSAudioController *_controller;
 }
 
 /**
@@ -70,7 +72,7 @@
 /**
  * Reference to the audio controller.
  */
-@property (nonatomic,strong) IBOutlet FSAudioController *audioController;
+@property (nonatomic,strong) FSAudioController *audioController;
 /**
  * Frequency analyzer.
  */

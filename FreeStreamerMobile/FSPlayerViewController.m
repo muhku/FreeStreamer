@@ -156,7 +156,7 @@
 
 - (void)viewWillDisappear:(BOOL)animated
 {
-    [self.audioController stop];
+    _audioController = nil;
     
     [[UIApplication sharedApplication] endReceivingRemoteControlEvents];
     
@@ -436,6 +436,14 @@
 - (FSPlaylistItem *)selectedPlaylistItem
 {
     return _selectedPlaylistItem;
+}
+
+- (FSAudioController *)audioController
+{
+    if (!_audioController) {
+        _audioController = [[FSAudioController alloc] init];
+    }
+    return _audioController;
 }
 
 /*
