@@ -134,6 +134,8 @@ FSStreamConfiguration makeFreeStreamerDefaultConfiguration();
 
 /**
  * Starts playing the stream from the given offset.
+ * The offset can be retrieved from the stream with the
+ * currentSeekByteOffset property.
  *
  * @param offset The offset where to start playback from.
  */
