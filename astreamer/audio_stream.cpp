@@ -106,8 +106,13 @@ Audio_Stream::~Audio_Stream()
         delete m_fileOutput, m_fileOutput = 0;
     }
 }
-
+    
 void Audio_Stream::open()
+{
+    open(0);
+}
+
+void Audio_Stream::open(HTTP_Stream_Position *position)
 {
     if (m_httpStreamRunning || m_audioStreamParserRunning) {
         AS_TRACE("%s: already running: return\n", __PRETTY_FUNCTION__);
@@ -137,7 +142,15 @@ void Audio_Stream::open()
         CFRelease(m_contentType), m_contentType = NULL;
     }
     
-    if (m_httpStream->open()) {
+    bool success;
+    
+    if (position) {
+        success = m_httpStream->open(*position);
+    } else {
+        success = m_httpStream->open();
+    }
+    
+    if (success) {
         AS_TRACE("%s: HTTP stream opened, buffering...\n", __PRETTY_FUNCTION__);
         m_httpStreamRunning = true;
         setState(BUFFERING);
@@ -274,19 +287,16 @@ void Audio_Stream::seekToTime(unsigned newSeekTime)
         return;
     }
     
-    m_seekTime = newSeekTime;
+    size_t originalContentLength = m_contentLength;
     
     close();
     
     AS_TRACE("Seeking position %llu\n", position.start);
     
-    if (m_httpStream->open(position)) {
-        AS_TRACE("%s: HTTP stream opened, buffering...\n", __PRETTY_FUNCTION__);
-        m_httpStreamRunning = true;
-    } else {
-        AS_TRACE("%s: failed to open the fHTTP stream\n", __PRETTY_FUNCTION__);
-        setState(FAILED);
-    }
+    open(&position);
+    
+    setSeekTime(newSeekTime);
+    setContentLength(originalContentLength);
 }
     
 HTTP_Stream_Position Audio_Stream::streamPositionForTime(unsigned newSeekTime)
@@ -347,6 +357,16 @@ void Audio_Stream::setDefaultContentType(CFStringRef defaultContentType)
     if (defaultContentType) {
         m_defaultContentType = CFStringCreateCopy(kCFAllocatorDefault, defaultContentType);
     }
+}
+    
+void Audio_Stream::setSeekTime(double seekTime)
+{
+    m_seekTime = seekTime;
+}
+    
+void Audio_Stream::setContentLength(size_t contentLength)
+{
+    m_contentLength = contentLength;
 }
     
 void Audio_Stream::setOutputFile(CFURLRef url)

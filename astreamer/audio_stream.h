@@ -51,6 +51,7 @@ public:
     virtual ~Audio_Stream();
     
     void open();
+    void open(HTTP_Stream_Position *position);
     void close();
     void pause();
     
@@ -65,6 +66,8 @@ public:
     void setUrl(CFURLRef url);
     void setStrictContentTypeChecking(bool strictChecking);
     void setDefaultContentType(CFStringRef defaultContentType);
+    void setSeekTime(double seekTime);
+    void setContentLength(size_t contentLength);
     
     void setOutputFile(CFURLRef url);
     CFURLRef outputFile();
