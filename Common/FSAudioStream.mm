@@ -137,6 +137,8 @@ public:
 @property (nonatomic,unsafe_unretained) id<FSPCMAudioStreamDelegate> delegate;
 @property (nonatomic,unsafe_unretained) FSAudioStream *stream;
 
+- (AudioStreamStateObserver *)streamStateObserver;
+
 - (void)reachabilityChanged:(NSNotification *)note;
 - (void)interruptionOccurred:(NSNotification *)notification;
 
@@ -160,8 +162,10 @@ public:
         
         _observer = new AudioStreamStateObserver();
         _observer->priv = self;
+       
         _audioStream = new astreamer::Audio_Stream();
         _observer->source = _audioStream;
+
         _audioStream->m_delegate = _observer;
         
         _reachability = [Reachability reachabilityForInternetConnection];
@@ -191,14 +195,19 @@ public:
 
 - (void)dealloc
 {
-    [_reachability stopNotifier];
-    
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     
-    _audioStream->close();
+    [self stop];
+    
+    _delegate = nil;
     
     delete _audioStream, _audioStream = nil;
     delete _observer, _observer = nil;
+}
+
+- (AudioStreamStateObserver *)streamStateObserver
+{
+    return _observer;
 }
 
 - (void)setUrl:(NSURL *)url
@@ -249,8 +258,8 @@ public:
 
 - (void)playFromURL:(NSURL*)url
 {
-    [self setUrl:url];
-    [self play];
+   [self setUrl:url];
+   [self play];
 }
 
 - (void)setDefaultContentType:(NSString *)defaultContentType
@@ -431,7 +440,7 @@ public:
                 /*
                  * Resume playing.
                  */
-                [self pause];
+               [self pause];
             }
         }
     }
@@ -554,6 +563,19 @@ public:
         _private.stream = self;
     }
     return self;
+}
+
+- (void)dealloc
+{
+    AudioStreamStateObserver *observer = [_private streamStateObserver];
+    
+    // Break the cyclic loop so that dealloc() may be called
+    observer->priv = nil;
+    
+    _private.stream = nil;
+    _private.delegate = nil;
+    
+    _private = nil;
 }
 
 - (void)setUrl:(NSURL *)url

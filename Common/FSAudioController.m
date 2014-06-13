@@ -45,7 +45,8 @@
 
 - (void)dealloc
 {
-    [_audioStream stop];
+    _audioStream.delegate = nil;
+    _audioStream = nil;
     
     [_checkContentTypeRequest cancel];
     [_parsePlaylistRequest cancel];
