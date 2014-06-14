@@ -99,7 +99,7 @@
                                                       
                                                       if (state == kFsAudioStreamPlaying) {
                                                           _checkStreamState = YES;
-                                                          [_stream setVolume:0];
+                                                          [_controller setVolume:0];
                                                       }
                                                   }];
     
@@ -192,7 +192,7 @@
                                                       
                                                       if (state == kFsAudioStreamPlaying) {
                                                           _checkStreamState = YES;
-                                                          [_stream setVolume:0];
+                                                          [_controller setVolume:0];
                                                       }
                                                   }];
     
@@ -235,7 +235,7 @@
                                                           _checkStreamState = YES;
                                                           
                                                           // Set the stream silent, better for testing
-                                                          [_controller.stream setVolume:0];
+                                                          [_controller setVolume:0];
                                                       }
                                                   }];
     
