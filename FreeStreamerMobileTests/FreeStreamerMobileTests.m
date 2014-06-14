@@ -38,8 +38,8 @@
 {
     // Put teardown code here. This method is called after the invocation of each test method in the class.
     
-    [_stream stop];
-    [_controller stop];
+    _stream = nil;
+    _controller = nil;
     _keepRunning = NO;
     _checkStreamState = NO;
     
