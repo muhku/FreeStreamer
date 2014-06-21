@@ -37,7 +37,7 @@
     
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:_url
                                                            cachePolicy:NSURLRequestReloadIgnoringCacheData
-                                                       timeoutInterval:30.0];
+                                                       timeoutInterval:10.0];
     [request setHTTPMethod:@"HEAD"];
     
     @synchronized (self) {

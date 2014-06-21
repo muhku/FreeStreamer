@@ -36,7 +36,7 @@
     
     NSURLRequest *request = [NSURLRequest requestWithURL:self.url
                                              cachePolicy:NSURLRequestUseProtocolCachePolicy
-                                         timeoutInterval:60.0];
+                                         timeoutInterval:10.0];
     
     @synchronized (self) {
         _receivedData = [NSMutableData data];
