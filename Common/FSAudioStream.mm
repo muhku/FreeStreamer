@@ -80,6 +80,15 @@ FSStreamConfiguration makeFreeStreamerDefaultConfiguration()
     return defaultConfiguration;
 }
 
+NSString *freeStreamerReleaseVersion()
+{
+    NSString *version = [NSString stringWithFormat:@"%i.%i.%i",
+                         FREESTREAMER_VERSION_MAJOR,
+                         FREESTREAMER_VERSION_MINOR,
+                         FREESTREAMER_VERSION_REVISION];
+    return version;
+}
+
 NSString* const FSAudioStreamStateChangeNotification = @"FSAudioStreamStateChangeNotification";
 NSString* const FSAudioStreamNotificationKey_Stream = @"stream";
 NSString* const FSAudioStreamNotificationKey_State = @"state";
@@ -524,7 +533,8 @@ public:
 
 -(NSString *)description
 {
-    return [NSString stringWithFormat:@"URL: %@\nbufferCount: %i\nbufferSize: %i\nmaxPacketDescs: %i\ndecodeQueueSize: %i\nhttpConnectionBufferSize: %i\noutputSampleRate: %f\noutputNumChannels: %ld\nbounceInterval: %i\nmaxBounceCount: %i\nstartupWatchdogPeriod: %i\nformat: %@",
+    return [NSString stringWithFormat:@"[FreeStreamer %@] URL: %@\nbufferCount: %i\nbufferSize: %i\nmaxPacketDescs: %i\ndecodeQueueSize: %i\nhttpConnectionBufferSize: %i\noutputSampleRate: %f\noutputNumChannels: %ld\nbounceInterval: %i\nmaxBounceCount: %i\nstartupWatchdogPeriod: %i\nformat: %@",
+            freeStreamerReleaseVersion(),
             self.url,
             self.configuration.bufferCount,
             self.configuration.bufferSize,

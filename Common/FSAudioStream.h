@@ -10,6 +10,21 @@
 #import <CoreAudio/CoreAudioTypes.h>
 
 /**
+ * The major version of the current release.
+ */
+#define FREESTREAMER_VERSION_MAJOR          2
+
+/**
+ * The minor version of the current release.
+ */
+#define FREESTREAMER_VERSION_MINOR          2
+
+/**
+ * The reversion of the current release
+ */
+#define FREESTREAMER_VERSION_REVISION       1
+
+/**
  * Follow this notification for the audio stream state changes.
  */
 extern NSString* const FSAudioStreamStateChangeNotification;
@@ -89,6 +104,7 @@ typedef struct {
 } FSStreamConfiguration;
 
 FSStreamConfiguration makeFreeStreamerDefaultConfiguration();
+NSString*             freeStreamerReleaseVersion();
 
 /**
  * FSAudioStream is a class for streaming audio files from an URL.
