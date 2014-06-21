@@ -1,4 +1,4 @@
-Copyright (c) 2011-2014 Matias Muhonen <info@freestreamer.io>
+Copyright (c) 2011-2014 Matias Muhonen <mmu@iki.fi>
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without

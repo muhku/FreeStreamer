@@ -146,14 +146,14 @@ Reporting bugs and contributing
 
 For code contributions, please create a pull request in Github.
 
-For bugs, please create a Github issue. I don't have time for private email support, so usually the best way to get help is to interact in Github.
+For bugs, please create a Github issue. I don't have time for private email support, so usually the best way to get help is to interact in [Github](https://github.com/muhku/FreeStreamer/).
 
 License
 ====================
 
 The BSD license which the files are licensed under allows is as follows:
 
-    Copyright (c) 2011-2014 Matias Muhonen <info@freestreamer.io>
+    Copyright (c) 2011-2014 Matias Muhonen <mmu@iki.fi>
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
