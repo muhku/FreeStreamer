@@ -30,6 +30,15 @@
 {
     self = [super init];
     if (self) {
+        NSMutableString *systemVersion = [[NSMutableString alloc] init];
+        
+#if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
+        [systemVersion appendString:@"iOS "];
+        [systemVersion appendString:[[UIDevice currentDevice] systemVersion]];
+#else
+        [systemVersion appendString:@"OS X"];
+#endif
+        
         self.bufferCount    = 8;
         self.bufferSize     = 32768;
         self.maxPacketDescs = 512;
@@ -40,8 +49,8 @@
         self.bounceInterval    = 10;
         self.maxBounceCount    = 4;   // Max number of bufferings in bounceInterval seconds
         self.startupWatchdogPeriod = 30; // If the stream doesn't start to play in this seconds, the watchdog will fail it
-        self.userAgent = [NSString stringWithFormat:@"FreeStreamer/%@", freeStreamerReleaseVersion()];
-            
+        self.userAgent = [NSString stringWithFormat:@"FreeStreamer/%@ (%@)", freeStreamerReleaseVersion(), systemVersion];
+        
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 60000)
         AVAudioSession *session = [AVAudioSession sharedInstance];
         double sampleRate = session.sampleRate;
