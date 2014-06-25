@@ -90,20 +90,24 @@ typedef struct {
 /**
  * The low-level stream configuration.
  */
-typedef struct {
-    unsigned bufferCount;
-    unsigned bufferSize;
-    unsigned maxPacketDescs;
-    unsigned decodeQueueSize;
-    unsigned httpConnectionBufferSize;
-    double   outputSampleRate;
-    long     outputNumChannels;
-    int      bounceInterval;
-    int      maxBounceCount;
-    int      startupWatchdogPeriod;
-} FSStreamConfiguration;
+@interface FSStreamConfiguration : NSObject {
+}
 
-FSStreamConfiguration makeFreeStreamerDefaultConfiguration();
+@property (nonatomic,assign) unsigned bufferCount;
+@property (nonatomic,assign) unsigned bufferSize;
+@property (nonatomic,assign) unsigned maxPacketDescs;
+@property (nonatomic,assign) unsigned decodeQueueSize;
+@property (nonatomic,assign) unsigned httpConnectionBufferSize;
+@property (nonatomic,assign) double   outputSampleRate;
+@property (nonatomic,assign) long     outputNumChannels;
+@property (nonatomic,assign) int      bounceInterval;
+@property (nonatomic,assign) int      maxBounceCount;
+@property (nonatomic,assign) int      startupWatchdogPeriod;
+@property (nonatomic,strong) NSString *userAgent;
+
+@end
+
+FSStreamConfiguration *makeFreeStreamerDefaultConfiguration();
 NSString*             freeStreamerReleaseVersion();
 
 /**
@@ -135,7 +139,7 @@ NSString*             freeStreamerReleaseVersion();
  *
  * @param configuration The stream configuration.
  */
-- (id)initWithConfiguration:(FSStreamConfiguration)configuration;
+- (id)initWithConfiguration:(FSStreamConfiguration *)configuration;
 
 /**
  * Starts playing the stream. If no playback URL is
@@ -255,7 +259,7 @@ NSString*             freeStreamerReleaseVersion();
 /**
  * The property has the low-level stream configuration.
  */
-@property (readonly) FSStreamConfiguration configuration;
+@property (readonly) FSStreamConfiguration *configuration;
 /**
  * The last stream error.
  */

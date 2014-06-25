@@ -24,9 +24,13 @@
 #import <MediaPlayer/MediaPlayer.h>
 #endif
 
-FSStreamConfiguration makeFreeStreamerDefaultConfiguration()
+@implementation FSStreamConfiguration
+
+@end
+
+FSStreamConfiguration *makeFreeStreamerDefaultConfiguration()
 {
-    FSStreamConfiguration defaultConfiguration;
+    FSStreamConfiguration *defaultConfiguration = [[FSStreamConfiguration alloc] init];
     
     defaultConfiguration.bufferCount    = 8;
     defaultConfiguration.bufferSize     = 32768;
@@ -38,6 +42,7 @@ FSStreamConfiguration makeFreeStreamerDefaultConfiguration()
     defaultConfiguration.bounceInterval    = 10;
     defaultConfiguration.maxBounceCount    = 4;   // Max number of bufferings in bounceInterval seconds
     defaultConfiguration.startupWatchdogPeriod = 30; // If the stream doesn't start to play in this seconds, the watchdog will fail it
+    defaultConfiguration.userAgent = [NSString stringWithFormat:@"FreeStreamer/%@", freeStreamerReleaseVersion()];
     
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 60000)
     AVAudioSession *session = [AVAudioSession sharedInstance];
@@ -141,7 +146,7 @@ public:
 @property (nonatomic,assign) BOOL wasInterrupted;
 @property (nonatomic,assign) BOOL wasDisconnected;
 @property (nonatomic,assign) BOOL wasContinuousStream;
-@property (readonly) FSStreamConfiguration configuration;
+@property (readonly) FSStreamConfiguration *configuration;
 @property (readonly) NSString *formatDescription;
 @property (copy) void (^onCompletion)();
 @property (copy) void (^onFailure)();
@@ -366,9 +371,9 @@ public:
     _audioStream->setOutputFile((__bridge CFURLRef)copyOfURL);
 }
 
-- (FSStreamConfiguration)configuration
+- (FSStreamConfiguration *)configuration
 {
-    FSStreamConfiguration config;
+    FSStreamConfiguration *config = [[FSStreamConfiguration alloc] init];
     
     astreamer::Stream_Configuration *c = astreamer::Stream_Configuration::configuration();
     
@@ -382,6 +387,11 @@ public:
     config.bounceInterval           = c->bounceInterval;
     config.maxBounceCount           = c->maxBounceCount;
     config.startupWatchdogPeriod    = c->startupWatchdogPeriod;
+    
+    if (c->userAgent) {
+        // Let the Objective-C side handle the memory for the copy of the original user-agent
+        config.userAgent = (__bridge_transfer NSString *)CFStringCreateCopy(kCFAllocatorDefault, c->userAgent);
+    }
 
     return config;
 }
@@ -533,7 +543,7 @@ public:
 
 -(NSString *)description
 {
-    return [NSString stringWithFormat:@"[FreeStreamer %@] URL: %@\nbufferCount: %i\nbufferSize: %i\nmaxPacketDescs: %i\ndecodeQueueSize: %i\nhttpConnectionBufferSize: %i\noutputSampleRate: %f\noutputNumChannels: %ld\nbounceInterval: %i\nmaxBounceCount: %i\nstartupWatchdogPeriod: %i\nformat: %@",
+    return [NSString stringWithFormat:@"[FreeStreamer %@] URL: %@\nbufferCount: %i\nbufferSize: %i\nmaxPacketDescs: %i\ndecodeQueueSize: %i\nhttpConnectionBufferSize: %i\noutputSampleRate: %f\noutputNumChannels: %ld\nbounceInterval: %i\nmaxBounceCount: %i\nstartupWatchdogPeriod: %i\nformat: %@\nuserAgent: %@",
             freeStreamerReleaseVersion(),
             self.url,
             self.configuration.bufferCount,
@@ -546,7 +556,8 @@ public:
             self.configuration.bounceInterval,
             self.configuration.maxBounceCount,
             self.configuration.startupWatchdogPeriod,
-            self.formatDescription];
+            self.formatDescription,
+            self.configuration.userAgent];
 }
 
 @end
@@ -562,7 +573,7 @@ public:
 
 -(id)init
 {
-    FSStreamConfiguration defaultConfiguration = makeFreeStreamerDefaultConfiguration();
+    FSStreamConfiguration *defaultConfiguration = makeFreeStreamerDefaultConfiguration();
     
     if (self = [self initWithConfiguration:defaultConfiguration]) {
     }
@@ -577,7 +588,7 @@ public:
     return self;
 }
 
-- (id)initWithConfiguration:(FSStreamConfiguration)configuration
+- (id)initWithConfiguration:(FSStreamConfiguration *)configuration
 {
     if (self = [super init]) {
         astreamer::Stream_Configuration *c = astreamer::Stream_Configuration::configuration();
@@ -592,6 +603,11 @@ public:
         c->maxBounceCount           = configuration.maxBounceCount;
         c->bounceInterval           = configuration.bounceInterval;
         c->startupWatchdogPeriod    = configuration.startupWatchdogPeriod;
+        
+        if (c->userAgent) {
+            CFRelease(c->userAgent);
+        }
+        c->userAgent = CFStringCreateCopy(kCFAllocatorDefault, (__bridge CFStringRef)configuration.userAgent);
         
         _private = [[FSAudioStreamPrivate alloc] init];
         _private.stream = self;
@@ -777,7 +793,7 @@ public:
     _private.onFailure = onFailure;
 }
 
-- (FSStreamConfiguration)configuration
+- (FSStreamConfiguration *)configuration
 {
     return _private.configuration;
 }

@@ -9,6 +9,8 @@
 #ifndef ASTREAMER_STREAM_CONFIGURATION_H
 #define ASTREAMER_STREAM_CONFIGURATION_H
 
+#import <CoreFoundation/CoreFoundation.h>
+
 namespace astreamer {
     
 struct Stream_Configuration {
@@ -22,6 +24,7 @@ struct Stream_Configuration {
     int bounceInterval;
     int maxBounceCount;
     int startupWatchdogPeriod;
+    CFStringRef userAgent;
     
     static Stream_Configuration *configuration();
     

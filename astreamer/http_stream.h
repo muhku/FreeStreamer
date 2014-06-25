@@ -31,7 +31,6 @@ private:
     
     static CFStringRef httpRequestMethod;
     static CFStringRef httpUserAgentHeader;
-    static CFStringRef httpUserAgentValue;
     static CFStringRef httpRangeHeader;
     static CFStringRef icyMetaDataHeader;
     static CFStringRef icyMetaDataValue;

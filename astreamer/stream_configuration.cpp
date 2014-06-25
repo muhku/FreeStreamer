@@ -10,12 +10,16 @@
 
 namespace astreamer {
     
-Stream_Configuration::Stream_Configuration()
+Stream_Configuration::Stream_Configuration() :
+    userAgent(NULL)
 {
 }
 
 Stream_Configuration::~Stream_Configuration()
 {
+    if (userAgent) {
+        CFRelease(userAgent), userAgent = NULL;
+    }
 }
 
 Stream_Configuration* Stream_Configuration::configuration()

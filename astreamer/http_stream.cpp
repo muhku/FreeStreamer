@@ -30,7 +30,6 @@ namespace astreamer {
 
 CFStringRef HTTP_Stream::httpRequestMethod   = CFSTR("GET");
 CFStringRef HTTP_Stream::httpUserAgentHeader = CFSTR("User-Agent");
-CFStringRef HTTP_Stream::httpUserAgentValue  = CFSTR("aStreamer/1.0");
 CFStringRef HTTP_Stream::httpRangeHeader     = CFSTR("Range");
 CFStringRef HTTP_Stream::icyMetaDataHeader = CFSTR("Icy-MetaData");
 CFStringRef HTTP_Stream::icyMetaDataValue  = CFSTR("1"); /* always request ICY metadata, if available */
@@ -265,11 +264,16 @@ CFReadStreamRef HTTP_Stream::createReadStream(CFURLRef url)
     CFHTTPMessageRef request = 0;
     CFDictionaryRef proxySettings = 0;
     
+    Stream_Configuration *config = Stream_Configuration::configuration();
+    
     if (!(request = CFHTTPMessageCreateRequest(kCFAllocatorDefault, httpRequestMethod, url, kCFHTTPVersion1_1))) {
         goto out;
     }
     
-    CFHTTPMessageSetHeaderFieldValue(request, httpUserAgentHeader, httpUserAgentValue);
+    if (config->userAgent) {
+        CFHTTPMessageSetHeaderFieldValue(request, httpUserAgentHeader, config->userAgent);
+    }
+    
     CFHTTPMessageSetHeaderFieldValue(request, icyMetaDataHeader, icyMetaDataValue);
     
     if (m_position.start > 0 && m_position.end > m_position.start) {
