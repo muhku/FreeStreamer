@@ -26,44 +26,42 @@
 
 @implementation FSStreamConfiguration
 
-@end
-
-FSStreamConfiguration *makeFreeStreamerDefaultConfiguration()
+- (id)init
 {
-    FSStreamConfiguration *defaultConfiguration = [[FSStreamConfiguration alloc] init];
-    
-    defaultConfiguration.bufferCount    = 8;
-    defaultConfiguration.bufferSize     = 32768;
-    defaultConfiguration.maxPacketDescs = 512;
-    defaultConfiguration.decodeQueueSize = 32;
-    defaultConfiguration.httpConnectionBufferSize = 1024;
-    defaultConfiguration.outputSampleRate = 44100;
-    defaultConfiguration.outputNumChannels = 2;
-    defaultConfiguration.bounceInterval    = 10;
-    defaultConfiguration.maxBounceCount    = 4;   // Max number of bufferings in bounceInterval seconds
-    defaultConfiguration.startupWatchdogPeriod = 30; // If the stream doesn't start to play in this seconds, the watchdog will fail it
-    defaultConfiguration.userAgent = [NSString stringWithFormat:@"FreeStreamer/%@", freeStreamerReleaseVersion()];
-    
+    self = [super init];
+    if (self) {
+        self.bufferCount    = 8;
+        self.bufferSize     = 32768;
+        self.maxPacketDescs = 512;
+        self.decodeQueueSize = 32;
+        self.httpConnectionBufferSize = 1024;
+        self.outputSampleRate = 44100;
+        self.outputNumChannels = 2;
+        self.bounceInterval    = 10;
+        self.maxBounceCount    = 4;   // Max number of bufferings in bounceInterval seconds
+        self.startupWatchdogPeriod = 30; // If the stream doesn't start to play in this seconds, the watchdog will fail it
+        self.userAgent = [NSString stringWithFormat:@"FreeStreamer/%@", freeStreamerReleaseVersion()];
+            
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 60000)
-    AVAudioSession *session = [AVAudioSession sharedInstance];
-    double sampleRate = session.sampleRate;
-    if (sampleRate > 0) {
-        defaultConfiguration.outputSampleRate = sampleRate;
-    }
-    NSInteger channels = session.outputNumberOfChannels;
-    if (channels > 0) {
-        defaultConfiguration.outputNumChannels = channels;
-    }
+        AVAudioSession *session = [AVAudioSession sharedInstance];
+        double sampleRate = session.sampleRate;
+        if (sampleRate > 0) {
+            self.outputSampleRate = sampleRate;
+        }
+        NSInteger channels = session.outputNumberOfChannels;
+        if (channels > 0) {
+            self.outputNumChannels = channels;
+        }
 #endif
-    
+            
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
-    /* iOS */
-    
-    #ifdef __LP64__
+        /* iOS */
+            
+#ifdef __LP64__
         /* Running on iPhone 5s or later,
          * so the default configuration is OK
          */
-    #else
+#else
         /* 32-bit CPU, a bit older iPhone/iPad, increase
          *  the buffer sizes a bit.
          *
@@ -71,19 +69,22 @@ FSStreamConfiguration *makeFreeStreamerDefaultConfiguration()
          * https://github.com/muhku/FreeStreamer/issues/41
          */
         int scale = 2;
-    
-        defaultConfiguration.bufferCount    *= scale;
-        defaultConfiguration.bufferSize     *= scale;
-        defaultConfiguration.maxPacketDescs *= scale;
-    #endif
-#else
-    /* OS X */
-    
-    // Default configuration is OK
+            
+        self.bufferCount    *= scale;
+        self.bufferSize     *= scale;
+        self.maxPacketDescs *= scale;
 #endif
+#else
+            /* OS X */
+            
+            // Default configuration is OK
+#endif
+    }
     
-    return defaultConfiguration;
+    return self;
 }
+
+@end
 
 NSString *freeStreamerReleaseVersion()
 {
@@ -573,7 +574,7 @@ public:
 
 -(id)init
 {
-    FSStreamConfiguration *defaultConfiguration = makeFreeStreamerDefaultConfiguration();
+    FSStreamConfiguration *defaultConfiguration = [[FSStreamConfiguration alloc] init];
     
     if (self = [self initWithConfiguration:defaultConfiguration]) {
     }

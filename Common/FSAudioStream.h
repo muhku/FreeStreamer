@@ -93,21 +93,53 @@ typedef struct {
 @interface FSStreamConfiguration : NSObject {
 }
 
+/**
+ * The number of buffers.
+ */
 @property (nonatomic,assign) unsigned bufferCount;
+/**
+ * The size of each buffer.
+ */
 @property (nonatomic,assign) unsigned bufferSize;
+/**
+ * The number of packet descriptions.
+ */
 @property (nonatomic,assign) unsigned maxPacketDescs;
+/**
+ * The decode queue size.
+ */
 @property (nonatomic,assign) unsigned decodeQueueSize;
+/**
+ * The HTTP connection buffer size.
+ */
 @property (nonatomic,assign) unsigned httpConnectionBufferSize;
+/**
+ * The output sample rate.
+ */
 @property (nonatomic,assign) double   outputSampleRate;
+/**
+ * The number of output channels.
+ */
 @property (nonatomic,assign) long     outputNumChannels;
+/**
+ * The interval within the stream may enter to the buffering state before it fails.
+ */
 @property (nonatomic,assign) int      bounceInterval;
+/**
+ * The number of times the stream may enter the buffering state before it fails.
+ */
 @property (nonatomic,assign) int      maxBounceCount;
+/**
+ * The stream must start within this seconds before it fails.
+ */
 @property (nonatomic,assign) int      startupWatchdogPeriod;
+/**
+ * The HTTP user agent used for stream operations.
+ */
 @property (nonatomic,strong) NSString *userAgent;
 
 @end
 
-FSStreamConfiguration *makeFreeStreamerDefaultConfiguration();
 NSString*             freeStreamerReleaseVersion();
 
 /**
