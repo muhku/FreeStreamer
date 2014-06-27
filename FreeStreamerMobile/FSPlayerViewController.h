@@ -37,6 +37,8 @@
     UIBarButtonItem *_infoButton;
     
     FSAudioController *_controller;
+    FSSeekByteOffset _lastSeekByteOffset;
+    NSURL *_lastPlaybackURL;
 }
 
 /**

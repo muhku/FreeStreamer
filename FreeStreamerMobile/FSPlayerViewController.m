@@ -84,7 +84,13 @@
 {
     if (_shouldStartPlaying) {
         _shouldStartPlaying = NO;
-        [self.audioController play];
+        
+        if ([self.audioController.url isEqual:_lastPlaybackURL]) {
+            // The same file was playing from a position, resume
+            [self.audioController.stream playFromOffset:_lastSeekByteOffset];
+        } else {
+            [self.audioController play];
+        }
     }
     
     [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
@@ -160,6 +166,17 @@
     [[UIApplication sharedApplication] endReceivingRemoteControlEvents];
     
     [self resignFirstResponder];
+    
+    if (!self.audioController.stream.continuous && self.audioController.isPlaying) {
+        // If a file with a duration is playing, store its last known playback position
+        // so that we can resume from the same position, if the same file
+        // is played again
+        
+        _lastSeekByteOffset = self.audioController.stream.currentSeekByteOffset;
+        _lastPlaybackURL = [self.audioController.url copy];
+    } else {
+        _lastPlaybackURL = nil;
+    }
     
     [super viewWillDisappear:animated];
 }
@@ -424,10 +441,6 @@
 
 - (void)setSelectedPlaylistItem:(FSPlaylistItem *)selectedPlaylistItem
 {
-    if (_selectedPlaylistItem == selectedPlaylistItem) {
-        return;
-    }
-    
     _selectedPlaylistItem = selectedPlaylistItem;
     
     self.navigationItem.title = self.selectedPlaylistItem.title;
