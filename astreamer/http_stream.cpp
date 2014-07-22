@@ -297,6 +297,8 @@ CFReadStreamRef HTTP_Stream::createReadStream(CFURLRef url)
         CFRelease(proxySettings);
     }
     
+    CFReadStreamSetProperty(readStream, kCFStreamPropertyHTTPShouldAutoredirect, kCFBooleanTrue);
+    
 out:
     if (request) {
         CFRelease(request);
