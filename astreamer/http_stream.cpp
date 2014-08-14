@@ -287,7 +287,7 @@ CFReadStreamRef HTTP_Stream::createReadStream(CFURLRef url)
         CFRelease(rangeHeaderValue);
     }
     
-    if (!(readStream = CFReadStreamCreateForStreamedHTTPRequest(kCFAllocatorDefault, request, 0))) {
+    if (!(readStream = CFReadStreamCreateForHTTPRequest(kCFAllocatorDefault, request))) {
         goto out;
     }
     
