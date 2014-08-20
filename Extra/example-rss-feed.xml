@@ -26,5 +26,9 @@
     	<title>BBC</title>
     	<link>http://www.bbc.co.uk/radio/listen/live/r5l_aaclca.pls</link>
     </item>
+    <item>
+        <title>Test MP3 file</title>
+        <link>https://dl.dropboxusercontent.com/u/995250/FreeStreamer/As%20long%20as%20the%20stars%20shine.mp3</link>
+    </item>
   </channel>
 </rss>
