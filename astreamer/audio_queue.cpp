@@ -121,6 +121,25 @@ void Audio_Queue::setVolume(float volume)
     }
     AudioQueueSetParameter(m_outAQ, kAudioQueueParam_Volume, volume);
 }
+    
+void Audio_Queue::setPlayRate(float playRate)
+{
+    if (!m_outAQ) {
+        return;
+    }
+    UInt32 enableTimePitchConversion = (playRate != 1.0);
+    
+    if (playRate < 0.5) {
+        playRate = 0.5;
+    }
+    if (playRate > 2.0) {
+        playRate = 2.0;
+    }
+
+    AudioQueueSetProperty (m_outAQ, kAudioQueueProperty_EnableTimePitch, &enableTimePitchConversion, sizeof(enableTimePitchConversion));
+    
+    AudioQueueSetParameter(m_outAQ, kAudioQueueParam_PlayRate, playRate);
+}
 
 void Audio_Queue::stop(bool stopImmediately)
 {

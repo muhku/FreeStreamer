@@ -45,6 +45,7 @@ public:
     void stop();
     
     void setVolume(float volume);
+    void setPlayRate(float playRate);
     
     unsigned timePlayedInSeconds();
 	

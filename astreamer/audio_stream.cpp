@@ -332,6 +332,13 @@ void Audio_Stream::setVolume(float volume)
     }
 }
     
+void Audio_Stream::setPlayRate(float playRate)
+{
+    if (m_audioQueue) {
+        m_audioQueue->setPlayRate(playRate);
+    }
+}
+    
 void Audio_Stream::setUrl(CFURLRef url)
 {
     m_httpStream->setUrl(url);

@@ -227,6 +227,18 @@ NSString*             freeStreamerReleaseVersion();
 - (void)setVolume:(float)volume;
 
 /**
+ * Sets the audio stream playback rate from 0.5 to 2.0.
+ * Value 1.0 means the normal playback rate. Values below
+ * 1.0 means a slower playback rate than usual and above
+ * 1.0 a faster playback rate. Notice that using a faster
+ * playback rate than 1.0 may mean that you have to increase
+ * the buffer sizes for the stream still to play.
+ *
+ * @param playRate The playback rate.
+ */
+- (void)setPlayRate:(float)playRate;
+
+/**
  * Returns the playback status: YES if the stream is playing, NO otherwise.
  */
 - (BOOL)isPlaying;

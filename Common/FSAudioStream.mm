@@ -177,6 +177,7 @@ public:
 - (void)pause;
 - (void)seekToTime:(unsigned)newSeekTime;
 - (void)setVolume:(float)volume;
+- (void)setPlayRate:(float)playRate;
 - (unsigned)timePlayedInSeconds;
 - (unsigned)durationInSeconds;
 - (astreamer::HTTP_Stream_Position)streamPositionForTime:(unsigned)newSeekTime;
@@ -536,6 +537,11 @@ public:
     _audioStream->setVolume(volume);
 }
 
+- (void)setPlayRate:(float)playRate
+{
+    _audioStream->setPlayRate(playRate);
+}
+
 - (unsigned)timePlayedInSeconds
 {
     return _audioStream->timePlayedInSeconds();
@@ -723,6 +729,11 @@ public:
 - (void)setVolume:(float)volume
 {
     [_private setVolume:volume];
+}
+
+- (void)setPlayRate:(float)playRate
+{
+    [_private setPlayRate:playRate];
 }
 
 - (BOOL)isPlaying

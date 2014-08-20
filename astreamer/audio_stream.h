@@ -64,6 +64,7 @@ public:
     HTTP_Stream_Position streamPositionForTime(unsigned newSeekTime);
     
     void setVolume(float volume);
+    void setPlayRate(float playRate);
     
     void setUrl(CFURLRef url);
     void setStrictContentTypeChecking(bool strictChecking);
