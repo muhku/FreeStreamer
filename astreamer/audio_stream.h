@@ -108,7 +108,6 @@ private:
     Audio_Queue *m_audioQueue;
     
     CFRunLoopTimerRef m_watchdogTimer;
-    CFRunLoopTimerRef m_playbackStopTimer;
     
     AudioFileStreamID m_audioFileStream;	// the audio file stream parser
     AudioConverterRef m_audioConverter;
@@ -153,8 +152,10 @@ private:
     void setCookiesForStream(AudioFileStreamID inAudioFileStream);
     unsigned bitrate();
     
+    int cachedDataCount();
+    void enqueueCachedData(int minPacketsRequired);
+    
     static void watchdogTimerCallback(CFRunLoopTimerRef timer, void *info);
-    static void playbackStopTimerCallback(CFRunLoopTimerRef timer, void *info);
     
     static OSStatus encoderDataCallback(AudioConverterRef inAudioConverter, UInt32 *ioNumberDataPackets, AudioBufferList *ioData, AudioStreamPacketDescription **outDataPacketDescription, void *inUserData);
     static void propertyValueCallback(void *inClientData, AudioFileStreamID inAudioFileStream, AudioFileStreamPropertyID inPropertyID, UInt32 *ioFlags);
