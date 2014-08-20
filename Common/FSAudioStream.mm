@@ -931,6 +931,11 @@ void AudioStreamStateObserver::audioStreamStateChanged(astreamer::Audio_Stream::
             [[AVAudioSession sharedInstance] setActive:YES error:nil];
 #endif
             break;
+        case astreamer::Audio_Stream::PAUSED:
+            priv.lastError = kFsAudioStreamErrorNone;
+            m_eofReached = false;
+            fsAudioState = [NSNumber numberWithInt:kFsAudioStreamPaused];
+            break;
         case astreamer::Audio_Stream::SEEKING:
             priv.lastError = kFsAudioStreamErrorNone;
             m_eofReached = false;

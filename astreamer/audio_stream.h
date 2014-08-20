@@ -44,6 +44,7 @@ public:
         STOPPED,
         BUFFERING,
         PLAYING,
+        PAUSED,
         SEEKING,
         FAILED,
         END_OF_FILE
