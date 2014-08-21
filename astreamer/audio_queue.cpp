@@ -50,7 +50,8 @@ Audio_Queue::Audio_Queue()
     m_waitingOnBuffer(false),
     m_queuedHead(0),
     m_queuedTail(0),
-    m_lastError(noErr)
+    m_lastError(noErr),
+    m_initialOutputVolume(1.0)
 {
     Stream_Configuration *config = Stream_Configuration::configuration();
     
@@ -112,6 +113,23 @@ void Audio_Queue::pause()
 void Audio_Queue::stop()
 {
     stop(true);
+}
+    
+float Audio_Queue::volume()
+{
+    if (!m_outAQ) {
+        return 1.0;
+    }
+    
+    float vol;
+    
+    OSStatus err = AudioQueueGetParameter(m_outAQ, kAudioQueueParam_Volume, &vol);
+    
+    if (!err) {
+        return vol;
+    }
+    
+    return 1.0;
 }
     
 void Audio_Queue::setVolume(float volume)
@@ -248,6 +266,10 @@ void Audio_Queue::handlePropertyChange(AudioFileStreamID inAudioFileStream, Audi
                 AQ_TRACE("%s: error in AudioQueueAddPropertyListener\n", __PRETTY_FUNCTION__);
                 m_lastError = err;
                 break;
+            }
+            
+            if (m_initialOutputVolume != 1.0) {
+                setVolume(m_initialOutputVolume);
             }
             
             break;

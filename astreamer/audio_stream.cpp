@@ -62,7 +62,8 @@ Audio_Stream::Audio_Stream() :
     m_processedPacketsCount(0),
     m_audioDataByteCount(0),
     m_packetDuration(0),
-    m_bitrateBufferIndex(0)
+    m_bitrateBufferIndex(0),
+    m_outputVolume(1.0)
 {
     m_httpStream->m_delegate = this;
     
@@ -327,6 +328,15 @@ HTTP_Stream_Position Audio_Stream::streamPositionForTime(unsigned newSeekTime)
     
 void Audio_Stream::setVolume(float volume)
 {
+    if (volume < 0) {
+        volume = 0;
+    }
+    if (volume > 1.0) {
+        volume = 1.0;
+    }
+    // Store the volume so it will be used consequently when the queue plays
+    m_outputVolume = volume;
+    
     if (m_audioQueue) {
         m_audioQueue->setVolume(volume);
     }
@@ -457,6 +467,12 @@ void Audio_Stream::audioQueueStateChanged(Audio_Queue::State state)
 {
     if (state == Audio_Queue::RUNNING) {
         setState(PLAYING);
+        
+        float currentVolume = m_audioQueue->volume();
+        
+        if (currentVolume != m_outputVolume) {
+            m_audioQueue->setVolume(m_outputVolume);
+        }
     } else if (state == Audio_Queue::IDLE) {
         setState(STOPPED);
     } else if (state == Audio_Queue::PAUSED) {
@@ -673,6 +689,8 @@ Audio_Queue* Audio_Stream::audioQueue()
         
         m_audioQueue->m_delegate = this;
         m_audioQueue->m_streamDesc = m_dstFormat;
+        
+        m_audioQueue->m_initialOutputVolume = m_outputVolume;
     }
     return m_audioQueue;
 }

@@ -44,6 +44,8 @@ public:
     void stop(bool stopImmediately);
     void stop();
     
+    float volume();
+    
     void setVolume(float volume);
     void setPlayRate(float playRate);
     
@@ -75,6 +77,7 @@ private:
 public:
     OSStatus m_lastError;
     AudioStreamBasicDescription m_streamDesc;
+    float m_initialOutputVolume;
 
 private:
     void cleanup();

@@ -145,6 +145,8 @@ private:
     double m_bitrateBuffer[kAudioStreamBitrateBufferSize];
     size_t m_bitrateBufferIndex;
     
+    float m_outputVolume;
+    
     Audio_Queue *audioQueue();
     void closeAudioQueue();
     

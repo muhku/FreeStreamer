@@ -34,6 +34,9 @@
     _controller = [[FSAudioController alloc] init];
     _keepRunning = YES;
     _checkStreamState = NO;
+    
+    [_stream setVolume:0];
+    [_controller setVolume:0];
 }
 
 - (void)tearDown
@@ -101,7 +104,6 @@
                                                       
                                                       if (state == kFsAudioStreamPlaying) {
                                                           _checkStreamState = YES;
-                                                          [_controller setVolume:0];
                                                       }
                                                   }];
     
@@ -142,9 +144,6 @@
                                                       
                                                       if (state == kFsAudioStreamPlaying) {
                                                           _checkStreamState = YES;
-                                                          
-                                                          // Set the stream silent, better for testing
-                                                          [_stream setVolume:0];
                                                       }
                                                   }];
     
@@ -194,7 +193,6 @@
                                                       
                                                       if (state == kFsAudioStreamPlaying) {
                                                           _checkStreamState = YES;
-                                                          [_controller setVolume:0];
                                                       }
                                                   }];
     
@@ -235,9 +233,6 @@
                                                       
                                                       if (state == kFsAudioStreamPlaying) {
                                                           _checkStreamState = YES;
-                                                          
-                                                          // Set the stream silent, better for testing
-                                                          [_controller setVolume:0];
                                                       }
                                                   }];
     
