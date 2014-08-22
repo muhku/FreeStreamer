@@ -143,6 +143,7 @@ public:
 	AudioStreamStateObserver *_observer;
     NSString *_defaultContentType;
     Reachability *_reachability;
+    FSSeekByteOffset _lastSeekByteOffset;
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
     UIBackgroundTaskIdentifier _backgroundTask;
 #endif
@@ -158,6 +159,7 @@ public:
 @property (nonatomic,assign) BOOL wasDisconnected;
 @property (nonatomic,assign) BOOL wasContinuousStream;
 @property (readonly) size_t prebufferedByteCount;
+@property (readonly) FSSeekByteOffset currentSeekByteOffset;
 @property (readonly) FSStreamConfiguration *configuration;
 @property (readonly) NSString *formatDescription;
 @property (copy) void (^onCompletion)();
@@ -389,6 +391,28 @@ public:
     return _audioStream->cachedDataSize();
 }
 
+- (FSSeekByteOffset)currentSeekByteOffset
+{
+    FSSeekByteOffset offset;
+    offset.start    = 0;
+    offset.end      = 0;
+    offset.position = 0;
+    
+    // If continuous
+    if ((0 == [self durationInSeconds])) {
+        return offset;
+    }
+    
+    offset.position = [self timePlayedInSeconds];
+    
+    astreamer::HTTP_Stream_Position httpStreamPos = [self streamPositionForTime:offset.position];
+    
+    offset.start = httpStreamPos.start;
+    offset.end   = httpStreamPos.end;
+    
+    return offset;
+}
+
 - (FSStreamConfiguration *)configuration
 {
     FSStreamConfiguration *config = [[FSStreamConfiguration alloc] init];
@@ -471,9 +495,10 @@ public:
                 [self stop];
             } else {
 #if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
-                NSLog(@"FSAudioStream: Interruption began. Non-continuous stream. Pausing the stream.");
+                NSLog(@"FSAudioStream: Interruption began. Non-continuous stream. Stopping the stream and saving the offset.");
 #endif
-                [self pause];
+                _lastSeekByteOffset = [self currentSeekByteOffset];
+                [self stop];
             }
         }
     } else if ([interruptionType intValue] == AVAudioSessionInterruptionTypeEnded) {
@@ -492,12 +517,12 @@ public:
                 [self play];
             } else {
 #if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
-                NSLog(@"FSAudioStream: Interruption ended. Continuous stream. Unpausing the stream.");
+                NSLog(@"FSAudioStream: Interruption ended. Continuous stream. Playing from the offset");
 #endif
                 /*
                  * Resume playing.
                  */
-               [self pause];
+               [self playFromOffset:_lastSeekByteOffset];
             }
         }
     }
@@ -779,23 +804,7 @@ public:
 
 - (FSSeekByteOffset)currentSeekByteOffset
 {
-    FSSeekByteOffset offset;
-    offset.start    = 0;
-    offset.end      = 0;
-    offset.position = 0;
-    
-    if (self.continuous) {
-        return offset;
-    }
-    
-    offset.position = [_private timePlayedInSeconds];
-    
-    astreamer::HTTP_Stream_Position httpStreamPos = [_private streamPositionForTime:offset.position];
-    
-    offset.start = httpStreamPos.start;
-    offset.end   = httpStreamPos.end;
-    
-    return offset;
+    return _private.currentSeekByteOffset;
 }
 
 - (BOOL)continuous
