@@ -157,6 +157,7 @@ public:
 @property (nonatomic,assign) BOOL wasInterrupted;
 @property (nonatomic,assign) BOOL wasDisconnected;
 @property (nonatomic,assign) BOOL wasContinuousStream;
+@property (readonly) size_t prebufferedByteCount;
 @property (readonly) FSStreamConfiguration *configuration;
 @property (readonly) NSString *formatDescription;
 @property (copy) void (^onCompletion)();
@@ -381,6 +382,11 @@ public:
     }
     NSURL *copyOfURL = [outputFile copy];
     _audioStream->setOutputFile((__bridge CFURLRef)copyOfURL);
+}
+
+- (size_t)prebufferedByteCount
+{
+    return _audioStream->cachedDataSize();
 }
 
 - (FSStreamConfiguration *)configuration
@@ -796,6 +802,11 @@ public:
 {
     FSStreamPosition duration = self.duration;
     return (duration.minute == 0 && duration.second == 0);
+}
+
+- (size_t)prebufferedByteCount
+{
+    return _private.prebufferedByteCount;
 }
 
 - (void (^)())onCompletion

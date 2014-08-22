@@ -81,6 +81,8 @@ public:
     CFStringRef sourceFormatDescription();
     CFStringRef contentType();
     
+    size_t cachedDataSize();
+    
     /* Audio_Queue_Delegate */
     void audioQueueStateChanged(Audio_Queue::State state);
     void audioQueueBuffersEmpty();

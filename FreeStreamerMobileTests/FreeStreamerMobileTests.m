@@ -125,6 +125,8 @@
             XCTAssertTrue(([_controller.stream.contentType isEqualToString:@"audio/mpeg"]), @"Invalid content type");
             XCTAssertTrue(([_controller.stream.suggestedFileExtension isEqualToString:@"mp3"]), @"Invalid file extension");
             
+            XCTAssertTrue((_controller.stream.prebufferedByteCount > 0), @"No cached bytes");
+            
             return;
         }
     }

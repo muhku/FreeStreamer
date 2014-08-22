@@ -297,6 +297,10 @@ NSString*             freeStreamerReleaseVersion();
  */
 @property (nonatomic,readonly) BOOL continuous;
 /**
+ * This property has the number of bytes buffered for this stream.
+ */
+@property (nonatomic,readonly) size_t prebufferedByteCount;
+/**
  * Called upon completion of the stream. Note that for continuous
  * streams this is never called.
  */
