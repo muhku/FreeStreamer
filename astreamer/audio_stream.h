@@ -71,7 +71,7 @@ public:
     void setStrictContentTypeChecking(bool strictChecking);
     void setDefaultContentType(CFStringRef defaultContentType);
     void setSeekPosition(unsigned seekPosition);
-    void setContentLength(size_t contentLength);
+    void setContentLength(UInt64 contentLength);
     
     void setOutputFile(CFURLRef url);
     CFURLRef outputFile();
@@ -106,7 +106,7 @@ private:
     bool m_httpStreamRunning;
     bool m_audioStreamParserRunning;
     
-    size_t m_contentLength;
+    UInt64 m_contentLength;
     
     State m_state;
     HTTP_Stream *m_httpStream;
@@ -157,7 +157,7 @@ private:
     Audio_Queue *audioQueue();
     void closeAudioQueue();
     
-    size_t contentLength();
+    UInt64 contentLength();
     void closeAndSignalError(int error);
     void setState(State state);
     void setCookiesForStream(AudioFileStreamID inAudioFileStream);

@@ -284,7 +284,7 @@ void Audio_Stream::seekToTime(unsigned newSeekTime)
         return;
     }
     
-    size_t originalContentLength = m_contentLength;
+    UInt64 originalContentLength = m_contentLength;
     
     close();
     
@@ -377,7 +377,7 @@ void Audio_Stream::setSeekPosition(unsigned seekPosition)
     m_seekPosition = seekPosition;
 }
     
-void Audio_Stream::setContentLength(size_t contentLength)
+void Audio_Stream::setContentLength(UInt64 contentLength)
 {
     m_contentLength = contentLength;
 }
@@ -730,7 +730,7 @@ void Audio_Stream::closeAudioQueue()
     delete m_audioQueue, m_audioQueue = 0;
 }
     
-size_t Audio_Stream::contentLength()
+UInt64 Audio_Stream::contentLength()
 {
     if (m_contentLength == 0) {
         m_contentLength = m_httpStream->contentLength();
@@ -786,7 +786,7 @@ void Audio_Stream::setCookiesForStream(AudioFileStreamID inAudioFileStream)
     
     // set the cookie on the queue.
     if (m_audioConverter) {
-        err = AudioConverterSetProperty(m_audioConverter, kAudioConverterDecompressionMagicCookie, cookieSize, cookieData);
+        AudioConverterSetProperty(m_audioConverter, kAudioConverterDecompressionMagicCookie, cookieSize, cookieData);
     }
     
     free(cookieData);
