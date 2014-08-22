@@ -85,7 +85,10 @@
  * Reference to the frequency plot.
  */
 @property (nonatomic,strong) IBOutlet FSFrequencyPlotView *frequencyPlotView;
-
+/**
+ * Reference to the buffering indicator.
+ */
+@property (nonatomic,strong) IBOutlet UIProgressView *bufferingIndicator;
 /**
  * Handles the notification upon the audio stream state change.
  *

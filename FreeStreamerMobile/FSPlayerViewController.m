@@ -73,6 +73,8 @@
     
     self.view.backgroundColor = [UIColor clearColor];
     
+    self.bufferingIndicator.hidden = YES;
+    
 #if ENABLE_ANALYZER
     self.analyzer.enabled = YES;
 #else
@@ -517,6 +519,10 @@
                                          cur.minute, cur.second,
                                          end.minute, end.second];
     }
+    
+    self.bufferingIndicator.hidden = NO;
+    
+    self.bufferingIndicator.progress = (float)self.audioController.stream.prebufferedByteCount / (float)self.audioController.stream.configuration.maxPrebufferedByteCount;
 }
 
 - (void)seekToNewTime
