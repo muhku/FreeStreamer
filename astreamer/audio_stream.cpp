@@ -834,6 +834,10 @@ void Audio_Stream::enqueueCachedData(int minPacketsRequired)
         return;
     }
     
+    if (state() == PAUSED) {
+        return;
+    }
+    
     int count = cachedDataCount();
     
     if (count > minPacketsRequired) {
