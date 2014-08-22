@@ -12,6 +12,7 @@ FreeStreamer has the following features:
 - Fast and low memory footprint (no overhead of Objective-C method calls)
 - Supports ShoutCast and IceCast audio streams + standard HTTP
 - Prepared for bad network conditions: can detect if the network condition is not good enough to keep playing the stream
+- Supports prebuffering the stream (in a similar manner to YouTube for instance)
 - Can detect the stream type based on the content type
 - Supports ShoutCast metadata
 - Supports interruptions (for example a phone call during playing the stream)
