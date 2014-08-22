@@ -75,6 +75,9 @@
     
     self.bufferingIndicator.hidden = YES;
     
+    [self.audioController setVolume:_outputVolume];
+    self.volumeSlider.value = _outputVolume;
+    
 #if ENABLE_ANALYZER
     self.analyzer.enabled = YES;
 #else
@@ -141,6 +144,8 @@
     self.pauseButton.hidden = YES;
     
     _infoButton = self.navigationItem.rightBarButtonItem;
+    
+    _outputVolume = 0.5;
     
 #if ENABLE_ANALYZER
     self.analyzer = [[FSFrequencyDomainAnalyzer alloc] init];
@@ -433,6 +438,13 @@
 - (IBAction)openStationUrl:(id)sender
 {
     [[UIApplication sharedApplication] openURL:_stationURL];
+}
+
+- (IBAction)changeVolume:(id)sender
+{
+    _outputVolume =  self.volumeSlider.value;
+    
+    [self.audioController setVolume:_outputVolume];
 }
 
 /*

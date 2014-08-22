@@ -27,6 +27,7 @@
     // State
     BOOL _paused;
     BOOL _shouldStartPlaying;
+    float _outputVolume;
     
     // UI
     NSTimer *_progressUpdateTimer;
@@ -65,6 +66,10 @@
  * Reference to the progress slider.
  */
 @property (nonatomic,strong) IBOutlet UISlider *progressSlider;
+/**
+ * Reference to the volume slider.
+ */
+@property (nonatomic,strong) IBOutlet UISlider *volumeSlider;
 /**
  * Reference to the status label.
  */
@@ -136,5 +141,11 @@
  * @param sender The sender of the action.
  */
 - (IBAction)openStationUrl:(id)sender;
+/**
+ * An action for changing the volume.
+ *
+ * @param sender The sender of the action.
+ */
+- (IBAction)changeVolume:(id)sender;
 
 @end
