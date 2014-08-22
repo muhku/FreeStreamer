@@ -135,6 +135,10 @@ typedef struct {
  */
 @property (nonatomic,assign) int      startupWatchdogPeriod;
 /**
+ * Allow buffering of this many bytes before the cache is full.
+ */
+@property (nonatomic,assign) int      maxPrebufferedByteCount;
+/**
  * The HTTP user agent used for stream operations.
  */
 @property (nonatomic,strong) NSString *userAgent;

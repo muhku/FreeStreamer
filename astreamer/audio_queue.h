@@ -98,6 +98,7 @@ public:
     virtual void audioQueueOverflow() = 0;
     virtual void audioQueueUnderflow() = 0;
     virtual void audioQueueInitializationFailed() = 0;
+    virtual void audioQueueFinishedPlayingPacket() = 0;
 };
 
 } // namespace astreamer

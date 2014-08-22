@@ -539,6 +539,10 @@ void Audio_Queue::audioQueueOutputCallback(void *inClientData, AudioQueueRef inA
     audioQueue->m_bufferInUse[bufIndex] = false;
     audioQueue->m_buffersUsed--;
     
+    if (audioQueue->m_delegate) {
+        audioQueue->m_delegate->audioQueueFinishedPlayingPacket();
+    }
+    
     if (audioQueue->m_buffersUsed == 0 && !audioQueue->m_queuedHead && audioQueue->m_delegate) {
         audioQueue->m_delegate->audioQueueBuffersEmpty();
     } else if (audioQueue->m_waitingOnBuffer) {

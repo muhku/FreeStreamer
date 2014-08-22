@@ -59,11 +59,13 @@ Audio_Stream::Audio_Stream() :
     m_outputFile(NULL),
     m_queuedHead(0),
     m_queuedTail(0),
+    m_cachedDataSize(0),
     m_processedPacketsCount(0),
     m_audioDataByteCount(0),
     m_packetDuration(0),
     m_bitrateBufferIndex(0),
-    m_outputVolume(1.0)
+    m_outputVolume(1.0),
+    m_queueCanAcceptPackets(true)
 {
     m_httpStream->m_delegate = this;
     
@@ -227,6 +229,7 @@ void Audio_Stream::close()
         cur = tmp;
     }
     m_queuedHead = m_queuedTail = 0;
+    m_cachedDataSize = 0;
     
     AS_TRACE("%s: leave\n", __PRETTY_FUNCTION__);
 }
@@ -530,6 +533,8 @@ void Audio_Stream::audioQueueBuffersEmpty()
     
     int count = cachedDataCount();
     
+    AS_TRACE("%i cached packets, enqueuing\n", count);
+    
     if (count > 0) {
         enqueueCachedData(1);
     } else {
@@ -541,12 +546,12 @@ void Audio_Stream::audioQueueBuffersEmpty()
     
 void Audio_Stream::audioQueueOverflow()
 {
-    m_httpStream->setScheduledInRunLoop(false);
+    m_queueCanAcceptPackets = false;
 }
     
 void Audio_Stream::audioQueueUnderflow()
 {
-    m_httpStream->setScheduledInRunLoop(true);
+    m_queueCanAcceptPackets = true;
 }
     
 void Audio_Stream::audioQueueInitializationFailed()
@@ -564,6 +569,17 @@ void Audio_Stream::audioQueueInitializationFailed()
         } else {
             m_delegate->audioStreamErrorOccurred(AS_ERR_STREAM_PARSE);
         }
+    }
+}
+    
+void Audio_Stream::audioQueueFinishedPlayingPacket()
+{
+    Stream_Configuration *config = Stream_Configuration::configuration();
+    
+    int count = cachedDataCount();
+    
+    if (count >= config->decodeQueueSize) {
+        enqueueCachedData(config->decodeQueueSize);
     }
 }
     
@@ -691,6 +707,8 @@ Audio_Queue* Audio_Stream::audioQueue()
         m_audioQueue->m_streamDesc = m_dstFormat;
         
         m_audioQueue->m_initialOutputVolume = m_outputVolume;
+        
+        m_queueCanAcceptPackets = true;
     }
     return m_audioQueue;
 }
@@ -807,6 +825,10 @@ int Audio_Stream::cachedDataCount()
     
 void Audio_Stream::enqueueCachedData(int minPacketsRequired)
 {
+    if (!m_queueCanAcceptPackets) {
+        return;
+    }
+    
     int count = cachedDataCount();
     
     if (count > minPacketsRequired) {
@@ -824,6 +846,8 @@ void Audio_Stream::enqueueCachedData(int minPacketsRequired)
         UInt32 ioOutputDataPackets = m_outputBufferSize / m_dstFormat.mBytesPerPacket;
         
         AS_TRACE("calling AudioConverterFillComplexBuffer\n");
+        
+        Stream_Configuration *config = Stream_Configuration::configuration();
         
         OSStatus err = AudioConverterFillComplexBuffer(m_audioConverter,
                                                        &encoderDataCallback,
@@ -855,6 +879,15 @@ void Audio_Stream::enqueueCachedData(int minPacketsRequired)
             for(std::list<queued_packet_t*>::iterator iter = m_processedPackets.begin();
                 iter != m_processedPackets.end(); iter++) {
                 queued_packet_t *cur = *iter;
+                
+                m_cachedDataSize -= cur->desc.mDataByteSize;
+                
+                if (m_cachedDataSize < config->maxPrebufferedByteCount) {
+                    AS_TRACE("Cache underflow, enabling the HTTP stream\n");
+                    
+                    m_httpStream->setScheduledInRunLoop(true);
+                }
+                
                 free(cur);
             }
             m_processedPackets.clear();
@@ -986,6 +1019,8 @@ void Audio_Stream::propertyValueCallback(void *inClientData, AudioFileStreamID i
 void Audio_Stream::streamDataCallback(void *inClientData, UInt32 inNumberBytes, UInt32 inNumberPackets, const void *inInputData, AudioStreamPacketDescription *inPacketDescriptions)
 {    
     AS_TRACE("%s: inNumberBytes %u, inNumberPackets %u\n", __FUNCTION__, inNumberBytes, inNumberPackets);
+    
+    Stream_Configuration *config = Stream_Configuration::configuration();
     Audio_Stream *THIS = static_cast<Audio_Stream*>(inClientData);
     
     if (!THIS->m_audioStreamParserRunning) {
@@ -1019,9 +1054,15 @@ void Audio_Stream::streamDataCallback(void *inClientData, UInt32 inNumberBytes, 
             THIS->m_queuedTail->next = packet;
             THIS->m_queuedTail = packet;
         }
+        
+        THIS->m_cachedDataSize += size;
+        
+        if (THIS->m_cachedDataSize >= config->maxPrebufferedByteCount) {
+            AS_TRACE("Cache overflow, disabling the HTTP stream\n");
+            
+            THIS->m_httpStream->setScheduledInRunLoop(false);
+        }
     }
-    
-    Stream_Configuration *config = Stream_Configuration::configuration();
     
     THIS->enqueueCachedData(config->decodeQueueSize);
 }

@@ -87,6 +87,7 @@ public:
     void audioQueueOverflow();
     void audioQueueUnderflow();
     void audioQueueInitializationFailed();
+    void audioQueueFinishedPlayingPacket();
     
     /* HTTP_Stream_Delegate */
     void streamIsReadyRead();
@@ -138,6 +139,8 @@ private:
     
     std::list <queued_packet_t*> m_processedPackets;
     
+    size_t m_cachedDataSize;
+    
     UInt32 m_processedPacketsCount;      // global packet statistics: count
     UInt64 m_audioDataByteCount;
     
@@ -146,6 +149,8 @@ private:
     size_t m_bitrateBufferIndex;
     
     float m_outputVolume;
+    
+    bool m_queueCanAcceptPackets;
     
     Audio_Queue *audioQueue();
     void closeAudioQueue();

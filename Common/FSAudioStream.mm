@@ -49,6 +49,7 @@
         self.bounceInterval    = 10;
         self.maxBounceCount    = 4;   // Max number of bufferings in bounceInterval seconds
         self.startupWatchdogPeriod = 30; // If the stream doesn't start to play in this seconds, the watchdog will fail it
+        self.maxPrebufferedByteCount = 1000000; // 1 MB
         self.userAgent = [NSString stringWithFormat:@"FreeStreamer/%@ (%@)", freeStreamerReleaseVersion(), systemVersion];
         
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 60000)
@@ -398,6 +399,7 @@ public:
     config.bounceInterval           = c->bounceInterval;
     config.maxBounceCount           = c->maxBounceCount;
     config.startupWatchdogPeriod    = c->startupWatchdogPeriod;
+    config.maxPrebufferedByteCount  = c->maxPrebufferedByteCount;
     
     if (c->userAgent) {
         // Let the Objective-C side handle the memory for the copy of the original user-agent
@@ -559,7 +561,7 @@ public:
 
 -(NSString *)description
 {
-    return [NSString stringWithFormat:@"[FreeStreamer %@] URL: %@\nbufferCount: %i\nbufferSize: %i\nmaxPacketDescs: %i\ndecodeQueueSize: %i\nhttpConnectionBufferSize: %i\noutputSampleRate: %f\noutputNumChannels: %ld\nbounceInterval: %i\nmaxBounceCount: %i\nstartupWatchdogPeriod: %i\nformat: %@\nuserAgent: %@",
+    return [NSString stringWithFormat:@"[FreeStreamer %@] URL: %@\nbufferCount: %i\nbufferSize: %i\nmaxPacketDescs: %i\ndecodeQueueSize: %i\nhttpConnectionBufferSize: %i\noutputSampleRate: %f\noutputNumChannels: %ld\nbounceInterval: %i\nmaxBounceCount: %i\nstartupWatchdogPeriod: %i\nmaxPrebufferedByteCount: %i\nformat: %@\nuserAgent: %@",
             freeStreamerReleaseVersion(),
             self.url,
             self.configuration.bufferCount,
@@ -572,6 +574,7 @@ public:
             self.configuration.bounceInterval,
             self.configuration.maxBounceCount,
             self.configuration.startupWatchdogPeriod,
+            self.configuration.maxPrebufferedByteCount,
             self.formatDescription,
             self.configuration.userAgent];
 }
@@ -619,6 +622,7 @@ public:
         c->maxBounceCount           = configuration.maxBounceCount;
         c->bounceInterval           = configuration.bounceInterval;
         c->startupWatchdogPeriod    = configuration.startupWatchdogPeriod;
+        c->maxPrebufferedByteCount  = configuration.maxPrebufferedByteCount;
         
         if (c->userAgent) {
             CFRelease(c->userAgent);
