@@ -248,6 +248,26 @@ void HTTP_Stream::setUrl(CFURLRef url)
     }
 }
     
+bool HTTP_Stream::canHandleUrl(CFURLRef url)
+{
+    if (!url) {
+        return false;
+    }
+    
+    CFStringRef scheme = CFURLCopyScheme(url);
+    
+    if (scheme) {
+        if (CFStringCompare(scheme, CFSTR("file"), 0) == kCFCompareEqualTo) {
+            // The only scheme we claim not to handle are local files.
+            return false;
+        }
+        
+        CFRelease(scheme);
+    }
+    
+    return true;
+}
+    
 void HTTP_Stream::id3metaDataAvailable(std::map<CFStringRef,CFStringRef> metaData)
 {
     if (m_delegate) {

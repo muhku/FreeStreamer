@@ -85,6 +85,8 @@ public:
     
     void setUrl(CFURLRef url);
     
+    static bool canHandleUrl(CFURLRef url);
+    
     /* ID3_Parser_Delegate */
     void id3metaDataAvailable(std::map<CFStringRef,CFStringRef> metaData);
 };
