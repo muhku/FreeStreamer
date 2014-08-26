@@ -258,6 +258,8 @@ bool HTTP_Stream::canHandleUrl(CFURLRef url)
     
     if (scheme) {
         if (CFStringCompare(scheme, CFSTR("file"), 0) == kCFCompareEqualTo) {
+            CFRelease(scheme);
+            
             // The only scheme we claim not to handle are local files.
             return false;
         }

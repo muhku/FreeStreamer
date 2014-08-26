@@ -10,6 +10,7 @@
 #include "file_output.h"
 #include "stream_configuration.h"
 #include "http_stream.h"
+#include "file_stream.h"
 
 /*
  * Some servers may send an incorrect MIME type for the audio stream.
@@ -367,6 +368,9 @@ void Audio_Stream::setUrl(CFURLRef url)
     
     if (HTTP_Stream::canHandleUrl(url)) {
         m_inputStream = new HTTP_Stream();
+        m_inputStream->m_delegate = this;
+    } else if (File_Stream::canHandleUrl(url)) {
+        m_inputStream = new File_Stream();
         m_inputStream->m_delegate = this;
     }
     
