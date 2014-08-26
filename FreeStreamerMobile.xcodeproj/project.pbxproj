@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		60349C1319AD0D1C009E05F9 /* test.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 60349C1219AD0D1C009E05F9 /* test.mp3 */; };
 		60412CD218D0B150007A0277 /* button-pause.png in Resources */ = {isa = PBXBuildFile; fileRef = 60412CCC18D0B150007A0277 /* button-pause.png */; };
 		60412CD318D0B150007A0277 /* button-play.png in Resources */ = {isa = PBXBuildFile; fileRef = 60412CCD18D0B150007A0277 /* button-play.png */; };
 		60412CD418D0B150007A0277 /* player-bg-bottom.png in Resources */ = {isa = PBXBuildFile; fileRef = 60412CCE18D0B150007A0277 /* player-bg-bottom.png */; };
@@ -65,6 +66,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		60349C1219AD0D1C009E05F9 /* test.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = test.mp3; sourceTree = "<group>"; };
 		60412CCC18D0B150007A0277 /* button-pause.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "button-pause.png"; path = "Assets/Images/button-pause.png"; sourceTree = "<group>"; };
 		60412CCD18D0B150007A0277 /* button-play.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "button-play.png"; path = "Assets/Images/button-play.png"; sourceTree = "<group>"; };
 		60412CCE18D0B150007A0277 /* player-bg-bottom.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "player-bg-bottom.png"; path = "Assets/Images/player-bg-bottom.png"; sourceTree = "<group>"; };
@@ -238,6 +240,7 @@
 		60B813DC18C532F8001CC5A7 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				60349C1219AD0D1C009E05F9 /* test.mp3 */,
 				60412CCB18D0B144007A0277 /* Images */,
 				60B813DD18C532F8001CC5A7 /* FreeStreamerMobile-Info.plist */,
 				60B813DE18C532F8001CC5A7 /* InfoPlist.strings */,
@@ -398,6 +401,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				60349C1319AD0D1C009E05F9 /* test.mp3 in Resources */,
 				60B813E018C532F8001CC5A7 /* InfoPlist.strings in Resources */,
 				60412CD318D0B150007A0277 /* button-play.png in Resources */,
 				60CF8BE818C5335200C657A8 /* FSMainWindow.xib in Resources */,
