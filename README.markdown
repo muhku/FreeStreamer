@@ -19,6 +19,7 @@ FreeStreamer has the following features:
 - Supports backgrounding
 - Supports a subset of the ID3v2 tag specification 
 - Supports Podcast RSS feeds
+- Supports local file playback
 - The stream contents can be stored in a file (see the OS X application for an example)
 - It is possible to access the PCM audio samples (useful if you want your own audio analyzer, for instance)
 - Includes a frequency analyzer and visualization, see [Additions](https://github.com/muhku/FreeStreamer/tree/master/Additions) and the iOS application
