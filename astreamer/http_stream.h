@@ -12,18 +12,12 @@
 #import <CFNetwork/CFNetwork.h>
 #import <vector>
 #import <map>
+#import "input_stream.h"
 #import "id3_parser.h"
 
 namespace astreamer {
 
-class HTTP_Stream_Delegate;
-    
-struct HTTP_Stream_Position {
-    UInt64 start;
-    UInt64 end;
-};
-
-class HTTP_Stream : public ID3_Parser_Delegate {
+class HTTP_Stream : public Input_Stream {
 private:
     
     HTTP_Stream(const HTTP_Stream&);
@@ -39,7 +33,7 @@ private:
     CFReadStreamRef m_readStream;
     bool m_scheduledInRunLoop;
     bool m_readPending;
-    HTTP_Stream_Position m_position;
+    Input_Stream_Position m_position;
     
     /* HTTP headers */
     bool m_httpHeadersParsed;
@@ -73,40 +67,26 @@ private:
     CFStringRef createMetaDataStringWithMostReasonableEncoding(const UInt8 *bytes, const CFIndex numBytes);
     
     static void readCallBack(CFReadStreamRef stream, CFStreamEventType eventType, void *clientCallBackInfo);
-
+    
 public:
-    
-    HTTP_Stream_Delegate *m_delegate;
-    
     HTTP_Stream();
     virtual ~HTTP_Stream();
     
-    HTTP_Stream_Position position();
+    Input_Stream_Position position();
     
     CFStringRef contentType();
     size_t contentLength();
     
     bool open();
-    bool open(const HTTP_Stream_Position& position);
+    bool open(const Input_Stream_Position& position);
     void close();
     
     void setScheduledInRunLoop(bool scheduledInRunLoop);
     
     void setUrl(CFURLRef url);
     
-    bool headersParsed();
-    
     /* ID3_Parser_Delegate */
     void id3metaDataAvailable(std::map<CFStringRef,CFStringRef> metaData);
-};
-
-class HTTP_Stream_Delegate {
-public:
-    virtual void streamIsReadyRead() = 0;
-    virtual void streamHasBytesAvailable(UInt8 *data, UInt32 numBytes) = 0;
-    virtual void streamEndEncountered() = 0;
-    virtual void streamErrorOccurred() = 0;
-    virtual void streamMetaDataAvailable(std::map<CFStringRef,CFStringRef> metaData) = 0;
 };
 
 } // namespace astreamer

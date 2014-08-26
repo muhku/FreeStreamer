@@ -12,7 +12,7 @@
 
 #include "audio_stream.h"
 #include "stream_configuration.h"
-#include "http_stream.h"
+#include "input_stream.h"
 
 #import <AVFoundation/AVFoundation.h>
 
@@ -184,7 +184,7 @@ public:
 - (void)setPlayRate:(float)playRate;
 - (unsigned)timePlayedInSeconds;
 - (unsigned)durationInSeconds;
-- (astreamer::HTTP_Stream_Position)streamPositionForTime:(unsigned)newSeekTime;
+- (astreamer::Input_Stream_Position)streamPositionForTime:(unsigned)newSeekTime;
 @end
 
 @implementation FSAudioStreamPrivate
@@ -298,7 +298,7 @@ public:
 
 - (void)playFromOffset:(FSSeekByteOffset)offset
 {
-    astreamer::HTTP_Stream_Position position;
+    astreamer::Input_Stream_Position position;
     position.start = offset.start;
     position.end   = offset.end;
     
@@ -405,7 +405,7 @@ public:
     
     offset.position = [self timePlayedInSeconds];
     
-    astreamer::HTTP_Stream_Position httpStreamPos = [self streamPositionForTime:offset.position];
+    astreamer::Input_Stream_Position httpStreamPos = [self streamPositionForTime:offset.position];
     
     offset.start = httpStreamPos.start;
     offset.end   = httpStreamPos.end;
@@ -585,7 +585,7 @@ public:
     return _audioStream->durationInSeconds();
 }
 
-- (astreamer::HTTP_Stream_Position)streamPositionForTime:(unsigned)newSeekTime
+- (astreamer::Input_Stream_Position)streamPositionForTime:(unsigned)newSeekTime
 {
     return _audioStream->streamPositionForTime(newSeekTime);
 }

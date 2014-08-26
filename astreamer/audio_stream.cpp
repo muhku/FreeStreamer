@@ -9,6 +9,7 @@
 #include "audio_stream.h"
 #include "file_output.h"
 #include "stream_configuration.h"
+#include "http_stream.h"
 
 /*
  * Some servers may send an incorrect MIME type for the audio stream.
@@ -31,11 +32,11 @@ namespace astreamer {
 /* Create HTTP stream as Audio_Stream (this) as the delegate */
 Audio_Stream::Audio_Stream() :
     m_delegate(0),
-    m_httpStreamRunning(false),
+    m_inputStreamRunning(false),
     m_audioStreamParserRunning(false),
     m_contentLength(0),
     m_state(STOPPED),
-    m_httpStream(new HTTP_Stream()),
+    m_inputStream(new HTTP_Stream()),
     m_audioQueue(0),
     m_watchdogTimer(0),
     m_audioFileStream(0),
@@ -67,7 +68,7 @@ Audio_Stream::Audio_Stream() :
     m_outputVolume(1.0),
     m_queueCanAcceptPackets(true)
 {
-    m_httpStream->m_delegate = this;
+    m_inputStream->m_delegate = this;
     
     memset(&m_srcFormat, 0, sizeof m_srcFormat);
     
@@ -99,8 +100,8 @@ Audio_Stream::~Audio_Stream()
     
     delete [] m_outputBuffer, m_outputBuffer = 0;
     
-    m_httpStream->m_delegate = 0;
-    delete m_httpStream, m_httpStream = 0;
+    m_inputStream->m_delegate = 0;
+    delete m_inputStream, m_inputStream = 0;
     
     if (m_audioConverter) {
         AudioConverterDispose(m_audioConverter), m_audioConverter = 0;
@@ -116,9 +117,9 @@ void Audio_Stream::open()
     open(0);
 }
 
-void Audio_Stream::open(HTTP_Stream_Position *position)
+void Audio_Stream::open(Input_Stream_Position *position)
 {
-    if (m_httpStreamRunning || m_audioStreamParserRunning) {
+    if (m_inputStreamRunning || m_audioStreamParserRunning) {
         AS_TRACE("%s: already running: return\n", __PRETTY_FUNCTION__);
         return;
     }
@@ -145,14 +146,14 @@ void Audio_Stream::open(HTTP_Stream_Position *position)
     bool success;
     
     if (position) {
-        success = m_httpStream->open(*position);
+        success = m_inputStream->open(*position);
     } else {
-        success = m_httpStream->open();
+        success = m_inputStream->open();
     }
     
     if (success) {
         AS_TRACE("%s: HTTP stream opened, buffering...\n", __PRETTY_FUNCTION__);
-        m_httpStreamRunning = true;
+        m_inputStreamRunning = true;
         setState(BUFFERING);
         
         if (config->startupWatchdogPeriod > 0) {
@@ -193,9 +194,9 @@ void Audio_Stream::close()
     
     /* Close the HTTP stream first so that the audio stream parser
        isn't fed with more data to parse */
-    if (m_httpStreamRunning) {
-        m_httpStream->close();
-        m_httpStreamRunning = false;
+    if (m_inputStreamRunning) {
+        m_inputStream->close();
+        m_inputStreamRunning = false;
     }
     
     if (m_audioStreamParserRunning) {
@@ -278,7 +279,7 @@ void Audio_Stream::seekToTime(unsigned newSeekTime)
         setState(SEEKING);
     }
     
-    HTTP_Stream_Position position = streamPositionForTime(newSeekTime);
+    Input_Stream_Position position = streamPositionForTime(newSeekTime);
     
     if (position.start == 0 && position.end == 0) {
         return;
@@ -296,9 +297,9 @@ void Audio_Stream::seekToTime(unsigned newSeekTime)
     setContentLength(originalContentLength);
 }
     
-HTTP_Stream_Position Audio_Stream::streamPositionForTime(unsigned newSeekTime)
+Input_Stream_Position Audio_Stream::streamPositionForTime(unsigned newSeekTime)
 {
-    HTTP_Stream_Position position;
+    Input_Stream_Position position;
     position.start = 0;
     position.end   = 0;
     
@@ -354,7 +355,7 @@ void Audio_Stream::setPlayRate(float playRate)
     
 void Audio_Stream::setUrl(CFURLRef url)
 {
-    m_httpStream->setUrl(url);
+    m_inputStream->setUrl(url);
 }
     
 void Audio_Stream::setStrictContentTypeChecking(bool strictChecking)
@@ -494,7 +495,7 @@ void Audio_Stream::audioQueueBuffersEmpty()
     
     Stream_Configuration *config = Stream_Configuration::configuration();
     
-    if (m_httpStreamRunning && FAILED != state()) {
+    if (m_inputStreamRunning && FAILED != state()) {
         /* Still feeding the audio queue with data,
            don't stop yet */
         setState(BUFFERING);
@@ -561,9 +562,9 @@ void Audio_Stream::audioQueueUnderflow()
     
 void Audio_Stream::audioQueueInitializationFailed()
 {
-    if (m_httpStreamRunning) {
-        m_httpStream->close();
-        m_httpStreamRunning = false;
+    if (m_inputStreamRunning) {
+        m_inputStream->close();
+        m_inputStreamRunning = false;
     }
     
     setState(FAILED);
@@ -599,7 +600,7 @@ void Audio_Stream::streamIsReadyRead()
     const CFIndex audioContentTypeLength = CFStringGetLength(audioContentType);
     bool matchesAudioContentType = false;
     
-    CFStringRef contentType = m_httpStream->contentType();
+    CFStringRef contentType = m_inputStream->contentType();
     
     if (m_contentType) {
         CFRelease(m_contentType), m_contentType = 0;
@@ -640,7 +641,7 @@ void Audio_Stream::streamHasBytesAvailable(UInt8 *data, UInt32 numBytes)
 {
     AS_TRACE("%s: %u bytes\n", __FUNCTION__, (unsigned int)numBytes);
     
-    if (!m_httpStreamRunning) {
+    if (!m_inputStreamRunning) {
         AS_TRACE("%s: stray callback detected!\n", __PRETTY_FUNCTION__);
         return;
     }
@@ -669,22 +670,22 @@ void Audio_Stream::streamEndEncountered()
 {
     AS_TRACE("%s\n", __PRETTY_FUNCTION__);
     
-    if (!m_httpStreamRunning) {
+    if (!m_inputStreamRunning) {
         AS_TRACE("%s: stray callback detected!\n", __PRETTY_FUNCTION__);
         return;
     }
     
     setState(END_OF_FILE);
     
-    m_httpStream->close();
-    m_httpStreamRunning = false;
+    m_inputStream->close();
+    m_inputStreamRunning = false;
 }
 
 void Audio_Stream::streamErrorOccurred()
 {
     AS_TRACE("%s\n", __PRETTY_FUNCTION__);
     
-    if (!m_httpStreamRunning) {
+    if (!m_inputStreamRunning) {
         AS_TRACE("%s: stray callback detected!\n", __PRETTY_FUNCTION__);
         return;
     }
@@ -733,7 +734,7 @@ void Audio_Stream::closeAudioQueue()
 UInt64 Audio_Stream::contentLength()
 {
     if (m_contentLength == 0) {
-        m_contentLength = m_httpStream->contentLength();
+        m_contentLength = m_inputStream->contentLength();
     }
     return m_contentLength;
 }
@@ -894,7 +895,7 @@ void Audio_Stream::enqueueCachedData(int minPacketsRequired)
                 if (m_cachedDataSize < config->maxPrebufferedByteCount) {
                     AS_TRACE("Cache underflow, enabling the HTTP stream\n");
                     
-                    m_httpStream->setScheduledInRunLoop(true);
+                    m_inputStream->setScheduledInRunLoop(true);
                 }
                 
                 free(cur);
@@ -1069,7 +1070,7 @@ void Audio_Stream::streamDataCallback(void *inClientData, UInt32 inNumberBytes, 
         if (THIS->m_cachedDataSize >= config->maxPrebufferedByteCount) {
             AS_TRACE("Cache overflow, disabling the HTTP stream\n");
             
-            THIS->m_httpStream->setScheduledInRunLoop(false);
+            THIS->m_inputStream->setScheduledInRunLoop(false);
         }
     }
     

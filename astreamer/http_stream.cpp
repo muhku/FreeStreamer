@@ -40,7 +40,6 @@ HTTP_Stream::HTTP_Stream() :
     m_readStream(0),
     m_scheduledInRunLoop(false),
     m_readPending(false),
-    m_delegate(0),
     m_url(0),
     m_httpHeadersParsed(false),
     m_contentType(0),
@@ -96,7 +95,7 @@ HTTP_Stream::~HTTP_Stream()
     delete m_id3Parser, m_id3Parser = 0;
 }
     
-HTTP_Stream_Position HTTP_Stream::position()
+Input_Stream_Position HTTP_Stream::position()
 {
     return m_position;
 }
@@ -113,7 +112,7 @@ size_t HTTP_Stream::contentLength()
     
 bool HTTP_Stream::open()
 {
-    HTTP_Stream_Position position;
+    Input_Stream_Position position;
     position.start = 0;
     position.end = 0;
     
@@ -125,7 +124,7 @@ bool HTTP_Stream::open()
     return open(position);
 }
 
-bool HTTP_Stream::open(const HTTP_Stream_Position& position)
+bool HTTP_Stream::open(const Input_Stream_Position& position)
 {
     bool success = false;
     CFStreamClientContext CTX = { 0, this, NULL, NULL, NULL };
