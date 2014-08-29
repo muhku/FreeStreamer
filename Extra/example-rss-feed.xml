@@ -34,5 +34,9 @@
         <title>Local MP3 file</title>
         <link>file://test.mp3</link>
     </item>
+    <item>
+        <title>M3U playlist test</title>
+        <link>https://raw.githubusercontent.com/muhku/FreeStreamer/master/Extra/test-playlist.m3u</link>
+    </item>
   </channel>
 </rss>
