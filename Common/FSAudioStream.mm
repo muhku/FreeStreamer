@@ -124,6 +124,8 @@ public:
     astreamer::Audio_Stream *source;
     FSAudioStreamPrivate *priv;
     
+    void reset();
+    
     void audioStreamErrorOccurred(int errorCode);
     void audioStreamStateChanged(astreamer::Audio_Stream::State state);
     void audioStreamMetaDataAvailable(std::map<CFStringRef,CFStringRef> metaData);
@@ -306,6 +308,8 @@ public:
     
     _audioStream->setSeekPosition(offset.position);
     _audioStream->setContentLength(offset.end);
+    
+    _observer->reset();
     
     [_reachability startNotifier];
 }
@@ -533,6 +537,8 @@ public:
 {
     _audioStream->open();
     
+    _observer->reset();
+
     [_reachability startNotifier];
 }
 
@@ -870,7 +876,12 @@ public:
  * AudioStreamStateObserver: listen to the state from the audio stream.
  * ===============================================================
  */
-    
+
+void AudioStreamStateObserver::reset()
+{
+    m_eofReached = false;
+}
+
 void AudioStreamStateObserver::audioStreamErrorOccurred(int errorCode)
 {
     switch (errorCode) {
@@ -944,12 +955,10 @@ void AudioStreamStateObserver::audioStreamStateChanged(astreamer::Audio_Stream::
             break;
         case astreamer::Audio_Stream::BUFFERING:
             priv.lastError = kFsAudioStreamErrorNone;
-            m_eofReached = false;
             fsAudioState = [NSNumber numberWithInt:kFsAudioStreamBuffering];
             break;
         case astreamer::Audio_Stream::PLAYING:
             priv.lastError = kFsAudioStreamErrorNone;
-            m_eofReached = false;
             fsAudioState = [NSNumber numberWithInt:kFsAudioStreamPlaying];
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
             [[AVAudioSession sharedInstance] setActive:YES error:nil];
@@ -957,12 +966,10 @@ void AudioStreamStateObserver::audioStreamStateChanged(astreamer::Audio_Stream::
             break;
         case astreamer::Audio_Stream::PAUSED:
             priv.lastError = kFsAudioStreamErrorNone;
-            m_eofReached = false;
             fsAudioState = [NSNumber numberWithInt:kFsAudioStreamPaused];
             break;
         case astreamer::Audio_Stream::SEEKING:
             priv.lastError = kFsAudioStreamErrorNone;
-            m_eofReached = false;
             fsAudioState = [NSNumber numberWithInt:kFsAudioStreamSeeking];
             break;
         case astreamer::Audio_Stream::END_OF_FILE:
@@ -971,7 +978,6 @@ void AudioStreamStateObserver::audioStreamStateChanged(astreamer::Audio_Stream::
             fsAudioState = [NSNumber numberWithInt:kFSAudioStreamEndOfFile];
             break;
         case astreamer::Audio_Stream::FAILED:
-            m_eofReached = false;
             fsAudioState = [NSNumber numberWithInt:kFsAudioStreamFailed];
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
             [[AVAudioSession sharedInstance] setActive:NO error:nil];
