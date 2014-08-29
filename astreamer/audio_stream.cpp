@@ -603,8 +603,6 @@ void Audio_Stream::audioQueueInitializationFailed()
     
 void Audio_Stream::audioQueueFinishedPlayingPacket()
 {
-    Stream_Configuration *config = Stream_Configuration::configuration();
-    
     int count = cachedDataCount();
     
     if (count > 0) {
