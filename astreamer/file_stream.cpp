@@ -75,7 +75,7 @@ CFStringRef File_Stream::contentType()
         
         // TODO: we should do the content-type resolvation in a better way.
         if (CFStringCompare(suffix, CFSTR(".mp3"), 0) == kCFCompareEqualTo) {
-            contentType = CFSTR("audio/mp3");
+            contentType = CFSTR("audio/mpeg");
         } else if (CFStringCompare(suffix, CFSTR(".m4a"), 0) == kCFCompareEqualTo) {
             contentType = CFSTR("audio/x-m4a");
         } else if (CFStringCompare(suffix, CFSTR(".mp3"), 0) == kCFCompareEqualTo) {
