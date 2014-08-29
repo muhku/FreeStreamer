@@ -334,6 +334,9 @@
             XCTAssertTrue(([_controller.stream.contentType isEqualToString:@"audio/mpeg"]), @"Invalid content type");
             XCTAssertTrue(([_controller.stream.suggestedFileExtension isEqualToString:@"mp3"]), @"Invalid file extension");
             
+            XCTAssertTrue((_controller.stream.duration.minute == 0), @"Invalid stream duration (minutes)");
+            XCTAssertTrue((_controller.stream.duration.second == 31), @"Invalid stream duration (seconds)");
+            
             return;
         }
     }
