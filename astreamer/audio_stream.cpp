@@ -563,7 +563,7 @@ void Audio_Stream::audioQueueBuffersEmpty()
     AS_TRACE("%i cached packets, enqueuing\n", count);
     
     if (count > 0) {
-        enqueueCachedData(1);
+        enqueueCachedData(0);
     } else {
         AS_TRACE("%s: closing the audio queue\n", __PRETTY_FUNCTION__);
         
