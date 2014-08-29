@@ -159,6 +159,13 @@ NSString*             freeStreamerReleaseVersion();
  *
  * Non-continuous streams (audio streams with a known duration) can be
  * seeked with the seekToPosition method.
+ *
+ * Note that FSAudioStream is not designed to be thread-safe! That means
+ * that using the streamer from multiple threads without syncronization
+ * could cause problems. It is recommended to keep the streamer in the
+ * main thread and call the streamer methods only from the main thread
+ * (consider using performSelectorOnMainThread: if calls from multiple
+ * threads are needed).
  */
 @interface FSAudioStream : NSObject {
     FSAudioStreamPrivate *_private;
