@@ -607,8 +607,8 @@ void Audio_Stream::audioQueueFinishedPlayingPacket()
     
     int count = cachedDataCount();
     
-    if (count >= config->decodeQueueSize) {
-        enqueueCachedData(config->decodeQueueSize);
+    if (count > 0) {
+        enqueueCachedData(0);
     }
 }
     
