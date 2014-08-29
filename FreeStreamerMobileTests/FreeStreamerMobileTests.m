@@ -270,6 +270,36 @@
     XCTAssertFalse(timedOut, @"Timed out - the stream did not start playing");
 }
 
+- (void)testShortFilePlayback
+{
+    __weak FreeStreamerMobileTests *weakSelf = self;
+    
+    _stream.url = [NSURL URLWithString:@"https://dl.dropboxusercontent.com/u/995250/FreeStreamer/5sec.mp3"];
+    
+    _stream.onCompletion = ^() {
+        weakSelf.checkStreamState = YES;
+    };
+    
+    [_stream play];
+    
+    NSTimeInterval timeout = 10.0;
+    NSTimeInterval idle = 0.1;
+    BOOL timedOut = NO;
+    
+    NSDate *timeoutDate = [[NSDate alloc] initWithTimeIntervalSinceNow:timeout];
+    while (!timedOut && _keepRunning) {
+        NSDate *tick = [[NSDate alloc] initWithTimeIntervalSinceNow:idle];
+        [[NSRunLoop currentRunLoop] runUntilDate:tick];
+        timedOut = ([tick compare:timeoutDate] == NSOrderedDescending);
+        
+        if (_checkStreamState) {
+            // Stream playback finished
+            return;
+        }
+    }
+    XCTAssertFalse(timedOut, @"Timed out - the stream did not complete playing");
+}
+
 - (void)testMetaData
 {
     [[NSNotificationCenter defaultCenter] addObserverForName:FSAudioStreamStateChangeNotification
