@@ -133,6 +133,54 @@
     XCTAssertFalse(timedOut, @"Timed out - the stream did not start playing");
 }
 
+- (void)testPlaybackFromOffset
+{
+    [[NSNotificationCenter defaultCenter] addObserverForName:FSAudioStreamStateChangeNotification
+                                                      object:nil
+                                                       queue:nil
+                                                  usingBlock:^(NSNotification *notification) {
+                                                      
+                                                      NSLog(@"FSAudioStreamStateChangeNotification received!");
+                                                      
+                                                      int state = [[notification.userInfo valueForKey:FSAudioStreamNotificationKey_State] intValue];
+                                                      
+                                                      if (state == kFsAudioStreamPlaying) {
+                                                          _checkStreamState = YES;
+                                                      }
+                                                  }];
+    
+    FSSeekByteOffset offset;
+    offset.start = 4063560;
+    offset.end   = 8227656;
+    offset.position = 127;
+    
+    _stream.url = [NSURL URLWithString:@"https://dl.dropboxusercontent.com/u/995250/FreeStreamer/As%20long%20as%20the%20stars%20shine.mp3"];
+    [_stream playFromOffset:offset];
+    
+    NSTimeInterval timeout = 15.0;
+    NSTimeInterval idle = 0.1;
+    BOOL timedOut = NO;
+    
+    NSDate *timeoutDate = [[NSDate alloc] initWithTimeIntervalSinceNow:timeout];
+    while (!timedOut && _keepRunning) {
+        NSDate *tick = [[NSDate alloc] initWithTimeIntervalSinceNow:idle];
+        [[NSRunLoop currentRunLoop] runUntilDate:tick];
+        timedOut = ([tick compare:timeoutDate] == NSOrderedDescending);
+        
+        if (_checkStreamState) {
+            // Stream started playing.
+            
+            FSStreamPosition pos = _stream.currentTimePlayed;
+            
+            XCTAssertTrue((pos.minute == 2), @"Invalid seek minute");
+            XCTAssertTrue((pos.second == 7), @"Invalid seek second");
+            
+            return;
+        }
+    }
+    XCTAssertFalse(timedOut, @"Timed out - the stream did not start playing");
+}
+
 - (void)testStreamPausing
 {
     [[NSNotificationCenter defaultCenter] addObserverForName:FSAudioStreamStateChangeNotification
