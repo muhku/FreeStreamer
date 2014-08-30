@@ -229,6 +229,36 @@
     XCTAssertFalse(timedOut, @"Timed out - the stream did not start playing");
 }
 
+- (void)testStressHandling
+{
+    NSTimeInterval timeout = 10.0;
+    NSTimeInterval idle = 0.7;
+    BOOL timedOut = NO;
+    
+    NSUInteger i = 0;
+    
+    NSDate *timeoutDate = [[NSDate alloc] initWithTimeIntervalSinceNow:timeout];
+    while (!timedOut) {
+        NSDate *tick = [[NSDate alloc] initWithTimeIntervalSinceNow:idle];
+        [[NSRunLoop currentRunLoop] runUntilDate:tick];
+        timedOut = ([tick compare:timeoutDate] == NSOrderedDescending);
+        
+        NSURL *url;
+        
+        if (i % 2 == 0) {
+            url = [NSURL URLWithString:@"https://dl.dropboxusercontent.com/u/995250/FreeStreamer/As%20long%20as%20the%20stars%20shine.mp3"];
+        } else {
+            url = [NSURL URLWithString:@"https://dl.dropboxusercontent.com/u/995250/FreeStreamer/5sec.mp3"];
+        }
+        
+        [_stream stop];
+        
+        [_stream playFromURL:url];
+        
+        NSLog(@"Cycle %lu", ++i);
+    }
+}
+
 - (void)testFileLength
 {
     [[NSNotificationCenter defaultCenter] addObserverForName:FSAudioStreamStateChangeNotification
