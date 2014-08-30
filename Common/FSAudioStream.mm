@@ -88,6 +88,9 @@
             /* OS X */
             
             // Default configuration is OK
+        
+            // No need to be so concervative with the cache sizes
+            self.maxPrebufferedByteCount = 16000000; // 16 MB
 #endif
     }
     
