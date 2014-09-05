@@ -1018,8 +1018,8 @@ void Audio_Stream::propertyValueCallback(void *inClientData, AudioFileStreamID i
             break;
         }
         case kAudioFileStreamProperty_ReadyToProducePackets: {
-            memset(&(THIS->m_srcFormat), 0, sizeof m_srcFormat);
-            UInt32 asbdSize = sizeof(m_srcFormat);
+            memset(&(THIS->m_srcFormat), 0, sizeof THIS->m_srcFormat);
+            UInt32 asbdSize = sizeof(THIS->m_srcFormat);
             OSStatus err = AudioFileStreamGetProperty(inAudioFileStream, kAudioFileStreamProperty_DataFormat, &asbdSize, &(THIS->m_srcFormat));
             if (err) {
                 AS_TRACE("Unable to set the src format\n");
