@@ -87,6 +87,8 @@
 
 - (void)viewDidAppear:(BOOL)animated
 {
+    [super viewDidAppear:animated];
+    
     if (_shouldStartPlaying) {
         _shouldStartPlaying = NO;
         
