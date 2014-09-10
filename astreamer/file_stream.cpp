@@ -98,19 +98,16 @@ done:
     
 size_t File_Stream::contentLength()
 {
-    SInt32 errorCode;
-    CFTypeRef prop;
-    if ((prop = CFURLCreatePropertyFromResource(kCFAllocatorDefault, m_url, kCFURLFileLength, &errorCode)) != NULL) {
-        CFNumberRef length = (CFNumberRef)prop;
-        
+    CFNumberRef length = NULL;
+    CFErrorRef err = NULL;
+
+    if (CFURLCopyResourcePropertyForKey(m_url, kCFURLFileSizeKey, &length, &err)) {
         CFIndex fileLength;
         if (CFNumberGetValue(length, kCFNumberCFIndexType, &fileLength)) {
-            CFRelease(prop);
+            CFRelease(length);
             
             return fileLength;
         }
-        
-        CFRelease(prop);
     }
     return 0;
 }
