@@ -1020,10 +1020,29 @@ void Audio_Stream::propertyValueCallback(void *inClientData, AudioFileStreamID i
         case kAudioFileStreamProperty_ReadyToProducePackets: {
             memset(&(THIS->m_srcFormat), 0, sizeof THIS->m_srcFormat);
             UInt32 asbdSize = sizeof(THIS->m_srcFormat);
+            UInt32 formatListSize = 0;
+            Boolean writable;
             OSStatus err = AudioFileStreamGetProperty(inAudioFileStream, kAudioFileStreamProperty_DataFormat, &asbdSize, &(THIS->m_srcFormat));
             if (err) {
                 AS_TRACE("Unable to set the src format\n");
                 break;
+            }
+
+            if (!AudioFileStreamGetPropertyInfo(inAudioFileStream, kAudioFileStreamProperty_FormatList, &formatListSize, &writable)) {
+                void *formatListData = calloc(1, formatListSize);
+                if (!AudioFileStreamGetProperty(inAudioFileStream, kAudioFileStreamProperty_FormatList, &formatListSize, formatListData)) {
+                    for (int i=0; i < formatListSize; i += sizeof(AudioFormatListItem)) {
+                        AudioStreamBasicDescription *pasbd = (AudioStreamBasicDescription *)formatListData + i;
+                        
+                        if (pasbd->mFormatID == kAudioFormatMPEG4AAC_HE ||
+                            pasbd->mFormatID == kAudioFormatMPEG4AAC_HE_V2) {
+                            THIS->m_srcFormat = *pasbd;
+                            break;
+                        }
+                    }
+                }
+                
+                free(formatListData);
             }
             
             THIS->m_packetDuration = THIS->m_srcFormat.mFramesPerPacket / THIS->m_srcFormat.mSampleRate;
