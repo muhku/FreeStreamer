@@ -16,6 +16,7 @@
 		60412CD718D0B150007A0277 /* player-top-bg.png in Resources */ = {isa = PBXBuildFile; fileRef = 60412CD118D0B150007A0277 /* player-top-bg.png */; };
 		6052B2BB19ACA11F00EAA7C8 /* input_stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6052B2B919ACA11F00EAA7C8 /* input_stream.cpp */; };
 		6052B2BE19ACB30200EAA7C8 /* file_stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6052B2BC19ACB30200EAA7C8 /* file_stream.cpp */; };
+		6087D8FA19D19A1100DCBD5F /* caching_stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6087D8F819D19A1100DCBD5F /* caching_stream.cpp */; };
 		60929A3B18F9907500A5BDEE /* AJNotificationView.m in Sources */ = {isa = PBXBuildFile; fileRef = 60929A3A18F9907500A5BDEE /* AJNotificationView.m */; };
 		60B813D618C532F8001CC5A7 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60B813D518C532F8001CC5A7 /* Foundation.framework */; };
 		60B813D818C532F8001CC5A7 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60B813D718C532F8001CC5A7 /* CoreGraphics.framework */; };
@@ -77,6 +78,8 @@
 		6052B2BA19ACA11F00EAA7C8 /* input_stream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = input_stream.h; sourceTree = "<group>"; };
 		6052B2BC19ACB30200EAA7C8 /* file_stream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = file_stream.cpp; sourceTree = "<group>"; };
 		6052B2BD19ACB30200EAA7C8 /* file_stream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = file_stream.h; sourceTree = "<group>"; };
+		6087D8F819D19A1100DCBD5F /* caching_stream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = caching_stream.cpp; sourceTree = "<group>"; };
+		6087D8F919D19A1100DCBD5F /* caching_stream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = caching_stream.h; sourceTree = "<group>"; };
 		60929A3918F9907500A5BDEE /* AJNotificationView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AJNotificationView.h; sourceTree = "<group>"; };
 		60929A3A18F9907500A5BDEE /* AJNotificationView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AJNotificationView.m; sourceTree = "<group>"; };
 		60B813D218C532F8001CC5A7 /* FreeStreamerMobile.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FreeStreamerMobile.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -287,6 +290,8 @@
 				6052B2BA19ACA11F00EAA7C8 /* input_stream.h */,
 				6052B2BC19ACB30200EAA7C8 /* file_stream.cpp */,
 				6052B2BD19ACB30200EAA7C8 /* file_stream.h */,
+				6087D8F819D19A1100DCBD5F /* caching_stream.cpp */,
+				6087D8F919D19A1100DCBD5F /* caching_stream.h */,
 			);
 			path = astreamer;
 			sourceTree = "<group>";
@@ -432,6 +437,7 @@
 				60CF8BFF18C5337000C657A8 /* FSCheckContentTypeRequest.m in Sources */,
 				60CF8C0318C5337000C657A8 /* FSXMLHttpRequest.m in Sources */,
 				60CF8C0018C5337000C657A8 /* FSParsePlaylistRequest.m in Sources */,
+				6087D8FA19D19A1100DCBD5F /* caching_stream.cpp in Sources */,
 				60B813E218C532F8001CC5A7 /* main.m in Sources */,
 				60CF8BE018C5333B00C657A8 /* FSFrequencyPlotView.m in Sources */,
 				60CF8BD818C5332F00C657A8 /* http_stream.cpp in Sources */,

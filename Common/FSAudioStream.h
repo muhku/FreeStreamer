@@ -142,6 +142,14 @@ typedef struct {
  * The HTTP user agent used for stream operations.
  */
 @property (nonatomic,strong) NSString *userAgent;
+/**
+ * The directory used for caching the streamed files.
+ */
+@property (nonatomic,strong) NSString *cacheDirectory;
+/**
+ * The property determining if caching the streams to the disk is enabled.
+ */
+@property (nonatomic,assign) BOOL cacheEnabled;
 
 @end
 

@@ -26,6 +26,8 @@ struct Stream_Configuration {
     int startupWatchdogPeriod;
     int maxPrebufferedByteCount;
     CFStringRef userAgent;
+    CFStringRef cacheDirectory;
+    bool cacheEnabled;
     
     static Stream_Configuration *configuration();
     

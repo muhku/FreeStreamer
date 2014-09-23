@@ -11,6 +11,9 @@
 #include "stream_configuration.h"
 #include "http_stream.h"
 #include "file_stream.h"
+#include "caching_stream.h"
+
+#include <CommonCrypto/CommonDigest.h>
 
 /*
  * Some servers may send an incorrect MIME type for the audio stream.
@@ -367,7 +370,23 @@ void Audio_Stream::setUrl(CFURLRef url)
     }
     
     if (HTTP_Stream::canHandleUrl(url)) {
-        m_inputStream = new HTTP_Stream();
+        Stream_Configuration *config = Stream_Configuration::configuration();
+        
+        if (config->cacheEnabled) {
+            Caching_Stream *cache = new Caching_Stream(new HTTP_Stream());
+            
+            CFStringRef urlString = CFURLGetString(url);
+            CFStringRef urlHash = createHashForString(urlString);
+            
+            cache->setCacheIdentifier(urlHash);
+            
+            CFRelease(urlHash);
+            
+            m_inputStream = cache;
+        } else {
+            m_inputStream = new HTTP_Stream();
+        }
+        
         m_inputStream->m_delegate = this;
     } else if (File_Stream::canHandleUrl(url)) {
         m_inputStream = new File_Stream();
@@ -728,6 +747,40 @@ void Audio_Stream::streamMetaDataAvailable(std::map<CFStringRef,CFStringRef> met
 }
     
 /* private */
+    
+CFStringRef Audio_Stream::createHashForString(CFStringRef str)
+{
+    UInt8 buf[4096];
+    CFIndex usedBytes = 0;
+    
+    CFStringGetBytes(str,
+                     CFRangeMake(0, CFStringGetLength(str)),
+                     kCFStringEncodingUTF8,
+                     '?',
+                     false,
+                     buf,
+                     4096,
+                     &usedBytes);
+    
+    CC_SHA1_CTX hashObject;
+    CC_SHA1_Init(&hashObject);
+    
+    CC_SHA1_Update(&hashObject,
+                   (const void *)buf,
+                   (CC_LONG)usedBytes);
+    
+    unsigned char digest[CC_SHA1_DIGEST_LENGTH];
+    CC_SHA1_Final(digest, &hashObject);
+    
+    char hash[2 * sizeof(digest) + 1];
+    for (size_t i = 0; i < sizeof(digest); ++i) {
+        snprintf(hash + (2 * i), 3, "%02x", (int)(digest[i]));
+    }
+    
+    return CFStringCreateWithCString(kCFAllocatorDefault,
+                                       (const char *)hash,
+                                       kCFStringEncodingUTF8);
+}
     
 Audio_Queue* Audio_Stream::audioQueue()
 {

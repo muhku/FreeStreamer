@@ -30,6 +30,8 @@ private:
     
     ID3_Parser *m_id3Parser;
     
+    CFStringRef m_contentType;
+    
     static void readCallBack(CFReadStreamRef stream, CFStreamEventType eventType, void *clientCallBackInfo);
     
 public:
@@ -39,6 +41,7 @@ public:
     Input_Stream_Position position();
     
     CFStringRef contentType();
+    void setContentType(CFStringRef contentType);
     size_t contentLength();
     
     bool open();

@@ -154,6 +154,8 @@ private:
     
     bool m_queueCanAcceptPackets;
     
+    CFStringRef createHashForString(CFStringRef str);
+    
     Audio_Queue *audioQueue();
     void closeAudioQueue();
     

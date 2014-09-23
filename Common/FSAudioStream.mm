@@ -51,6 +51,13 @@
         self.startupWatchdogPeriod = 30; // If the stream doesn't start to play in this seconds, the watchdog will fail it
         self.maxPrebufferedByteCount = 1000000; // 1 MB
         self.userAgent = [NSString stringWithFormat:@"FreeStreamer/%@ (%@)", freeStreamerReleaseVersion(), systemVersion];
+        self.cacheEnabled = NO; // Do not enable disk caching by default
+        
+        NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+        
+        if ([paths count] > 0) {
+            self.cacheDirectory = [paths objectAtIndex:0];
+        }
         
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 60000)
         AVAudioSession *session = [AVAudioSession sharedInstance];
@@ -601,7 +608,7 @@ public:
 
 -(NSString *)description
 {
-    return [NSString stringWithFormat:@"[FreeStreamer %@] URL: %@\nbufferCount: %i\nbufferSize: %i\nmaxPacketDescs: %i\ndecodeQueueSize: %i\nhttpConnectionBufferSize: %i\noutputSampleRate: %f\noutputNumChannels: %ld\nbounceInterval: %i\nmaxBounceCount: %i\nstartupWatchdogPeriod: %i\nmaxPrebufferedByteCount: %i\nformat: %@\nuserAgent: %@",
+    return [NSString stringWithFormat:@"[FreeStreamer %@] URL: %@\nbufferCount: %i\nbufferSize: %i\nmaxPacketDescs: %i\ndecodeQueueSize: %i\nhttpConnectionBufferSize: %i\noutputSampleRate: %f\noutputNumChannels: %ld\nbounceInterval: %i\nmaxBounceCount: %i\nstartupWatchdogPeriod: %i\nmaxPrebufferedByteCount: %i\nformat: %@\nuserAgent: %@\ncacheDirectory: %@\ncacheEnabled: %@",
             freeStreamerReleaseVersion(),
             self.url,
             self.configuration.bufferCount,
@@ -616,7 +623,9 @@ public:
             self.configuration.startupWatchdogPeriod,
             self.configuration.maxPrebufferedByteCount,
             self.formatDescription,
-            self.configuration.userAgent];
+            self.configuration.userAgent,
+            self.configuration.cacheDirectory,
+            (self.configuration.cacheEnabled ? @"YES" : @"NO")];
 }
 
 @end
@@ -663,11 +672,17 @@ public:
         c->bounceInterval           = configuration.bounceInterval;
         c->startupWatchdogPeriod    = configuration.startupWatchdogPeriod;
         c->maxPrebufferedByteCount  = configuration.maxPrebufferedByteCount;
+        c->cacheEnabled             = configuration.cacheEnabled;
         
         if (c->userAgent) {
             CFRelease(c->userAgent);
         }
         c->userAgent = CFStringCreateCopy(kCFAllocatorDefault, (__bridge CFStringRef)configuration.userAgent);
+        
+        if (c->cacheDirectory) {
+            CFRelease(c->cacheDirectory);
+        }
+        c->cacheDirectory = CFStringCreateCopy(kCFAllocatorDefault, (__bridge CFStringRef)configuration.cacheDirectory);
         
         _private = [[FSAudioStreamPrivate alloc] init];
         _private.stream = self;

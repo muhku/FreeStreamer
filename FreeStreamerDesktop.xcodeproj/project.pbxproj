@@ -36,6 +36,7 @@
 		6066DAE2182427A30005E1A2 /* FSXAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 6066DA64182422A50005E1A2 /* FSXAppDelegate.m */; };
 		6066DAE4182427A30005E1A2 /* FSXPlayerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6066DA66182422A50005E1A2 /* FSXPlayerViewController.m */; };
 		6066DAE5182427A30005E1A2 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6066DA6E182422D70005E1A2 /* main.m */; };
+		6087D8FD19D1CB4F00DCBD5F /* caching_stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6087D8FB19D1CB4F00DCBD5F /* caching_stream.cpp */; };
 		609F6DA718295684000E45B2 /* FSCheckContentTypeRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 609F6DA618295684000E45B2 /* FSCheckContentTypeRequest.m */; };
 		609F6DAA18295F54000E45B2 /* FSParsePlaylistRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 609F6DA918295F54000E45B2 /* FSParsePlaylistRequest.m */; };
 		60BCF70C18E4A400007B243E /* stream_configuration.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 60BCF70A18E4A400007B243E /* stream_configuration.cpp */; };
@@ -99,6 +100,8 @@
 		6066DA99182425090005E1A2 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.0.sdk/System/Library/Frameworks/AudioToolbox.framework; sourceTree = DEVELOPER_DIR; };
 		6066DA9B182425150005E1A2 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.0.sdk/System/Library/Frameworks/CFNetwork.framework; sourceTree = DEVELOPER_DIR; };
 		6066DA9D182425240005E1A2 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.0.sdk/System/Library/Frameworks/AVFoundation.framework; sourceTree = DEVELOPER_DIR; };
+		6087D8FB19D1CB4F00DCBD5F /* caching_stream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = caching_stream.cpp; path = astreamer/caching_stream.cpp; sourceTree = SOURCE_ROOT; };
+		6087D8FC19D1CB4F00DCBD5F /* caching_stream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = caching_stream.h; path = astreamer/caching_stream.h; sourceTree = SOURCE_ROOT; };
 		609F6DA518295684000E45B2 /* FSCheckContentTypeRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSCheckContentTypeRequest.h; sourceTree = "<group>"; };
 		609F6DA618295684000E45B2 /* FSCheckContentTypeRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSCheckContentTypeRequest.m; sourceTree = "<group>"; };
 		609F6DA818295F54000E45B2 /* FSParsePlaylistRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSParsePlaylistRequest.h; sourceTree = "<group>"; };
@@ -247,6 +250,8 @@
 		60322891182411F000B7027B /* astreamer */ = {
 			isa = PBXGroup;
 			children = (
+				6087D8FB19D1CB4F00DCBD5F /* caching_stream.cpp */,
+				6087D8FC19D1CB4F00DCBD5F /* caching_stream.h */,
 				6052B2C619ACD08D00EAA7C8 /* file_stream.cpp */,
 				6052B2C719ACD08D00EAA7C8 /* file_stream.h */,
 				6052B2C319ACD08700EAA7C8 /* input_stream.cpp */,
@@ -401,6 +406,7 @@
 				6052B2C519ACD08700EAA7C8 /* input_stream.cpp in Sources */,
 				604849E018662FE100E8F808 /* file_output.cpp in Sources */,
 				602C629B1847936B00EA657D /* Reachability.m in Sources */,
+				6087D8FD19D1CB4F00DCBD5F /* caching_stream.cpp in Sources */,
 				6066DAD2182427A30005E1A2 /* FSAudioController.m in Sources */,
 				6066DAD4182427A30005E1A2 /* FSAudioStream.mm in Sources */,
 				6066DAD8182427A30005E1A2 /* FSPlaylistItem.m in Sources */,

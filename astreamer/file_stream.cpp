@@ -16,7 +16,8 @@ File_Stream::File_Stream() :
     m_scheduledInRunLoop(false),
     m_readPending(false),
     m_fileReadBuffer(0),
-    m_id3Parser(new ID3_Parser())
+    m_id3Parser(new ID3_Parser()),
+    m_contentType(0)
 {
     m_id3Parser->m_delegate = this;
 }
@@ -34,6 +35,10 @@ File_Stream::~File_Stream()
     }
     
     delete m_id3Parser, m_id3Parser = 0;
+    
+    if (m_contentType) {
+        CFRelease(m_contentType);
+    }
 }
     
 Input_Stream_Position File_Stream::position()
@@ -43,6 +48,13 @@ Input_Stream_Position File_Stream::position()
     
 CFStringRef File_Stream::contentType()
 {
+    if (m_contentType) {
+        // Use the provided content type
+        return m_contentType;
+    }
+    
+    // Try to resolve the content type from the file
+    
     CFStringRef contentType = CFSTR("");
     CFStringRef pathComponent = 0;
     CFIndex len = 0;
@@ -94,6 +106,16 @@ done:
     }
     
     return contentType;
+}
+    
+void File_Stream::setContentType(CFStringRef contentType)
+{
+    if (m_contentType) {
+        CFRelease(m_contentType), m_contentType = 0;
+    }
+    if (contentType) {
+        m_contentType = CFStringCreateCopy(kCFAllocatorDefault, contentType);
+    }
 }
     
 size_t File_Stream::contentLength()
