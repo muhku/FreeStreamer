@@ -295,7 +295,7 @@ void Caching_Stream::streamHasBytesAvailable(UInt8 *data, UInt32 numBytes)
                 }
             }
             
-            if (m_writable) {
+            if (m_writable && m_fileOutput) {
                 m_writable &= (m_fileOutput->write(data, numBytes) > 0);
             }
         }
