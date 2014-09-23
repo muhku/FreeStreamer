@@ -28,6 +28,7 @@ struct Stream_Configuration {
     CFStringRef userAgent;
     CFStringRef cacheDirectory;
     bool cacheEnabled;
+    int maxDiskCacheSize;
     
     static Stream_Configuration *configuration();
     

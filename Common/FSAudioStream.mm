@@ -52,6 +52,7 @@
         self.maxPrebufferedByteCount = 1000000; // 1 MB
         self.userAgent = [NSString stringWithFormat:@"FreeStreamer/%@ (%@)", freeStreamerReleaseVersion(), systemVersion];
         self.cacheEnabled = NO; // Do not enable disk caching by default
+        self.maxDiskCacheSize = 100000000;
         
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
         
@@ -249,6 +250,61 @@ public:
     
     delete _audioStream, _audioStream = nil;
     delete _observer, _observer = nil;
+    
+    // Clean up the disk cache.
+    
+    if (!self.configuration.cacheEnabled) {
+        // Don't clean up if cache not enabled
+        return;
+    }
+    
+    unsigned long long totalCacheSize = 0;
+    
+    NSArray *files = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:self.configuration.cacheDirectory error:nil];
+    if (!files) {
+        return;
+    }
+    
+    // Calculate the total size
+    for (NSString *file in files) {
+        if ([file hasPrefix:@"FSCache-"]) {
+            NSString *fullPath = [NSString stringWithFormat:@"%@/%@", self.configuration.cacheDirectory, file];
+            
+            NSDictionary *fileAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:fullPath error:nil];
+            
+            NSNumber *fileSizeNumber = [fileAttributes objectForKey:NSFileSize];
+            totalCacheSize += [fileSizeNumber longLongValue];
+        }
+    }
+    
+    // And finally do the cleanup
+    for (NSString *file in files) {
+        if (totalCacheSize < self.configuration.maxDiskCacheSize) {
+            // Enough cache cleanup done
+            break;
+        }
+        
+        if ([file hasPrefix:@"FSCache-"] && ![file hasSuffix:@".metadata"]) {
+            NSString *contentPath = [NSString stringWithFormat:@"%@/%@", self.configuration.cacheDirectory, file];
+            NSDictionary *contentAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:contentPath error:nil];
+            NSNumber *contentFileSize = [contentAttributes objectForKey:NSFileSize];
+            
+            NSString *metaDataPath = [NSString stringWithFormat:@"%@/%@.metadata", self.configuration.cacheDirectory, file];
+            NSDictionary *metaDataAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:metaDataPath error:nil];
+            NSNumber *metaDataSize = [metaDataAttributes objectForKey:NSFileSize];
+            
+            // Firstly try removing the meta data file.
+            if (![[NSFileManager defaultManager] removeItemAtPath:metaDataPath error:nil]) {
+                continue;
+            }
+            totalCacheSize -= [metaDataSize longLongValue];
+                
+            if (![[NSFileManager defaultManager] removeItemAtPath:contentPath error:nil]) {
+                continue;
+            }
+            totalCacheSize -= [contentFileSize longLongValue];
+        }
+    }
 }
 
 - (AudioStreamStateObserver *)streamStateObserver
@@ -608,7 +664,7 @@ public:
 
 -(NSString *)description
 {
-    return [NSString stringWithFormat:@"[FreeStreamer %@] URL: %@\nbufferCount: %i\nbufferSize: %i\nmaxPacketDescs: %i\ndecodeQueueSize: %i\nhttpConnectionBufferSize: %i\noutputSampleRate: %f\noutputNumChannels: %ld\nbounceInterval: %i\nmaxBounceCount: %i\nstartupWatchdogPeriod: %i\nmaxPrebufferedByteCount: %i\nformat: %@\nuserAgent: %@\ncacheDirectory: %@\ncacheEnabled: %@",
+    return [NSString stringWithFormat:@"[FreeStreamer %@] URL: %@\nbufferCount: %i\nbufferSize: %i\nmaxPacketDescs: %i\ndecodeQueueSize: %i\nhttpConnectionBufferSize: %i\noutputSampleRate: %f\noutputNumChannels: %ld\nbounceInterval: %i\nmaxBounceCount: %i\nstartupWatchdogPeriod: %i\nmaxPrebufferedByteCount: %i\nformat: %@\nuserAgent: %@\ncacheDirectory: %@\ncacheEnabled: %@\nmaxDiskCacheSize: %i",
             freeStreamerReleaseVersion(),
             self.url,
             self.configuration.bufferCount,
@@ -625,7 +681,8 @@ public:
             self.formatDescription,
             self.configuration.userAgent,
             self.configuration.cacheDirectory,
-            (self.configuration.cacheEnabled ? @"YES" : @"NO")];
+            (self.configuration.cacheEnabled ? @"YES" : @"NO"),
+            self.configuration.maxDiskCacheSize];
 }
 
 @end
@@ -673,6 +730,7 @@ public:
         c->startupWatchdogPeriod    = configuration.startupWatchdogPeriod;
         c->maxPrebufferedByteCount  = configuration.maxPrebufferedByteCount;
         c->cacheEnabled             = configuration.cacheEnabled;
+        c->maxDiskCacheSize         = configuration.maxDiskCacheSize;
         
         if (c->userAgent) {
             CFRelease(c->userAgent);

@@ -150,6 +150,10 @@ typedef struct {
  * The property determining if caching the streams to the disk is enabled.
  */
 @property (nonatomic,assign) BOOL cacheEnabled;
+/**
+ * The maximum size of the disk cache in bytes.
+ */
+@property (nonatomic,assign) int maxDiskCacheSize;
 
 @end
 
