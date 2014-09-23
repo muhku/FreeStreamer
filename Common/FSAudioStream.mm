@@ -51,7 +51,8 @@
 
 @end
 
-static NSInteger sortCacheObjects(id co1, id co2, void *keyForSorting) {
+static NSInteger sortCacheObjects(id co1, id co2, void *keyForSorting)
+{
     FSCacheObject *cached1 = (FSCacheObject *)co1;
     FSCacheObject *cached2 = (FSCacheObject *)co2;
     
