@@ -31,6 +31,7 @@
 @property (strong,nonatomic) NSString *name;
 @property (strong,nonatomic) NSDictionary *attributes;
 @property (nonatomic,readonly) unsigned long long fileSize;
+@property (nonatomic,readonly) NSDate *modificationDate;
 
 @end
 
@@ -42,7 +43,23 @@
     return [fileSizeNumber longLongValue];
 }
 
+- (NSDate *)modificationDate
+{
+    NSDate *date = [self.attributes objectForKey:NSFileModificationDate];
+    return date;
+}
+
 @end
+
+static NSInteger sortCacheObjects(id co1, id co2, void *keyForSorting) {
+    FSCacheObject *cached1 = (FSCacheObject *)co1;
+    FSCacheObject *cached2 = (FSCacheObject *)co2;
+    
+    NSDate *d1 = cached1.modificationDate;
+    NSDate *d2 = cached2.modificationDate;
+    
+    return [d1 compare:d2];
+}
 
 @implementation FSStreamConfiguration
 
@@ -296,6 +313,10 @@ public:
             }
         }
     }
+    
+    // Sort by the modification date.
+    // In this way the older content will be removed first from the cache.
+    [cachedFiles sortUsingFunction:sortCacheObjects context:NULL];
     
     for (FSCacheObject *cacheObj in cachedFiles) {
         if (totalCacheSize < self.configuration.maxDiskCacheSize) {
