@@ -24,6 +24,26 @@
 #import <MediaPlayer/MediaPlayer.h>
 #endif
 
+@interface FSCacheObject : NSObject {
+}
+
+@property (strong,nonatomic) NSString *path;
+@property (strong,nonatomic) NSString *name;
+@property (strong,nonatomic) NSDictionary *attributes;
+@property (nonatomic,readonly) unsigned long long fileSize;
+
+@end
+
+@implementation FSCacheObject
+
+- (unsigned long long)fileSize
+{
+    NSNumber *fileSizeNumber = [self.attributes objectForKey:NSFileSize];
+    return [fileSizeNumber longLongValue];
+}
+
+@end
+
 @implementation FSStreamConfiguration
 
 - (id)init
@@ -260,50 +280,42 @@ public:
     
     unsigned long long totalCacheSize = 0;
     
-    NSArray *files = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:self.configuration.cacheDirectory error:nil];
-    if (!files) {
-        return;
-    }
+    NSMutableArray *cachedFiles = [[NSMutableArray alloc] init];
     
-    // Calculate the total size
-    for (NSString *file in files) {
+    for (NSString *file in [[NSFileManager defaultManager] contentsOfDirectoryAtPath:self.configuration.cacheDirectory error:nil]) {
         if ([file hasPrefix:@"FSCache-"]) {
-            NSString *fullPath = [NSString stringWithFormat:@"%@/%@", self.configuration.cacheDirectory, file];
+            FSCacheObject *cacheObj = [[FSCacheObject alloc] init];
+            cacheObj.name = file;
+            cacheObj.path = [NSString stringWithFormat:@"%@/%@", self.configuration.cacheDirectory, cacheObj.name];
+            cacheObj.attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:cacheObj.path error:nil];
             
-            NSDictionary *fileAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:fullPath error:nil];
+            totalCacheSize += [cacheObj fileSize];
             
-            NSNumber *fileSizeNumber = [fileAttributes objectForKey:NSFileSize];
-            totalCacheSize += [fileSizeNumber longLongValue];
+            if (![cacheObj.name hasSuffix:@".metadata"]) {
+                [cachedFiles addObject:cacheObj];
+            }
         }
     }
     
-    // And finally do the cleanup
-    for (NSString *file in files) {
+    for (FSCacheObject *cacheObj in cachedFiles) {
         if (totalCacheSize < self.configuration.maxDiskCacheSize) {
-            // Enough cache cleanup done
             break;
         }
         
-        if ([file hasPrefix:@"FSCache-"] && ![file hasSuffix:@".metadata"]) {
-            NSString *contentPath = [NSString stringWithFormat:@"%@/%@", self.configuration.cacheDirectory, file];
-            NSDictionary *contentAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:contentPath error:nil];
-            NSNumber *contentFileSize = [contentAttributes objectForKey:NSFileSize];
-            
-            NSString *metaDataPath = [NSString stringWithFormat:@"%@/%@.metadata", self.configuration.cacheDirectory, file];
-            NSDictionary *metaDataAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:metaDataPath error:nil];
-            NSNumber *metaDataSize = [metaDataAttributes objectForKey:NSFileSize];
-            
-            // Firstly try removing the meta data file.
-            if (![[NSFileManager defaultManager] removeItemAtPath:metaDataPath error:nil]) {
-                continue;
-            }
-            totalCacheSize -= [metaDataSize longLongValue];
-                
-            if (![[NSFileManager defaultManager] removeItemAtPath:contentPath error:nil]) {
-                continue;
-            }
-            totalCacheSize -= [contentFileSize longLongValue];
+        FSCacheObject *cachedMetaData = [[FSCacheObject alloc] init];
+        cachedMetaData.name = [NSString stringWithFormat:@"%@.metadata", cacheObj.name];
+        cachedMetaData.path = [NSString stringWithFormat:@"%@/%@", self.configuration.cacheDirectory, cachedMetaData.name];
+        cachedMetaData.attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:cachedMetaData.path error:nil];
+        
+        if (![[NSFileManager defaultManager] removeItemAtPath:cachedMetaData.path error:nil]) {
+            continue;
         }
+        totalCacheSize -= [cachedMetaData fileSize];
+                
+        if (![[NSFileManager defaultManager] removeItemAtPath:cacheObj.path error:nil]) {
+            continue;
+        }
+        totalCacheSize -= [cacheObj fileSize];
     }
 }
 
