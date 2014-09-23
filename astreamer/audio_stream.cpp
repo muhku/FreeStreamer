@@ -378,9 +378,12 @@ void Audio_Stream::setUrl(CFURLRef url)
             CFStringRef urlString = CFURLGetString(url);
             CFStringRef urlHash = createHashForString(urlString);
             
-            cache->setCacheIdentifier(urlHash);
+            CFStringRef cacheIdentifier = CFStringCreateWithFormat(NULL, NULL, CFSTR("FSCache-%@"), urlHash);
+            
+            cache->setCacheIdentifier(cacheIdentifier);
             
             CFRelease(urlHash);
+            CFRelease(cacheIdentifier);
             
             m_inputStream = cache;
         } else {

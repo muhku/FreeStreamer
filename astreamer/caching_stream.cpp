@@ -288,10 +288,16 @@ void Caching_Stream::streamHasBytesAvailable(UInt8 *data, UInt32 numBytes)
     if (m_cacheable) {
         if (numBytes > 0) {
             if (!m_fileOutput) {
-                m_fileOutput = new File_Output(m_fileUrl);
+                if (m_fileUrl) {
+                    m_fileOutput = new File_Output(m_fileUrl);
+                
+                    m_writable = true;
+                }
             }
             
-            m_writable = (m_fileOutput->write(data, numBytes) > 0);
+            if (m_writable) {
+                m_writable &= (m_fileOutput->write(data, numBytes) > 0);
+            }
         }
     }
     if (m_delegate) {
