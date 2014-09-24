@@ -40,6 +40,8 @@
     FSAudioController *_controller;
     FSSeekByteOffset _lastSeekByteOffset;
     NSURL *_lastPlaybackURL;
+    
+    float _maxPrebufferedByteCount;
 }
 
 /**

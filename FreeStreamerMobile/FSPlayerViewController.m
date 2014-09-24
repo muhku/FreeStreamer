@@ -78,6 +78,8 @@
     [self.audioController setVolume:_outputVolume];
     self.volumeSlider.value = _outputVolume;
     
+    _maxPrebufferedByteCount = (float)self.audioController.stream.configuration.maxPrebufferedByteCount;
+    
 #if ENABLE_ANALYZER
     self.analyzer.enabled = YES;
 #else
@@ -536,7 +538,7 @@
     
     self.bufferingIndicator.hidden = NO;
     
-    self.bufferingIndicator.progress = (float)self.audioController.stream.prebufferedByteCount / (float)self.audioController.stream.configuration.maxPrebufferedByteCount;
+    self.bufferingIndicator.progress = (float)self.audioController.stream.prebufferedByteCount / _maxPrebufferedByteCount;
 }
 
 - (void)seekToNewTime
