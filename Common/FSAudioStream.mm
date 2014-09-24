@@ -89,7 +89,7 @@ static NSInteger sortCacheObjects(id co1, id co2, void *keyForSorting)
         self.startupWatchdogPeriod = 30; // If the stream doesn't start to play in this seconds, the watchdog will fail it
         self.maxPrebufferedByteCount = 1000000; // 1 MB
         self.userAgent = [NSString stringWithFormat:@"FreeStreamer/%@ (%@)", freeStreamerReleaseVersion(), systemVersion];
-        self.cacheEnabled = NO; // Do not enable disk caching by default
+        self.cacheEnabled = YES;
         self.maxDiskCacheSize = 100000000;
         
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);

@@ -16,9 +16,11 @@
 #if !defined (CS_DEBUG)
 #define CS_TRACE(...) do {} while (0)
 #define CS_TRACE_CFSTRING(X) do {} while (0)
+#define CS_TRACE_CFURL(X) do {} while (0)
 #else
 #define CS_TRACE(...) printf(__VA_ARGS__)
 #define CS_TRACE_CFSTRING(X) CS_TRACE("%s\n", CFStringGetCStringPtr(X, kCFStringEncodingMacRoman))
+#define CS_TRACE_CFURL(X) CS_TRACE_CFSTRING(CFURLGetString(X))
 #endif
 
 namespace astreamer {
@@ -149,12 +151,17 @@ bool Caching_Stream::open()
         
         readMetaData();
         
+        CS_TRACE("Playing file from cache\n");
+        CS_TRACE_CFURL(m_fileUrl);
+        
         status = m_fileStream->open();
     } else {
         m_cacheable = true;
         m_writable  = false;
         m_useCache  = false;
         m_cacheMetaDataWritten = false;
+        
+        CS_TRACE("File not cached\n");
     
         status = m_target->open();
     }
@@ -175,12 +182,17 @@ bool Caching_Stream::open(const Input_Stream_Position& position)
         
         readMetaData();
         
+        CS_TRACE("Playing file from cache\n");
+        CS_TRACE_CFURL(m_fileUrl);
+        
         status = m_fileStream->open(position);
     } else {
         m_cacheable = false;
         m_writable  = false;
         m_useCache  = false;
         m_cacheMetaDataWritten = false;
+        
+        CS_TRACE("File not cached\n");
         
         status = m_target->open(position);
     }
@@ -278,6 +290,11 @@ void Caching_Stream::streamIsReadyRead()
         m_cacheable = (m_target->contentLength() > 0);
     }
     
+#if CS_DEBUG
+    if (m_cacheable) CS_TRACE("Stream can be cached!\n");
+    else CS_TRACE("Stream cannot be cached\n");
+#endif
+    
     if (m_delegate) {
         m_delegate->streamIsReadyRead();
     }
@@ -289,6 +306,8 @@ void Caching_Stream::streamHasBytesAvailable(UInt8 *data, UInt32 numBytes)
         if (numBytes > 0) {
             if (!m_fileOutput) {
                 if (m_fileUrl) {
+                    CS_TRACE("Caching started for stream\n");
+                    
                     m_fileOutput = new File_Output(m_fileUrl);
                 
                     m_writable = true;
@@ -314,6 +333,7 @@ void Caching_Stream::streamEndEncountered()
     if (m_cacheable) {
         if (m_writable) {
             CS_TRACE("Successfully cached the stream\n");
+            CS_TRACE_CFURL(m_fileUrl);
             
             // We only write the meta data if the stream was successfully streamed.
             // In that way we can use the meta data as an indicator that there is a file to stream.
@@ -350,6 +370,9 @@ void Caching_Stream::streamEndEncountered()
                     CFRelease(writeStream);
                 }
                 
+                m_cacheable = false;
+                m_writable  = false;
+                m_useCache  = true;
                 m_cacheMetaDataWritten = true;
             }
         }
