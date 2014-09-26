@@ -28,11 +28,14 @@
     BOOL _paused;
     BOOL _shouldStartPlaying;
     float _outputVolume;
+    BOOL _analyzerEnabled;
     
     // UI
     NSTimer *_progressUpdateTimer;
     NSTimer *_playbackSeekTimer;
     double _seekToPoint;
+    
+    FSFrequencyDomainAnalyzer *_analyzer;
     
     NSURL *_stationURL;
     UIBarButtonItem *_infoButton;
@@ -65,6 +68,10 @@
  */
 @property (nonatomic,strong) IBOutlet UIButton *pauseButton;
 /**
+ * Reference to the pause button.
+ */
+@property (nonatomic,strong) IBOutlet UIButton *analyzerButton;
+/**
  * Reference to the progress slider.
  */
 @property (nonatomic,strong) IBOutlet UISlider *progressSlider;
@@ -84,10 +91,6 @@
  * Reference to the audio controller.
  */
 @property (nonatomic,strong) FSAudioController *audioController;
-/**
- * Frequency analyzer.
- */
-@property (nonatomic,strong) FSFrequencyDomainAnalyzer *analyzer;
 /**
  * Reference to the frequency plot.
  */
@@ -149,5 +152,11 @@
  * @param sender The sender of the action.
  */
 - (IBAction)changeVolume:(id)sender;
+/**
+ * An action for toggling the analyzer on/off.
+ *
+ * @param sender The sender of the action.
+ */
+- (IBAction)toggleAnalyzer:(id)sender;
 
 @end

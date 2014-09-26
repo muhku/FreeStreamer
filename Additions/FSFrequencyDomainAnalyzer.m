@@ -40,7 +40,6 @@
     DSPSplitComplex _complexSplit;
     FFTSetup _fft;
 
-    BOOL _shouldExit;
     BOOL _bufferModified;
     BOOL _busy;
 
@@ -98,7 +97,7 @@
 
 - (void)dealloc
 {
-    _shouldExit = YES;
+    self.shouldExit = YES;
 
     vDSP_destroy_fftsetup(_fft);
 }
@@ -110,7 +109,7 @@
            return;
        }
        
-       if (_shouldExit) {
+       if (self.shouldExit) {
            return;
        }
 
@@ -188,7 +187,7 @@
 
         [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode
                                  beforeDate:[NSDate distantFuture]];
-    } while (!_shouldExit); 
+    } while (!self.shouldExit);
 }
 
 - (void)processSamples:(const int16_t *)samples

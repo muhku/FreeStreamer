@@ -16,6 +16,7 @@
 
 @property (nonatomic,unsafe_unretained) IBOutlet id<FSFrequencyDomainAnalyzerDelegate> delegate;
 @property (nonatomic,assign) BOOL enabled;
+@property (nonatomic,assign) BOOL shouldExit;
 
 - (void)audioStream:(FSAudioStream *)audioStream samplesAvailable:(const int16_t *)samples count:(NSUInteger)count;
 

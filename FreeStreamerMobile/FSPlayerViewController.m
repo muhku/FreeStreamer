@@ -15,15 +15,6 @@
 #import "FSFrequencyPlotView.h"
 #import "AJNotificationView.h"
 
-/*
- * Comment the following line, if you want to disable the frequency analyzer.
- *
- * Do not unnecessarily enable the analyzer, as it will consume considerable
- * amount of CPU, thus, battery. It is enabled by default as a sake of
- * demonstration.
- */
-#define ENABLE_ANALYZER 1
-
 @interface FSPlayerViewController ()
 
 - (void)clearStatus;
@@ -79,12 +70,6 @@
     self.volumeSlider.value = _outputVolume;
     
     _maxPrebufferedByteCount = (float)self.audioController.stream.configuration.maxPrebufferedByteCount;
-    
-#if ENABLE_ANALYZER
-    self.analyzer.enabled = YES;
-#else
-    self.frequencyPlotView.hidden = YES;
-#endif
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -150,11 +135,6 @@
     _infoButton = self.navigationItem.rightBarButtonItem;
     
     _outputVolume = 0.5;
-    
-#if ENABLE_ANALYZER
-    self.analyzer = [[FSFrequencyDomainAnalyzer alloc] init];
-    self.analyzer.delegate = self.frequencyPlotView;
-#endif
 }
 
 - (void)viewDidUnload
@@ -199,10 +179,9 @@
     // Free the resources (audio queue, etc.)
     _audioController = nil;
     
-#if ENABLE_ANALYZER
-    self.analyzer.enabled = NO;
-    [self.frequencyPlotView reset];
-#endif
+    if (_analyzerEnabled) {
+        [self toggleAnalyzer:self];
+    }
     
     if (_progressUpdateTimer) {
         [_progressUpdateTimer invalidate], _progressUpdateTimer = nil;
@@ -319,16 +298,12 @@
 
 - (void)applicationDidEnterBackgroundNotification:(NSNotification *)notification
 {
-#if ENABLE_ANALYZER
-    self.analyzer.enabled = NO;
-#endif
+    _analyzer.enabled = NO;
 }
 
 - (void)applicationWillEnterForegroundNotification:(NSNotification *)notification
 {
-#if ENABLE_ANALYZER
-    self.analyzer.enabled = YES;
-#endif
+    _analyzer.enabled = _analyzerEnabled;
 }
 
 - (void)audioStreamErrorOccurred:(NSNotification *)notification
@@ -451,6 +426,28 @@
     [self.audioController setVolume:_outputVolume];
 }
 
+- (IBAction)toggleAnalyzer:(id)sender
+{
+    if (!_analyzerEnabled) {
+        _analyzer = [[FSFrequencyDomainAnalyzer alloc] init];
+        _analyzer.delegate = self.frequencyPlotView;
+        _analyzer.enabled = YES;
+        
+        self.frequencyPlotView.hidden = NO;
+        _audioController.stream.delegate = _analyzer;
+    } else {
+        _audioController.stream.delegate = nil;
+        
+        [self.frequencyPlotView reset];
+        self.frequencyPlotView.hidden = YES;
+        
+        _analyzer.shouldExit = YES;
+        _analyzer = nil;
+    }
+    
+    _analyzerEnabled = (!_analyzerEnabled);
+}
+
 /*
  * =======================================
  * Properties
@@ -475,10 +472,6 @@
 {
     if (!_audioController) {
         _audioController = [[FSAudioController alloc] init];
-        
-#if ENABLE_ANALYZER
-        _audioController.stream.delegate = self.analyzer;
-#endif
     }
     return _audioController;
 }
