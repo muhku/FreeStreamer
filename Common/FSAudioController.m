@@ -192,7 +192,12 @@
 - (void)play
 {
     @synchronized (self) {
-        if (self.stream.cached && [self.playlistItems count] == 0) {
+        if ([self.url isFileURL] && [self.playlistItems count] == 0) {
+            /*
+             * Directly play file URLs without checking from network.
+             */
+            [self.audioStream play];
+        } else if (self.stream.cached && [self.playlistItems count] == 0) {
             /*
              * Start playing the cached streams immediately without checking from network.
              */
