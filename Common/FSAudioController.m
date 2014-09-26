@@ -192,7 +192,12 @@
 - (void)play
 {
     @synchronized (self) {
-        if (self.readyToPlay) {
+        if (self.stream.cached && [self.playlistItems count] == 0) {
+            /*
+             * Start playing the cached streams immediately without checking from network.
+             */
+            [self.audioStream play];
+        } else if (self.readyToPlay) {
             /*
              * All prework done; we should have a playable URL for the stream.
              * Start playback.

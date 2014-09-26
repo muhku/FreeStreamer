@@ -81,6 +81,8 @@ public:
     CFStringRef sourceFormatDescription();
     CFStringRef contentType();
     
+    CFStringRef createCacheIdentifierForURL(CFURLRef url);
+    
     size_t cachedDataSize();
     
     /* Audio_Queue_Delegate */

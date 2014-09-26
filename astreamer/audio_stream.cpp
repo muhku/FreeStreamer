@@ -375,14 +375,10 @@ void Audio_Stream::setUrl(CFURLRef url)
         if (config->cacheEnabled) {
             Caching_Stream *cache = new Caching_Stream(new HTTP_Stream());
             
-            CFStringRef urlString = CFURLGetString(url);
-            CFStringRef urlHash = createHashForString(urlString);
-            
-            CFStringRef cacheIdentifier = CFStringCreateWithFormat(NULL, NULL, CFSTR("FSCache-%@"), urlHash);
+            CFStringRef cacheIdentifier = createCacheIdentifierForURL(url);
             
             cache->setCacheIdentifier(cacheIdentifier);
             
-            CFRelease(urlHash);
             CFRelease(cacheIdentifier);
             
             m_inputStream = cache;
@@ -466,6 +462,18 @@ CFStringRef Audio_Stream::sourceFormatDescription()
 CFStringRef Audio_Stream::contentType()
 {
     return m_contentType;
+}
+    
+CFStringRef Audio_Stream::createCacheIdentifierForURL(CFURLRef url)
+{
+    CFStringRef urlString = CFURLGetString(url);
+    CFStringRef urlHash = createHashForString(urlString);
+    
+    CFStringRef cacheIdentifier = CFStringCreateWithFormat(NULL, NULL, CFSTR("FSCache-%@"), urlHash);
+    
+    CFRelease(urlHash);
+    
+    return cacheIdentifier;
 }
     
 size_t Audio_Stream::cachedDataSize()

@@ -316,6 +316,10 @@ NSString*             freeStreamerReleaseVersion();
  */
 @property (nonatomic,readonly) BOOL continuous;
 /**
+ * The property is true if the stream has been cached locally.
+ */
+@property (nonatomic,readonly) BOOL cached;
+/**
  * This property has the number of bytes buffered for this stream.
  */
 @property (nonatomic,readonly) size_t prebufferedByteCount;

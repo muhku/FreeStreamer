@@ -213,6 +213,7 @@ public:
 @property (readonly) FSSeekByteOffset currentSeekByteOffset;
 @property (readonly) FSStreamConfiguration *configuration;
 @property (readonly) NSString *formatDescription;
+@property (readonly) BOOL cached;
 @property (copy) void (^onCompletion)();
 @property (copy) void (^onFailure)();
 @property (nonatomic,assign) FSAudioStreamError lastError;
@@ -546,6 +547,17 @@ public:
 - (NSString *)formatDescription
 {
     return CFBridgingRelease(_audioStream->sourceFormatDescription());
+}
+
+- (BOOL)cached
+{
+    NSString *cacheIdentifier = (NSString*)CFBridgingRelease(_audioStream->createCacheIdentifierForURL((__bridge CFURLRef)self.url));
+    
+    NSString *fullPath = [NSString stringWithFormat:@"%@/%@.metadata", self.configuration.cacheDirectory, cacheIdentifier];
+    
+    BOOL cachedFileExists = [[NSFileManager defaultManager] fileExistsAtPath:fullPath];
+    
+    return cachedFileExists;
 }
 
 - (void)reachabilityChanged:(NSNotification *)note
@@ -927,6 +939,11 @@ public:
 {
     FSStreamPosition duration = self.duration;
     return (duration.minute == 0 && duration.second == 0);
+}
+
+- (BOOL)cached
+{
+    return _private.cached;
 }
 
 - (size_t)prebufferedByteCount
