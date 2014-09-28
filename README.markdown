@@ -19,6 +19,11 @@ Documentation
 
 See the [FAQ](https://github.com/muhku/FreeStreamer/wiki/FreeStreamer-FAQ) (Frequently Asked Questions) in the wiki. We also have an [API documentation](http://freestreamer.io/api/) available. The [usage instructions](https://github.com/muhku/FreeStreamer/wiki/Using-the-player-in-your-own-project) are also covered in the wiki.
 
+Is somebody using this in real life?
+====================
+
+The short answer is yes! Check out our [website](http://freestreamer.io/) for the reference applications.
+
 Reporting bugs and contributing
 ====================
 
