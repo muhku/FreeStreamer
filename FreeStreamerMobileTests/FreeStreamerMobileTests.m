@@ -407,6 +407,12 @@
                                                       XCTAssertTrue([stationName isEqualToString:@"BBC 5Live"], @"Station name does not match.");
                                                   }];
     
+    _controller.stream.onMetaDataAvailable = ^(NSDictionary *metaData) {
+        NSString *stationName = metaData[@"IcecastStationName"];
+        
+        XCTAssertTrue([stationName isEqualToString:@"BBC 5Live"], @"Station name does not match.");
+    };
+    
     _controller.url = [NSURL URLWithString:@"http://www.bbc.co.uk/radio/listen/live/r5l_aaclca.pls"];
     [_controller play];
     
