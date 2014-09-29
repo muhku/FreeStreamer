@@ -1089,7 +1089,7 @@ void AudioStreamStateObserver::audioStreamStateChanged(astreamer::Audio_Stream::
 {
     NSNumber *fsAudioState;
     
-    FSAudioStreamState streamerState = kFsAudioStreamUnknown;
+    FSAudioStreamState streamerState = kFsAudioStreamUnknownState;
     
     switch (state) {
         case astreamer::Audio_Stream::STOPPED:
@@ -1134,7 +1134,7 @@ void AudioStreamStateObserver::audioStreamStateChanged(astreamer::Audio_Stream::
 #endif
             break;
         default:
-            streamerState = kFsAudioStreamUnknown;
+            streamerState = kFsAudioStreamUnknownState;
             /* unknown state */
             return;
             

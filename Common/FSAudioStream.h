@@ -54,7 +54,7 @@ typedef enum {
     kFsAudioStreamSeeking,
     kFSAudioStreamEndOfFile,
     kFsAudioStreamFailed,
-    kFsAudioStreamUnknown
+    kFsAudioStreamUnknownState
 } FSAudioStreamState;
 
 /**
