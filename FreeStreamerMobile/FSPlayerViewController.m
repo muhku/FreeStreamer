@@ -70,37 +70,6 @@
     self.volumeSlider.value = _outputVolume;
     
     _maxPrebufferedByteCount = (float)self.audioController.stream.configuration.maxPrebufferedByteCount;
-}
-
-- (void)viewDidAppear:(BOOL)animated
-{
-    [super viewDidAppear:animated];
-    
-    if (_shouldStartPlaying) {
-        _shouldStartPlaying = NO;
-        
-        if ([self.audioController.url isEqual:_lastPlaybackURL]) {
-            // The same file was playing from a position, resume
-            [self.audioController.stream playFromOffset:_lastSeekByteOffset];
-        } else {
-            [self.audioController play];
-        }
-    }
-    
-    [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
-    
-    [self becomeFirstResponder];
-    
-    _progressUpdateTimer = [NSTimer scheduledTimerWithTimeInterval:1.0
-                                                            target:self
-                                                          selector:@selector(updatePlaybackProgress)
-                                                          userInfo:nil
-                                                           repeats:YES];
-}
-
-- (void)viewDidLoad
-{
-    [super viewDidLoad];
     
     self.audioController.stream.onStateChange = ^(FSAudioStreamState state) {
         switch (state) {
@@ -233,6 +202,37 @@
         [_statusLabel setHidden:NO];
         self.statusLabel.text = streamInfo;
     };
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    
+    if (_shouldStartPlaying) {
+        _shouldStartPlaying = NO;
+        
+        if ([self.audioController.url isEqual:_lastPlaybackURL]) {
+            // The same file was playing from a position, resume
+            [self.audioController.stream playFromOffset:_lastSeekByteOffset];
+        } else {
+            [self.audioController play];
+        }
+    }
+    
+    [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
+    
+    [self becomeFirstResponder];
+    
+    _progressUpdateTimer = [NSTimer scheduledTimerWithTimeInterval:1.0
+                                                            target:self
+                                                          selector:@selector(updatePlaybackProgress)
+                                                          userInfo:nil
+                                                           repeats:YES];
+}
+
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
     
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(applicationDidEnterBackgroundNotification:)
