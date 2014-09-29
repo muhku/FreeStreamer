@@ -93,19 +93,13 @@
 
 - (void)testSomaGrooveSaladPlays
 {
-    [[NSNotificationCenter defaultCenter] addObserverForName:FSAudioStreamStateChangeNotification
-                                                      object:nil
-                                                       queue:nil
-                                                  usingBlock:^(NSNotification *notification) {
-                                                      
-                                                      NSLog(@"FSAudioStreamStateChangeNotification received!");
-                                                      
-                                                      int state = [[notification.userInfo valueForKey:FSAudioStreamNotificationKey_State] intValue];
-                                                      
-                                                      if (state == kFsAudioStreamPlaying) {
-                                                          _checkStreamState = YES;
-                                                      }
-                                                  }];
+    _controller.stream.onStateChange = ^(FSAudioStreamState state) {
+        NSLog(@"FSAudioStreamStateChangeNotification received!");
+        
+        if (state == kFsAudioStreamPlaying) {
+            _checkStreamState = YES;
+        }
+    };
     
     _controller.url = [NSURL URLWithString:@"http://somafm.com/groovesalad56.pls"];
     [_controller play];

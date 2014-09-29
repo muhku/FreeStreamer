@@ -53,7 +53,8 @@ typedef enum {
     kFsAudioStreamPaused,
     kFsAudioStreamSeeking,
     kFSAudioStreamEndOfFile,
-    kFsAudioStreamFailed
+    kFsAudioStreamFailed,
+    kFsAudioStreamUnknown
 } FSAudioStreamState;
 
 /**
@@ -329,17 +330,21 @@ NSString*             freeStreamerReleaseVersion();
  */
 @property (copy) void (^onCompletion)();
 /**
+ * Called upon a state change.
+ */
+@property (copy) void (^onStateChange)(FSAudioStreamState state);
+/**
+ * Called upon a meta data is available.
+ */
+@property (copy) void (^onMetaDataAvailable)(NSDictionary *metadata);
+/**
  * Called upon a failure.
  */
-@property (copy) void (^onFailure)();
+@property (copy) void (^onFailure)(FSAudioStreamError error);
 /**
  * The property has the low-level stream configuration.
  */
 @property (readonly) FSStreamConfiguration *configuration;
-/**
- * The last stream error.
- */
-@property (readonly) FSAudioStreamError lastError;
 /**
  * Delegate.
  */

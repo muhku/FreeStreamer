@@ -101,22 +101,138 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    // Do any additional setup after loading the view from its nib.
     
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(audioStreamStateDidChange:)
-                                                 name:FSAudioStreamStateChangeNotification
-                                               object:nil];
+    self.audioController.stream.onStateChange = ^(FSAudioStreamState state) {
+        switch (state) {
+            case kFsAudioStreamRetrievingURL:
+                [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+                
+                [self showStatus:@"Retrieving URL..."];
+                
+                self.statusLabel.text = @"";
+                
+                self.progressSlider.enabled = NO;
+                self.playButton.hidden = YES;
+                self.pauseButton.hidden = NO;
+                _paused = NO;
+                break;
+                
+            case kFsAudioStreamStopped:
+                [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+                
+                self.statusLabel.text = @"";
+                
+                self.progressSlider.enabled = NO;
+                self.playButton.hidden = NO;
+                self.pauseButton.hidden = YES;
+                _paused = NO;
+                break;
+                
+            case kFsAudioStreamBuffering:
+                [self showStatus:@"Buffering..."];
+                
+                [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+                self.progressSlider.enabled = NO;
+                self.playButton.hidden = YES;
+                self.pauseButton.hidden = NO;
+                _paused = NO;
+                break;
+                
+            case kFsAudioStreamSeeking:
+                [self showStatus:@"Seeking..."];
+                
+                [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+                self.progressSlider.enabled = NO;
+                self.playButton.hidden = YES;
+                self.pauseButton.hidden = NO;
+                _paused = NO;
+                break;
+                
+            case kFsAudioStreamPlaying:
+                [self determineStationNameWithMetaData:nil];
+                
+                [self clearStatus];
+                
+                [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+                
+                self.progressSlider.enabled = YES;
+                
+                if (!_progressUpdateTimer) {
+                    _progressUpdateTimer = [NSTimer scheduledTimerWithTimeInterval:1.0
+                                                                            target:self
+                                                                          selector:@selector(updatePlaybackProgress)
+                                                                          userInfo:nil
+                                                                           repeats:YES];
+                }
+                
+                self.playButton.hidden = YES;
+                self.pauseButton.hidden = NO;
+                _paused = NO;
+                
+                break;
+                
+            case kFsAudioStreamFailed:
+                [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+                self.progressSlider.enabled = NO;
+                self.playButton.hidden = NO;
+                self.pauseButton.hidden = YES;
+                _paused = NO;
+                break;
+            default:
+                break;
+        }
+    };
     
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(audioStreamErrorOccurred:)
-                                                 name:FSAudioStreamErrorNotification
-                                               object:nil];
+    self.audioController.stream.onFailure = ^(FSAudioStreamError error) {
+        NSString *errorDescription;
+        
+        switch (error) {
+            case kFsAudioStreamErrorOpen:
+                errorDescription = @"Cannot open the audio stream";
+                break;
+            case kFsAudioStreamErrorStreamParse:
+                errorDescription = @"Cannot read the audio stream";
+                break;
+            case kFsAudioStreamErrorNetwork:
+                errorDescription = @"Network failed: cannot play the audio stream";
+                break;
+            case kFsAudioStreamErrorUnsupportedFormat:
+                errorDescription = @"Unsupported format";
+                break;
+            case kFsAudioStreamErrorStreamBouncing:
+                errorDescription = @"Network failed: cannot get enough data to play";
+                break;
+            default:
+                errorDescription = @"Unknown error occurred";
+                break;
+        }
+        
+        [self showErrorStatus:errorDescription];
+    };
     
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(audioStreamMetaDataAvailable:)
-                                                 name:FSAudioStreamMetaDataNotification
-                                               object:nil];
+    self.audioController.stream.onMetaDataAvailable = ^(NSDictionary *metaData) {
+        NSMutableString *streamInfo = [[NSMutableString alloc] init];
+        
+        [self determineStationNameWithMetaData:metaData];
+        
+        if (metaData[@"MPMediaItemPropertyArtist"] &&
+            metaData[@"MPMediaItemPropertyTitle"]) {
+            [streamInfo appendString:metaData[@"MPMediaItemPropertyArtist"]];
+            [streamInfo appendString:@" - "];
+            [streamInfo appendString:metaData[@"MPMediaItemPropertyTitle"]];
+        } else if (metaData[@"StreamTitle"]) {
+            [streamInfo appendString:metaData[@"StreamTitle"]];
+        }
+        
+        if (metaData[@"StreamUrl"] && [metaData[@"StreamUrl"] length] > 0) {
+            _stationURL = [NSURL URLWithString:metaData[@"StreamUrl"]];
+            
+            self.navigationItem.rightBarButtonItem = _infoButton;
+        }
+        
+        [_statusLabel setHidden:NO];
+        self.statusLabel.text = streamInfo;
+    };
     
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(applicationDidEnterBackgroundNotification:)
@@ -194,89 +310,6 @@
  * =======================================
  */
 
-- (void)audioStreamStateDidChange:(NSNotification *)notification
-{
-    NSDictionary *dict = [notification userInfo];
-    int state = [[dict valueForKey:FSAudioStreamNotificationKey_State] intValue];
-    
-    switch (state) {
-        case kFsAudioStreamRetrievingURL:
-            [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-            
-            [self showStatus:@"Retrieving URL..."];
-            
-            self.statusLabel.text = @"";
-            
-            self.progressSlider.enabled = NO;
-            self.playButton.hidden = YES;
-            self.pauseButton.hidden = NO;
-            _paused = NO;
-            break;
-            
-        case kFsAudioStreamStopped:
-            [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-            
-            self.statusLabel.text = @"";
-            
-            self.progressSlider.enabled = NO;
-            self.playButton.hidden = NO;
-            self.pauseButton.hidden = YES;
-            _paused = NO;
-            break;
-            
-        case kFsAudioStreamBuffering:
-            [self showStatus:@"Buffering..."];
-
-            [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-            self.progressSlider.enabled = NO;
-            self.playButton.hidden = YES;
-            self.pauseButton.hidden = NO;
-            _paused = NO;
-            break;
-            
-        case kFsAudioStreamSeeking:
-            [self showStatus:@"Seeking..."];
-            
-            [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-            self.progressSlider.enabled = NO;
-            self.playButton.hidden = YES;
-            self.pauseButton.hidden = NO;
-            _paused = NO;
-            break;
-            
-        case kFsAudioStreamPlaying:
-            [self determineStationNameWithMetaData:nil];
-            
-            [self clearStatus];
-            
-            [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-            
-            self.progressSlider.enabled = YES;
-            
-            if (!_progressUpdateTimer) {
-                _progressUpdateTimer = [NSTimer scheduledTimerWithTimeInterval:1.0
-                                                                        target:self
-                                                                      selector:@selector(updatePlaybackProgress)
-                                                                      userInfo:nil
-                                                                       repeats:YES];
-            }
-            
-            self.playButton.hidden = YES;
-            self.pauseButton.hidden = NO;
-            _paused = NO;
-            
-            break;
-            
-        case kFsAudioStreamFailed:
-            [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-            self.progressSlider.enabled = NO;
-            self.playButton.hidden = NO;
-            self.pauseButton.hidden = YES;
-            _paused = NO;
-            break;
-    }
-}
-
 - (void)remoteControlReceivedWithEvent:(UIEvent *)receivedEvent
 {
     if (receivedEvent.type == UIEventTypeRemoteControl) {
@@ -304,65 +337,6 @@
 - (void)applicationWillEnterForegroundNotification:(NSNotification *)notification
 {
     _analyzer.enabled = _analyzerEnabled;
-}
-
-- (void)audioStreamErrorOccurred:(NSNotification *)notification
-{
-    NSDictionary *dict = [notification userInfo];
-    int errorCode = [[dict valueForKey:FSAudioStreamNotificationKey_Error] intValue];
-    
-    NSString *errorDescription;
-    
-    switch (errorCode) {
-        case kFsAudioStreamErrorOpen:
-            errorDescription = @"Cannot open the audio stream";
-            break;
-        case kFsAudioStreamErrorStreamParse:
-            errorDescription = @"Cannot read the audio stream";
-            break;
-        case kFsAudioStreamErrorNetwork:
-            errorDescription = @"Network failed: cannot play the audio stream";
-            break;
-        case kFsAudioStreamErrorUnsupportedFormat:
-            errorDescription = @"Unsupported format";
-            break;
-        case kFsAudioStreamErrorStreamBouncing:
-            errorDescription = @"Network failed: cannot get enough data to play";
-            break;
-        default:
-            errorDescription = @"Unknown error occurred";
-            break;
-    }
-    
-    [self showErrorStatus:errorDescription];
-}
-
-- (void)audioStreamMetaDataAvailable:(NSNotification *)notification
-{
-    NSDictionary *dict = [notification userInfo];
-    NSDictionary *metaData = [dict valueForKey:FSAudioStreamNotificationKey_MetaData];
-    
-    NSMutableString *streamInfo = [[NSMutableString alloc] init];
-    
-    [self determineStationNameWithMetaData:metaData];
-    
-    if (metaData[@"MPMediaItemPropertyArtist"] &&
-        metaData[@"MPMediaItemPropertyTitle"]) {
-        [streamInfo appendString:metaData[@"MPMediaItemPropertyArtist"]];
-        [streamInfo appendString:@" - "];
-        [streamInfo appendString:metaData[@"MPMediaItemPropertyTitle"]];
-    } else if (metaData[@"StreamTitle"]) {
-        [streamInfo appendString:metaData[@"StreamTitle"]];
-    }
-    
-    if (metaData[@"StreamUrl"] && [metaData[@"StreamUrl"] length] > 0) {
-        _stationURL = [NSURL URLWithString:metaData[@"StreamUrl"]];
-        
-        self.navigationItem.rightBarButtonItem = _infoButton;
-    }
-    
-    [_statusLabel setHidden:NO];
-    self.statusLabel.text = streamInfo;
 }
 
 /*

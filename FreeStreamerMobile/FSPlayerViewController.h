@@ -100,12 +100,6 @@
  */
 @property (nonatomic,strong) IBOutlet UIProgressView *bufferingIndicator;
 /**
- * Handles the notification upon the audio stream state change.
- *
- * @param notification The audio stream state notification.
- */
-- (void)audioStreamStateDidChange:(NSNotification *)notification;
-/**
  * Handles the notification upon entering background.
  *
  * @param notification The notification.

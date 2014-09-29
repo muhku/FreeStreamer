@@ -215,8 +215,9 @@ public:
 @property (readonly) NSString *formatDescription;
 @property (readonly) BOOL cached;
 @property (copy) void (^onCompletion)();
-@property (copy) void (^onFailure)();
-@property (nonatomic,assign) FSAudioStreamError lastError;
+@property (copy) void (^onStateChange)(FSAudioStreamState state);
+@property (copy) void (^onMetaDataAvailable)(NSDictionary *metaData);
+@property (copy) void (^onFailure)(FSAudioStreamError error);
 @property (nonatomic,unsafe_unretained) id<FSPCMAudioStreamDelegate> delegate;
 @property (nonatomic,unsafe_unretained) FSAudioStream *stream;
 
@@ -255,8 +256,6 @@ public:
         _audioStream->m_delegate = _observer;
         
         _reachability = [Reachability reachabilityForInternetConnection];
-        
-        self.lastError = kFsAudioStreamErrorNone;
         
         _delegate = nil;
         
@@ -961,12 +960,32 @@ public:
     _private.onCompletion = onCompletion;
 }
 
-- (void (^)())onFailure
+- (void (^)(FSAudioStreamState state))onStateChange
+{
+    return _private.onStateChange;
+}
+
+- (void (^)(NSDictionary *metaData))onMetaDataAvailable
+{
+    return _private.onMetaDataAvailable;
+}
+
+- (void (^)(FSAudioStreamError error))onFailure
 {
     return _private.onFailure;
 }
 
-- (void)setOnFailure:(void (^)())onFailure
+- (void)setOnStateChange:(void (^)(FSAudioStreamState))onStateChange
+{
+    _private.onStateChange = onStateChange;
+}
+
+- (void)setOnMetaDataAvailable:(void (^)(NSDictionary *))onMetaDataAvailable
+{
+    _private.onMetaDataAvailable = onMetaDataAvailable;
+}
+
+- (void)setOnFailure:(void (^)(FSAudioStreamError error))onFailure
 {
     _private.onFailure = onFailure;
 }
@@ -974,11 +993,6 @@ public:
 - (FSStreamConfiguration *)configuration
 {
     return _private.configuration;
-}
-
-- (FSAudioStreamError)lastError
-{
-    return _private.lastError;
 }
 
 - (void)setDelegate:(id<FSPCMAudioStreamDelegate>)delegate
@@ -1011,9 +1025,11 @@ void AudioStreamStateObserver::reset()
 
 void AudioStreamStateObserver::audioStreamErrorOccurred(int errorCode)
 {
+    FSAudioStreamError error = kFsAudioStreamErrorNone;
+    
     switch (errorCode) {
         case kFsAudioStreamErrorOpen:
-            priv.lastError = kFsAudioStreamErrorOpen;
+            error = kFsAudioStreamErrorOpen;
             
 #if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
             NSLog(@"FSAudioStream: Error opening the stream: %@", priv);
@@ -1021,7 +1037,7 @@ void AudioStreamStateObserver::audioStreamErrorOccurred(int errorCode)
             
             break;
         case kFsAudioStreamErrorStreamParse:
-            priv.lastError = kFsAudioStreamErrorStreamParse;
+            error = kFsAudioStreamErrorStreamParse;
             
 #if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
             NSLog(@"FSAudioStream: Error parsing the stream: %@", priv);
@@ -1029,7 +1045,7 @@ void AudioStreamStateObserver::audioStreamErrorOccurred(int errorCode)
             
             break;
         case kFsAudioStreamErrorNetwork:
-            priv.lastError = kFsAudioStreamErrorNetwork;
+            error = kFsAudioStreamErrorNetwork;
         
 #if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
             NSLog(@"FSAudioStream: Network error: %@", priv);
@@ -1037,7 +1053,7 @@ void AudioStreamStateObserver::audioStreamErrorOccurred(int errorCode)
             
             break;
         case kFsAudioStreamErrorUnsupportedFormat:
-            priv.lastError = kFsAudioStreamErrorUnsupportedFormat;
+            error = kFsAudioStreamErrorUnsupportedFormat;
     
 #if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
             NSLog(@"FSAudioStream: Unsupported format error: %@", priv);
@@ -1046,7 +1062,7 @@ void AudioStreamStateObserver::audioStreamErrorOccurred(int errorCode)
             break;
             
         case kFsAudioStreamErrorStreamBouncing:
-            priv.lastError = kFsAudioStreamErrorStreamBouncing;
+            error = kFsAudioStreamErrorStreamBouncing;
             
 #if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
             NSLog(@"FSAudioStream: Stream bounced: %@", priv);
@@ -1056,6 +1072,10 @@ void AudioStreamStateObserver::audioStreamErrorOccurred(int errorCode)
             
         default:
             break;
+    }
+    
+    if (priv.onFailure) {
+        priv.onFailure(error);
     }
     
     NSDictionary *userInfo = @{FSAudioStreamNotificationKey_Error: @(errorCode),
@@ -1069,10 +1089,12 @@ void AudioStreamStateObserver::audioStreamStateChanged(astreamer::Audio_Stream::
 {
     NSNumber *fsAudioState;
     
+    FSAudioStreamState streamerState = kFsAudioStreamUnknown;
+    
     switch (state) {
         case astreamer::Audio_Stream::STOPPED:
-            priv.lastError = kFsAudioStreamErrorNone;
             fsAudioState = [NSNumber numberWithInt:kFsAudioStreamStopped];
+            streamerState = kFsAudioStreamStopped;
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
             [[AVAudioSession sharedInstance] setActive:NO error:nil];
 #endif
@@ -1081,43 +1103,46 @@ void AudioStreamStateObserver::audioStreamStateChanged(astreamer::Audio_Stream::
             }
             break;
         case astreamer::Audio_Stream::BUFFERING:
-            priv.lastError = kFsAudioStreamErrorNone;
             fsAudioState = [NSNumber numberWithInt:kFsAudioStreamBuffering];
+            streamerState = kFsAudioStreamBuffering;
             break;
         case astreamer::Audio_Stream::PLAYING:
-            priv.lastError = kFsAudioStreamErrorNone;
             fsAudioState = [NSNumber numberWithInt:kFsAudioStreamPlaying];
+            streamerState = kFsAudioStreamPlaying;
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
             [[AVAudioSession sharedInstance] setActive:YES error:nil];
 #endif
             break;
         case astreamer::Audio_Stream::PAUSED:
-            priv.lastError = kFsAudioStreamErrorNone;
             fsAudioState = [NSNumber numberWithInt:kFsAudioStreamPaused];
+            streamerState = kFsAudioStreamPaused;
             break;
         case astreamer::Audio_Stream::SEEKING:
-            priv.lastError = kFsAudioStreamErrorNone;
             fsAudioState = [NSNumber numberWithInt:kFsAudioStreamSeeking];
+            streamerState = kFsAudioStreamSeeking;
             break;
         case astreamer::Audio_Stream::END_OF_FILE:
-            priv.lastError = kFsAudioStreamErrorNone;
             m_eofReached = true;
             fsAudioState = [NSNumber numberWithInt:kFSAudioStreamEndOfFile];
+            streamerState = kFSAudioStreamEndOfFile;
             break;
         case astreamer::Audio_Stream::FAILED:
             fsAudioState = [NSNumber numberWithInt:kFsAudioStreamFailed];
+            streamerState = kFsAudioStreamFailed;
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
             [[AVAudioSession sharedInstance] setActive:NO error:nil];
 #endif
-            if (priv.onFailure) {
-                priv.onFailure();
-            }
             break;
         default:
+            streamerState = kFsAudioStreamUnknown;
             /* unknown state */
             return;
             
             break;
+    }
+    
+    if (priv.onStateChange) {
+        priv.onStateChange(streamerState);
     }
     
     NSDictionary *userInfo = @{FSAudioStreamNotificationKey_State: fsAudioState,
@@ -1153,6 +1178,10 @@ void AudioStreamStateObserver::audioStreamMetaDataAvailable(std::map<CFStringRef
     
     [[MPNowPlayingInfoCenter defaultCenter] setNowPlayingInfo:songInfo];
 #endif
+    
+    if (priv.onMetaDataAvailable) {
+        priv.onMetaDataAvailable(metaDataDictionary);
+    }
     
     NSDictionary *userInfo = @{FSAudioStreamNotificationKey_MetaData: metaDataDictionary,
                               FSAudioStreamNotificationKey_Stream: [NSValue valueWithPointer:source]};
