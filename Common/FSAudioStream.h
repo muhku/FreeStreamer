@@ -7,7 +7,6 @@
  */
 
 #import <Foundation/Foundation.h>
-#import <CoreAudio/CoreAudioTypes.h>
 
 /**
  * The major version of the current release.
