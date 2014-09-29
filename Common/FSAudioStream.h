@@ -292,11 +292,11 @@ NSString*             freeStreamerReleaseVersion();
 /**
  * The property has the content type of the stream, for instance audio/mpeg.
  */
-@property (nonatomic,assign) NSString *contentType;
+@property (nonatomic,readonly) NSString *contentType;
 /**
  * The property has the suggested file extension for the stream based on the stream content type.
  */
-@property (nonatomic,assign) NSString *suggestedFileExtension;
+@property (nonatomic,readonly) NSString *suggestedFileExtension;
 /**
  * This property has the current playback position, if the stream is non-continuous.
  * The current playback position cannot be determined for continuous streams.
