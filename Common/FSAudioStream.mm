@@ -129,6 +129,8 @@ static NSInteger sortCacheObjects(id co1, id co2, void *keyForSorting)
         self.bufferCount    *= scale;
         self.bufferSize     *= scale;
         self.maxPacketDescs *= scale;
+        
+        // Discussed here: https://github.com/muhku/FreeStreamer/issues/98
         self.decodeQueueSize *= scale;
 #endif
 #else
