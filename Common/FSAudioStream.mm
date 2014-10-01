@@ -129,6 +129,7 @@ static NSInteger sortCacheObjects(id co1, id co2, void *keyForSorting)
         self.bufferCount    *= scale;
         self.bufferSize     *= scale;
         self.maxPacketDescs *= scale;
+        self.decodeQueueSize *= scale;
 #endif
 #else
             /* OS X */
