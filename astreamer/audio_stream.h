@@ -155,6 +155,7 @@ private:
     float m_outputVolume;
     
     bool m_queueCanAcceptPackets;
+    bool m_converterRunOutOfData;
     
     CFStringRef createHashForString(CFStringRef str);
     

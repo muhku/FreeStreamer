@@ -70,7 +70,8 @@ Audio_Stream::Audio_Stream() :
     m_packetDuration(0),
     m_bitrateBufferIndex(0),
     m_outputVolume(1.0),
-    m_queueCanAcceptPackets(true)
+    m_queueCanAcceptPackets(true),
+    m_converterRunOutOfData(false)
 {
     memset(&m_srcFormat, 0, sizeof m_srcFormat);
     
@@ -135,6 +136,7 @@ void Audio_Stream::open(Input_Stream_Position *position)
     m_processedPacketsCount = 0;
     m_bitrateBufferIndex = 0;
     m_initializationError = noErr;
+    m_converterRunOutOfData = false;
     
     if (m_watchdogTimer) {
         CFRunLoopTimerInvalidate(m_watchdogTimer);
@@ -925,7 +927,28 @@ int Audio_Stream::cachedDataCount()
 void Audio_Stream::enqueueCachedData(int minPacketsRequired)
 {
     if (!m_queueCanAcceptPackets) {
+        AS_TRACE("Queue cannot accept packets, return\n");
         return;
+    }
+    
+    if (m_converterRunOutOfData) {
+        AS_TRACE("Converted run out of data\n");
+        
+        if (m_audioConverter) {
+            AudioConverterDispose(m_audioConverter);
+        }
+        
+        OSStatus err = AudioConverterNew(&(m_srcFormat),
+                                         &(m_dstFormat),
+                                         &(m_audioConverter));
+        
+        if (err) {
+            AS_TRACE("Error in creating an audio converter, error %i\n", err);
+            
+           m_initializationError = err;
+        }
+        
+        m_converterRunOutOfData = false;
     }
     
     if (state() == PAUSED) {
@@ -1020,11 +1043,15 @@ OSStatus Audio_Stream::encoderDataCallback(AudioConverterRef inAudioConverter, U
         
         AS_TRACE("run out of data to provide for encoding\n");
         
+        THIS->m_converterRunOutOfData = true;
+        
         *ioNumberDataPackets = 0;
         
         ioData->mBuffers[0].mDataByteSize = 0;
         
         return noErr;
+    } else {
+        THIS->m_converterRunOutOfData = false;
     }
     
     *ioNumberDataPackets = 1;
