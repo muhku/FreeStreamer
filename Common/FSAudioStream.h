@@ -258,6 +258,8 @@ NSString*             freeStreamerReleaseVersion();
  * playback rate than 1.0 may mean that you have to increase
  * the buffer sizes for the stream still to play.
  *
+ * The play rate has only effect if the stream is playing.
+ *
  * @param playRate The playback rate.
  */
 - (void)setPlayRate:(float)playRate;
