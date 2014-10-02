@@ -789,7 +789,11 @@ public:
         if (c->cacheDirectory) {
             CFRelease(c->cacheDirectory);
         }
-        c->cacheDirectory = CFStringCreateCopy(kCFAllocatorDefault, (__bridge CFStringRef)configuration.cacheDirectory);
+        if (configuration.cacheDirectory) {
+            c->cacheDirectory = CFStringCreateCopy(kCFAllocatorDefault, (__bridge CFStringRef)configuration.cacheDirectory);
+        } else {
+            c->cacheDirectory = NULL;
+        }
         
         _private = [[FSAudioStreamPrivate alloc] init];
         _private.stream = self;

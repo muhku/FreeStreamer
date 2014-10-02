@@ -65,6 +65,16 @@
     [_controller playFromURL:nil];
 }
 
+- (void)testNullCacheDirectory
+{
+    FSStreamConfiguration *config = [[FSStreamConfiguration alloc] init];
+    config.cacheDirectory = nil;
+    
+    FSAudioStream *stream = [_stream initWithConfiguration:config];
+    
+    [stream play];
+}
+
 - (void)testPlaylistRetrieval
 {
     __weak FreeStreamerMobileTests *weakSelf = self;
