@@ -550,11 +550,15 @@ public:
 
 - (BOOL)cached
 {
-    NSString *cacheIdentifier = (NSString*)CFBridgingRelease(_audioStream->createCacheIdentifierForURL((__bridge CFURLRef)self.url));
+    BOOL cachedFileExists = NO;
     
-    NSString *fullPath = [NSString stringWithFormat:@"%@/%@.metadata", self.configuration.cacheDirectory, cacheIdentifier];
-    
-    BOOL cachedFileExists = [[NSFileManager defaultManager] fileExistsAtPath:fullPath];
+    if (self.url) {
+        NSString *cacheIdentifier = (NSString*)CFBridgingRelease(_audioStream->createCacheIdentifierForURL((__bridge CFURLRef)self.url));
+        
+        NSString *fullPath = [NSString stringWithFormat:@"%@/%@.metadata", self.configuration.cacheDirectory, cacheIdentifier];
+        
+        cachedFileExists = [[NSFileManager defaultManager] fileExistsAtPath:fullPath];
+    }
     
     return cachedFileExists;
 }

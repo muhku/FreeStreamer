@@ -55,6 +55,16 @@
     [super tearDown];
 }
 
+- (void)testStreamNullURL
+{
+    [_stream playFromURL:nil];
+}
+
+- (void)testControllerNullURL
+{
+    [_controller playFromURL:nil];
+}
+
 - (void)testPlaylistRetrieval
 {
     __weak FreeStreamerMobileTests *weakSelf = self;
