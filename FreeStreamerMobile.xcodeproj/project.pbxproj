@@ -48,12 +48,12 @@
 		60CF8C0118C5337000C657A8 /* FSParseRssPodcastFeedRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 60CF8BF618C5337000C657A8 /* FSParseRssPodcastFeedRequest.m */; };
 		60CF8C0218C5337000C657A8 /* FSPlaylistItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 60CF8BF818C5337000C657A8 /* FSPlaylistItem.m */; };
 		60CF8C0318C5337000C657A8 /* FSXMLHttpRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 60CF8BFA18C5337000C657A8 /* FSXMLHttpRequest.m */; };
-		60CF8C0418C5337000C657A8 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 60CF8BFC18C5337000C657A8 /* Reachability.m */; };
 		60CF8C0618C5339900C657A8 /* libxml2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 60CF8C0518C5339900C657A8 /* libxml2.dylib */; };
 		60CF8C0818C5345A00C657A8 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60CF8C0718C5345A00C657A8 /* CFNetwork.framework */; };
 		60CF8C0A18C5345F00C657A8 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60CF8C0918C5345F00C657A8 /* AudioToolbox.framework */; };
 		60CF8C0C18C5346700C657A8 /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60CF8C0B18C5346700C657A8 /* MediaPlayer.framework */; };
 		60CF8C0E18C5346F00C657A8 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60CF8C0D18C5346F00C657A8 /* AVFoundation.framework */; };
+		60DB926519E4143A00326783 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 60DB926419E4143A00326783 /* Reachability.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -133,13 +133,13 @@
 		60CF8BF818C5337000C657A8 /* FSPlaylistItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSPlaylistItem.m; sourceTree = "<group>"; };
 		60CF8BF918C5337000C657A8 /* FSXMLHttpRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSXMLHttpRequest.h; sourceTree = "<group>"; };
 		60CF8BFA18C5337000C657A8 /* FSXMLHttpRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSXMLHttpRequest.m; sourceTree = "<group>"; };
-		60CF8BFB18C5337000C657A8 /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
-		60CF8BFC18C5337000C657A8 /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
 		60CF8C0518C5339900C657A8 /* libxml2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.dylib; path = usr/lib/libxml2.dylib; sourceTree = SDKROOT; };
 		60CF8C0718C5345A00C657A8 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		60CF8C0918C5345F00C657A8 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		60CF8C0B18C5346700C657A8 /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
 		60CF8C0D18C5346F00C657A8 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
+		60DB926319E4143A00326783 /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
+		60DB926419E4143A00326783 /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -187,6 +187,7 @@
 		60B813C918C532F8001CC5A7 = {
 			isa = PBXGroup;
 			children = (
+				60DB926119E4143A00326783 /* 3rdparty */,
 				60CF8BEC18C5337000C657A8 /* Common */,
 				60CF8BDA18C5333B00C657A8 /* Additions */,
 				60CF8BCA18C5332F00C657A8 /* astreamer */,
@@ -324,10 +325,25 @@
 				60CF8BF818C5337000C657A8 /* FSPlaylistItem.m */,
 				60CF8BF918C5337000C657A8 /* FSXMLHttpRequest.h */,
 				60CF8BFA18C5337000C657A8 /* FSXMLHttpRequest.m */,
-				60CF8BFB18C5337000C657A8 /* Reachability.h */,
-				60CF8BFC18C5337000C657A8 /* Reachability.m */,
 			);
 			path = Common;
+			sourceTree = "<group>";
+		};
+		60DB926119E4143A00326783 /* 3rdparty */ = {
+			isa = PBXGroup;
+			children = (
+				60DB926219E4143A00326783 /* Reachability */,
+			);
+			path = 3rdparty;
+			sourceTree = "<group>";
+		};
+		60DB926219E4143A00326783 /* Reachability */ = {
+			isa = PBXGroup;
+			children = (
+				60DB926319E4143A00326783 /* Reachability.h */,
+				60DB926419E4143A00326783 /* Reachability.m */,
+			);
+			path = Reachability;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -444,6 +460,7 @@
 				6052B2BB19ACA11F00EAA7C8 /* input_stream.cpp in Sources */,
 				60CF8BD918C5332F00C657A8 /* id3_parser.cpp in Sources */,
 				60BCF70918E49B16007B243E /* stream_configuration.cpp in Sources */,
+				60DB926519E4143A00326783 /* Reachability.m in Sources */,
 				60CF8C0218C5337000C657A8 /* FSPlaylistItem.m in Sources */,
 				60B813E618C532F8001CC5A7 /* FSAppDelegate.m in Sources */,
 				60CF8BEA18C5335200C657A8 /* FSPlayerViewController.m in Sources */,
@@ -451,7 +468,6 @@
 				60CF8C0118C5337000C657A8 /* FSParseRssPodcastFeedRequest.m in Sources */,
 				60CF8BD518C5332F00C657A8 /* audio_queue.cpp in Sources */,
 				6052B2BE19ACB30200EAA7C8 /* file_stream.cpp in Sources */,
-				60CF8C0418C5337000C657A8 /* Reachability.m in Sources */,
 				60CF8BD718C5332F00C657A8 /* file_output.cpp in Sources */,
 				60CF8BDF18C5333B00C657A8 /* FSFrequencyDomainAnalyzer.m in Sources */,
 				60CF8BFE18C5337000C657A8 /* FSAudioStream.mm in Sources */,
