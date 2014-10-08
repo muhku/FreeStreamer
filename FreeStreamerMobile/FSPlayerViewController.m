@@ -8,6 +8,8 @@
 
 #import "FSPlayerViewController.h"
 
+#import <MediaPlayer/MediaPlayer.h>
+
 #import "FSAudioStream.h"
 #import "FSAudioController.h"
 #import "FSPlaylistItem.h"
@@ -183,6 +185,20 @@
         NSMutableString *streamInfo = [[NSMutableString alloc] init];
         
         [self determineStationNameWithMetaData:metaData];
+        
+        NSMutableDictionary *songInfo = [[NSMutableDictionary alloc] init];
+        
+        if (metaData[@"MPMediaItemPropertyTitle"]) {
+            songInfo[MPMediaItemPropertyTitle] = metaData[@"MPMediaItemPropertyTitle"];
+        } else if (metaData[@"StreamTitle"]) {
+            songInfo[MPMediaItemPropertyTitle] = metaData[@"StreamTitle"];
+        }
+        
+        if (metaData[@"MPMediaItemPropertyArtist"]) {
+            songInfo[MPMediaItemPropertyArtist] = metaData[@"MPMediaItemPropertyArtist"];
+        }
+        
+        [[MPNowPlayingInfoCenter defaultCenter] setNowPlayingInfo:songInfo];
         
         if (metaData[@"MPMediaItemPropertyArtist"] &&
             metaData[@"MPMediaItemPropertyTitle"]) {

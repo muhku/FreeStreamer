@@ -20,10 +20,6 @@
 #import <AudioToolbox/AudioToolbox.h>
 #endif
 
-#if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 50000)
-#import <MediaPlayer/MediaPlayer.h>
-#endif
-
 @interface FSCacheObject : NSObject {
 }
 
@@ -1170,22 +1166,6 @@ void AudioStreamStateObserver::audioStreamMetaDataAvailable(std::map<CFStringRef
         
         metaDataDictionary[CFBridgingRelease(key)] = CFBridgingRelease(value);
     }
-    
-#if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 50000)
-    NSMutableDictionary *songInfo = [[NSMutableDictionary alloc] init];
-    
-    if (metaDataDictionary[@"MPMediaItemPropertyTitle"]) {
-        songInfo[MPMediaItemPropertyTitle] = metaDataDictionary[@"MPMediaItemPropertyTitle"];
-    } else if (metaDataDictionary[@"StreamTitle"]) {
-        songInfo[MPMediaItemPropertyTitle] = metaDataDictionary[@"StreamTitle"];
-    }
-    
-    if (metaDataDictionary[@"MPMediaItemPropertyArtist"]) {
-        songInfo[MPMediaItemPropertyArtist] = metaDataDictionary[@"MPMediaItemPropertyArtist"];
-    }
-    
-    [[MPNowPlayingInfoCenter defaultCenter] setNowPlayingInfo:songInfo];
-#endif
     
     if (priv.onMetaDataAvailable) {
         priv.onMetaDataAvailable(metaDataDictionary);
