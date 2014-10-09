@@ -65,11 +65,25 @@ Caching_Stream::~Caching_Stream()
     
 CFURLRef Caching_Stream::createFileURLWithPath(CFStringRef path)
 {
-    CFURLRef regularUrl = CFURLCreateWithString(kCFAllocatorDefault, path, NULL);
+    CFURLRef fileUrl = NULL;
     
-    CFURLRef fileUrl = CFURLCreateFilePathURL(kCFAllocatorDefault, regularUrl, NULL);
+    if (!path) {
+        return fileUrl;
+    }
     
-    CFRelease(regularUrl);
+    CFStringRef escapedPath = CFURLCreateStringByAddingPercentEscapes(kCFAllocatorDefault, path, NULL, NULL, kCFStringEncodingUTF8);
+    
+    CFURLRef regularUrl = CFURLCreateWithString(kCFAllocatorDefault, (escapedPath ? escapedPath : path), NULL);
+    
+    if (regularUrl) {
+        fileUrl = CFURLCreateFilePathURL(kCFAllocatorDefault, regularUrl, NULL);
+
+        CFRelease(regularUrl);
+    }
+    
+    if (escapedPath) {
+        CFRelease(escapedPath);
+    }
     
     return fileUrl;
 }
