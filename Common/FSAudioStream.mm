@@ -251,7 +251,7 @@ public:
 
         _audioStream->m_delegate = _observer;
         
-        _reachability = [Reachability reachabilityForInternetConnection];
+        _reachability = nil;
         
         _delegate = nil;
         
@@ -407,7 +407,11 @@ public:
     
     _observer->reset();
     
-    [_reachability startNotifier];
+    if (!_reachability) {
+        _reachability = [Reachability reachabilityForInternetConnection];
+        
+        [_reachability startNotifier];
+    }
 }
 
 - (void)setDefaultContentType:(NSString *)defaultContentType
@@ -650,7 +654,11 @@ public:
     
     _observer->reset();
 
-    [_reachability startNotifier];
+    if (!_reachability) {
+        _reachability = [Reachability reachabilityForInternetConnection];
+        
+        [_reachability startNotifier];
+    }
 }
 
 - (void)stop
@@ -664,7 +672,7 @@ public:
     }
 #endif
     
-    [_reachability stopNotifier];
+    [_reachability stopNotifier], _reachability = nil;
 }
 
 - (BOOL)isPlaying
