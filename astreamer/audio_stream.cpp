@@ -712,7 +712,13 @@ void Audio_Stream::streamHasBytesAvailable(UInt8 *data, UInt32 numBytes)
         
         if (result != 0) {
             AS_TRACE("%s: AudioFileStreamParseBytes error %d\n", __PRETTY_FUNCTION__, (int)result);
-            closeAndSignalError(AS_ERR_STREAM_PARSE);
+            
+            if (result == kAudioFileStreamError_NotOptimized) {
+                AS_TRACE("Trying to use non-optimized format\n");
+                closeAndSignalError(AS_ERR_UNSUPPORTED_FORMAT);
+            } else {
+                closeAndSignalError(AS_ERR_STREAM_PARSE);
+            }
         } else if (m_initializationError == kAudioConverterErr_FormatNotSupported) {
             AS_TRACE("Audio stream initialization failed due to unsupported format\n");
             closeAndSignalError(AS_ERR_UNSUPPORTED_FORMAT);
