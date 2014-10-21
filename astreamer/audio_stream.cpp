@@ -507,7 +507,8 @@ AudioFileTypeID Audio_Stream::audioStreamTypeFromContentType(CFStringRef content
     } else if (CFStringCompare(contentType, CFSTR("audio/x-m4a"), 0) == kCFCompareEqualTo) {
         fileTypeHint = kAudioFileM4AType;
         AS_TRACE("kAudioFileM4AType detected\n");
-    } else if (CFStringCompare(contentType, CFSTR("audio/mp4"), 0) == kCFCompareEqualTo) {
+    } else if (CFStringCompare(contentType, CFSTR("audio/mp4"), 0) == kCFCompareEqualTo ||
+               CFStringCompare(contentType, CFSTR("video/mp4"), 0) == kCFCompareEqualTo) {
         fileTypeHint = kAudioFileMPEG4Type;
         AS_TRACE("kAudioFileMPEG4Type detected\n");
     } else if (CFStringCompare(contentType, CFSTR("audio/x-caf"), 0) == kCFCompareEqualTo) {
@@ -650,7 +651,7 @@ void Audio_Stream::streamIsReadyRead()
     }
     
     CFStringRef audioContentType = CFSTR("audio/");
-    const CFIndex audioContentTypeLength = CFStringGetLength(audioContentType);
+    CFStringRef videoContentType = CFSTR("video/");
     bool matchesAudioContentType = false;
     
     CFStringRef contentType = 0;
@@ -664,12 +665,12 @@ void Audio_Stream::streamIsReadyRead()
     }
     if (contentType) {
         m_contentType = CFStringCreateCopy(kCFAllocatorDefault, contentType);
-    
-        /* Check if the stream's MIME type begins with audio/ */
-        matchesAudioContentType = (kCFCompareEqualTo ==
-                                    CFStringCompareWithOptions(contentType, CFSTR("audio/"),
-                                                               CFRangeMake(0, audioContentTypeLength),
-                                                               0));
+        
+        if (kCFCompareEqualTo == CFStringCompareWithOptions(contentType, audioContentType, CFRangeMake(0, CFStringGetLength(audioContentType)),0)) {
+            matchesAudioContentType = true;
+        } else if (kCFCompareEqualTo == CFStringCompareWithOptions(contentType, videoContentType, CFRangeMake(0, CFStringGetLength(videoContentType)),0)) {
+            matchesAudioContentType = true;
+        }
     }
     
     if (m_strictContentTypeChecking && !matchesAudioContentType) {
