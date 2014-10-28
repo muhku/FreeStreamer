@@ -605,6 +605,8 @@ void Audio_Stream::audioQueueBuffersEmpty()
     } else {
         AS_TRACE("%s: closing the audio queue\n", __PRETTY_FUNCTION__);
         
+        setState(PLAYBACK_COMPLETED);
+        
         close();
     }
 }

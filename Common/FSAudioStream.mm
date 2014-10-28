@@ -162,14 +162,9 @@ NSString* const FSAudioStreamNotificationKey_MetaData = @"metadata";
 
 class AudioStreamStateObserver : public astreamer::Audio_Stream_Delegate
 {
-private:
-    bool m_eofReached;
-    
 public:
     astreamer::Audio_Stream *source;
     FSAudioStreamPrivate *priv;
-    
-    void reset();
     
     void audioStreamErrorOccurred(int errorCode);
     void audioStreamStateChanged(astreamer::Audio_Stream::State state);
@@ -220,6 +215,9 @@ public:
 
 - (void)reachabilityChanged:(NSNotification *)note;
 - (void)interruptionOccurred:(NSNotification *)notification;
+
+- (void)notifyPlaybackCompletion;
+- (void)notifyStateChange:(FSAudioStreamState)streamerState;
 
 - (void)play;
 - (void)playFromURL:(NSURL*)url;
@@ -398,8 +396,6 @@ public:
     
     _audioStream->setSeekPosition(offset.position);
     _audioStream->setContentLength(offset.end);
-    
-    _observer->reset();
     
     if (!_reachability) {
         _reachability = [Reachability reachabilityForInternetConnection];
@@ -642,11 +638,31 @@ public:
 #endif
 }
 
+- (void)notifyPlaybackCompletion
+{
+    [self notifyStateChange:kFsAudioStreamPlaybackCompleted];
+    
+    if (self.onCompletion) {
+        self.onCompletion();
+    }
+}
+
+- (void)notifyStateChange:(FSAudioStreamState)streamerState
+{
+    if (self.onStateChange) {
+        self.onStateChange(streamerState);
+    }
+    
+    NSDictionary *userInfo = @{FSAudioStreamNotificationKey_State: [NSNumber numberWithInt:streamerState],
+                               FSAudioStreamNotificationKey_Stream: [NSValue valueWithPointer:_audioStream]};
+    NSNotification *notification = [NSNotification notificationWithName:FSAudioStreamStateChangeNotification object:nil userInfo:userInfo];
+    
+    [[NSNotificationCenter defaultCenter] postNotification:notification];
+}
+
 - (void)play
 {
     _audioStream->open();
-    
-    _observer->reset();
 
     if (!_reachability) {
         _reachability = [Reachability reachabilityForInternetConnection];
@@ -1024,11 +1040,6 @@ public:
  * ===============================================================
  */
 
-void AudioStreamStateObserver::reset()
-{
-    m_eofReached = false;
-}
-
 void AudioStreamStateObserver::audioStreamErrorOccurred(int errorCode)
 {
     FSAudioStreamError error = kFsAudioStreamErrorNone;
@@ -1093,51 +1104,51 @@ void AudioStreamStateObserver::audioStreamErrorOccurred(int errorCode)
     
 void AudioStreamStateObserver::audioStreamStateChanged(astreamer::Audio_Stream::State state)
 {
-    NSNumber *fsAudioState;
-    
     FSAudioStreamState streamerState = kFsAudioStreamUnknownState;
     
     switch (state) {
         case astreamer::Audio_Stream::STOPPED:
-            fsAudioState = [NSNumber numberWithInt:kFsAudioStreamStopped];
             streamerState = kFsAudioStreamStopped;
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
             [[AVAudioSession sharedInstance] setActive:NO error:nil];
 #endif
-            if (m_eofReached && priv.onCompletion) {
-                priv.onCompletion();
-            }
             break;
         case astreamer::Audio_Stream::BUFFERING:
-            fsAudioState = [NSNumber numberWithInt:kFsAudioStreamBuffering];
             streamerState = kFsAudioStreamBuffering;
             break;
         case astreamer::Audio_Stream::PLAYING:
-            fsAudioState = [NSNumber numberWithInt:kFsAudioStreamPlaying];
             streamerState = kFsAudioStreamPlaying;
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
             [[AVAudioSession sharedInstance] setActive:YES error:nil];
 #endif
             break;
         case astreamer::Audio_Stream::PAUSED:
-            fsAudioState = [NSNumber numberWithInt:kFsAudioStreamPaused];
             streamerState = kFsAudioStreamPaused;
             break;
         case astreamer::Audio_Stream::SEEKING:
-            fsAudioState = [NSNumber numberWithInt:kFsAudioStreamSeeking];
             streamerState = kFsAudioStreamSeeking;
             break;
         case astreamer::Audio_Stream::END_OF_FILE:
-            m_eofReached = true;
-            fsAudioState = [NSNumber numberWithInt:kFSAudioStreamEndOfFile];
             streamerState = kFSAudioStreamEndOfFile;
             break;
         case astreamer::Audio_Stream::FAILED:
-            fsAudioState = [NSNumber numberWithInt:kFsAudioStreamFailed];
             streamerState = kFsAudioStreamFailed;
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
             [[AVAudioSession sharedInstance] setActive:NO error:nil];
 #endif
+            break;
+        case astreamer::Audio_Stream::PLAYBACK_COMPLETED:
+            // Let the event loop run so that the stream is closed when the completion
+            // notification is delivered
+            [NSTimer scheduledTimerWithTimeInterval:1
+                                             target:priv
+                                           selector:@selector(notifyPlaybackCompletion)
+                                           userInfo:nil
+                                            repeats:NO];
+            
+            // We also delay the state change notification
+            return;
+            
             break;
         default:
             streamerState = kFsAudioStreamUnknownState;
@@ -1147,15 +1158,7 @@ void AudioStreamStateObserver::audioStreamStateChanged(astreamer::Audio_Stream::
             break;
     }
     
-    if (priv.onStateChange) {
-        priv.onStateChange(streamerState);
-    }
-    
-    NSDictionary *userInfo = @{FSAudioStreamNotificationKey_State: fsAudioState,
-                              FSAudioStreamNotificationKey_Stream: [NSValue valueWithPointer:source]};
-    NSNotification *notification = [NSNotification notificationWithName:FSAudioStreamStateChangeNotification object:nil userInfo:userInfo];
-    
-    [[NSNotificationCenter defaultCenter] postNotification:notification];
+    [priv notifyStateChange:streamerState];
 }
     
 void AudioStreamStateObserver::audioStreamMetaDataAvailable(std::map<CFStringRef,CFStringRef> metaData)

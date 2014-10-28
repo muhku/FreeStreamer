@@ -47,7 +47,8 @@ public:
         PAUSED,
         SEEKING,
         FAILED,
-        END_OF_FILE
+        END_OF_FILE,
+        PLAYBACK_COMPLETED
     };
     
     Audio_Stream();
