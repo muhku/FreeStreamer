@@ -483,6 +483,11 @@ size_t Audio_Stream::cachedDataSize()
     return m_cachedDataSize;
 }
     
+bool Audio_Stream::strictContentTypeChecking()
+{
+    return m_strictContentTypeChecking;
+}
+    
 AudioFileTypeID Audio_Stream::audioStreamTypeFromContentType(CFStringRef contentType)
 {
     AudioFileTypeID fileTypeHint = kAudioFileMP3Type;

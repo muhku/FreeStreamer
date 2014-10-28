@@ -186,7 +186,6 @@ public:
 @interface FSAudioStreamPrivate : NSObject {
     astreamer::Audio_Stream *_audioStream;
     NSURL *_url;
-    BOOL _strictContentTypeChecking;
 	AudioStreamStateObserver *_observer;
     NSString *_defaultContentType;
     Reachability *_reachability;
@@ -375,17 +374,12 @@ public:
 
 - (void)setStrictContentTypeChecking:(BOOL)strictContentTypeChecking
 {
-    if (_strictContentTypeChecking == strictContentTypeChecking) {
-        // No change
-        return;
-    }
-    _strictContentTypeChecking = strictContentTypeChecking;
     _audioStream->setStrictContentTypeChecking(strictContentTypeChecking);
 }
 
 - (BOOL)strictContentTypeChecking
 {
-    return _strictContentTypeChecking;
+    return _audioStream->strictContentTypeChecking();
 }
 
 - (void)playFromURL:(NSURL*)url

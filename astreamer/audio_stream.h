@@ -84,6 +84,7 @@ public:
     CFStringRef createCacheIdentifierForURL(CFURLRef url);
     
     size_t cachedDataSize();
+    bool strictContentTypeChecking();
     
     /* Audio_Queue_Delegate */
     void audioQueueStateChanged(Audio_Queue::State state);
