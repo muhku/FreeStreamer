@@ -689,7 +689,7 @@ void Audio_Stream::streamIsReadyRead()
     OSStatus result = AudioFileStreamOpen(this,
                                           propertyValueCallback,
                                           streamDataCallback,
-                                          audioStreamTypeFromContentType(contentType),
+                                          audioStreamTypeFromContentType((contentType ? contentType : m_defaultContentType)),
                                           &m_audioFileStream);
     
     if (result == 0) {

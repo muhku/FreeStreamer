@@ -286,8 +286,8 @@ NSString*             freeStreamerReleaseVersion();
  */
 @property (nonatomic,assign) NSURL *outputFile;
 /**
- * Sets a default content type for the stream. Only used when strict content
- * type checking is disabled.
+ * Sets a default content type for the stream. Used if
+ * the stream content type is not available.
  */
 @property (nonatomic,assign) NSString *defaultContentType;
 /**
