@@ -362,14 +362,17 @@ void Caching_Stream::streamEndEncountered()
                         UInt8 buf[1024];
                         CFIndex usedBytes = 0;
                         
-                        CFStringGetBytes(contentType,
-                                         CFRangeMake(0, CFStringGetLength(contentType)),
-                                         kCFStringEncodingUTF8,
-                                         '?',
-                                         false,
-                                         buf,
-                                         1024,
-                                         &usedBytes);
+                        if (contentType) {
+                            // It is possible that some streams don't provide a content type
+                            CFStringGetBytes(contentType,
+                                             CFRangeMake(0, CFStringGetLength(contentType)),
+                                             kCFStringEncodingUTF8,
+                                             '?',
+                                             false,
+                                             buf,
+                                             1024,
+                                             &usedBytes);
+                        }
                         
                         if (usedBytes > 0) {
                             CS_TRACE("Writing the meta data\n");
