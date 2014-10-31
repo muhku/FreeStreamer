@@ -225,12 +225,11 @@ public:
 - (void)stop;
 - (BOOL)isPlaying;
 - (void)pause;
-- (void)seekToTime:(unsigned)newSeekTime;
+- (void)seekToOffset:(float)offset;
 - (void)setVolume:(float)volume;
 - (void)setPlayRate:(float)playRate;
-- (unsigned)timePlayedInSeconds;
-- (unsigned)durationInSeconds;
-- (astreamer::Input_Stream_Position)streamPositionForTime:(unsigned)newSeekTime;
+- (astreamer::AS_Playback_Position)playbackPosition;
+- (float)durationInSeconds;
 @end
 
 @implementation FSAudioStreamPrivate
@@ -394,7 +393,7 @@ public:
     
     _audioStream->open(&position);
     
-    _audioStream->setSeekPosition(offset.position);
+    _audioStream->setSeekOffset(offset.position);
     _audioStream->setContentLength(offset.end);
     
     if (!_reachability) {
@@ -493,13 +492,13 @@ public:
     offset.position = 0;
     
     // If continuous
-    if ((0 == [self durationInSeconds])) {
+    if (!([self durationInSeconds] > 0)) {
         return offset;
     }
     
-    offset.position = [self timePlayedInSeconds];
+    offset.position = _audioStream->playbackPosition().offset;
     
-    astreamer::Input_Stream_Position httpStreamPos = [self streamPositionForTime:offset.position];
+    astreamer::Input_Stream_Position httpStreamPos = _audioStream->streamPositionForOffset(offset.position);
     
     offset.start = httpStreamPos.start;
     offset.end   = httpStreamPos.end;
@@ -595,7 +594,7 @@ public:
         if ([self isPlaying]) {
             self.wasInterrupted = YES;
             // Continuous streams do not have a duration.
-            self.wasContinuousStream = (0 == [self durationInSeconds]);
+            self.wasContinuousStream = !([self durationInSeconds] > 0);
             
             if (self.wasContinuousStream) {
 #if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
@@ -695,9 +694,9 @@ public:
     _audioStream->pause();
 }
 
-- (void)seekToTime:(unsigned)newSeekTime
+- (void)seekToOffset:(float)offset
 {
-    _audioStream->seekToTime(newSeekTime);
+    _audioStream->seekToOffset(offset);
 }
 
 - (void)setVolume:(float)volume
@@ -710,19 +709,14 @@ public:
     _audioStream->setPlayRate(playRate);
 }
 
-- (unsigned)timePlayedInSeconds
+- (astreamer::AS_Playback_Position)playbackPosition
 {
-    return _audioStream->timePlayedInSeconds();
+    return _audioStream->playbackPosition();
 }
 
-- (unsigned)durationInSeconds
+- (float)durationInSeconds
 {
     return _audioStream->durationInSeconds();
-}
-
-- (astreamer::Input_Stream_Position)streamPositionForTime:(unsigned)newSeekTime
-{
-    return _audioStream->streamPositionForTime(newSeekTime);
 }
 
 -(NSString *)description
@@ -905,9 +899,15 @@ public:
 
 - (void)seekToPosition:(FSStreamPosition)position
 {
-    unsigned seekTime = position.minute * 60 + position.second;
+    if (!(position.position > 0)) {
+        // To retain compatibility with older implementations,
+        // fallback to using less accurate position.minute and position.second, if needed
+        const float seekTime = position.minute * 60 + position.second;
+        
+        position.position = seekTime / [_private durationInSeconds];
+    }
     
-    [_private seekToTime:seekTime];
+    [_private seekToOffset:position.position];
 }
 
 - (void)setVolume:(float)volume
@@ -927,27 +927,54 @@ public:
 
 - (FSStreamPosition)currentTimePlayed
 {
-    unsigned u = [_private timePlayedInSeconds];
+    FSStreamPosition pos;
+    pos.position = 0;
+    pos.playbackTimeInSeconds = [_private playbackPosition].timePlayed;
+    pos.minute = 0;
+    pos.second = 0;
     
-    unsigned s,m;
+    const float durationInSeconds = [_private durationInSeconds];
     
-    s = u % 60, u /= 60;
-    m = u;
+    if (durationInSeconds > 0) {
+        pos.position = pos.playbackTimeInSeconds / [_private durationInSeconds];
+    }
     
-    FSStreamPosition pos = {.minute = m, .second = s};
+    // Extract the minutes and seconds for convenience
+    if (pos.playbackTimeInSeconds > 0) {
+        unsigned u = pos.playbackTimeInSeconds;
+        unsigned s,m;
+    
+        s = u % 60, u /= 60;
+        m = u;
+    
+        pos.minute = m;
+        pos.second = s;
+    }
+
     return pos;
 }
 
 - (FSStreamPosition)duration
 {
-    unsigned u = [_private durationInSeconds];
+    FSStreamPosition pos;
+    pos.minute = 0;
+    pos.second = 0;
+    pos.playbackTimeInSeconds = 0;
+    pos.position              = 0;
     
-    unsigned s,m;
+    const float durationInSeconds = [_private durationInSeconds];
     
-    s = u % 60, u /= 60;
-    m = u;
+    if (durationInSeconds > 0) {
+        unsigned u = durationInSeconds;
     
-    FSStreamPosition pos = {.minute = m, .second = s};
+        unsigned s,m;
+    
+        s = u % 60, u /= 60;
+        m = u;
+        
+        pos.minute = m;
+        pos.second = s;
+    }
     return pos;
 }
 
@@ -958,8 +985,7 @@ public:
 
 - (BOOL)continuous
 {
-    FSStreamPosition duration = self.duration;
-    return (duration.minute == 0 && duration.second == 0);
+    return !([_private durationInSeconds] > 0);
 }
 
 - (BOOL)cached

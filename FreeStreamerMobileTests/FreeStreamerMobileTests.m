@@ -164,9 +164,9 @@
                                                   }];
     
     FSSeekByteOffset offset;
-    offset.start = 4063560;
+    offset.start = 4089672;
     offset.end   = 8227656;
-    offset.position = 127;
+    offset.position = 0.497128189;
     
     _stream.url = [NSURL URLWithString:@"https://dl.dropboxusercontent.com/u/995250/FreeStreamer/As%20long%20as%20the%20stars%20shine.mp3"];
     [_stream playFromOffset:offset];

@@ -129,7 +129,7 @@
                 self.progressSlider.enabled = YES;
                 
                 if (!_progressUpdateTimer) {
-                    _progressUpdateTimer = [NSTimer scheduledTimerWithTimeInterval:1.0
+                    _progressUpdateTimer = [NSTimer scheduledTimerWithTimeInterval:0.5
                                                                             target:self
                                                                           selector:@selector(updatePlaybackProgress)
                                                                           userInfo:nil
@@ -239,7 +239,7 @@
     
     [self becomeFirstResponder];
     
-    _progressUpdateTimer = [NSTimer scheduledTimerWithTimeInterval:1.0
+    _progressUpdateTimer = [NSTimer scheduledTimerWithTimeInterval:0.5
                                                             target:self
                                                           selector:@selector(updatePlaybackProgress)
                                                           userInfo:nil
@@ -505,14 +505,12 @@
         self.progressSlider.value = 0;
         self.currentPlaybackTime.text = @"";
     } else {
-        double s = self.audioController.stream.currentTimePlayed.minute * 60 + self.audioController.stream.currentTimePlayed.second;
-        double e = self.audioController.stream.duration.minute * 60 + self.audioController.stream.duration.second;
-        
         self.progressSlider.enabled = YES;
-        self.progressSlider.value = s / e;
         
         FSStreamPosition cur = self.audioController.stream.currentTimePlayed;
         FSStreamPosition end = self.audioController.stream.duration;
+        
+        self.progressSlider.value = cur.position;
         
         self.currentPlaybackTime.text = [NSString stringWithFormat:@"%i:%02i / %i:%02i",
                                          cur.minute, cur.second,
@@ -528,16 +526,8 @@
 {
     self.progressSlider.enabled = NO;
     
-    unsigned u = (self.audioController.stream.duration.minute * 60 + self.audioController.stream.duration.second) * _seekToPoint;
-    
-    unsigned s,m;
-    
-    s = u % 60, u /= 60;
-    m = u;
-    
     FSStreamPosition pos;
-    pos.minute = m;
-    pos.second = s;
+    pos.position = _seekToPoint;
     
     [self.audioController.stream seekToPosition:pos];
 }

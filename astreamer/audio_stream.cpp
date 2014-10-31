@@ -49,7 +49,7 @@ Audio_Stream::Audio_Stream() :
     m_outputBufferSize(Stream_Configuration::configuration()->bufferSize),
     m_outputBuffer(new UInt8[m_outputBufferSize]),
     m_dataOffset(0),
-    m_seekPosition(0),
+    m_seekOffset(0),
     m_bounceCount(0),
     m_firstBufferingTime(0),
 #if defined (AS_RELAX_CONTENT_TYPE_CHECK)
@@ -130,7 +130,7 @@ void Audio_Stream::open(Input_Stream_Position *position)
     }
     
     m_contentLength = 0;
-    m_seekPosition = 0;
+    m_seekOffset = 0;
     m_bounceCount = 0;
     m_firstBufferingTime = 0;
     m_processedPacketsCount = 0;
@@ -252,24 +252,37 @@ void Audio_Stream::pause()
     audioQueue()->pause();
 }
     
-unsigned Audio_Stream::timePlayedInSeconds()
+AS_Playback_Position Audio_Stream::playbackPosition()
 {
+    AS_Playback_Position playbackPosition;
+    playbackPosition.offset     = 0;
+    playbackPosition.timePlayed = 0;
+    
     if (m_audioStreamParserRunning) {
-        return m_seekPosition + audioQueue()->timePlayedInSeconds();
+        AudioTimeStamp queueTime = audioQueue()->currentTime();
+        
+        playbackPosition.timePlayed = (durationInSeconds() * m_seekOffset) +
+                                    (queueTime.mSampleTime / m_dstFormat.mSampleRate);
+        
+        float duration = durationInSeconds();
+        
+        if (duration > 0) {
+            playbackPosition.offset = playbackPosition.timePlayed / durationInSeconds();
+        }
     }
-    return 0;
+    return playbackPosition;
 }
     
-unsigned Audio_Stream::durationInSeconds()
+float Audio_Stream::durationInSeconds()
 {
-    unsigned duration = 0;
+    float duration = 0;
     unsigned bitrate = this->bitrate();
     
     if (bitrate == 0) {
         goto out;
     }
     
-    double d;
+    float d;
     
     if (m_audioDataByteCount > 0) {
         d = m_audioDataByteCount;
@@ -283,7 +296,7 @@ out:
     return duration;
 }
     
-void Audio_Stream::seekToTime(unsigned newSeekTime)
+void Audio_Stream::seekToOffset(float offset)
 {
     if (state() == SEEKING) {
         return;
@@ -291,7 +304,7 @@ void Audio_Stream::seekToTime(unsigned newSeekTime)
         setState(SEEKING);
     }
     
-    Input_Stream_Position position = streamPositionForTime(newSeekTime);
+    Input_Stream_Position position = streamPositionForOffset(offset);
     
     if (position.start == 0 && position.end == 0) {
         return;
@@ -305,22 +318,21 @@ void Audio_Stream::seekToTime(unsigned newSeekTime)
     
     open(&position);
     
-    setSeekPosition(newSeekTime);
+    setSeekOffset(offset);
     setContentLength(originalContentLength);
 }
     
-Input_Stream_Position Audio_Stream::streamPositionForTime(unsigned newSeekTime)
+Input_Stream_Position Audio_Stream::streamPositionForOffset(float offset)
 {
     Input_Stream_Position position;
     position.start = 0;
     position.end   = 0;
     
-    unsigned duration = durationInSeconds();
+    float duration = durationInSeconds();
     if (!(duration > 0)) {
         return position;
     }
     
-    double offset = (double)newSeekTime / (double)duration;
     UInt64 seekByteOffset = m_dataOffset + offset * (contentLength() - m_dataOffset);
     
     position.start = seekByteOffset;
@@ -331,7 +343,7 @@ Input_Stream_Position Audio_Stream::streamPositionForTime(unsigned newSeekTime)
     if (packetDuration > 0 && bitrate() > 0) {
         UInt32 ioFlags = 0;
         SInt64 packetAlignedByteOffset;
-        SInt64 seekPacket = floor((double)newSeekTime / packetDuration);
+        SInt64 seekPacket = floor((duration * offset) / packetDuration);
         
         OSStatus err = AudioFileStreamSeek(m_audioFileStream, seekPacket, &packetAlignedByteOffset, &ioFlags);
         if (!err) {
@@ -414,9 +426,9 @@ void Audio_Stream::setDefaultContentType(CFStringRef defaultContentType)
     }
 }
     
-void Audio_Stream::setSeekPosition(unsigned seekPosition)
+void Audio_Stream::setSeekOffset(float offset)
 {
-    m_seekPosition = seekPosition;
+    m_seekOffset = offset;
 }
     
 void Audio_Stream::setContentLength(UInt64 contentLength)
