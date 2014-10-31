@@ -78,6 +78,17 @@ typedef enum {
 typedef struct {
     unsigned minute;
     unsigned second;
+    
+    /**
+     * Playback time in seconds.
+     */
+    float playbackTimeInSeconds;
+    
+    /**
+     * Position within the stream, where 0 is the beginning
+     * and 1.0 is the end.
+     */
+    float position;
 } FSStreamPosition;
 
 /**
@@ -86,7 +97,11 @@ typedef struct {
 typedef struct {
     UInt64 start;
     UInt64 end;
-    unsigned position;
+    /**
+     * Position within the stream, where 0 is the beginning
+     * and 1.0 is the end.
+     */
+    float position;
 } FSSeekByteOffset;
 
 /**

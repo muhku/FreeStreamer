@@ -23,6 +23,11 @@ typedef struct queued_packet {
     char data[];
 } queued_packet_t;
     
+typedef struct {
+    float offset;
+    float timePlayed;
+} AS_Playback_Position;
+    
 enum Audio_Stream_Error {
     AS_ERR_OPEN = 1,          // Cannot open the audio stream
     AS_ERR_STREAM_PARSE = 2,  // Parse error
@@ -59,11 +64,11 @@ public:
     void close();
     void pause();
     
-    unsigned timePlayedInSeconds();
-    unsigned durationInSeconds();
-    void seekToTime(unsigned newSeekTime);
+    AS_Playback_Position playbackPosition();
+    float durationInSeconds();
+    void seekToOffset(float offset);
     
-    Input_Stream_Position streamPositionForTime(unsigned newSeekTime);
+    Input_Stream_Position streamPositionForOffset(float offset);
     
     void setVolume(float volume);
     void setPlayRate(float playRate);
@@ -71,7 +76,7 @@ public:
     void setUrl(CFURLRef url);
     void setStrictContentTypeChecking(bool strictChecking);
     void setDefaultContentType(CFStringRef defaultContentType);
-    void setSeekPosition(unsigned seekPosition);
+    void setSeekOffset(float offset);
     void setContentLength(UInt64 contentLength);
     
     void setOutputFile(CFURLRef url);
@@ -128,7 +133,7 @@ private:
     UInt8 *m_outputBuffer;
     
     UInt64 m_dataOffset;
-    unsigned m_seekPosition;
+    float m_seekOffset;
     size_t m_bounceCount;
     CFAbsoluteTime m_firstBufferingTime;
     

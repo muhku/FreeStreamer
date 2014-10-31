@@ -49,7 +49,7 @@ public:
     void setVolume(float volume);
     void setPlayRate(float playRate);
     
-    unsigned timePlayedInSeconds();
+    AudioTimeStamp currentTime();
 	
 private:
     Audio_Queue(const Audio_Queue&);

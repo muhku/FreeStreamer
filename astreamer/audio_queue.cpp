@@ -191,22 +191,19 @@ void Audio_Queue::stop(bool stopImmediately)
     AQ_TRACE("%s: leave\n", __PRETTY_FUNCTION__);
 }
     
-unsigned Audio_Queue::timePlayedInSeconds()
+AudioTimeStamp Audio_Queue::currentTime()
 {
-    unsigned timePlayed = 0;
-    
     AudioTimeStamp queueTime;
     Boolean discontinuity;
     
+    memset(&queueTime, 0, sizeof queueTime);
+    
     OSStatus err = AudioQueueGetCurrentTime(m_outAQ, NULL, &queueTime, &discontinuity);
     if (err) {
-        goto out;
+        AQ_TRACE("AudioQueueGetCurrentTime failed\n");
     }
     
-    timePlayed = queueTime.mSampleTime / m_streamDesc.mSampleRate;
-    
-out:
-    return timePlayed;
+    return queueTime;
 }
 
 void Audio_Queue::handlePropertyChange(AudioFileStreamID inAudioFileStream, AudioFileStreamPropertyID inPropertyID, UInt32 *ioFlags)
