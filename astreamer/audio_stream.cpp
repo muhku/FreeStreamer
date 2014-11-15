@@ -564,11 +564,19 @@ void Audio_Stream::audioQueueBuffersEmpty()
 {
     AS_TRACE("%s: enter\n", __PRETTY_FUNCTION__);
     
-    Stream_Configuration *config = Stream_Configuration::configuration();
+    /*
+     * Entering here means that the audio queue has run out of data to play.
+     */
     
-    if (m_inputStreamRunning && FAILED != state()) {
-        /* Still feeding the audio queue with data,
-           don't stop yet */
+    const int count = cachedDataCount();
+    
+    /*
+     * If we don't have any cached data to play and we are still supposed to
+     * feed the audio queue with data, enter the buffering state.
+     */
+    if (count == 0 && m_inputStreamRunning && FAILED != state()) {
+        Stream_Configuration *config = Stream_Configuration::configuration();
+        
         setState(BUFFERING);
         
         if (m_firstBufferingTime == 0) {
@@ -606,11 +614,9 @@ void Audio_Stream::audioQueueBuffersEmpty()
         return;
     }
     
-    // Keep enqueuing the packets in the queue until we have them
-    
-    int count = cachedDataCount();
-    
     AS_TRACE("%i cached packets, enqueuing\n", count);
+    
+    // Keep enqueuing the packets in the queue until we have them
     
     if (count > 0) {
         enqueueCachedData(0);
