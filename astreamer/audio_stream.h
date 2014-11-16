@@ -114,6 +114,7 @@ private:
     
     bool m_inputStreamRunning;
     bool m_audioStreamParserRunning;
+    bool m_initialBufferingCompleted;
     
     UInt64 m_contentLength;
     

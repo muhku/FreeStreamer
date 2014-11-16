@@ -38,6 +38,7 @@ Audio_Stream::Audio_Stream() :
     m_delegate(0),
     m_inputStreamRunning(false),
     m_audioStreamParserRunning(false),
+    m_initialBufferingCompleted(false),
     m_contentLength(0),
     m_state(STOPPED),
     m_inputStream(0),
@@ -152,10 +153,15 @@ void Audio_Stream::open(Input_Stream_Position *position)
     bool success = false;
     
     if (position) {
+        // Do not require buffering when seeking
+        m_initialBufferingCompleted = true;
+        
         if (m_inputStream) {
             success = m_inputStream->open(*position);
         }
     } else {
+        m_initialBufferingCompleted = false;
+        
         if (m_inputStream) {
             success = m_inputStream->open();
         }
@@ -987,9 +993,37 @@ void Audio_Stream::enqueueCachedData(int minPacketsRequired)
         return;
     }
     
-    int count = cachedDataCount();
+    Stream_Configuration *config = Stream_Configuration::configuration();
     
-    if (count > minPacketsRequired) {
+    const int count = cachedDataCount();
+    
+    if (!m_initialBufferingCompleted) {
+        // Check if we have enough prebuffered data to start playback
+        
+        AS_TRACE("initial buffering not completed, checking if enough data\n");
+        
+        int lim;
+        
+        if (!(contentLength() > 0)) {
+            // Continuous stream
+            lim = config->requiredInitialPrebufferedByteCountForContinuousStream;
+            AS_TRACE("continuous stream, %i bytes must be cached to start the playback\n", lim);
+        } else {
+            // Non-continuous
+            lim = config->requiredInitialPrebufferedByteCountForNonContinuousStream;
+            AS_TRACE("non-continuous stream, %i bytes must be cached to start the playback\n", lim);
+        }
+        
+        if (m_cachedDataSize > lim) {
+            AS_TRACE("buffered %zu bytes, required for playback %i, starting playback\n", m_cachedDataSize, lim);
+            
+            m_initialBufferingCompleted = true;
+        } else {
+            AS_TRACE("not enough cached data to start playback\n");
+        }
+    }
+    
+    if (m_initialBufferingCompleted && count > minPacketsRequired) {
         AudioBufferList outputBufferList;
         outputBufferList.mNumberBuffers = 1;
         outputBufferList.mBuffers[0].mNumberChannels = m_dstFormat.mChannelsPerFrame;
@@ -1004,8 +1038,6 @@ void Audio_Stream::enqueueCachedData(int minPacketsRequired)
         UInt32 ioOutputDataPackets = m_outputBufferSize / m_dstFormat.mBytesPerPacket;
         
         AS_TRACE("calling AudioConverterFillComplexBuffer\n");
-        
-        Stream_Configuration *config = Stream_Configuration::configuration();
         
         OSStatus err = AudioConverterFillComplexBuffer(m_audioConverter,
                                                        &encoderDataCallback,

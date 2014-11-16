@@ -87,6 +87,8 @@ static NSInteger sortCacheObjects(id co1, id co2, void *keyForSorting)
         self.userAgent = [NSString stringWithFormat:@"FreeStreamer/%@ (%@)", freeStreamerReleaseVersion(), systemVersion];
         self.cacheEnabled = YES;
         self.maxDiskCacheSize = 100000000;
+        self.requiredInitialPrebufferedByteCountForContinuousStream = 100000;
+        self.requiredInitialPrebufferedByteCountForNonContinuousStream = 50000;
         
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
         
@@ -721,7 +723,7 @@ public:
 
 -(NSString *)description
 {
-    return [NSString stringWithFormat:@"[FreeStreamer %@] URL: %@\nbufferCount: %i\nbufferSize: %i\nmaxPacketDescs: %i\ndecodeQueueSize: %i\nhttpConnectionBufferSize: %i\noutputSampleRate: %f\noutputNumChannels: %ld\nbounceInterval: %i\nmaxBounceCount: %i\nstartupWatchdogPeriod: %i\nmaxPrebufferedByteCount: %i\nformat: %@\nuserAgent: %@\ncacheDirectory: %@\ncacheEnabled: %@\nmaxDiskCacheSize: %i",
+    return [NSString stringWithFormat:@"[FreeStreamer %@] URL: %@\nbufferCount: %i\nbufferSize: %i\nmaxPacketDescs: %i\ndecodeQueueSize: %i\nhttpConnectionBufferSize: %i\noutputSampleRate: %f\noutputNumChannels: %ld\nbounceInterval: %i\nmaxBounceCount: %i\nstartupWatchdogPeriod: %i\nmaxPrebufferedByteCount: %i\nformat: %@\nuserAgent: %@\ncacheDirectory: %@\ncacheEnabled: %@\nmaxDiskCacheSize: %i\nrequiredInitialPrebufferedByteCountForContinuousStream: %i\nrequiredInitialPrebufferedByteCountForNonContinuousStream: %i",
             freeStreamerReleaseVersion(),
             self.url,
             self.configuration.bufferCount,
@@ -739,7 +741,9 @@ public:
             self.configuration.userAgent,
             self.configuration.cacheDirectory,
             (self.configuration.cacheEnabled ? @"YES" : @"NO"),
-            self.configuration.maxDiskCacheSize];
+            self.configuration.maxDiskCacheSize,
+            self.configuration.requiredInitialPrebufferedByteCountForContinuousStream,
+            self.configuration.requiredInitialPrebufferedByteCountForNonContinuousStream];
 }
 
 @end
@@ -788,6 +792,8 @@ public:
         c->maxPrebufferedByteCount  = configuration.maxPrebufferedByteCount;
         c->cacheEnabled             = configuration.cacheEnabled;
         c->maxDiskCacheSize         = configuration.maxDiskCacheSize;
+        c->requiredInitialPrebufferedByteCountForContinuousStream = configuration.requiredInitialPrebufferedByteCountForContinuousStream;
+        c->requiredInitialPrebufferedByteCountForNonContinuousStream = configuration.requiredInitialPrebufferedByteCountForNonContinuousStream;
         
         if (c->userAgent) {
             CFRelease(c->userAgent);

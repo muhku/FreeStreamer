@@ -155,6 +155,14 @@ typedef struct {
  */
 @property (nonatomic,assign) int      maxPrebufferedByteCount;
 /**
+ * Require buffering of this many bytes before the playback can start for a continuous stream.
+ */
+@property (nonatomic,assign) int      requiredInitialPrebufferedByteCountForContinuousStream;
+/**
+ * Require buffering of this many bytes before the playback can start a non-continuous stream.
+ */
+@property (nonatomic,assign) int      requiredInitialPrebufferedByteCountForNonContinuousStream;
+/**
  * The HTTP user agent used for stream operations.
  */
 @property (nonatomic,strong) NSString *userAgent;
