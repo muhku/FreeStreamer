@@ -104,7 +104,7 @@ public:
     void streamIsReadyRead();
     void streamHasBytesAvailable(UInt8 *data, UInt32 numBytes);
     void streamEndEncountered();
-    void streamErrorOccurred();
+    void streamErrorOccurred(CFStringRef errorDesc);
     void streamMetaDataAvailable(std::map<CFStringRef,CFStringRef> metaData);
 
 private:
@@ -171,7 +171,7 @@ private:
     void closeAudioQueue();
     
     UInt64 contentLength();
-    void closeAndSignalError(int error);
+    void closeAndSignalError(int error, CFStringRef errorDescription);
     void setState(State state);
     void setCookiesForStream(AudioFileStreamID inAudioFileStream);
     unsigned bitrate();
@@ -191,7 +191,7 @@ private:
 class Audio_Stream_Delegate {
 public:
     virtual void audioStreamStateChanged(Audio_Stream::State state) = 0;
-    virtual void audioStreamErrorOccurred(int errorCode) = 0;
+    virtual void audioStreamErrorOccurred(int errorCode, CFStringRef errorDescription) = 0;
     virtual void audioStreamMetaDataAvailable(std::map<CFStringRef,CFStringRef> metaData) = 0;
     virtual void samplesAvailable(AudioBufferList samples, AudioStreamPacketDescription description) = 0;
 };    

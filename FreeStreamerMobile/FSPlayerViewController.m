@@ -154,31 +154,33 @@
         }
     };
     
-    self.audioController.stream.onFailure = ^(FSAudioStreamError error) {
-        NSString *errorDescription;
+    self.audioController.stream.onFailure = ^(FSAudioStreamError error, NSString *errorDescription) {
+        NSString *errorCategory;
         
         switch (error) {
             case kFsAudioStreamErrorOpen:
-                errorDescription = @"Cannot open the audio stream";
+                errorCategory = @"Cannot open the audio stream: ";
                 break;
             case kFsAudioStreamErrorStreamParse:
-                errorDescription = @"Cannot read the audio stream";
+                errorCategory = @"Cannot read the audio stream: ";
                 break;
             case kFsAudioStreamErrorNetwork:
-                errorDescription = @"Network failed: cannot play the audio stream";
+                errorCategory = @"Network failed: cannot play the audio stream: ";
                 break;
             case kFsAudioStreamErrorUnsupportedFormat:
-                errorDescription = @"Unsupported format";
+                errorCategory = @"Unsupported format: ";
                 break;
             case kFsAudioStreamErrorStreamBouncing:
-                errorDescription = @"Network failed: cannot get enough data to play";
+                errorCategory = @"Network failed: cannot get enough data to play: ";
                 break;
             default:
-                errorDescription = @"Unknown error occurred";
+                errorCategory = @"Unknown error occurred: ";
                 break;
         }
         
-        [self showErrorStatus:errorDescription];
+        NSString *formattedError = [NSString stringWithFormat:@"%@ %@", errorCategory, errorDescription];
+        
+        [self showErrorStatus:formattedError];
     };
     
     self.audioController.stream.onMetaDataAvailable = ^(NSDictionary *metaData) {
@@ -526,7 +528,7 @@
 {
     self.progressSlider.enabled = NO;
     
-    FSStreamPosition pos;
+    FSStreamPosition pos = {0};
     pos.position = _seekToPoint;
     
     [self.audioController.stream seekToPosition:pos];

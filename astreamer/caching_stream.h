@@ -61,7 +61,7 @@ public:
     void streamIsReadyRead();
     void streamHasBytesAvailable(UInt8 *data, UInt32 numBytes);
     void streamEndEncountered();
-    void streamErrorOccurred();
+    void streamErrorOccurred(CFStringRef errorDesc);
     void streamMetaDataAvailable(std::map<CFStringRef,CFStringRef> metaData);
 };
     

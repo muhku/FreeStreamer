@@ -365,7 +365,7 @@ NSString*             freeStreamerReleaseVersion();
 /**
  * Called upon a failure.
  */
-@property (copy) void (^onFailure)(FSAudioStreamError error);
+@property (copy) void (^onFailure)(FSAudioStreamError error, NSString *errorDescription);
 /**
  * The property has the low-level stream configuration.
  */

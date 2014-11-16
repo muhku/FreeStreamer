@@ -32,6 +32,26 @@
 #endif
 
 namespace astreamer {
+    
+static CFStringRef coreAudioErrorToCFString(CFStringRef basicErrorDescription, OSStatus error)
+{
+    char str[20] = {0};
+    
+    *(UInt32 *) (str + 1) = CFSwapInt32HostToBig(error);
+    if (isprint(str[1]) && isprint(str[2]) && isprint(str[3]) && isprint(str[4])) {
+        str[0] = str[5] = '\'';
+        str[6] = '\0';
+    } else {
+        sprintf(str, "%d", (int)error);
+    }
+    
+    CFStringRef formattedError = CFStringCreateWithFormat(NULL,
+                                                          NULL,
+                                                          CFSTR("%@: error code %s"),
+                                                          basicErrorDescription,
+                                                          str);
+    return formattedError;
+}
 	
 /* Create HTTP stream as Audio_Stream (this) as the delegate */
 Audio_Stream::Audio_Stream() :
@@ -194,8 +214,7 @@ void Audio_Stream::open(Input_Stream_Position *position)
             CFRunLoopAddTimer(CFRunLoopGetCurrent(), m_watchdogTimer, kCFRunLoopCommonModes);
         }
     } else {
-        AS_TRACE("%s: failed to open the HTTP stream\n", __PRETTY_FUNCTION__);
-        closeAndSignalError(AS_ERR_OPEN);
+        closeAndSignalError(AS_ERR_OPEN, CFSTR("Input stream open error"));
     }
 }
     
@@ -614,7 +633,12 @@ void Audio_Stream::audioQueueBuffersEmpty()
         
         // Check if we have reached the bounce state
         if (m_bounceCount >= config->maxBounceCount) {
-            closeAndSignalError(AS_ERR_BOUNCING);
+            CFStringRef errorDescription = CFStringCreateWithFormat(NULL, NULL, CFSTR("Buffered %zu times in the last %i seconds"), m_bounceCount, config->maxBounceCount);
+            
+            closeAndSignalError(AS_ERR_BOUNCING, errorDescription);
+            if (errorDescription) {
+                CFRelease(errorDescription);
+            }
         }
         
         return;
@@ -658,9 +682,13 @@ void Audio_Stream::audioQueueInitializationFailed()
     
     if (m_delegate) {
         if (audioQueue()->m_lastError == kAudioFormatUnsupportedDataFormatError) {
-            m_delegate->audioStreamErrorOccurred(AS_ERR_UNSUPPORTED_FORMAT);
+            m_delegate->audioStreamErrorOccurred(AS_ERR_UNSUPPORTED_FORMAT, CFSTR("Audio queue failed, unsupported format"));
         } else {
-            m_delegate->audioStreamErrorOccurred(AS_ERR_STREAM_PARSE);
+            CFStringRef errorDescription = coreAudioErrorToCFString(CFSTR("Audio queue failed"), audioQueue()->m_lastError);
+            m_delegate->audioStreamErrorOccurred(AS_ERR_STREAM_PARSE, errorDescription);
+            if (errorDescription) {
+                CFRelease(errorDescription);
+            }
         }
     }
 }
@@ -705,7 +733,18 @@ void Audio_Stream::streamIsReadyRead()
     }
     
     if (m_strictContentTypeChecking && !matchesAudioContentType) {
-        closeAndSignalError(AS_ERR_OPEN);
+        CFStringRef errorDescription = NULL;
+        
+        if (m_contentType) {
+            errorDescription = CFStringCreateWithFormat(NULL, NULL, CFSTR("Strict content type checking active, %@ is not an audio content type"), m_contentType);
+        } else {
+            errorDescription = CFStringCreateCopy(kCFAllocatorDefault, CFSTR("Strict content type checking active, no content type provided by the server"));
+        }
+        
+        closeAndSignalError(AS_ERR_OPEN, errorDescription);
+        if (errorDescription) {
+            CFRelease(errorDescription);
+        }
         return;
     }
     
@@ -722,7 +761,7 @@ void Audio_Stream::streamIsReadyRead()
         AS_TRACE("%s: audio file stream opened.\n", __PRETTY_FUNCTION__);
         m_audioStreamParserRunning = true;
     } else {
-        closeAndSignalError(AS_ERR_OPEN);
+        closeAndSignalError(AS_ERR_OPEN, CFSTR("Audio file stream parser open error"));
     }
 }
 	
@@ -746,17 +785,32 @@ void Audio_Stream::streamHasBytesAvailable(UInt8 *data, UInt32 numBytes)
             AS_TRACE("%s: AudioFileStreamParseBytes error %d\n", __PRETTY_FUNCTION__, (int)result);
             
             if (result == kAudioFileStreamError_NotOptimized) {
-                AS_TRACE("Trying to use non-optimized format\n");
-                closeAndSignalError(AS_ERR_UNSUPPORTED_FORMAT);
+                closeAndSignalError(AS_ERR_UNSUPPORTED_FORMAT, CFSTR("Non-optimized formats not supported for streaming"));
             } else {
-                closeAndSignalError(AS_ERR_STREAM_PARSE);
+                CFStringRef errorDescription = coreAudioErrorToCFString(CFSTR("Audio file stream parse bytes error"), result);
+                closeAndSignalError(AS_ERR_STREAM_PARSE, errorDescription);
+                if (errorDescription) {
+                    CFRelease(errorDescription);
+                }
             }
         } else if (m_initializationError == kAudioConverterErr_FormatNotSupported) {
-            AS_TRACE("Audio stream initialization failed due to unsupported format\n");
-            closeAndSignalError(AS_ERR_UNSUPPORTED_FORMAT);
+            CFStringRef sourceFormat = sourceFormatDescription();
+            
+            CFStringRef errorDescription = CFStringCreateWithFormat(NULL, NULL, CFSTR("%@ not supported for streaming"), sourceFormat);
+            
+            closeAndSignalError(AS_ERR_UNSUPPORTED_FORMAT, errorDescription);
+            if (errorDescription) {
+                CFRelease(errorDescription);
+            }
+            if (sourceFormat) {
+                CFRelease(sourceFormat);
+            }
         } else if (m_initializationError != noErr) {
-            AS_TRACE("Audio stream initialization failed due to unknown error\n");
-            closeAndSignalError(AS_ERR_OPEN);
+            CFStringRef errorDescription = coreAudioErrorToCFString(CFSTR("Error in audio stream initialization"), m_initializationError);
+            closeAndSignalError(AS_ERR_OPEN, errorDescription);
+            if (errorDescription) {
+                CFRelease(errorDescription);
+            }
         }
     }
 }
@@ -778,7 +832,7 @@ void Audio_Stream::streamEndEncountered()
     m_inputStreamRunning = false;
 }
 
-void Audio_Stream::streamErrorOccurred()
+void Audio_Stream::streamErrorOccurred(CFStringRef errorDesc)
 {
     AS_TRACE("%s\n", __PRETTY_FUNCTION__);
     
@@ -787,7 +841,7 @@ void Audio_Stream::streamErrorOccurred()
         return;
     }
     
-    closeAndSignalError(AS_ERR_NETWORK);
+    closeAndSignalError(AS_ERR_NETWORK, errorDesc);
 }
     
 void Audio_Stream::streamMetaDataAvailable(std::map<CFStringRef,CFStringRef> metaData)
@@ -872,7 +926,7 @@ UInt64 Audio_Stream::contentLength()
     return m_contentLength;
 }
 
-void Audio_Stream::closeAndSignalError(int errorCode)
+void Audio_Stream::closeAndSignalError(int errorCode, CFStringRef errorDescription)
 {
     AS_TRACE("%s: error %i\n", __PRETTY_FUNCTION__, errorCode);
     
@@ -880,7 +934,7 @@ void Audio_Stream::closeAndSignalError(int errorCode)
     close();
     
     if (m_delegate) {
-        m_delegate->audioStreamErrorOccurred(errorCode);
+        m_delegate->audioStreamErrorOccurred(errorCode, errorDescription);
     }
 }
     
@@ -945,9 +999,14 @@ void Audio_Stream::watchdogTimerCallback(CFRunLoopTimerRef timer, void *info)
     Audio_Stream *THIS = (Audio_Stream *)info;
     
     if (PLAYING != THIS->state()) {
-        AS_TRACE("The stream startup watchdog activated: stream didn't start to play soon enough\n");
+        Stream_Configuration *config = Stream_Configuration::configuration();
         
-        THIS->closeAndSignalError(AS_ERR_OPEN);
+        CFStringRef errorDescription = CFStringCreateWithFormat(NULL, NULL, CFSTR("The stream startup watchdog activated: stream didn't start to play in %d seconds"), config->startupWatchdogPeriod);
+        
+        THIS->closeAndSignalError(AS_ERR_OPEN, errorDescription);
+        if (errorDescription) {
+            CFRelease(errorDescription);
+        }
     }
 }
 

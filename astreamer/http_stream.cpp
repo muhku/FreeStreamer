@@ -665,6 +665,8 @@ void HTTP_Stream::readCallBack(CFReadStreamRef stream, CFStreamEventType eventTy
     
     Stream_Configuration *config = Stream_Configuration::configuration();
     
+    CFStringRef reportedNetworkError = NULL;
+    
     switch (eventType) {
         case kCFStreamEventHasBytesAvailable: {
             if (!THIS->m_httpReadBuffer) {
@@ -688,24 +690,26 @@ void HTTP_Stream::readCallBack(CFReadStreamRef stream, CFStreamEventType eventTy
                 if (CFReadStreamGetStatus(stream) == kCFStreamStatusError ||
                     bytesRead < 0) {
                     
-#if defined (HS_DEBUG)
                     CFErrorRef streamError = CFReadStreamCopyError(stream);
                     
                     if (streamError) {
                         CFStringRef errorDesc = CFErrorCopyDescription(streamError);
                         
                         if (errorDesc) {
-                            HS_TRACE_CFSTRING(errorDesc);
+                            reportedNetworkError = CFStringCreateCopy(kCFAllocatorDefault, errorDesc);
                             
                             CFRelease(errorDesc);
                         }
                         
                         CFRelease(streamError);
                     }
-#endif /* HS_DEBUG */
                     
                     if (THIS->m_delegate) {
-                        THIS->m_delegate->streamErrorOccurred();
+                        THIS->m_delegate->streamErrorOccurred(reportedNetworkError);
+                        
+                        if (reportedNetworkError) {
+                            CFRelease(reportedNetworkError), reportedNetworkError = NULL;
+                        }
                     }
                     break;
                 }
@@ -734,7 +738,11 @@ void HTTP_Stream::readCallBack(CFReadStreamRef stream, CFStreamEventType eventTy
                     }
                 }
             }
-                
+            
+            if (reportedNetworkError) {
+                CFRelease(reportedNetworkError), reportedNetworkError = NULL;
+            }
+            
             break;
         }
         case kCFStreamEventEndEncountered: {
@@ -745,7 +753,25 @@ void HTTP_Stream::readCallBack(CFReadStreamRef stream, CFStreamEventType eventTy
         }
         case kCFStreamEventErrorOccurred: {
             if (THIS->m_delegate) {
-                THIS->m_delegate->streamErrorOccurred();
+                CFStringRef reportedNetworkError = NULL;
+                CFErrorRef streamError = CFReadStreamCopyError(stream);
+                
+                if (streamError) {
+                    CFStringRef errorDesc = CFErrorCopyDescription(streamError);
+                    
+                    if (errorDesc) {
+                        reportedNetworkError = CFStringCreateCopy(kCFAllocatorDefault, errorDesc);
+                        
+                        CFRelease(errorDesc);
+                    }
+                    
+                    CFRelease(streamError);
+                }
+                
+                THIS->m_delegate->streamErrorOccurred(reportedNetworkError);
+                if (reportedNetworkError) {
+                    CFRelease(reportedNetworkError);
+                }
             }
             break;
         }

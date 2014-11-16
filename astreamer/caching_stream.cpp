@@ -399,10 +399,10 @@ void Caching_Stream::streamEndEncountered()
     }
 }
     
-void Caching_Stream::streamErrorOccurred()
+void Caching_Stream::streamErrorOccurred(CFStringRef errorDesc)
 {
     if (m_delegate) {
-        m_delegate->streamErrorOccurred();
+        m_delegate->streamErrorOccurred(errorDesc);
     }
 }
     

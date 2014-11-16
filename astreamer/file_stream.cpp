@@ -316,7 +316,25 @@ void File_Stream::readCallBack(CFReadStreamRef stream, CFStreamEventType eventTy
                     bytesRead < 0) {
                     
                     if (THIS->m_delegate) {
-                        THIS->m_delegate->streamErrorOccurred();
+                        CFStringRef reportedNetworkError = NULL;
+                        CFErrorRef streamError = CFReadStreamCopyError(stream);
+                        
+                        if (streamError) {
+                            CFStringRef errorDesc = CFErrorCopyDescription(streamError);
+                            
+                            if (errorDesc) {
+                                reportedNetworkError = CFStringCreateCopy(kCFAllocatorDefault, errorDesc);
+                                
+                                CFRelease(errorDesc);
+                            }
+                            
+                            CFRelease(streamError);
+                        }
+                        
+                        THIS->m_delegate->streamErrorOccurred(reportedNetworkError);
+                        if (reportedNetworkError) {
+                            CFRelease(reportedNetworkError);
+                        }
                     }
                     break;
                 }
@@ -342,7 +360,25 @@ void File_Stream::readCallBack(CFReadStreamRef stream, CFStreamEventType eventTy
         }
         case kCFStreamEventErrorOccurred: {
             if (THIS->m_delegate) {
-                THIS->m_delegate->streamErrorOccurred();
+                CFStringRef reportedNetworkError = NULL;
+                CFErrorRef streamError = CFReadStreamCopyError(stream);
+                
+                if (streamError) {
+                    CFStringRef errorDesc = CFErrorCopyDescription(streamError);
+                    
+                    if (errorDesc) {
+                        reportedNetworkError = CFStringCreateCopy(kCFAllocatorDefault, errorDesc);
+                        
+                        CFRelease(errorDesc);
+                    }
+                    
+                    CFRelease(streamError);
+                }
+                
+                THIS->m_delegate->streamErrorOccurred(reportedNetworkError);
+                if (reportedNetworkError) {
+                    CFRelease(reportedNetworkError);
+                }
             }
             break;
         }
