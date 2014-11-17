@@ -602,6 +602,9 @@ void Audio_Stream::audioQueueBuffersEmpty()
     if (count == 0 && m_inputStreamRunning && FAILED != state()) {
         Stream_Configuration *config = Stream_Configuration::configuration();
         
+        // Always make sure we are scheduled to receive data if we start buffering
+        m_inputStream->setScheduledInRunLoop(true);
+        
         setState(BUFFERING);
         
         if (m_firstBufferingTime == 0) {
