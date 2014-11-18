@@ -219,7 +219,15 @@ public:
 - (void)reachabilityChanged:(NSNotification *)note;
 - (void)interruptionOccurred:(NSNotification *)notification;
 
+- (void)notifyPlaybackStopped;
+- (void)notifyPlaybackBuffering;
+- (void)notifyPlaybackPlaying;
+- (void)notifyPlaybackPaused;
+- (void)notifyPlaybackSeeking;
+- (void)notifyPlaybackEndOfFile;
+- (void)notifyPlaybackFailed;
 - (void)notifyPlaybackCompletion;
+- (void)notifyPlaybackUnknownState;
 - (void)notifyStateChange:(FSAudioStreamState)streamerState;
 
 - (void)play;
@@ -640,6 +648,53 @@ public:
 #endif
 }
 
+- (void)notifyPlaybackStopped
+{
+#if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
+    [[AVAudioSession sharedInstance] setActive:NO error:nil];
+#endif
+    
+    [self notifyStateChange:kFsAudioStreamStopped];
+}
+
+- (void)notifyPlaybackBuffering
+{
+    [self notifyStateChange:kFsAudioStreamBuffering];
+}
+
+- (void)notifyPlaybackPlaying
+{
+#if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
+    [[AVAudioSession sharedInstance] setActive:YES error:nil];
+#endif
+    
+    [self notifyStateChange:kFsAudioStreamPlaying];
+}
+
+- (void)notifyPlaybackPaused
+{
+    [self notifyStateChange:kFsAudioStreamPaused];
+}
+
+- (void)notifyPlaybackSeeking
+{
+    [self notifyStateChange:kFsAudioStreamSeeking];
+}
+
+- (void)notifyPlaybackEndOfFile
+{
+    [self notifyStateChange:kFSAudioStreamEndOfFile];
+}
+
+- (void)notifyPlaybackFailed
+{
+#if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
+    [[AVAudioSession sharedInstance] setActive:NO error:nil];
+#endif
+    
+    [self notifyStateChange:kFsAudioStreamFailed];
+}
+
 - (void)notifyPlaybackCompletion
 {
     [self notifyStateChange:kFsAudioStreamPlaybackCompleted];
@@ -647,6 +702,11 @@ public:
     if (self.onCompletion) {
         self.onCompletion();
     }
+}
+
+- (void)notifyPlaybackUnknownState
+{
+    [self notifyStateChange:kFsAudioStreamUnknownState];
 }
 
 - (void)notifyStateChange:(FSAudioStreamState)streamerState
@@ -1144,61 +1204,46 @@ void AudioStreamStateObserver::audioStreamErrorOccurred(int errorCode, CFStringR
     
 void AudioStreamStateObserver::audioStreamStateChanged(astreamer::Audio_Stream::State state)
 {
-    FSAudioStreamState streamerState = kFsAudioStreamUnknownState;
+    SEL notificationHandler;
     
     switch (state) {
         case astreamer::Audio_Stream::STOPPED:
-            streamerState = kFsAudioStreamStopped;
-#if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
-            [[AVAudioSession sharedInstance] setActive:NO error:nil];
-#endif
+            notificationHandler = @selector(notifyPlaybackStopped);
             break;
         case astreamer::Audio_Stream::BUFFERING:
-            streamerState = kFsAudioStreamBuffering;
+            notificationHandler = @selector(notifyPlaybackBuffering);
             break;
         case astreamer::Audio_Stream::PLAYING:
-            streamerState = kFsAudioStreamPlaying;
-#if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
-            [[AVAudioSession sharedInstance] setActive:YES error:nil];
-#endif
+            notificationHandler = @selector(notifyPlaybackPlaying);
             break;
         case astreamer::Audio_Stream::PAUSED:
-            streamerState = kFsAudioStreamPaused;
+            notificationHandler = @selector(notifyPlaybackPaused);
             break;
         case astreamer::Audio_Stream::SEEKING:
-            streamerState = kFsAudioStreamSeeking;
+            notificationHandler = @selector(notifyPlaybackSeeking);
             break;
         case astreamer::Audio_Stream::END_OF_FILE:
-            streamerState = kFSAudioStreamEndOfFile;
+            notificationHandler = @selector(notifyPlaybackEndOfFile);
             break;
         case astreamer::Audio_Stream::FAILED:
-            streamerState = kFsAudioStreamFailed;
-#if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
-            [[AVAudioSession sharedInstance] setActive:NO error:nil];
-#endif
+            notificationHandler = @selector(notifyPlaybackFailed);
             break;
         case astreamer::Audio_Stream::PLAYBACK_COMPLETED:
-            // Let the event loop run so that the stream is closed when the completion
-            // notification is delivered
-            [NSTimer scheduledTimerWithTimeInterval:1
-                                             target:priv
-                                           selector:@selector(notifyPlaybackCompletion)
-                                           userInfo:nil
-                                            repeats:NO];
-            
-            // We also delay the state change notification
-            return;
-            
+            notificationHandler = @selector(notifyPlaybackCompletion);
             break;
         default:
-            streamerState = kFsAudioStreamUnknownState;
-            /* unknown state */
-            return;
-            
+            // Unknown state
+            notificationHandler = @selector(notifyPlaybackUnknownState);
             break;
     }
     
-    [priv notifyStateChange:streamerState];
+    // Detach from the player so that the event loop can complete its cycle.
+    // This ensures that the stream gets closed, if needs to be.
+    [NSTimer scheduledTimerWithTimeInterval:0.1
+                                     target:priv
+                                   selector:notificationHandler
+                                   userInfo:nil
+                                    repeats:NO];
 }
     
 void AudioStreamStateObserver::audioStreamMetaDataAvailable(std::map<CFStringRef,CFStringRef> metaData)
