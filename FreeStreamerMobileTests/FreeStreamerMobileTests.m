@@ -141,6 +141,8 @@
             
             XCTAssertTrue((_controller.stream.prebufferedByteCount > 0), @"No cached bytes");
             
+            XCTAssertTrue(((unsigned)_controller.stream.bitRate == 56000), @"Invalid bit rate");
+            
             return;
         }
     }

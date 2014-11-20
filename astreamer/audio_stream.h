@@ -91,6 +91,7 @@ public:
     
     size_t cachedDataSize();
     bool strictContentTypeChecking();
+    float bitrate();
     
     /* Audio_Queue_Delegate */
     void audioQueueStateChanged(Audio_Queue::State state);
@@ -174,7 +175,6 @@ private:
     void closeAndSignalError(int error, CFStringRef errorDescription);
     void setState(State state);
     void setCookiesForStream(AudioFileStreamID inAudioFileStream);
-    unsigned bitrate();
     
     int cachedDataCount();
     void enqueueCachedData(int minPacketsRequired);

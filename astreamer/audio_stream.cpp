@@ -301,9 +301,9 @@ AS_Playback_Position Audio_Stream::playbackPosition()
 float Audio_Stream::durationInSeconds()
 {
     float duration = 0;
-    unsigned bitrate = this->bitrate();
+    float bitrate = this->bitrate();
     
-    if (bitrate == 0) {
+    if (!(bitrate > 0)) {
         goto out;
     }
     
@@ -983,7 +983,7 @@ void Audio_Stream::setCookiesForStream(AudioFileStreamID inAudioFileStream)
     free(cookieData);
 }
     
-unsigned Audio_Stream::bitrate()
+float Audio_Stream::bitrate()
 {
     if (m_processedPacketsCount < kAudioStreamBitrateBufferSize) {
         return 0;
@@ -994,7 +994,7 @@ unsigned Audio_Stream::bitrate()
         sum += m_bitrateBuffer[i];
     }
     
-    return sum / kAudioStreamBitrateBufferSize;
+    return sum / (float)kAudioStreamBitrateBufferSize;
 }
     
 void Audio_Stream::watchdogTimerCallback(CFRunLoopTimerRef timer, void *info)

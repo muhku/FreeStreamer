@@ -204,6 +204,7 @@ public:
 @property (nonatomic,assign) BOOL wasContinuousStream;
 @property (readonly) size_t prebufferedByteCount;
 @property (readonly) FSSeekByteOffset currentSeekByteOffset;
+@property (readonly) float bitRate;
 @property (readonly) FSStreamConfiguration *configuration;
 @property (readonly) NSString *formatDescription;
 @property (readonly) BOOL cached;
@@ -515,6 +516,11 @@ public:
     offset.end   = httpStreamPos.end;
     
     return offset;
+}
+
+- (float)bitRate
+{
+    return _audioStream->bitrate();
 }
 
 - (FSStreamConfiguration *)configuration
@@ -1048,6 +1054,11 @@ public:
 - (FSSeekByteOffset)currentSeekByteOffset
 {
     return _private.currentSeekByteOffset;
+}
+
+- (float)bitRate
+{
+    return _private.bitRate;
 }
 
 - (BOOL)continuous

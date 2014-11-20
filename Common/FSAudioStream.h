@@ -338,6 +338,11 @@ NSString*             freeStreamerReleaseVersion();
  */
 @property (nonatomic,readonly) FSSeekByteOffset currentSeekByteOffset;
 /**
+ * This property has the bit rate of the stream. The bit rate is initially 0,
+ * before the stream has processed enough packets to calculate the bit rate.
+ */
+@property (nonatomic,readonly) float bitRate;
+/**
  * The property is true if the stream is continuous (no known duration).
  */
 @property (nonatomic,readonly) BOOL continuous;
