@@ -89,6 +89,7 @@ Audio_Stream::Audio_Stream() :
     m_processedPacketsCount(0),
     m_audioDataByteCount(0),
     m_audioDataPacketCount(0),
+    m_bitRate(0),
     m_packetDuration(0),
     m_bitrateBufferIndex(0),
     m_outputVolume(1.0),
@@ -160,6 +161,7 @@ void Audio_Stream::open(Input_Stream_Position *position)
     m_initializationError = noErr;
     m_converterRunOutOfData = false;
     m_audioDataPacketCount = 0;
+    m_bitRate = 0;
     
     if (m_watchdogTimer) {
         CFRunLoopTimerInvalidate(m_watchdogTimer);
@@ -991,6 +993,12 @@ void Audio_Stream::setCookiesForStream(AudioFileStreamID inAudioFileStream)
     
 float Audio_Stream::bitrate()
 {
+    // Use the stream provided bit rate, if available
+    if (m_bitRate > 0) {
+        return m_bitRate;
+    }
+    
+    // Stream didn't provide a bit rate, so let's calculate it
     if (m_processedPacketsCount < kAudioStreamBitrateBufferSize) {
         return 0;
     }
@@ -1218,6 +1226,16 @@ void Audio_Stream::propertyValueCallback(void *inClientData, AudioFileStreamID i
     }
     
     switch (inPropertyID) {
+        case kAudioFileStreamProperty_BitRate: {
+            UInt32 bitRateSize = sizeof(THIS->m_bitRate);
+            OSStatus err = AudioFileStreamGetProperty(inAudioFileStream,
+                                                      kAudioFileStreamProperty_BitRate,
+                                                      &bitRateSize, &THIS->m_bitRate);
+            if (err) {
+                THIS->m_bitRate = 0;
+            }
+            break;
+        }
         case kAudioFileStreamProperty_DataOffset: {
             SInt64 offset;
             UInt32 offsetSize = sizeof(offset);
@@ -1326,7 +1344,8 @@ void Audio_Stream::streamDataCallback(void *inClientData, UInt32 inNumberBytes, 
         UInt32 size = inPacketDescriptions[i].mDataByteSize;
         queued_packet_t *packet = (queued_packet_t *)malloc(sizeof(queued_packet_t) + size);
         
-        if (THIS->m_bitrateBufferIndex < kAudioStreamBitrateBufferSize) {
+        // If the stream didn't provide bitRate (m_bitRate == 0), then let's calculate it
+        if (THIS->m_bitRate == 0 && THIS->m_bitrateBufferIndex < kAudioStreamBitrateBufferSize) {
             // Only keep sampling for one buffer cycle; this is to keep the counters (for instance) duration
             // stable.
             
