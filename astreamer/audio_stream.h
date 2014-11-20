@@ -156,6 +156,7 @@ private:
     
     UInt32 m_processedPacketsCount;      // global packet statistics: count
     UInt64 m_audioDataByteCount;
+    UInt64 m_audioDataPacketCount;
     
     double m_packetDuration;
     double m_bitrateBuffer[kAudioStreamBitrateBufferSize];

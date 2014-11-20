@@ -88,6 +88,7 @@ Audio_Stream::Audio_Stream() :
     m_cachedDataSize(0),
     m_processedPacketsCount(0),
     m_audioDataByteCount(0),
+    m_audioDataPacketCount(0),
     m_packetDuration(0),
     m_bitrateBufferIndex(0),
     m_outputVolume(1.0),
@@ -158,6 +159,7 @@ void Audio_Stream::open(Input_Stream_Position *position)
     m_bitrateBufferIndex = 0;
     m_initializationError = noErr;
     m_converterRunOutOfData = false;
+    m_audioDataPacketCount = 0;
     
     if (m_watchdogTimer) {
         CFRunLoopTimerInvalidate(m_watchdogTimer);
@@ -300,25 +302,29 @@ AS_Playback_Position Audio_Stream::playbackPosition()
     
 float Audio_Stream::durationInSeconds()
 {
-    float duration = 0;
-    float bitrate = this->bitrate();
-    
-    if (!(bitrate > 0)) {
-        goto out;
+    if (m_audioDataPacketCount > 0 && m_srcFormat.mFramesPerPacket > 0) {
+        return m_audioDataPacketCount * m_srcFormat.mFramesPerPacket / m_srcFormat.mSampleRate;
     }
     
-    float d;
+    // Not enough data provided by the format, use bit rate based estimation
+    UInt64 audioFileLength = 0;
     
     if (m_audioDataByteCount > 0) {
-        d = m_audioDataByteCount;
+        audioFileLength = m_audioDataByteCount;
     } else {
-        d = contentLength();
+        audioFileLength = contentLength();
     }
     
-    duration = d / (bitrate * 0.125);
+    if (audioFileLength > 0) {
+        float bitrate = this->bitrate();
+        
+        if (bitrate > 0) {
+            return audioFileLength / (bitrate * 0.125);
+        }
+    }
     
-out:
-    return duration;
+    // No file length available, cannot calculate the duration
+    return 0;
 }
     
 void Audio_Stream::seekToOffset(float offset)
@@ -1225,12 +1231,22 @@ void Audio_Stream::propertyValueCallback(void *inClientData, AudioFileStreamID i
             break;
         }
         case kAudioFileStreamProperty_AudioDataByteCount: {
-            UInt32 byteCountSize = sizeof(UInt64);
+            UInt32 byteCountSize = sizeof(THIS->m_audioDataByteCount);
             OSStatus err = AudioFileStreamGetProperty(inAudioFileStream,
                                                       kAudioFileStreamProperty_AudioDataByteCount,
                                                       &byteCountSize, &THIS->m_audioDataByteCount);
             if (err) {
                 THIS->m_audioDataByteCount = 0;
+            }
+            break;
+        }
+        case kAudioFileStreamProperty_AudioDataPacketCount: {
+            UInt32 packetCountSize = sizeof(THIS->m_audioDataPacketCount);
+            OSStatus err = AudioFileStreamGetProperty(inAudioFileStream,
+                                                      kAudioFileStreamProperty_AudioDataPacketCount,
+                                                      &packetCountSize, &THIS->m_audioDataPacketCount);
+            if (err) {
+                THIS->m_audioDataPacketCount = 0;
             }
             break;
         }
