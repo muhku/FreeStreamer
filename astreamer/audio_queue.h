@@ -35,7 +35,7 @@ public:
     
     bool initialized();
     
-    void handlePropertyChange(AudioFileStreamID inAudioFileStream, AudioFileStreamPropertyID inPropertyID, UInt32 *ioFlags);
+    void init();
     void handleAudioPackets(UInt32 inNumberBytes, UInt32 inNumberPackets, const void *inInputData, AudioStreamPacketDescription *inPacketDescriptions);
     int handlePacket(const void *data, AudioStreamPacketDescription *desc);
     

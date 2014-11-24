@@ -206,71 +206,62 @@ AudioTimeStamp Audio_Queue::currentTime()
     return queueTime;
 }
 
-void Audio_Queue::handlePropertyChange(AudioFileStreamID inAudioFileStream, AudioFileStreamPropertyID inPropertyID, UInt32 *ioFlags)
+void Audio_Queue::init()
 {
     OSStatus err = noErr;
     
-    AQ_TRACE("found property '%u%u%u%u'\n", (inPropertyID>>24)&255, (inPropertyID>>16)&255, (inPropertyID>>8)&255, inPropertyID&255);
-    
-    switch (inPropertyID) {
-        case kAudioFileStreamProperty_ReadyToProducePackets:
-        {
-            cleanup();
-            
-            // create the audio queue
-            err = AudioQueueNewOutput(&m_streamDesc, audioQueueOutputCallback, this, CFRunLoopGetCurrent(), NULL, 0, &m_outAQ);
-            if (err) {
-                AQ_TRACE("%s: error in AudioQueueNewOutput\n", __PRETTY_FUNCTION__);
-                
-                m_lastError = err;
-                
-                if (m_delegate) {
-                    m_delegate->audioQueueInitializationFailed();
-                }
-                
-                break;
-            }
-            
-            Stream_Configuration *configuration = Stream_Configuration::configuration();
-            
-            // allocate audio queue buffers
-            for (unsigned int i = 0; i < configuration->bufferCount; ++i) {
-                err = AudioQueueAllocateBuffer(m_outAQ, configuration->bufferSize, &m_audioQueueBuffer[i]);
-                if (err) {
-                    /* If allocating the buffers failed, everything else will fail, too.
-                     *  Dispose the queue so that we can later on detect that this
-                     *  queue in fact has not been initialized.
-                     */
-                    
-                    AQ_TRACE("%s: error in AudioQueueAllocateBuffer\n", __PRETTY_FUNCTION__);
-                    
-                    (void)AudioQueueDispose(m_outAQ, true);
-                    m_outAQ = 0;
-                    
-                    m_lastError = err;
-                    
-                    if (m_delegate) {
-                        m_delegate->audioQueueInitializationFailed();
-                    }
-                    
-                    break;
-                }
-            }
-            
-            // listen for kAudioQueueProperty_IsRunning
-            err = AudioQueueAddPropertyListener(m_outAQ, kAudioQueueProperty_IsRunning, audioQueueIsRunningCallback, this);
-            if (err) {
-                AQ_TRACE("%s: error in AudioQueueAddPropertyListener\n", __PRETTY_FUNCTION__);
-                m_lastError = err;
-                break;
-            }
-            
-            if (m_initialOutputVolume != 1.0) {
-                setVolume(m_initialOutputVolume);
-            }
-            
-            break;
+    cleanup();
+        
+    // create the audio queue
+    err = AudioQueueNewOutput(&m_streamDesc, audioQueueOutputCallback, this, CFRunLoopGetCurrent(), NULL, 0, &m_outAQ);
+    if (err) {
+        AQ_TRACE("%s: error in AudioQueueNewOutput\n", __PRETTY_FUNCTION__);
+        
+        m_lastError = err;
+        
+        if (m_delegate) {
+            m_delegate->audioQueueInitializationFailed();
         }
+        
+        return;
+    }
+    
+    Stream_Configuration *configuration = Stream_Configuration::configuration();
+    
+    // allocate audio queue buffers
+    for (unsigned int i = 0; i < configuration->bufferCount; ++i) {
+        err = AudioQueueAllocateBuffer(m_outAQ, configuration->bufferSize, &m_audioQueueBuffer[i]);
+        if (err) {
+            /* If allocating the buffers failed, everything else will fail, too.
+             *  Dispose the queue so that we can later on detect that this
+             *  queue in fact has not been initialized.
+             */
+            
+            AQ_TRACE("%s: error in AudioQueueAllocateBuffer\n", __PRETTY_FUNCTION__);
+            
+            (void)AudioQueueDispose(m_outAQ, true);
+            m_outAQ = 0;
+            
+            m_lastError = err;
+            
+            if (m_delegate) {
+                m_delegate->audioQueueInitializationFailed();
+            }
+            
+            return;
+        }
+    }
+    
+    // listen for kAudioQueueProperty_IsRunning
+    err = AudioQueueAddPropertyListener(m_outAQ, kAudioQueueProperty_IsRunning, audioQueueIsRunningCallback, this);
+    if (err) {
+        AQ_TRACE("%s: error in AudioQueueAddPropertyListener\n", __PRETTY_FUNCTION__);
+        m_lastError = err;
+        return;
+    }
+    
+    if (m_initialOutputVolume != 1.0) {
+        setVolume(m_initialOutputVolume);
     }
 }
 

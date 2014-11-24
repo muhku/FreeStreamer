@@ -59,6 +59,7 @@ Audio_Stream::Audio_Stream() :
     m_inputStreamRunning(false),
     m_audioStreamParserRunning(false),
     m_initialBufferingCompleted(false),
+    m_discontinuity(false),
     m_contentLength(0),
     m_state(STOPPED),
     m_inputStream(0),
@@ -122,7 +123,7 @@ Audio_Stream::~Audio_Stream()
         CFRelease(m_contentType), m_contentType = NULL;
     }
     
-    close();
+    close(true);
     
     delete [] m_outputBuffer, m_outputBuffer = 0;
     
@@ -162,6 +163,7 @@ void Audio_Stream::open(Input_Stream_Position *position)
     m_converterRunOutOfData = false;
     m_audioDataPacketCount = 0;
     m_bitRate = 0;
+    m_discontinuity = true;
     
     if (m_watchdogTimer) {
         CFRunLoopTimerInvalidate(m_watchdogTimer);
@@ -222,7 +224,7 @@ void Audio_Stream::open(Input_Stream_Position *position)
     }
 }
     
-void Audio_Stream::close()
+void Audio_Stream::close(bool closeParser)
 {
     AS_TRACE("%s: enter\n", __PRETTY_FUNCTION__);
     
@@ -240,7 +242,7 @@ void Audio_Stream::close()
         m_inputStreamRunning = false;
     }
     
-    if (m_audioStreamParserRunning) {
+    if (closeParser && m_audioStreamParserRunning) {
         if (m_audioFileStream) {
             if (AudioFileStreamClose(m_audioFileStream) != 0) {
                 AS_TRACE("%s: AudioFileStreamClose failed\n", __PRETTY_FUNCTION__);
@@ -333,8 +335,6 @@ void Audio_Stream::seekToOffset(float offset)
 {
     if (state() == SEEKING) {
         return;
-    } else {
-        setState(SEEKING);
     }
     
     Input_Stream_Position position = streamPositionForOffset(offset);
@@ -345,14 +345,33 @@ void Audio_Stream::seekToOffset(float offset)
     
     UInt64 originalContentLength = m_contentLength;
     
-    close();
-    
     AS_TRACE("Seeking position %llu\n", position.start);
     
-    open(&position);
+    // Close but keep the stream parser running
+    close(false);
     
-    setSeekOffset(offset);
-    setContentLength(originalContentLength);
+    m_bounceCount = 0;
+    m_firstBufferingTime = 0;
+    m_processedPacketsCount = 0;
+    m_bitrateBufferIndex = 0;
+    m_initializationError = noErr;
+    m_converterRunOutOfData = false;
+    m_discontinuity = true;
+
+    bool success = m_inputStream->open(position);
+    
+    if (success) {
+        setSeekOffset(offset);
+        setContentLength(originalContentLength);
+        
+        m_inputStreamRunning = true;
+        
+        audioQueue()->init();
+        
+        setState(BUFFERING);
+    } else {
+        closeAndSignalError(AS_ERR_OPEN, CFSTR("Input stream open error"));
+    }
 }
     
 Input_Stream_Position Audio_Stream::streamPositionForOffset(float offset)
@@ -666,7 +685,7 @@ void Audio_Stream::audioQueueBuffersEmpty()
         
         setState(PLAYBACK_COMPLETED);
         
-        close();
+        close(true);
     }
 }
     
@@ -790,7 +809,7 @@ void Audio_Stream::streamHasBytesAvailable(UInt8 *data, UInt32 numBytes)
     }
 	
     if (m_audioStreamParserRunning) {
-        OSStatus result = AudioFileStreamParseBytes(m_audioFileStream, numBytes, data, 0);
+        OSStatus result = AudioFileStreamParseBytes(m_audioFileStream, numBytes, data, (m_discontinuity ? kAudioFileStreamParseFlag_Discontinuity : 0));
         
         if (result != 0) {
             AS_TRACE("%s: AudioFileStreamParseBytes error %d\n", __PRETTY_FUNCTION__, (int)result);
@@ -822,6 +841,8 @@ void Audio_Stream::streamHasBytesAvailable(UInt8 *data, UInt32 numBytes)
             if (errorDescription) {
                 CFRelease(errorDescription);
             }
+        } else {
+            m_discontinuity = false;
         }
     }
 }
@@ -942,7 +963,7 @@ void Audio_Stream::closeAndSignalError(int errorCode, CFStringRef errorDescripti
     AS_TRACE("%s: error %i\n", __PRETTY_FUNCTION__, errorCode);
     
     setState(FAILED);
-    close();
+    close(true);
     
     if (m_delegate) {
         m_delegate->audioStreamErrorOccurred(errorCode, errorDescription);
@@ -1316,11 +1337,10 @@ void Audio_Stream::propertyValueCallback(void *inClientData, AudioFileStreamID i
             
             THIS->setCookiesForStream(inAudioFileStream);
             
-            THIS->audioQueue()->handlePropertyChange(inAudioFileStream, inPropertyID, ioFlags);
+            THIS->audioQueue()->init();
             break;
         }
         default: {
-            THIS->audioQueue()->handlePropertyChange(inAudioFileStream, inPropertyID, ioFlags);
             break;
         }
     }

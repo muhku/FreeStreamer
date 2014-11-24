@@ -741,7 +741,7 @@ public:
 
 - (void)stop
 {
-    _audioStream->close();
+    _audioStream->close(true);
     
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
     if (_backgroundTask != UIBackgroundTaskInvalid) {

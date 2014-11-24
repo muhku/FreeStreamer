@@ -61,7 +61,7 @@ public:
     
     void open();
     void open(Input_Stream_Position *position);
-    void close();
+    void close(bool closeParser);
     void pause();
     
     AS_Playback_Position playbackPosition();
@@ -116,6 +116,7 @@ private:
     bool m_inputStreamRunning;
     bool m_audioStreamParserRunning;
     bool m_initialBufferingCompleted;
+    bool m_discontinuity;
     
     UInt64 m_contentLength;
     
