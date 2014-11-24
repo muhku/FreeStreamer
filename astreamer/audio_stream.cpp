@@ -345,7 +345,19 @@ void Audio_Stream::seekToOffset(float offset)
     
     UInt64 originalContentLength = m_contentLength;
     
-    AS_TRACE("Seeking position %llu\n", position.start);
+    const float duration = durationInSeconds();
+    const double packetDuration = m_srcFormat.mFramesPerPacket / m_srcFormat.mSampleRate;
+    
+    if (packetDuration > 0) {
+        UInt32 ioFlags = 0;
+        SInt64 packetAlignedByteOffset;
+        SInt64 seekPacket = floor((duration * offset) / packetDuration);
+        
+        OSStatus err = AudioFileStreamSeek(m_audioFileStream, seekPacket, &packetAlignedByteOffset, &ioFlags);
+        if (!err) {
+            position.start = packetAlignedByteOffset + m_dataOffset;
+        }
+    }
     
     // Close but keep the stream parser running
     close(false);
@@ -380,7 +392,7 @@ Input_Stream_Position Audio_Stream::streamPositionForOffset(float offset)
     position.start = 0;
     position.end   = 0;
     
-    float duration = durationInSeconds();
+    const float duration = durationInSeconds();
     if (!(duration > 0)) {
         return position;
     }
@@ -389,19 +401,6 @@ Input_Stream_Position Audio_Stream::streamPositionForOffset(float offset)
     
     position.start = seekByteOffset;
     position.end = contentLength();
-    
-    double packetDuration = m_srcFormat.mFramesPerPacket / m_srcFormat.mSampleRate;
-    
-    if (packetDuration > 0 && bitrate() > 0) {
-        UInt32 ioFlags = 0;
-        SInt64 packetAlignedByteOffset;
-        SInt64 seekPacket = floor((duration * offset) / packetDuration);
-        
-        OSStatus err = AudioFileStreamSeek(m_audioFileStream, seekPacket, &packetAlignedByteOffset, &ioFlags);
-        if (!err) {
-            position.start = packetAlignedByteOffset + m_dataOffset;
-        }
-    }
     
     return position;
 }
