@@ -340,6 +340,7 @@ void Audio_Stream::seekToOffset(float offset)
     Input_Stream_Position position = streamPositionForOffset(offset);
     
     if (position.start == 0 && position.end == 0) {
+        closeAndSignalError(AS_ERR_NETWORK, CFSTR("Failed to retrieve seeking position"));
         return;
     }
     
@@ -356,7 +357,13 @@ void Audio_Stream::seekToOffset(float offset)
         OSStatus err = AudioFileStreamSeek(m_audioFileStream, seekPacket, &packetAlignedByteOffset, &ioFlags);
         if (!err) {
             position.start = packetAlignedByteOffset + m_dataOffset;
+        } else {
+            closeAndSignalError(AS_ERR_NETWORK, CFSTR("Failed to calculate seeking position"));
+            return;
         }
+    } else {
+        closeAndSignalError(AS_ERR_NETWORK, CFSTR("Failed to calculate seeking position"));
+        return;
     }
     
     // Close but keep the stream parser running
