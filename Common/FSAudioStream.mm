@@ -540,10 +540,22 @@ public:
     config.maxBounceCount           = c->maxBounceCount;
     config.startupWatchdogPeriod    = c->startupWatchdogPeriod;
     config.maxPrebufferedByteCount  = c->maxPrebufferedByteCount;
+    config.requiredInitialPrebufferedByteCountForContinuousStream = c->requiredInitialPrebufferedByteCountForContinuousStream;
+    config.requiredInitialPrebufferedByteCountForNonContinuousStream = c->requiredInitialPrebufferedByteCountForNonContinuousStream;
+    config.cacheEnabled             = c->cacheEnabled;
+    config.maxDiskCacheSize         = c->maxDiskCacheSize;
     
     if (c->userAgent) {
         // Let the Objective-C side handle the memory for the copy of the original user-agent
         config.userAgent = (__bridge_transfer NSString *)CFStringCreateCopy(kCFAllocatorDefault, c->userAgent);
+    }
+    
+    if (c->cacheDirectory) {
+        config.cacheDirectory = (__bridge_transfer NSString *)CFStringCreateCopy(kCFAllocatorDefault, c->cacheDirectory);
+    }
+    
+    if (c->predefinedHttpHeaderValues) {
+        config.predefinedHttpHeaderValues = (__bridge_transfer NSDictionary *)CFDictionaryCreateCopy(kCFAllocatorDefault, c->predefinedHttpHeaderValues);
     }
 
     return config;
@@ -790,7 +802,7 @@ public:
 
 -(NSString *)description
 {
-    return [NSString stringWithFormat:@"[FreeStreamer %@] URL: %@\nbufferCount: %i\nbufferSize: %i\nmaxPacketDescs: %i\ndecodeQueueSize: %i\nhttpConnectionBufferSize: %i\noutputSampleRate: %f\noutputNumChannels: %ld\nbounceInterval: %i\nmaxBounceCount: %i\nstartupWatchdogPeriod: %i\nmaxPrebufferedByteCount: %i\nformat: %@\nuserAgent: %@\ncacheDirectory: %@\ncacheEnabled: %@\nmaxDiskCacheSize: %i\nrequiredInitialPrebufferedByteCountForContinuousStream: %i\nrequiredInitialPrebufferedByteCountForNonContinuousStream: %i",
+    return [NSString stringWithFormat:@"[FreeStreamer %@] URL: %@\nbufferCount: %i\nbufferSize: %i\nmaxPacketDescs: %i\ndecodeQueueSize: %i\nhttpConnectionBufferSize: %i\noutputSampleRate: %f\noutputNumChannels: %ld\nbounceInterval: %i\nmaxBounceCount: %i\nstartupWatchdogPeriod: %i\nmaxPrebufferedByteCount: %i\nformat: %@\nuserAgent: %@\ncacheDirectory: %@\npredefinedHttpHeaderValues: %@\ncacheEnabled: %@\nmaxDiskCacheSize: %i\nrequiredInitialPrebufferedByteCountForContinuousStream: %i\nrequiredInitialPrebufferedByteCountForNonContinuousStream: %i",
             freeStreamerReleaseVersion(),
             self.url,
             self.configuration.bufferCount,
@@ -807,6 +819,7 @@ public:
             self.formatDescription,
             self.configuration.userAgent,
             self.configuration.cacheDirectory,
+            self.configuration.predefinedHttpHeaderValues,
             (self.configuration.cacheEnabled ? @"YES" : @"NO"),
             self.configuration.maxDiskCacheSize,
             self.configuration.requiredInitialPrebufferedByteCountForContinuousStream,
@@ -874,6 +887,15 @@ public:
             c->cacheDirectory = CFStringCreateCopy(kCFAllocatorDefault, (__bridge CFStringRef)configuration.cacheDirectory);
         } else {
             c->cacheDirectory = NULL;
+        }
+        
+        if (c->predefinedHttpHeaderValues) {
+            CFRelease(c->predefinedHttpHeaderValues);
+        }
+        if (configuration.predefinedHttpHeaderValues) {
+            c->predefinedHttpHeaderValues = CFDictionaryCreateCopy(kCFAllocatorDefault, (__bridge CFDictionaryRef)configuration.predefinedHttpHeaderValues);
+        } else {
+            c->predefinedHttpHeaderValues = NULL;
         }
         
         _private = [[FSAudioStreamPrivate alloc] init];

@@ -21,7 +21,7 @@
 /**
  * The reversion of the current release
  */
-#define FREESTREAMER_VERSION_REVISION       7
+#define FREESTREAMER_VERSION_REVISION       8
 
 /**
  * Follow this notification for the audio stream state changes.
@@ -170,6 +170,11 @@ typedef struct {
  * The directory used for caching the streamed files.
  */
 @property (nonatomic,strong) NSString *cacheDirectory;
+/**
+ * The HTTP headers that are appended to the request when the streaming starts. Notice
+ * that the headers override any headers previously set by FreeStreamer.
+ */
+@property (nonatomic,strong) NSDictionary *predefinedHttpHeaderValues;
 /**
  * The property determining if caching the streams to the disk is enabled.
  */

@@ -11,7 +11,9 @@
 namespace astreamer {
     
 Stream_Configuration::Stream_Configuration() :
-    userAgent(NULL)
+    userAgent(NULL),
+    cacheDirectory(NULL),
+    predefinedHttpHeaderValues(NULL)
 {
 }
 

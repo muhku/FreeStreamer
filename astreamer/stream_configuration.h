@@ -29,6 +29,7 @@ struct Stream_Configuration {
     int requiredInitialPrebufferedByteCountForNonContinuousStream;
     CFStringRef userAgent;
     CFStringRef cacheDirectory;
+    CFDictionaryRef predefinedHttpHeaderValues;
     bool cacheEnabled;
     int maxDiskCacheSize;
     

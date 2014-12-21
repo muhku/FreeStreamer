@@ -308,6 +308,44 @@ CFReadStreamRef HTTP_Stream::createReadStream(CFURLRef url)
         CFRelease(rangeHeaderValue);
     }
     
+    if (config->predefinedHttpHeaderValues) {
+        const CFIndex numKeys = CFDictionaryGetCount(config->predefinedHttpHeaderValues);
+        
+        if (numKeys > 0) {
+            CFTypeRef *keys = (CFTypeRef *) malloc(numKeys * sizeof(CFTypeRef));
+            
+            if (keys) {
+                CFDictionaryGetKeysAndValues(config->predefinedHttpHeaderValues, (const void **) keys, NULL);
+                
+                for (CFIndex i=0; i < numKeys; i++) {
+                    CFTypeRef key = keys[i];
+                    
+                    if (CFGetTypeID(key) == CFStringGetTypeID()) {
+                        const void *value = CFDictionaryGetValue(config->predefinedHttpHeaderValues, (const void *) key);
+                        
+                        if (value) {
+                            CFStringRef headerKey = (CFStringRef) key;
+                            
+                            CFTypeRef valueRef = (CFTypeRef) value;
+                            
+                            if (CFGetTypeID(valueRef) == CFStringGetTypeID()) {
+                                CFStringRef headerValue = (CFStringRef) valueRef;
+                                
+                                HS_TRACE("Setting predefined HTTP header ");
+                                HS_TRACE_CFSTRING(headerKey);
+                                HS_TRACE_CFSTRING(headerValue);
+                                
+                                CFHTTPMessageSetHeaderFieldValue(request, headerKey, headerValue);
+                            }
+                        }
+                    }
+                }
+                
+                free(keys);
+            }
+        }
+    }
+    
     if (!(readStream = CFReadStreamCreateForHTTPRequest(kCFAllocatorDefault, request))) {
         goto out;
     }
