@@ -227,6 +227,12 @@ NSString*             freeStreamerReleaseVersion();
 - (id)initWithConfiguration:(FSStreamConfiguration *)configuration;
 
 /**
+ * Starts preload the stream. If no preload URL is
+ * defined, an error will occur.
+ */
+- (void)preload;
+
+/**
  * Starts playing the stream. If no playback URL is
  * defined, an error will occur.
  */

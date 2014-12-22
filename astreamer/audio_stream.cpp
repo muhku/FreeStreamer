@@ -60,6 +60,7 @@ Audio_Stream::Audio_Stream() :
     m_audioStreamParserRunning(false),
     m_initialBufferingCompleted(false),
     m_discontinuity(false),
+    m_preloading(false),
     m_contentLength(0),
     m_state(STOPPED),
     m_inputStream(0),
@@ -198,7 +199,7 @@ void Audio_Stream::open(Input_Stream_Position *position)
         m_inputStreamRunning = true;
         setState(BUFFERING);
         
-        if (config->startupWatchdogPeriod > 0) {
+        if (!m_preloading && config->startupWatchdogPeriod > 0) {
             /*
              * Start the WD if we have one requested. In this way we can track
              * that the stream doesn't stuck forever on the buffering state
@@ -283,6 +284,15 @@ void Audio_Stream::close(bool closeParser)
 void Audio_Stream::pause()
 {
     audioQueue()->pause();
+}
+    
+void Audio_Stream::startCachedDataPlayback()
+{
+    Stream_Configuration *config = Stream_Configuration::configuration();
+    
+    m_preloading = false;
+    
+    enqueueCachedData(config->decodeQueueSize);
 }
     
 AS_Playback_Position Audio_Stream::playbackPosition()
@@ -501,6 +511,16 @@ void Audio_Stream::setSeekOffset(float offset)
 void Audio_Stream::setContentLength(UInt64 contentLength)
 {
     m_contentLength = contentLength;
+}
+    
+void Audio_Stream::setPreloading(bool preloading)
+{
+    m_preloading = preloading;
+}
+    
+bool Audio_Stream::isPreloading()
+{
+    return m_preloading;
 }
     
 void Audio_Stream::setOutputFile(CFURLRef url)
@@ -1135,7 +1155,7 @@ void Audio_Stream::enqueueCachedData(int minPacketsRequired)
         }
     }
     
-    if (m_initialBufferingCompleted && count > minPacketsRequired) {
+    if (!m_preloading && m_initialBufferingCompleted && count > minPacketsRequired) {
         AudioBufferList outputBufferList;
         outputBufferList.mNumberBuffers = 1;
         outputBufferList.mBuffers[0].mNumberChannels = m_dstFormat.mChannelsPerFrame;
