@@ -34,7 +34,7 @@ License
 
 The BSD license which the files are licensed under allows is as follows:
 
-    Copyright (c) 2011-2014 Matias Muhonen <mmu@iki.fi>
+    Copyright (c) 2011-2015 Matias Muhonen <mmu@iki.fi>
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
