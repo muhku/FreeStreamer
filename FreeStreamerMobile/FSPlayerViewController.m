@@ -413,9 +413,7 @@
 
 - (IBAction)changeVolume:(id)sender
 {
-    _outputVolume =  self.volumeSlider.value;
-    
-    [self.audioController setVolume:_outputVolume];
+    self.audioController.volume = self.volumeSlider.value;
 }
 
 - (IBAction)toggleAnalyzer:(id)sender

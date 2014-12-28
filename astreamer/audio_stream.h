@@ -70,6 +70,7 @@ public:
     
     Input_Stream_Position streamPositionForOffset(float offset);
     
+    float currentVolume();
     void setVolume(float volume);
     void setPlayRate(float playRate);
     

@@ -35,8 +35,8 @@
     _keepRunning = YES;
     _checkStreamState = NO;
     
-    [_stream setVolume:0];
-    [_controller setVolume:0];
+    _stream.volume = 0;
+    _controller.volume = 0;
 }
 
 - (void)tearDown
@@ -136,6 +136,11 @@
         
         if (_checkStreamState) {
             // Stream started playing.
+            
+            XCTAssertTrue((_controller.volume == 0), @"Invalid controller volume");
+            
+            XCTAssertTrue((_controller.stream.volume == 0), @"Invalid stream volume");
+            
             XCTAssertTrue(([_controller.stream.contentType isEqualToString:@"audio/mpeg"]), @"Invalid content type");
             XCTAssertTrue(([_controller.stream.suggestedFileExtension isEqualToString:@"mp3"]), @"Invalid file extension");
             

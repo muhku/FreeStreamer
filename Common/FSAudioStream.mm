@@ -238,6 +238,7 @@ public:
 - (BOOL)isPlaying;
 - (void)pause;
 - (void)seekToOffset:(float)offset;
+- (float)currentVolume;
 - (void)setVolume:(float)volume;
 - (void)setPlayRate:(float)playRate;
 - (astreamer::AS_Playback_Position)playbackPosition;
@@ -780,6 +781,11 @@ public:
     _audioStream->seekToOffset(offset);
 }
 
+- (float)currentVolume
+{
+    return _audioStream->currentVolume();
+}
+
 - (void)setVolume:(float)volume
 {
     _audioStream->setVolume(volume);
@@ -1005,11 +1011,6 @@ public:
     [_private seekToOffset:position.position];
 }
 
-- (void)setVolume:(float)volume
-{
-    [_private setVolume:volume];
-}
-
 - (void)setPlayRate:(float)playRate
 {
     [_private setPlayRate:playRate];
@@ -1096,6 +1097,16 @@ public:
 - (size_t)prebufferedByteCount
 {
     return _private.prebufferedByteCount;
+}
+
+- (float)volume
+{
+    return [_private currentVolume];
+}
+
+- (void)setVolume:(float)volume
+{
+    [_private setVolume:volume];
 }
 
 - (void (^)())onCompletion

@@ -244,16 +244,21 @@
     [self.audioStream pause];
 }
 
-- (void)setVolume:(float)volume
-{
-    [self.audioStream setVolume:volume];
-}
-
 /*
  * =======================================
  * Properties
  * =======================================
  */
+
+- (void)setVolume:(float)volume
+{
+    self.audioStream.volume = volume;
+}
+
+- (float)volume
+{
+    return self.audioStream.volume;
+}
 
 - (void)setUrl:(NSURL *)url
 {

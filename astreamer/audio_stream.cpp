@@ -412,6 +412,11 @@ Input_Stream_Position Audio_Stream::streamPositionForOffset(float offset)
     return position;
 }
     
+float Audio_Stream::currentVolume()
+{
+    return m_outputVolume;
+}
+    
 void Audio_Stream::setVolume(float volume)
 {
     if (volume < 0) {
