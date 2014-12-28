@@ -254,7 +254,9 @@ void Audio_Stream::close(bool closeParser)
     
     closeAudioQueue();
     
-    if (FAILED != state()) {
+    const State currentState = state();
+    
+    if (FAILED != currentState && SEEKING != currentState) {
         /*
          * Set the stream state to stopped if the stream was stopped successfully.
          * We don't want to cause a spurious stopped state as the fail state should
@@ -336,6 +338,8 @@ void Audio_Stream::seekToOffset(float offset)
     if (state() == SEEKING) {
         return;
     }
+    
+    setState(SEEKING);
     
     Input_Stream_Position position = streamPositionForOffset(offset);
     
