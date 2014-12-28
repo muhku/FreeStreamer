@@ -21,7 +21,7 @@
 /**
  * The reversion of the current release
  */
-#define FREESTREAMER_VERSION_REVISION       8
+#define FREESTREAMER_VERSION_REVISION       9
 
 /**
  * Follow this notification for the audio stream state changes.
