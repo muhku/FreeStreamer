@@ -11,6 +11,7 @@ Features
 - **Prepared for tough network conditions**: adjustable buffer sizes, stream pre-buffering and restart on failures
 - **Metadata support**: ShoutCast metadata, IDv2 tags
 - **Local disk caching**: user only needs to stream a file once and after that it can be played from a local cache
+- **Preloading**: playback can start immediately without needing to wait for buffering
 - **Record**: support recording the stream contents to a file
 - **Access the PCM audio samples**: as an example, a visualizer is included
 
