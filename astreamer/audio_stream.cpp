@@ -61,7 +61,9 @@ Audio_Stream::Audio_Stream() :
     m_initialBufferingCompleted(false),
     m_discontinuity(false),
     m_preloading(false),
+    m_ignoreDecodeQueueSize(false),
     m_contentLength(0),
+    m_bytesReceived(0),
     m_state(STOPPED),
     m_inputStream(0),
     m_audioQueue(0),
@@ -155,6 +157,7 @@ void Audio_Stream::open(Input_Stream_Position *position)
     }
     
     m_contentLength = 0;
+    m_bytesReceived = 0;
     m_seekOffset = 0;
     m_bounceCount = 0;
     m_firstBufferingTime = 0;
@@ -165,6 +168,7 @@ void Audio_Stream::open(Input_Stream_Position *position)
     m_audioDataPacketCount = 0;
     m_bitRate = 0;
     m_discontinuity = true;
+    m_ignoreDecodeQueueSize = false;
     
     if (m_watchdogTimer) {
         CFRunLoopTimerInvalidate(m_watchdogTimer);
@@ -839,6 +843,8 @@ void Audio_Stream::streamHasBytesAvailable(UInt8 *data, UInt32 numBytes)
         return;
     }
     
+    m_bytesReceived += numBytes;
+    
     if (m_fileOutput) {
         m_fileOutput->write(data, numBytes);
     }
@@ -1155,7 +1161,20 @@ void Audio_Stream::enqueueCachedData(int minPacketsRequired)
         }
     }
     
-    if (!m_preloading && m_initialBufferingCompleted && count > minPacketsRequired) {
+    // If the stream has never started playing and we have received 90% of the data of the stream,
+    // let's override the limits
+    if (m_watchdogTimer && contentLength() > 0) {
+        const UInt64 numBytesRequiredToBeBuffered = contentLength() * 0.9;
+        
+        if (m_bytesReceived >= numBytesRequiredToBeBuffered) {
+            m_initialBufferingCompleted = true;
+            m_ignoreDecodeQueueSize = true;
+            
+            AS_TRACE("90% of the data of the stream buffered, overriding buffering limits\n");
+        }
+    }
+    
+    if (!m_preloading && m_initialBufferingCompleted && (count > minPacketsRequired || m_ignoreDecodeQueueSize)) {
         AudioBufferList outputBufferList;
         outputBufferList.mNumberBuffers = 1;
         outputBufferList.mBuffers[0].mNumberChannels = m_dstFormat.mChannelsPerFrame;

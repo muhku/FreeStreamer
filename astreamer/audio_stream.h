@@ -123,8 +123,10 @@ private:
     bool m_initialBufferingCompleted;
     bool m_discontinuity;
     bool m_preloading;
+    bool m_ignoreDecodeQueueSize;
     
     UInt64 m_contentLength;
+    UInt64 m_bytesReceived;
     
     State m_state;
     Input_Stream *m_inputStream;
