@@ -67,6 +67,7 @@
     self.view.backgroundColor = [UIColor clearColor];
     
     self.bufferingIndicator.hidden = YES;
+    self.prebufferStatus.hidden = YES;
     
     [self.audioController setVolume:_outputVolume];
     self.volumeSlider.value = _outputVolume;
@@ -518,8 +519,29 @@
     }
     
     self.bufferingIndicator.hidden = NO;
+    self.prebufferStatus.hidden = YES;
     
-    self.bufferingIndicator.progress = (float)self.audioController.stream.prebufferedByteCount / _maxPrebufferedByteCount;
+    if (self.audioController.stream.contentLength > 0) {
+        // A non-continuous stream, show the buffering progress within the whole file
+        FSSeekByteOffset currentOffset = self.audioController.stream.currentSeekByteOffset;
+        
+        UInt64 totalBufferedData = currentOffset.start + self.audioController.stream.prebufferedByteCount;
+        
+        float bufferedDataFromTotal = (float)totalBufferedData / self.audioController.stream.contentLength;
+        
+        self.bufferingIndicator.progress = (float)currentOffset.start / self.audioController.stream.contentLength;
+        
+        // Use the status to show how much data we have in the buffers
+        self.prebufferStatus.frame = CGRectMake(self.bufferingIndicator.frame.origin.x,
+                                                self.bufferingIndicator.frame.origin.y,
+                                                CGRectGetWidth(self.bufferingIndicator.frame) * bufferedDataFromTotal,
+                                                5);
+        self.prebufferStatus.hidden = NO;
+    } else {
+        // A continuous stream, use the buffering indicator to show progress
+        // among the filled prebuffer
+        self.bufferingIndicator.progress = (float)self.audioController.stream.prebufferedByteCount / _maxPrebufferedByteCount;
+    }
 }
 
 - (void)seekToNewTime

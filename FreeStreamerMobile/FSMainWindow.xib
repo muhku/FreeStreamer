@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6245" systemVersion="13F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6254" systemVersion="14B25" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <deployment defaultVersion="1792" identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6238"/>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6247"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="UIApplication">
@@ -31,7 +31,7 @@
             <viewControllers>
                 <tableViewController id="12" customClass="FSPlaylistViewController">
                     <tableView key="view" opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="13">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="504"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <connections>
@@ -63,6 +63,10 @@
                 <rect key="frame" x="0.0" y="0.0" width="320" height="352"/>
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                 <subviews>
+                    <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="MEj-tS-Sp2">
+                        <rect key="frame" x="137" y="285" width="70" height="47"/>
+                        <color key="backgroundColor" red="0.81399936868686873" green="0.81399936868686873" blue="0.81399936868686873" alpha="1" colorSpace="calibratedRGB"/>
+                    </view>
                     <imageView hidden="YES" userInteractionEnabled="NO" alpha="0.69999998807907104" contentMode="scaleToFill" image="player-top-bg.png" translatesAutoresizingMaskIntoConstraints="NO" id="167">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
                         <constraints>
@@ -140,9 +144,6 @@
                         <rect key="frame" x="0.0" y="191" width="320" height="108"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
-                    <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" misplaced="YES" progressViewStyle="bar" progress="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="526">
-                        <rect key="frame" x="0.0" y="314" width="320" height="2.5"/>
-                    </progressView>
                     <slider opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="572">
                         <rect key="frame" x="18" y="374" width="284" height="31"/>
                         <color key="minimumTrackTintColor" cocoaTouchSystemColor="darkTextColor"/>
@@ -158,6 +159,9 @@
                             <action selector="toggleAnalyzer:" destination="17" eventType="touchUpInside" id="602"/>
                         </connections>
                     </button>
+                    <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" misplaced="YES" progressViewStyle="bar" progress="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="526">
+                        <rect key="frame" x="0.0" y="314" width="320" height="2.5"/>
+                    </progressView>
                 </subviews>
                 <color key="backgroundColor" red="0.87438434099999995" green="0.87438434099999995" blue="0.87438434099999995" alpha="0.59999999999999998" colorSpace="calibratedRGB"/>
                 <constraints>
@@ -213,6 +217,7 @@
                 <outlet property="frequencyPlotView" destination="508" id="522"/>
                 <outlet property="pauseButton" destination="28" id="412"/>
                 <outlet property="playButton" destination="27" id="411"/>
+                <outlet property="prebufferStatus" destination="MEj-tS-Sp2" id="ggL-qT-eGg"/>
                 <outlet property="progressSlider" destination="48" id="49"/>
                 <outlet property="statusLabel" destination="26" id="30"/>
                 <outlet property="volumeSlider" destination="572" id="585"/>

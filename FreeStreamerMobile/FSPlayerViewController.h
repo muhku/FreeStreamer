@@ -100,6 +100,10 @@
  */
 @property (nonatomic,strong) IBOutlet UIProgressView *bufferingIndicator;
 /**
+ * Reference to the prebuffer status.
+ */
+@property (nonatomic,strong) IBOutlet UIView *prebufferStatus;
+/**
  * Handles the notification upon entering background.
  *
  * @param notification The notification.
