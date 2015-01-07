@@ -124,6 +124,7 @@ private:
     bool m_discontinuity;
     bool m_preloading;
     bool m_ignoreDecodeQueueSize;
+    bool m_audioQueueConsumedPackets;
     
     UInt64 m_contentLength;
     UInt64 m_bytesReceived;

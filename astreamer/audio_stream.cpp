@@ -62,6 +62,7 @@ Audio_Stream::Audio_Stream() :
     m_discontinuity(false),
     m_preloading(false),
     m_ignoreDecodeQueueSize(false),
+    m_audioQueueConsumedPackets(false),
     m_contentLength(0),
     m_bytesReceived(0),
     m_state(STOPPED),
@@ -169,6 +170,7 @@ void Audio_Stream::open(Input_Stream_Position *position)
     m_bitRate = 0;
     m_discontinuity = true;
     m_ignoreDecodeQueueSize = false;
+    m_audioQueueConsumedPackets = false;
     
     if (m_watchdogTimer) {
         CFRunLoopTimerInvalidate(m_watchdogTimer);
@@ -387,6 +389,7 @@ void Audio_Stream::seekToOffset(float offset)
     // Close but keep the stream parser running
     close(false);
     
+    m_bytesReceived = 0;
     m_bounceCount = 0;
     m_firstBufferingTime = 0;
     m_processedPacketsCount = 0;
@@ -985,6 +988,8 @@ void Audio_Stream::closeAudioQueue()
     
     AS_TRACE("Releasing audio queue\n");
     
+    m_audioQueueConsumedPackets = false;
+    
     m_audioQueue->m_delegate = 0;
     delete m_audioQueue, m_audioQueue = 0;
 }
@@ -1163,14 +1168,20 @@ void Audio_Stream::enqueueCachedData(int minPacketsRequired)
     
     // If the stream has never started playing and we have received 90% of the data of the stream,
     // let's override the limits
-    if (m_watchdogTimer && contentLength() > 0) {
-        const UInt64 numBytesRequiredToBeBuffered = contentLength() * 0.9;
+    if (!m_audioQueueConsumedPackets && contentLength() > 0) {
+        const UInt64 seekLength = contentLength() * m_seekOffset;
+        
+        AS_TRACE("seek length %llu\n", seekLength);
+        
+        const UInt64 numBytesRequiredToBeBuffered = (contentLength() - seekLength) * 0.9;
+        
+        AS_TRACE("audio queue not consumed packets, content length %llu, required bytes to be buffered %llu\n", contentLength(), numBytesRequiredToBeBuffered);
         
         if (m_bytesReceived >= numBytesRequiredToBeBuffered) {
             m_initialBufferingCompleted = true;
             m_ignoreDecodeQueueSize = true;
             
-            AS_TRACE("90% of the data of the stream buffered, overriding buffering limits\n");
+            AS_TRACE("%llu bytes received, overriding buffering limits\n", m_bytesReceived);
         }
     }
     
@@ -1207,6 +1218,8 @@ void Audio_Stream::enqueueCachedData(int minPacketsRequired)
             }
             
             setState(PLAYING);
+            
+            m_audioQueueConsumedPackets = true;
             
             audioQueue()->handleAudioPackets(outputBufferList.mBuffers[0].mDataByteSize,
                                                    outputBufferList.mNumberBuffers,
