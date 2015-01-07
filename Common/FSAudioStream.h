@@ -322,6 +322,11 @@ NSString*             freeStreamerReleaseVersion();
  */
 @property (nonatomic,readonly) NSString *suggestedFileExtension;
 /**
+ * The property has the content length of the stream (in bytes). The length is zero if
+ * the stream is continuous.
+ */
+@property (nonatomic,readonly) UInt64 contentLength;
+/**
  * This property has the current playback position, if the stream is non-continuous.
  * The current playback position cannot be determined for continuous streams.
  */

@@ -242,6 +242,8 @@
         if (_checkStreamState) {
             // Stream started playing.
             
+            XCTAssertTrue((_stream.contentLength == 0), @"Invalid content length");
+            
             [_controller pause];
             
             return;
@@ -316,6 +318,7 @@
                 
                 XCTAssertTrue((_stream.duration.minute == 4), @"Invalid stream duration (minutes)");
                 XCTAssertTrue((_stream.duration.second == 17), @"Invalid stream duration (seconds)");
+                XCTAssertTrue((_stream.contentLength == 8227656), @"Invalid content length");
                 
                 // Checks done, we are done.
                 _keepRunning = NO;
@@ -435,6 +438,7 @@
             // Stream started playing.
             XCTAssertTrue(([_controller.stream.contentType isEqualToString:@"audio/mpeg"]), @"Invalid content type");
             XCTAssertTrue(([_controller.stream.suggestedFileExtension isEqualToString:@"mp3"]), @"Invalid file extension");
+            XCTAssertTrue((_controller.stream.contentLength == 33285), @"Invalid content length");
             
             XCTAssertTrue((_controller.stream.duration.minute == 0), @"Invalid stream duration (minutes)");
             XCTAssertTrue((_controller.stream.duration.second == 2), @"Invalid stream duration (seconds)");

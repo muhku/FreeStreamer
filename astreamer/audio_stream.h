@@ -98,6 +98,8 @@ public:
     bool strictContentTypeChecking();
     float bitrate();
     
+    UInt64 contentLength();
+    
     /* Audio_Queue_Delegate */
     void audioQueueStateChanged(Audio_Queue::State state);
     void audioQueueBuffersEmpty();
@@ -183,7 +185,6 @@ private:
     Audio_Queue *audioQueue();
     void closeAudioQueue();
     
-    UInt64 contentLength();
     void closeAndSignalError(int error, CFStringRef errorDescription);
     void setState(State state);
     void setCookiesForStream(AudioFileStreamID inAudioFileStream);

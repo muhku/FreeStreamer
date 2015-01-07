@@ -196,8 +196,9 @@ public:
 @property (nonatomic,assign) NSURL *url;
 @property (nonatomic,assign) BOOL strictContentTypeChecking;
 @property (nonatomic,assign) NSString *defaultContentType;
-@property (nonatomic,assign) NSString *contentType;
-@property (nonatomic,assign) NSString *suggestedFileExtension;
+@property (readonly) NSString *contentType;
+@property (readonly) NSString *suggestedFileExtension;
+@property (readonly) UInt64 contentLength;
 @property (nonatomic,assign) NSURL *outputFile;
 @property (nonatomic,assign) BOOL wasInterrupted;
 @property (nonatomic,assign) BOOL wasDisconnected;
@@ -470,6 +471,11 @@ public:
         suggestedFileExtension = @"aac";
     }
     return suggestedFileExtension;
+}
+
+- (UInt64)contentLength
+{
+    return _audioStream->contentLength();
 }
 
 - (NSURL*)outputFile
@@ -984,6 +990,11 @@ public:
 - (NSString*)suggestedFileExtension
 {
     return [_private suggestedFileExtension];
+}
+
+- (UInt64)contentLength
+{
+    return [_private contentLength];
 }
 
 - (void)preload
