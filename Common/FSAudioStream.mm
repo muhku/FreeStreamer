@@ -86,7 +86,7 @@ static NSInteger sortCacheObjects(id co1, id co2, void *keyForSorting)
         self.maxPrebufferedByteCount = 1000000; // 1 MB
         self.userAgent = [NSString stringWithFormat:@"FreeStreamer/%@ (%@)", freeStreamerReleaseVersion(), systemVersion];
         self.cacheEnabled = YES;
-        self.seekingFromCacheEnabled = NO;
+        self.seekingFromCacheEnabled = YES;
         self.maxDiskCacheSize = 100000000;
         self.requiredInitialPrebufferedByteCountForContinuousStream = 100000;
         self.requiredInitialPrebufferedByteCountForNonContinuousStream = 50000;
