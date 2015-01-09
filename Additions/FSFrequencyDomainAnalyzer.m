@@ -128,10 +128,17 @@
        }
 
       /*
-       * The analyzer is free. Copy the data to the buffer to be analyzer.
+       * The analyzer is free. Copy the data to the buffer to be analyzed.
        */
-       memset(_sampleBuffer, 0, sizeof(*_sampleBuffer) * kSFrequencyDomainAnalyzerSampleCount);
-       memcpy(_sampleBuffer, samples, sizeof(samples) * MIN(kSFrequencyDomainAnalyzerSampleCount, count));
+       const size_t bufferSize = sizeof(int16_t) * MIN(kSFrequencyDomainAnalyzerSampleCount, count);
+       
+       memcpy(_sampleBuffer, samples, bufferSize);
+       
+       const size_t diff = sizeof(_sampleBuffer) - bufferSize;
+       
+       if (diff > 0) {
+           memset(_sampleBuffer + (sizeof(_sampleBuffer) - diff), 0, diff);
+       }
 
       /*
        * Notify the thread that it should process the buffer.
@@ -183,10 +190,9 @@
                      [self.delegate frequenceAnalyzer:self levelsAvailable:_levels.overall count:kSFrequencyDomainAnalyzerLevelCount];
                  });
              }
+        } else {
+            [NSThread sleepForTimeInterval:.01];
         }
-
-        [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode
-                                 beforeDate:[NSDate distantFuture]];
     } while (!self.shouldExit);
 }
 
