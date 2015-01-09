@@ -74,6 +74,7 @@ Audio_Stream::Audio_Stream() :
     m_initializationError(noErr),
     m_outputBufferSize(Stream_Configuration::configuration()->bufferSize),
     m_outputBuffer(new UInt8[m_outputBufferSize]),
+    m_packetIdentifier(0),
     m_dataOffset(0),
     m_seekOffset(0),
     m_bounceCount(0),
@@ -194,6 +195,8 @@ void Audio_Stream::open(Input_Stream_Position *position)
         }
     } else {
         m_initialBufferingCompleted = false;
+        
+        m_packetIdentifier = 0;
         
         if (m_inputStream) {
             success = m_inputStream->open();
@@ -374,6 +377,8 @@ void Audio_Stream::seekToOffset(float offset)
         SInt64 packetAlignedByteOffset;
         SInt64 seekPacket = floor((duration * offset) / packetDuration);
         
+        m_packetIdentifier = seekPacket;
+        
         OSStatus err = AudioFileStreamSeek(m_audioFileStream, seekPacket, &packetAlignedByteOffset, &ioFlags);
         if (!err) {
             position.start = packetAlignedByteOffset + m_dataOffset;
@@ -386,31 +391,75 @@ void Audio_Stream::seekToOffset(float offset)
         return;
     }
     
-    // Close but keep the stream parser running
-    close(false);
-    
-    m_bytesReceived = 0;
-    m_bounceCount = 0;
-    m_firstBufferingTime = 0;
-    m_processedPacketsCount = 0;
-    m_bitrateBufferIndex = 0;
-    m_initializationError = noErr;
-    m_converterRunOutOfData = false;
-    m_discontinuity = true;
-
-    bool success = m_inputStream->open(position);
-    
-    if (success) {
-        setSeekOffset(offset);
-        setContentLength(originalContentLength);
+    // Do a cache lookup if we can find the seeked packet from the cache and no need to
+    // open the stream from the new position
+    bool foundCachedPacket = false;
+    queued_packet_t *cur = m_queuedHead;
+    while (cur) {
+        if (cur->identifier == m_packetIdentifier) {
+            foundCachedPacket = true;
+            break;
+        }
         
-        m_inputStreamRunning = true;
+        queued_packet_t *tmp = cur->next;
+        cur = tmp;
+    }
+    
+    if (!foundCachedPacket) {
+        // Close but keep the stream parser running
+        close(false);
+        
+        m_bytesReceived = 0;
+        m_bounceCount = 0;
+        m_firstBufferingTime = 0;
+        m_processedPacketsCount = 0;
+        m_bitrateBufferIndex = 0;
+        m_initializationError = noErr;
+        m_converterRunOutOfData = false;
+        m_discontinuity = true;
+
+        bool success = m_inputStream->open(position);
+        
+        if (success) {
+            setSeekOffset(offset);
+            setContentLength(originalContentLength);
+            
+            m_inputStreamRunning = true;
+            
+            audioQueue()->init();
+            
+            setState(BUFFERING);
+        } else {
+            closeAndSignalError(AS_ERR_OPEN, CFSTR("Input stream open error"));
+        }
+    } else {
+        // Found the packet from the cache, let's use the cache directly.
+        m_inputStream->setScheduledInRunLoop(false);
+        
+        closeAudioQueue();
+        
+        // Free the packets until the packet we are seeking.
+        queued_packet_t *cur = m_queuedHead;
+        while (cur) {
+            if (cur->identifier == m_packetIdentifier) {
+                break;
+            }
+            
+            queued_packet_t *tmp = cur->next;
+            
+            m_cachedDataSize -= cur->desc.mDataByteSize;
+            
+            free(cur);
+            cur = tmp;
+        }
+        m_queuedHead = cur;
+        m_discontinuity = true;
+        
+        setSeekOffset(offset);
         
         audioQueue()->init();
         
-        setState(BUFFERING);
-    } else {
-        closeAndSignalError(AS_ERR_OPEN, CFSTR("Input stream open error"));
+        m_inputStream->setScheduledInRunLoop(true);
     }
 }
     
@@ -1431,6 +1480,8 @@ void Audio_Stream::streamDataCallback(void *inClientData, UInt32 inNumberBytes, 
         UInt32 size = inPacketDescriptions[i].mDataByteSize;
         queued_packet_t *packet = (queued_packet_t *)malloc(sizeof(queued_packet_t) + size);
         
+        packet->identifier = THIS->m_packetIdentifier;
+        
         // If the stream didn't provide bitRate (m_bitRate == 0), then let's calculate it
         if (THIS->m_bitRate == 0 && THIS->m_bitrateBufferIndex < kAudioStreamBitrateBufferSize) {
             // Only keep sampling for one buffer cycle; this is to keep the counters (for instance) duration
@@ -1438,7 +1489,6 @@ void Audio_Stream::streamDataCallback(void *inClientData, UInt32 inNumberBytes, 
             
             THIS->m_bitrateBuffer[THIS->m_bitrateBufferIndex++] = 8 * inPacketDescriptions[i].mDataByteSize / THIS->m_packetDuration;
         }
-        
         
         /* Prepare the packet */
         packet->next = NULL;
@@ -1455,6 +1505,8 @@ void Audio_Stream::streamDataCallback(void *inClientData, UInt32 inNumberBytes, 
         }
         
         THIS->m_cachedDataSize += size;
+        
+        THIS->m_packetIdentifier++;
         
         if (THIS->m_cachedDataSize >= config->maxPrebufferedByteCount) {
             AS_TRACE("Cache overflow, disabling the HTTP stream\n");

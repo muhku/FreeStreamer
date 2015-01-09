@@ -18,6 +18,7 @@
 namespace astreamer {
     
 typedef struct queued_packet {
+    UInt64 identifier;
     AudioStreamPacketDescription desc;
     struct queued_packet *next;
     char data[];
@@ -146,6 +147,7 @@ private:
     UInt32 m_outputBufferSize;
     UInt8 *m_outputBuffer;
     
+    UInt64 m_packetIdentifier;
     UInt64 m_dataOffset;
     float m_seekOffset;
     size_t m_bounceCount;
