@@ -391,18 +391,25 @@ void Audio_Stream::seekToOffset(float offset)
         return;
     }
     
+    Stream_Configuration *config = Stream_Configuration::configuration();
+    
     // Do a cache lookup if we can find the seeked packet from the cache and no need to
     // open the stream from the new position
     bool foundCachedPacket = false;
-    queued_packet_t *cur = m_queuedHead;
-    while (cur) {
-        if (cur->identifier == m_packetIdentifier) {
-            foundCachedPacket = true;
-            break;
+    
+    if (config->seekingFromCacheEnabled) {
+        queued_packet_t *cur = m_queuedHead;
+        while (cur) {
+            if (cur->identifier == m_packetIdentifier) {
+                foundCachedPacket = true;
+                break;
+            }
+            
+            queued_packet_t *tmp = cur->next;
+            cur = tmp;
         }
-        
-        queued_packet_t *tmp = cur->next;
-        cur = tmp;
+    } else {
+        AS_TRACE("Seeking from cache disabled\n");
     }
     
     if (!foundCachedPacket) {

@@ -180,6 +180,11 @@ typedef struct {
  */
 @property (nonatomic,assign) BOOL cacheEnabled;
 /**
+ * The property determining if seeking from the audio packets stored in cache is enabled.
+ * The benefit is that seeking is faster in the case the audio packets are already cached in memory.
+ */
+@property (nonatomic,assign) BOOL seekingFromCacheEnabled;
+/**
  * The maximum size of the disk cache in bytes.
  */
 @property (nonatomic,assign) int maxDiskCacheSize;

@@ -86,6 +86,7 @@ static NSInteger sortCacheObjects(id co1, id co2, void *keyForSorting)
         self.maxPrebufferedByteCount = 1000000; // 1 MB
         self.userAgent = [NSString stringWithFormat:@"FreeStreamer/%@ (%@)", freeStreamerReleaseVersion(), systemVersion];
         self.cacheEnabled = YES;
+        self.seekingFromCacheEnabled = NO;
         self.maxDiskCacheSize = 100000000;
         self.requiredInitialPrebufferedByteCountForContinuousStream = 100000;
         self.requiredInitialPrebufferedByteCountForNonContinuousStream = 50000;
@@ -550,6 +551,7 @@ public:
     config.requiredInitialPrebufferedByteCountForContinuousStream = c->requiredInitialPrebufferedByteCountForContinuousStream;
     config.requiredInitialPrebufferedByteCountForNonContinuousStream = c->requiredInitialPrebufferedByteCountForNonContinuousStream;
     config.cacheEnabled             = c->cacheEnabled;
+    config.seekingFromCacheEnabled  = c->seekingFromCacheEnabled;
     config.maxDiskCacheSize         = c->maxDiskCacheSize;
     
     if (c->userAgent) {
@@ -827,7 +829,7 @@ public:
 
 -(NSString *)description
 {
-    return [NSString stringWithFormat:@"[FreeStreamer %@] URL: %@\nbufferCount: %i\nbufferSize: %i\nmaxPacketDescs: %i\ndecodeQueueSize: %i\nhttpConnectionBufferSize: %i\noutputSampleRate: %f\noutputNumChannels: %ld\nbounceInterval: %i\nmaxBounceCount: %i\nstartupWatchdogPeriod: %i\nmaxPrebufferedByteCount: %i\nformat: %@\nuserAgent: %@\ncacheDirectory: %@\npredefinedHttpHeaderValues: %@\ncacheEnabled: %@\nmaxDiskCacheSize: %i\nrequiredInitialPrebufferedByteCountForContinuousStream: %i\nrequiredInitialPrebufferedByteCountForNonContinuousStream: %i",
+    return [NSString stringWithFormat:@"[FreeStreamer %@] URL: %@\nbufferCount: %i\nbufferSize: %i\nmaxPacketDescs: %i\ndecodeQueueSize: %i\nhttpConnectionBufferSize: %i\noutputSampleRate: %f\noutputNumChannels: %ld\nbounceInterval: %i\nmaxBounceCount: %i\nstartupWatchdogPeriod: %i\nmaxPrebufferedByteCount: %i\nformat: %@\nuserAgent: %@\ncacheDirectory: %@\npredefinedHttpHeaderValues: %@\ncacheEnabled: %@\nseekingFromCacheEnabled: %@\nmaxDiskCacheSize: %i\nrequiredInitialPrebufferedByteCountForContinuousStream: %i\nrequiredInitialPrebufferedByteCountForNonContinuousStream: %i",
             freeStreamerReleaseVersion(),
             self.url,
             self.configuration.bufferCount,
@@ -846,6 +848,7 @@ public:
             self.configuration.cacheDirectory,
             self.configuration.predefinedHttpHeaderValues,
             (self.configuration.cacheEnabled ? @"YES" : @"NO"),
+            (self.configuration.seekingFromCacheEnabled ? @"YES" : @"NO"),
             self.configuration.maxDiskCacheSize,
             self.configuration.requiredInitialPrebufferedByteCountForContinuousStream,
             self.configuration.requiredInitialPrebufferedByteCountForNonContinuousStream];
@@ -896,6 +899,7 @@ public:
         c->startupWatchdogPeriod    = configuration.startupWatchdogPeriod;
         c->maxPrebufferedByteCount  = configuration.maxPrebufferedByteCount;
         c->cacheEnabled             = configuration.cacheEnabled;
+        c->seekingFromCacheEnabled  = configuration.seekingFromCacheEnabled;
         c->maxDiskCacheSize         = configuration.maxDiskCacheSize;
         c->requiredInitialPrebufferedByteCountForContinuousStream = configuration.requiredInitialPrebufferedByteCountForContinuousStream;
         c->requiredInitialPrebufferedByteCountForNonContinuousStream = configuration.requiredInitialPrebufferedByteCountForNonContinuousStream;

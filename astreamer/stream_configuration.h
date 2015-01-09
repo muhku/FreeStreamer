@@ -31,6 +31,7 @@ struct Stream_Configuration {
     CFStringRef cacheDirectory;
     CFDictionaryRef predefinedHttpHeaderValues;
     bool cacheEnabled;
+    bool seekingFromCacheEnabled;
     int maxDiskCacheSize;
     
     static Stream_Configuration *configuration();
