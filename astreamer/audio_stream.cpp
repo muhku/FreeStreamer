@@ -69,6 +69,7 @@ Audio_Stream::Audio_Stream() :
     m_inputStream(0),
     m_audioQueue(0),
     m_watchdogTimer(0),
+    m_audioQueueTimer(0),
     m_audioFileStream(0),
     m_audioConverter(0),
     m_initializationError(noErr),
@@ -178,6 +179,11 @@ void Audio_Stream::open(Input_Stream_Position *position)
         CFRelease(m_watchdogTimer), m_watchdogTimer = 0;
     }
     
+    if (m_audioQueueTimer) {
+        CFRunLoopTimerInvalidate(m_audioQueueTimer);
+        CFRelease(m_audioQueueTimer), m_audioQueueTimer = 0;
+    }
+    
     Stream_Configuration *config = Stream_Configuration::configuration();
     
     if (m_contentType) {
@@ -241,6 +247,11 @@ void Audio_Stream::close(bool closeParser)
     if (m_watchdogTimer) {
         CFRunLoopTimerInvalidate(m_watchdogTimer);
         CFRelease(m_watchdogTimer), m_watchdogTimer = 0;
+    }
+    
+    if (m_audioQueueTimer) {
+        CFRunLoopTimerInvalidate(m_audioQueueTimer);
+        CFRelease(m_audioQueueTimer), m_audioQueueTimer = 0;
     }
     
     /* Close the HTTP stream first so that the audio stream parser
@@ -962,6 +973,23 @@ void Audio_Stream::streamEndEncountered()
         m_inputStream->close();
     }
     m_inputStreamRunning = false;
+    
+    if (m_audioQueueTimer) {
+        CFRunLoopTimerInvalidate(m_audioQueueTimer);
+        CFRelease(m_audioQueueTimer), m_audioQueueTimer = 0;
+    }
+    
+    CFRunLoopTimerContext ctx = {0, this, NULL, NULL, NULL};
+    
+    m_audioQueueTimer = CFRunLoopTimerCreate(NULL,
+                                           CFAbsoluteTimeGetCurrent(),
+                                           0.050, // 50 ms
+                                           0,
+                                           0,
+                                           audioQueueTimerCallback,
+                                           &ctx);
+    
+    CFRunLoopAddTimer(CFRunLoopGetCurrent(), m_audioQueueTimer, kCFRunLoopCommonModes);
 }
 
 void Audio_Stream::streamErrorOccurred(CFStringRef errorDesc)
@@ -1147,6 +1175,26 @@ void Audio_Stream::watchdogTimerCallback(CFRunLoopTimerRef timer, void *info)
         if (errorDescription) {
             CFRelease(errorDescription);
         }
+    }
+}
+    
+void Audio_Stream::audioQueueTimerCallback(CFRunLoopTimerRef timer, void *info)
+{
+    AS_TRACE("audioQueueTimerCallback called\n");
+    
+    Audio_Stream *THIS = (Audio_Stream *)info;
+    
+    if (THIS->m_inputStreamRunning) {
+        /* We are not needed, the input stream will drive the queue */
+        return;
+    }
+    
+    Stream_Configuration *config = Stream_Configuration::configuration();
+    
+    int count = THIS->cachedDataCount();
+    
+    if (count > 0) {
+        THIS->enqueueCachedData(config->decodeQueueSize);
     }
 }
 
