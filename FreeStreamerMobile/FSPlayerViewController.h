@@ -33,7 +33,13 @@
     // UI
     NSTimer *_progressUpdateTimer;
     NSTimer *_playbackSeekTimer;
+    NSTimer *_volumeRampTimer;
     double _seekToPoint;
+    float _volumeBeforeRamping;
+    int _rampStep;
+    int _rampStepCount;
+    bool _rampUp;
+    SEL _postRampAction;
     
     FSFrequencyDomainAnalyzer *_analyzer;
     

@@ -23,8 +23,11 @@
 - (void)showStatus:(NSString *)status;
 - (void)showErrorStatus:(NSString *)status;
 - (void)updatePlaybackProgress;
+- (void)rampVolume;
 - (void)seekToNewTime;
 - (void)determineStationNameWithMetaData:(NSDictionary *)metaData;
+- (void)doSeeking;
+- (void)finalizeSeeking;
 
 @end
 
@@ -122,6 +125,19 @@
                 
             case kFsAudioStreamPlaying:
                 [self determineStationNameWithMetaData:nil];
+                
+                if (_volumeBeforeRamping > 0) {
+                    _rampStep = 1;
+                    _rampStepCount = 5; // 50ms and 5 steps = 250ms ramp
+                    _rampUp = true;
+                    _postRampAction = @selector(finalizeSeeking);
+                    
+                    _volumeRampTimer = [NSTimer scheduledTimerWithTimeInterval:0.05 // 50ms
+                                                                        target:self
+                                                                      selector:@selector(rampVolume)
+                                                                      userInfo:nil
+                                                                       repeats:YES];
+                }
                 
                 [self clearStatus];
                 
@@ -544,14 +560,49 @@
     }
 }
 
+- (void)rampVolume
+{
+    if (_rampStep > _rampStepCount) {
+        [_volumeRampTimer invalidate], _volumeRampTimer = nil;
+        
+        if (_postRampAction) {
+            [self performSelector:_postRampAction withObject:nil afterDelay:0];
+        }
+        
+        return;
+    }
+    
+    if (_rampUp) {
+        self.audioController.volume = (_volumeBeforeRamping / _rampStepCount) * _rampStep;
+    } else {
+        self.audioController.volume = (_volumeBeforeRamping / _rampStepCount) * (_rampStepCount - _rampStep);
+    }
+    
+    _rampStep++;
+}
+
 - (void)seekToNewTime
 {
     self.progressSlider.enabled = NO;
     
-    FSStreamPosition pos = {0};
-    pos.position = _seekToPoint;
+    // Fade out the volume to avoid pops
+    _volumeBeforeRamping = self.audioController.volume;
     
-    [self.audioController.stream seekToPosition:pos];
+    if (_volumeBeforeRamping > 0) {
+        _rampStep = 1;
+        _rampStepCount = 5; // 50ms and 5 steps = 250ms ramp
+        _rampUp = false;
+        _postRampAction = @selector(doSeeking);
+        
+        _volumeRampTimer = [NSTimer scheduledTimerWithTimeInterval:0.05 // 50ms
+                                                            target:self
+                                                          selector:@selector(rampVolume)
+                                                          userInfo:nil
+                                                           repeats:YES];
+    } else {
+        // Just directly seek, volume is already 0
+        [self doSeeking];
+    }
 }
 
 - (void)determineStationNameWithMetaData:(NSDictionary *)metaData
@@ -571,6 +622,19 @@
             }
         }
     }
+}
+
+- (void)doSeeking
+{
+    FSStreamPosition pos = {0};
+    pos.position = _seekToPoint;
+    
+    [self.audioController.stream seekToPosition:pos];
+}
+
+- (void)finalizeSeeking
+{
+    _volumeBeforeRamping = 0;
 }
 
 @end
