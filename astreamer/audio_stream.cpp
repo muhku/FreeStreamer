@@ -92,6 +92,7 @@ Audio_Stream::Audio_Stream() :
     m_outputFile(NULL),
     m_queuedHead(0),
     m_queuedTail(0),
+    m_playPacket(0),
     m_cachedDataSize(0),
     m_audioDataByteCount(0),
     m_audioDataPacketCount(0),
@@ -293,7 +294,7 @@ void Audio_Stream::close(bool closeParser)
         free(cur);
         cur = tmp;
     }
-    m_queuedHead = m_queuedTail = 0;
+    m_queuedHead = m_queuedTail = 0, m_playPacket = 0;
     m_cachedDataSize = 0;
     
     AS_TRACE("%s: leave\n", __PRETTY_FUNCTION__);
@@ -405,12 +406,14 @@ void Audio_Stream::seekToOffset(float offset)
     // Do a cache lookup if we can find the seeked packet from the cache and no need to
     // open the stream from the new position
     bool foundCachedPacket = false;
+    queued_packet_t *seekPacket = 0;
     
     if (config->seekingFromCacheEnabled) {
         queued_packet_t *cur = m_queuedHead;
         while (cur) {
             if (cur->identifier == m_packetIdentifier) {
                 foundCachedPacket = true;
+                seekPacket = cur;
                 break;
             }
             
@@ -422,6 +425,8 @@ void Audio_Stream::seekToOffset(float offset)
     }
     
     if (!foundCachedPacket) {
+        AS_TRACE("Seeked packet not found from cache, reopening the input stream\n");
+        
         // Close but keep the stream parser running
         close(false);
         
@@ -448,26 +453,14 @@ void Audio_Stream::seekToOffset(float offset)
             closeAndSignalError(AS_ERR_OPEN, CFSTR("Input stream open error"));
         }
     } else {
+        AS_TRACE("Seeked packet found from cache!\n");
+        
         // Found the packet from the cache, let's use the cache directly.
         m_inputStream->setScheduledInRunLoop(false);
         
         closeAudioQueue();
         
-        // Free the packets until the packet we are seeking.
-        queued_packet_t *cur = m_queuedHead;
-        while (cur) {
-            if (cur->identifier == m_packetIdentifier) {
-                break;
-            }
-            
-            queued_packet_t *tmp = cur->next;
-            
-            m_cachedDataSize -= cur->desc.mDataByteSize;
-            
-            free(cur);
-            cur = tmp;
-        }
-        m_queuedHead = cur;
+        m_playPacket    = seekPacket;
         m_discontinuity = true;
         
         setSeekOffset(offset);
@@ -726,7 +719,7 @@ void Audio_Stream::audioQueueBuffersEmpty()
      * Entering here means that the audio queue has run out of data to play.
      */
     
-    const int count = cachedDataCount();
+    const int count = playbackDataCount();
     
     /*
      * If we don't have any cached data to play and we are still supposed to
@@ -784,7 +777,7 @@ void Audio_Stream::audioQueueBuffersEmpty()
     
     // Keep enqueuing the packets in the queue until we have them
     
-    if (count > 0) {
+    if (m_playPacket && count > 0) {
         enqueueCachedData(0);
     } else {
         AS_TRACE("%s: closing the audio queue\n", __PRETTY_FUNCTION__);
@@ -831,7 +824,7 @@ void Audio_Stream::audioQueueInitializationFailed()
     
 void Audio_Stream::audioQueueFinishedPlayingPacket()
 {
-    int count = cachedDataCount();
+    int count = playbackDataCount();
     
     if (count > 0) {
         enqueueCachedData(0);
@@ -1188,7 +1181,7 @@ void Audio_Stream::audioQueueTimerCallback(CFRunLoopTimerRef timer, void *info)
     
     Stream_Configuration *config = Stream_Configuration::configuration();
     
-    int count = THIS->cachedDataCount();
+    int count = THIS->playbackDataCount();
     
     if (count > 0) {
         THIS->enqueueCachedData(config->decodeQueueSize);
@@ -1199,6 +1192,17 @@ int Audio_Stream::cachedDataCount()
 {
     int count = 0;
     queued_packet_t *cur = m_queuedHead;
+    while (cur) {
+        cur = cur->next;
+        count++;
+    }
+    return count;
+}
+    
+int Audio_Stream::playbackDataCount()
+{
+    int count = 0;
+    queued_packet_t *cur = m_playPacket;
     while (cur) {
         cur = cur->next;
         count++;
@@ -1239,7 +1243,7 @@ void Audio_Stream::enqueueCachedData(int minPacketsRequired)
     
     Stream_Configuration *config = Stream_Configuration::configuration();
     
-    const int count = cachedDataCount();
+    const int count = playbackDataCount();
     
     if (!m_initialBufferingCompleted) {
         // Check if we have enough prebuffered data to start playback
@@ -1331,7 +1335,9 @@ void Audio_Stream::enqueueCachedData(int minPacketsRequired)
                 m_delegate->samplesAvailable(outputBufferList, description);
             }
             
-            cleanupCachedData();
+            if (m_cachedDataSize >= config->maxPrebufferedByteCount) {
+                cleanupCachedData();
+            }
         } else {
             AS_TRACE("AudioConverterFillComplexBuffer failed, error %i\n", err);
         }
@@ -1342,14 +1348,31 @@ void Audio_Stream::enqueueCachedData(int minPacketsRequired)
     
 void Audio_Stream::cleanupCachedData()
 {
-    for(std::list<queued_packet_t*>::iterator iter = m_processedPackets.begin();
-        iter != m_processedPackets.end(); iter++) {
-        queued_packet_t *cur = *iter;
+    if (m_processedPackets.size() == 0) {
+        // Nothing can be cleaned yet, sorry
+        AS_TRACE("Cache cleanup called but no free packets\n");
+        return;
+    }
+    
+    queued_packet_t *lastPacket = m_processedPackets.back();
+    
+    bool keepCleaning = true;
+    queued_packet_t *cur = m_queuedHead;
+    while (cur && keepCleaning) {
+        if (cur->identifier == lastPacket->identifier) {
+            AS_TRACE("Found the last packet to be cleaned up\n");
+            keepCleaning  = false;
+        }
+        
+        queued_packet_t *tmp = cur->next;
         
         m_cachedDataSize -= cur->desc.mDataByteSize;
         
         free(cur);
+        cur = tmp;
     }
+    m_queuedHead = cur;
+    
     m_processedPackets.clear();
     
     if (m_inputStream) {
@@ -1365,7 +1388,7 @@ OSStatus Audio_Stream::encoderDataCallback(AudioConverterRef inAudioConverter, U
     AS_TRACE("encoderDataCallback called\n");
     
     // Dequeue one packet per time for the decoder
-    queued_packet_t *front = THIS->m_queuedHead;
+    queued_packet_t *front = THIS->m_playPacket;
     
     if (!front) {
         /*
@@ -1395,9 +1418,8 @@ OSStatus Audio_Stream::encoderDataCallback(AudioConverterRef inAudioConverter, U
         *outDataPacketDescription = &front->desc;
     }
     
-    THIS->m_queuedHead = front->next;
+    THIS->m_playPacket = front->next;
     
-    front->next = NULL;
     THIS->m_processedPackets.push_front(front);
     
     return noErr;
@@ -1550,7 +1572,7 @@ void Audio_Stream::streamDataCallback(void *inClientData, UInt32 inNumberBytes, 
                size);
         
         if (THIS->m_queuedHead == NULL) {
-            THIS->m_queuedHead = THIS->m_queuedTail = packet;
+            THIS->m_queuedHead = THIS->m_queuedTail = THIS->m_playPacket = packet;
         } else {
             THIS->m_queuedTail->next = packet;
             THIS->m_queuedTail = packet;
@@ -1566,6 +1588,8 @@ void Audio_Stream::streamDataCallback(void *inClientData, UInt32 inNumberBytes, 
             if (THIS->m_inputStream) {
                 THIS->m_inputStream->setScheduledInRunLoop(false);
             }
+            
+            THIS->cleanupCachedData();
         }
     }
     

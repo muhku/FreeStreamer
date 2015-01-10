@@ -164,6 +164,7 @@ private:
     
     queued_packet_t *m_queuedHead;
     queued_packet_t *m_queuedTail;
+    queued_packet_t *m_playPacket;
     
     std::list <queued_packet_t*> m_processedPackets;
     
@@ -192,6 +193,7 @@ private:
     void setCookiesForStream(AudioFileStreamID inAudioFileStream);
     
     int cachedDataCount();
+    int playbackDataCount();
     void enqueueCachedData(int minPacketsRequired);
     void cleanupCachedData();
     
