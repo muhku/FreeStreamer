@@ -169,7 +169,6 @@ private:
     
     size_t m_cachedDataSize;
     
-    UInt32 m_processedPacketsCount;      // global packet statistics: count
     UInt64 m_audioDataByteCount;
     UInt64 m_audioDataPacketCount;
     UInt32 m_bitRate;

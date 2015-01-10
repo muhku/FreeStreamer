@@ -93,7 +93,6 @@ Audio_Stream::Audio_Stream() :
     m_queuedHead(0),
     m_queuedTail(0),
     m_cachedDataSize(0),
-    m_processedPacketsCount(0),
     m_audioDataByteCount(0),
     m_audioDataPacketCount(0),
     m_bitRate(0),
@@ -164,7 +163,6 @@ void Audio_Stream::open(Input_Stream_Position *position)
     m_seekOffset = 0;
     m_bounceCount = 0;
     m_firstBufferingTime = 0;
-    m_processedPacketsCount = 0;
     m_bitrateBufferIndex = 0;
     m_initializationError = noErr;
     m_converterRunOutOfData = false;
@@ -430,7 +428,6 @@ void Audio_Stream::seekToOffset(float offset)
         m_bytesReceived = 0;
         m_bounceCount = 0;
         m_firstBufferingTime = 0;
-        m_processedPacketsCount = 0;
         m_bitrateBufferIndex = 0;
         m_initializationError = noErr;
         m_converterRunOutOfData = false;
@@ -1150,7 +1147,7 @@ float Audio_Stream::bitrate()
     }
     
     // Stream didn't provide a bit rate, so let's calculate it
-    if (m_processedPacketsCount < kAudioStreamBitrateBufferSize) {
+    if (m_bitrateBufferIndex < kAudioStreamBitrateBufferSize) {
         return 0;
     }
     double sum = 0;
@@ -1400,8 +1397,6 @@ OSStatus Audio_Stream::encoderDataCallback(AudioConverterRef inAudioConverter, U
     
     front->next = NULL;
     THIS->m_processedPackets.push_front(front);
-    
-    THIS->m_processedPacketsCount++;
     
     return noErr;
 }
