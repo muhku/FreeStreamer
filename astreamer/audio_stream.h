@@ -193,6 +193,7 @@ private:
     
     int cachedDataCount();
     void enqueueCachedData(int minPacketsRequired);
+    void cleanupCachedData();
     
     static void watchdogTimerCallback(CFRunLoopTimerRef timer, void *info);
     static void audioQueueTimerCallback(CFRunLoopTimerRef timer, void *info);
