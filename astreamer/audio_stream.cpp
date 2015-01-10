@@ -1342,25 +1342,20 @@ void Audio_Stream::enqueueCachedData(int minPacketsRequired)
     
 void Audio_Stream::cleanupCachedData()
 {
-    Stream_Configuration *config = Stream_Configuration::configuration();
-    
     for(std::list<queued_packet_t*>::iterator iter = m_processedPackets.begin();
         iter != m_processedPackets.end(); iter++) {
         queued_packet_t *cur = *iter;
         
         m_cachedDataSize -= cur->desc.mDataByteSize;
         
-        if (m_cachedDataSize < config->maxPrebufferedByteCount) {
-            AS_TRACE("Cache underflow, enabling the HTTP stream\n");
-            
-            if (m_inputStream) {
-                m_inputStream->setScheduledInRunLoop(true);
-            }
-        }
-        
         free(cur);
     }
     m_processedPackets.clear();
+    
+    if (m_inputStream) {
+        AS_TRACE("Cache underflow, enabling the HTTP stream\n");
+        m_inputStream->setScheduledInRunLoop(true);
+    }
 }
     
 OSStatus Audio_Stream::encoderDataCallback(AudioConverterRef inAudioConverter, UInt32 *ioNumberDataPackets, AudioBufferList *ioData, AudioStreamPacketDescription **outDataPacketDescription, void *inUserData)
