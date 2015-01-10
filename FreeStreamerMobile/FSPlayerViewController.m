@@ -17,6 +17,11 @@
 #import "FSFrequencyPlotView.h"
 #import "AJNotificationView.h"
 
+/*
+ * To pause after seeking, uncomment the following line:
+ */
+//#define PAUSE_AFTER_SEEKING 1
+
 @interface FSPlayerViewController ()
 
 - (void)clearStatus;
@@ -126,19 +131,6 @@
             case kFsAudioStreamPlaying:
                 [self determineStationNameWithMetaData:nil];
                 
-                if (_volumeBeforeRamping > 0) {
-                    _rampStep = 1;
-                    _rampStepCount = 5; // 50ms and 5 steps = 250ms ramp
-                    _rampUp = true;
-                    _postRampAction = @selector(finalizeSeeking);
-                    
-                    _volumeRampTimer = [NSTimer scheduledTimerWithTimeInterval:0.05 // 50ms
-                                                                        target:self
-                                                                      selector:@selector(rampVolume)
-                                                                      userInfo:nil
-                                                                       repeats:YES];
-                }
-                
                 [self clearStatus];
                 
                 [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
@@ -151,6 +143,29 @@
                                                                           selector:@selector(updatePlaybackProgress)
                                                                           userInfo:nil
                                                                            repeats:YES];
+                }
+                
+                if (_volumeBeforeRamping > 0) {
+                    // If we have volume before ramping set, it means we were seeked
+                    
+#if PAUSE_AFTER_SEEKING
+                    [self pause:self];
+                    self.audioController.volume = _volumeBeforeRamping;
+                    _volumeBeforeRamping = 0;
+                    
+                    break;
+#else
+                    _rampStep = 1;
+                    _rampStepCount = 5; // 50ms and 5 steps = 250ms ramp
+                    _rampUp = true;
+                    _postRampAction = @selector(finalizeSeeking);
+                    
+                    _volumeRampTimer = [NSTimer scheduledTimerWithTimeInterval:0.05 // 50ms
+                                                                        target:self
+                                                                      selector:@selector(rampVolume)
+                                                                      userInfo:nil
+                                                                       repeats:YES];
+#endif
                 }
                 
                 self.playButton.hidden = YES;
