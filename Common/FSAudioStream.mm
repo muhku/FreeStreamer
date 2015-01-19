@@ -189,7 +189,7 @@ public:
     NSString *_defaultContentType;
     Reachability *_reachability;
     FSSeekByteOffset _lastSeekByteOffset;
-    BOOL _userRequestedPause;
+    BOOL _wasPaused;
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
     UIBackgroundTaskIdentifier _backgroundTask;
 #endif
@@ -630,7 +630,7 @@ public:
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 60000)
     NSNumber *interruptionType = [[notification userInfo] valueForKey:AVAudioSessionInterruptionTypeKey];
     if ([interruptionType intValue] == AVAudioSessionInterruptionTypeBegan) {
-        if ([self isPlaying] &&  _userRequestedPause == NO) {
+        if ([self isPlaying] &&  _wasPaused == NO) {
             self.wasInterrupted = YES;
             // Continuous streams do not have a duration.
             self.wasContinuousStream = !([self durationInSeconds] > 0);
@@ -759,7 +759,7 @@ public:
 
 - (void)play
 {
-    _userRequestedPause = NO;
+    _wasPaused = NO;
 
     if (_audioStream->isPreloading()) {
         _audioStream->startCachedDataPlayback();
@@ -797,7 +797,7 @@ public:
 
 - (void)pause
 {
-    _userRequestedPause = YES;
+    _wasPaused = YES;
     _audioStream->pause();
 }
 
