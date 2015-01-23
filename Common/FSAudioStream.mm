@@ -630,7 +630,7 @@ public:
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 60000)
     NSNumber *interruptionType = [[notification userInfo] valueForKey:AVAudioSessionInterruptionTypeKey];
     if ([interruptionType intValue] == AVAudioSessionInterruptionTypeBegan) {
-        if ([self isPlaying] &&  _wasPaused == NO) {
+        if ([self isPlaying] && !_wasPaused) {
             self.wasInterrupted = YES;
             // Continuous streams do not have a duration.
             self.wasContinuousStream = !([self durationInSeconds] > 0);
