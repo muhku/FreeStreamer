@@ -396,53 +396,72 @@ void HTTP_Stream::parseHttpHeadersIfNeeded(const UInt8 *buf, const CFIndex bufSi
     
     CFHTTPMessageRef response = (CFHTTPMessageRef)CFReadStreamCopyProperty(m_readStream, kCFStreamPropertyHTTPResponseHeader);
     if (response) {
-        /*
-         * If the server responded with the icy-metaint header, the response
-         * body will be encoded in the ShoutCast protocol.
-         */
-        CFStringRef icyMetaIntString = CFHTTPMessageCopyHeaderFieldValue(response, CFSTR("icy-metaint"));
-        if (icyMetaIntString) {
-            m_icyStream = true;
-            m_icyHeadersParsed = true;
-            m_icyHeadersRead = true;
-            m_icyMetaDataInterval = CFStringGetIntValue(icyMetaIntString);
-            CFRelease(icyMetaIntString);
+    	UInt32 statusCode;
+        statusCode = CFHTTPMessageGetResponseStatusCode(response);
+        if (statusCode == 200)
+        {
+	        /*
+	         * If the server responded with the icy-metaint header, the response
+	         * body will be encoded in the ShoutCast protocol.
+	         */
+	        CFStringRef icyMetaIntString = CFHTTPMessageCopyHeaderFieldValue(response, CFSTR("icy-metaint"));
+	        if (icyMetaIntString) {
+	            m_icyStream = true;
+	            m_icyHeadersParsed = true;
+	            m_icyHeadersRead = true;
+	            m_icyMetaDataInterval = CFStringGetIntValue(icyMetaIntString);
+	            CFRelease(icyMetaIntString);
+	        }
+	        
+	        HS_TRACE("icy-metaint: %zu\n", m_icyMetaDataInterval);
+	        
+	        CFStringRef icyNameString = CFHTTPMessageCopyHeaderFieldValue(response, CFSTR("icy-name"));
+	        if (icyNameString) {
+	            if (m_icyName) {
+	                CFRelease(m_icyName);
+	            }
+	            m_icyName = icyNameString;
+	            
+	            if (m_delegate) {
+	                std::map<CFStringRef,CFStringRef> metadataMap;
+	                
+	                metadataMap[CFSTR("IcecastStationName")] = CFStringCreateCopy(kCFAllocatorDefault, m_icyName);
+	                
+	                m_delegate->streamMetaDataAvailable(metadataMap);
+	            }
+	        }
+	        
+	        if (m_contentType) {
+	            CFRelease(m_contentType);
+	        }
+	        
+	        m_contentType = CFHTTPMessageCopyHeaderFieldValue(response, CFSTR("Content-Type"));
+	        
+	        HS_TRACE("Content-type: ");
+	        HS_TRACE_CFSTRING(m_contentType);
+	        
+	        CFStringRef contentLengthString = CFHTTPMessageCopyHeaderFieldValue(response, CFSTR("Content-Length"));
+	        if (contentLengthString) {
+	            m_contentLength = CFStringGetIntValue(contentLengthString);
+	            
+	            CFRelease(contentLengthString);
+	        }
         }
-        
-        HS_TRACE("icy-metaint: %zu\n", m_icyMetaDataInterval);
-        
-        CFStringRef icyNameString = CFHTTPMessageCopyHeaderFieldValue(response, CFSTR("icy-name"));
-        if (icyNameString) {
-            if (m_icyName) {
-                CFRelease(m_icyName);
-            }
-            m_icyName = icyNameString;
+        else {
+            HS_TRACE("HTTP response code %zu ",statusCode);
             
+            CFStringRef statusCodeStr = CFStringCreateWithFormat(NULL,
+                                                              NULL,
+                                                              CFSTR("HTTP response code %d"),
+                                                              (unsigned int)statusCode);
             if (m_delegate) {
-                std::map<CFStringRef,CFStringRef> metadataMap;
+                m_delegate->streamErrorOccurred(statusCodeStr);
                 
-                metadataMap[CFSTR("IcecastStationName")] = CFStringCreateCopy(kCFAllocatorDefault, m_icyName);
-                
-                m_delegate->streamMetaDataAvailable(metadataMap);
+                if (statusCodeStr) {
+                    CFRelease(statusCodeStr), statusCodeStr = NULL;
+                }
             }
         }
-        
-        if (m_contentType) {
-            CFRelease(m_contentType);
-        }
-        
-        m_contentType = CFHTTPMessageCopyHeaderFieldValue(response, CFSTR("Content-Type"));
-        
-        HS_TRACE("Content-type: ");
-        HS_TRACE_CFSTRING(m_contentType);
-        
-        CFStringRef contentLengthString = CFHTTPMessageCopyHeaderFieldValue(response, CFSTR("Content-Length"));
-        if (contentLengthString) {
-            m_contentLength = CFStringGetIntValue(contentLengthString);
-            
-            CFRelease(contentLengthString);
-        }
-        
         CFRelease(response);
     }
        
