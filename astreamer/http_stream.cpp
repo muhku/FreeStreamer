@@ -395,6 +395,8 @@ void HTTP_Stream::parseHttpHeadersIfNeeded(const UInt8 *buf, const CFIndex bufSi
     HS_TRACE("A regular HTTP stream\n");
     
     CFHTTPMessageRef response = (CFHTTPMessageRef)CFReadStreamCopyProperty(m_readStream, kCFStreamPropertyHTTPResponseHeader);
+    CFIndex statusCode = 0;
+    
     if (response) {
         /*
          * If the server responded with the icy-metaint header, the response
@@ -410,6 +412,10 @@ void HTTP_Stream::parseHttpHeadersIfNeeded(const UInt8 *buf, const CFIndex bufSi
         }
         
         HS_TRACE("icy-metaint: %zu\n", m_icyMetaDataInterval);
+        
+        statusCode = CFHTTPMessageGetResponseStatusCode(response);
+        
+        HS_TRACE("HTTP response code %zu", statusCode);
         
         CFStringRef icyNameString = CFHTTPMessageCopyHeaderFieldValue(response, CFSTR("icy-name"));
         if (icyNameString) {
@@ -446,8 +452,20 @@ void HTTP_Stream::parseHttpHeadersIfNeeded(const UInt8 *buf, const CFIndex bufSi
         CFRelease(response);
     }
        
-    if (m_delegate) {
+    if (m_delegate && statusCode == 200) {
         m_delegate->streamIsReadyRead();
+    } else {
+        if (m_delegate) {
+            CFStringRef statusCodeString = CFStringCreateWithFormat(NULL,
+                                                                    NULL,
+                                                                    CFSTR("HTTP response code %d"),
+                                                                    (unsigned int)statusCode);
+            m_delegate->streamErrorOccurred(statusCodeString);
+            
+            if (statusCodeString) {
+                CFRelease(statusCodeString);
+            }
+        }
     }
 }
     
