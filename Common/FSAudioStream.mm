@@ -1304,7 +1304,8 @@ void AudioStreamStateObserver::audioStreamErrorOccurred(int errorCode, CFStringR
     
     [[NSNotificationCenter defaultCenter] postNotification:notification];
     
-    if (error == kFsAudioStreamErrorNetwork) {
+    if (error == kFsAudioStreamErrorNetwork ||
+        error == kFsAudioStreamErrorUnsupportedFormat) {
         [priv attemptRestart];
     }
 }
