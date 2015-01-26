@@ -20,6 +20,8 @@
 #import <AudioToolbox/AudioToolbox.h>
 #endif
 
+#import <UIKit/UIKit.h>
+
 @interface FSCacheObject : NSObject {
 }
 
