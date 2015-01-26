@@ -18,9 +18,8 @@
 
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
 #import <AudioToolbox/AudioToolbox.h>
-#endif
-
 #import <UIKit/UIKit.h>
+#endif
 
 @interface FSCacheObject : NSObject {
 }
