@@ -452,7 +452,8 @@ void HTTP_Stream::parseHttpHeadersIfNeeded(const UInt8 *buf, const CFIndex bufSi
         CFRelease(response);
     }
        
-    if (m_delegate && statusCode == 200) {
+    if (m_delegate &&
+        (statusCode == 200 || statusCode == 206)) {
         m_delegate->streamIsReadyRead();
     } else {
         if (m_delegate) {
