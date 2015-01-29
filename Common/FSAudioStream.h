@@ -16,12 +16,12 @@
 /**
  * The minor version of the current release.
  */
-#define FREESTREAMER_VERSION_MINOR          9
+#define FREESTREAMER_VERSION_MINOR          10
 
 /**
  * The reversion of the current release
  */
-#define FREESTREAMER_VERSION_REVISION       17
+#define FREESTREAMER_VERSION_REVISION       1
 
 /**
  * Follow this notification for the audio stream state changes.
