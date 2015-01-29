@@ -69,6 +69,9 @@
     self.navigationController.navigationBar.barStyle = UIBarStyleBlack;
     self.navigationController.navigationBarHidden = NO;
     
+    self.nextButton.hidden = YES;
+    self.previousButton.hidden = YES;
+    
     _stationURL = nil;
     self.navigationItem.rightBarButtonItem = nil;
     
@@ -167,7 +170,7 @@
                                                                        repeats:YES];
 #endif
                 }
-                
+                [self toggleNextPreviousButtons];
                 self.playButton.hidden = YES;
                 self.pauseButton.hidden = NO;
                 _paused = NO;
@@ -181,6 +184,10 @@
                 self.pauseButton.hidden = YES;
                 _paused = NO;
                 break;
+            case kFsAudioStreamPlaybackCompleted:
+                [self toggleNextPreviousButtons];
+                break;
+
             default:
                 break;
         }
@@ -446,6 +453,32 @@
 - (IBAction)changeVolume:(id)sender
 {
     self.audioController.volume = self.volumeSlider.value;
+}
+
+-(IBAction)playNext:(id)sender
+{
+    [self.audioController playNextItem];
+}
+
+-(IBAction)playPrevious:(id)sender
+{
+    [self.audioController playPreviousItem];
+}
+
+-(void)toggleNextPreviousButtons
+{
+    if([self.audioController hasNextItem] || [self.audioController hasPreviousItem])
+    {
+        self.nextButton.hidden = NO;
+        self.previousButton.hidden = NO;
+        self.nextButton.enabled = [self.audioController hasNextItem];
+        self.previousButton.enabled = [self.audioController hasPreviousItem];
+    }
+    else
+    {
+        self.nextButton.hidden = YES;
+        self.previousButton.hidden = YES;
+    }
 }
 
 - (IBAction)toggleAnalyzer:(id)sender

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6254" systemVersion="14B25" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6250" systemVersion="14A389" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6247"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6244"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="UIApplication">
@@ -64,7 +64,6 @@
                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                 <subviews>
                     <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="MEj-tS-Sp2">
-                        <rect key="frame" x="137" y="285" width="70" height="47"/>
                         <color key="backgroundColor" red="0.81399936868686873" green="0.81399936868686873" blue="0.81399936868686873" alpha="1" colorSpace="calibratedRGB"/>
                     </view>
                     <imageView hidden="YES" userInteractionEnabled="NO" alpha="0.69999998807907104" contentMode="scaleToFill" image="player-top-bg.png" translatesAutoresizingMaskIntoConstraints="NO" id="167">
@@ -100,14 +99,32 @@
                             <action selector="seek:" destination="17" eventType="valueChanged" id="50"/>
                         </connections>
                     </slider>
-                    <imageView userInteractionEnabled="NO" alpha="0.75" contentMode="scaleToFill" misplaced="YES" image="player-bg-bottom.png" translatesAutoresizingMaskIntoConstraints="NO" id="142">
-                        <rect key="frame" x="0.0" y="320" width="320" height="96"/>
+                    <imageView userInteractionEnabled="NO" alpha="0.75" contentMode="scaleToFill" image="player-bg-bottom.png" translatesAutoresizingMaskIntoConstraints="NO" id="142">
+                        <rect key="frame" x="0.0" y="256" width="320" height="96"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="96" id="149"/>
                         </constraints>
                     </imageView>
-                    <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="28">
-                        <rect key="frame" x="137" y="320" width="47" height="47"/>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="3Dl-E5-tXf" userLabel="previousButton">
+                        <rect key="frame" x="40" y="256" width="47" height="47"/>
+                        <state key="normal" image="button-previous.png">
+                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                        </state>
+                        <connections>
+                            <action selector="playPrevious:" destination="17" eventType="touchUpInside" id="yJg-gX-l2W"/>
+                        </connections>
+                    </button>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="w85-te-F6p" userLabel="nextButton">
+                        <rect key="frame" x="234" y="256" width="47" height="47"/>
+                        <state key="normal" image="button-next.png">
+                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                        </state>
+                        <connections>
+                            <action selector="playNext:" destination="17" eventType="touchUpInside" id="zd0-bj-7QC"/>
+                        </connections>
+                    </button>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="28" userLabel="pauseButton">
+                        <rect key="frame" x="137" y="256" width="47" height="47"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="47" id="648"/>
                         </constraints>
@@ -123,8 +140,8 @@
                             <action selector="pause:" destination="17" eventType="touchUpInside" id="413"/>
                         </connections>
                     </button>
-                    <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="27">
-                        <rect key="frame" x="137" y="320" width="47" height="47"/>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="27" userLabel="playButton">
+                        <rect key="frame" x="137" y="256" width="47" height="47"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="47" id="649"/>
                         </constraints>
@@ -140,12 +157,12 @@
                             <action selector="play:" destination="17" eventType="touchUpInside" id="31"/>
                         </connections>
                     </button>
-                    <view contentMode="scaleToFill" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="508" customClass="FSFrequencyPlotView">
-                        <rect key="frame" x="0.0" y="191" width="320" height="108"/>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="508" customClass="FSFrequencyPlotView">
+                        <rect key="frame" x="0.0" y="191" width="320" height="44"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     </view>
-                    <slider opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="572">
-                        <rect key="frame" x="18" y="374" width="284" height="31"/>
+                    <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="572">
+                        <rect key="frame" x="18" y="310" width="284" height="31"/>
                         <color key="minimumTrackTintColor" cocoaTouchSystemColor="darkTextColor"/>
                         <color key="maximumTrackTintColor" cocoaTouchSystemColor="darkTextColor"/>
                         <color key="thumbTintColor" cocoaTouchSystemColor="darkTextColor"/>
@@ -153,14 +170,14 @@
                             <action selector="changeVolume:" destination="17" eventType="valueChanged" id="591"/>
                         </connections>
                     </slider>
-                    <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="detailDisclosure" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="592">
-                        <rect key="frame" x="148" y="163" width="22" height="22"/>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="detailDisclosure" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="592">
+                        <rect key="frame" x="149" y="163" width="22" height="22"/>
                         <connections>
                             <action selector="toggleAnalyzer:" destination="17" eventType="touchUpInside" id="602"/>
                         </connections>
                     </button>
-                    <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" misplaced="YES" progressViewStyle="bar" progress="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="526">
-                        <rect key="frame" x="0.0" y="314" width="320" height="2.5"/>
+                    <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" progressViewStyle="bar" progress="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="526">
+                        <rect key="frame" x="0.0" y="250" width="320" height="3"/>
                     </progressView>
                 </subviews>
                 <color key="backgroundColor" red="0.87438434099999995" green="0.87438434099999995" blue="0.87438434099999995" alpha="0.59999999999999998" colorSpace="calibratedRGB"/>
@@ -197,6 +214,14 @@
                     <constraint firstItem="526" firstAttribute="trailing" secondItem="508" secondAttribute="trailing" id="652"/>
                     <constraint firstItem="592" firstAttribute="centerX" secondItem="26" secondAttribute="centerX" id="655"/>
                     <constraint firstItem="592" firstAttribute="centerX" secondItem="46" secondAttribute="centerX" id="656"/>
+                    <constraint firstItem="3Dl-E5-tXf" firstAttribute="top" secondItem="28" secondAttribute="top" id="00C-EM-wUq"/>
+                    <constraint firstItem="w85-te-F6p" firstAttribute="height" secondItem="28" secondAttribute="height" id="2Pj-aI-eGd"/>
+                    <constraint firstItem="28" firstAttribute="leading" secondItem="3Dl-E5-tXf" secondAttribute="trailing" constant="50" id="Hzr-Xn-r1X"/>
+                    <constraint firstItem="w85-te-F6p" firstAttribute="leading" secondItem="28" secondAttribute="trailing" constant="50" id="PoY-yP-EAA"/>
+                    <constraint firstItem="3Dl-E5-tXf" firstAttribute="width" secondItem="28" secondAttribute="width" id="ayT-Aw-WSZ"/>
+                    <constraint firstItem="3Dl-E5-tXf" firstAttribute="height" secondItem="28" secondAttribute="height" id="o8H-Z6-rZP"/>
+                    <constraint firstItem="w85-te-F6p" firstAttribute="top" secondItem="28" secondAttribute="top" id="pJU-Vd-Ngv"/>
+                    <constraint firstItem="w85-te-F6p" firstAttribute="width" secondItem="28" secondAttribute="width" id="xBO-hf-5x1"/>
                 </constraints>
             </view>
             <extendedEdge key="edgesForExtendedLayout"/>
@@ -215,9 +240,11 @@
                 <outlet property="bufferingIndicator" destination="526" id="536"/>
                 <outlet property="currentPlaybackTime" destination="46" id="47"/>
                 <outlet property="frequencyPlotView" destination="508" id="522"/>
+                <outlet property="nextButton" destination="w85-te-F6p" id="Ye6-4h-4hS"/>
                 <outlet property="pauseButton" destination="28" id="412"/>
                 <outlet property="playButton" destination="27" id="411"/>
                 <outlet property="prebufferStatus" destination="MEj-tS-Sp2" id="ggL-qT-eGg"/>
+                <outlet property="previousButton" destination="3Dl-E5-tXf" id="ZlX-W0-2U9"/>
                 <outlet property="progressSlider" destination="48" id="49"/>
                 <outlet property="statusLabel" destination="26" id="30"/>
                 <outlet property="volumeSlider" destination="572" id="585"/>
@@ -226,8 +253,10 @@
         </viewController>
     </objects>
     <resources>
+        <image name="button-next.png" width="76" height="94"/>
         <image name="button-pause.png" width="94" height="94"/>
         <image name="button-play.png" width="94" height="94"/>
+        <image name="button-previous.png" width="82" height="94"/>
         <image name="player-bg-bottom.png" width="640" height="192"/>
         <image name="player-top-bg.png" width="640" height="60"/>
     </resources>

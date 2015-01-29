@@ -73,6 +73,28 @@
 - (BOOL)isPlaying;
 
 /**
+ * Returns if the current multiple-item playlist has next item
+ */
+-(BOOL)hasNextItem;
+
+/**
+ * Returns if the current multiple-item playlist has Previous item
+ */
+-(BOOL)hasPreviousItem;
+
+/**
+ * Play the next item of multiple-item playlist
+ */
+-(void)playNextItem;
+
+/**
+ * Play the previous item of multiple-item playlist
+ */
+
+-(void)playPreviousItem;
+
+
+/**
  * This property holds the current playback volume of the stream,
  * from 0.0 to 1.0.
  *

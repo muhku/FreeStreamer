@@ -244,6 +244,43 @@
     [self.audioStream pause];
 }
 
+-(BOOL)hasMultiplePlaylistItems
+{
+    return ([self.playlistItems count] > 1);
+}
+
+-(BOOL)hasNextItem
+{
+    return [self hasMultiplePlaylistItems] && (self.currentPlaylistItemIndex + 1 < [self.playlistItems count]);
+}
+
+-(BOOL)hasPreviousItem
+{
+    return ([self hasMultiplePlaylistItems] && (self.currentPlaylistItemIndex != 0));
+}
+
+-(void)playNextItem
+{
+    if ([self hasNextItem])
+    {
+        self.currentPlaylistItemIndex = self.currentPlaylistItemIndex + 1;
+        
+        [self play];
+    }
+}
+
+-(void)playPreviousItem
+{
+    if ([self hasPreviousItem])
+    {
+        self.currentPlaylistItemIndex = self.currentPlaylistItemIndex - 1;
+        
+        [self play];
+    }
+    
+}
+
+
 /*
  * =======================================
  * Properties
