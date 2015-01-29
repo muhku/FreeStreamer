@@ -74,6 +74,14 @@
  */
 @property (nonatomic,strong) IBOutlet UIButton *pauseButton;
 /**
+ * Reference to the next button.
+ */
+@property (nonatomic,strong) IBOutlet UIButton *nextButton;
+/**
+ * Reference to the previous button.
+ */
+@property (nonatomic,strong) IBOutlet UIButton *previousButton;
+/**
  * Reference to the pause button.
  */
 @property (nonatomic,strong) IBOutlet UIButton *analyzerButton;
@@ -138,6 +146,19 @@
  * @param sender The sender of the action.
  */
 - (IBAction)pause:(id)sender;
+
+/**
+ * An action for Playing the next item of a multi-item playlist.
+ *
+ * @param sender The sender of the action.
+ */
+-(IBAction)playNext:(id)sender;
+/**
+ * An action for Playing the previous item of a multi-item playlist.
+ *
+ * @param sender The sender of the action.
+ */
+-(IBAction)playPrevious:(id)sender;
 /**
  * An action for seeking the stream.
  *
