@@ -728,6 +728,8 @@ void Audio_Stream::audioQueueBuffersEmpty()
     if (count == 0 && m_inputStreamRunning && FAILED != state()) {
         Stream_Configuration *config = Stream_Configuration::configuration();
         
+        m_playPacket = m_queuedHead;
+        
         // Always make sure we are scheduled to receive data if we start buffering
         m_inputStream->setScheduledInRunLoop(true);
         
@@ -1243,6 +1245,7 @@ void Audio_Stream::enqueueCachedData(int minPacketsRequired)
     
     Stream_Configuration *config = Stream_Configuration::configuration();
     
+    const bool continuous = (!(contentLength() > 0));
     const int count = playbackDataCount();
     
     if (!m_initialBufferingCompleted) {
@@ -1252,7 +1255,7 @@ void Audio_Stream::enqueueCachedData(int minPacketsRequired)
         
         int lim;
         
-        if (!(contentLength() > 0)) {
+        if (continuous) {
             // Continuous stream
             lim = config->requiredInitialPrebufferedByteCountForContinuousStream;
             AS_TRACE("continuous stream, %i bytes must be cached to start the playback\n", lim);
@@ -1335,8 +1338,14 @@ void Audio_Stream::enqueueCachedData(int minPacketsRequired)
                 m_delegate->samplesAvailable(outputBufferList, description);
             }
             
-            if (m_cachedDataSize >= config->maxPrebufferedByteCount) {
+            // For continuous streams, we don't need to accummulate the data for seeking
+            if (continuous) {
                 cleanupCachedData();
+            } else {
+                // For non-continuous streams, keep previous data for seeking
+                if (m_cachedDataSize >= config->maxPrebufferedByteCount) {
+                    cleanupCachedData();
+                }
             }
         } else {
             AS_TRACE("AudioConverterFillComplexBuffer failed, error %i\n", err);
