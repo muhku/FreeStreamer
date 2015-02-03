@@ -28,7 +28,8 @@
 #if !defined (AS_DEBUG)
 #define AS_TRACE(...) do {} while (0)
 #else
-#define AS_TRACE(...) printf(__VA_ARGS__)
+#include <pthread.h>
+#define AS_TRACE(...) printf("[audio_stream.cpp:%i thread %x] ", __LINE__, pthread_mach_thread_np(pthread_self())); printf(__VA_ARGS__)
 #endif
 
 namespace astreamer {
@@ -1387,6 +1388,10 @@ void Audio_Stream::cleanupCachedData()
         
         free(cur);
         cur = tmp;
+        if (cur == m_playPacket){
+            keepCleaning = false;
+            AS_TRACE("Found m_playPacket\n");
+        }
     }
     m_queuedHead = cur;
     
