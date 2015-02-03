@@ -719,19 +719,13 @@ void Audio_Stream::audioQueueBuffersEmpty()
      * Entering here means that the audio queue has run out of data to play.
      */
     
-    if (FAILED == state()) {
-        AS_TRACE("Stream failed, stale audio queue callback.\n");
-        
-        return;
-    }
-    
     const int count = playbackDataCount();
     
     /*
      * If we don't have any cached data to play and we are still supposed to
      * feed the audio queue with data, enter the buffering state.
      */
-    if (count == 0 && m_inputStreamRunning) {
+    if (count == 0 && m_inputStreamRunning && FAILED != state()) {
         Stream_Configuration *config = Stream_Configuration::configuration();
         
         m_playPacket = m_queuedHead;
