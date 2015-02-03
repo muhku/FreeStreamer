@@ -958,6 +958,14 @@ void Audio_Stream::streamEndEncountered()
         AS_TRACE("%s: stray callback detected!\n", __PRETTY_FUNCTION__);
         return;
     }
+
+    if (!(contentLength() > 0)) {
+        /* Continuous streams are not supposed to end */
+        
+        closeAndSignalError(AS_ERR_NETWORK, CFSTR("Stream ended abruptly"));
+        
+        return;
+    }
     
     setState(END_OF_FILE);
     
