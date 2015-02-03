@@ -298,6 +298,11 @@ NSString*             freeStreamerReleaseVersion();
 - (BOOL)isPlaying;
 
 /**
+ * Cleans all cached data from the persistent storage.
+ */
+- (void)expungeCache;
+
+/**
  * The stream URL.
  */
 @property (nonatomic,assign) NSURL *url;
@@ -374,6 +379,10 @@ NSString*             freeStreamerReleaseVersion();
  * lower than the current playback volume set by the user.
  */
 @property (nonatomic,assign) float volume;
+/**
+ * The current size of the disk cache.
+ */
+@property (nonatomic,readonly) unsigned long long totalCachedObjectsSize;
 /**
  * Called upon completion of the stream. Note that for continuous
  * streams this is never called.

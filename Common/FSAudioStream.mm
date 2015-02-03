@@ -238,6 +238,7 @@ public:
 - (void)notifyStateChange:(FSAudioStreamState)streamerState;
 
 - (void)attemptRestart;
+- (void)expungeCache;
 - (void)play;
 - (void)playFromURL:(NSURL*)url;
 - (void)playFromOffset:(FSSeekByteOffset)offset;
@@ -246,6 +247,7 @@ public:
 - (void)pause;
 - (void)seekToOffset:(float)offset;
 - (float)currentVolume;
+- (unsigned long long)totalCachedObjectsSize;
 - (void)setVolume:(float)volume;
 - (void)setPlayRate:(float)playRate;
 - (astreamer::AS_Playback_Position)playbackPosition;
@@ -780,6 +782,21 @@ public:
     self.restartCount++;
 }
 
+- (void)expungeCache
+{
+    for (NSString *file in [[NSFileManager defaultManager] contentsOfDirectoryAtPath:self.configuration.cacheDirectory error:nil]) {
+        NSString *fullPath = [NSString stringWithFormat:@"%@/%@", self.configuration.cacheDirectory, file];
+        
+        if ([file hasPrefix:@"FSCache-"]) {
+            if (![[NSFileManager defaultManager] removeItemAtPath:fullPath error:nil]) {
+#if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
+                NSLog(@"Failed expunging %@ from the cache", fullPath);
+#endif
+            }
+        }
+    }
+}
+
 - (void)play
 {
     _wasPaused = NO;
@@ -832,6 +849,20 @@ public:
 - (float)currentVolume
 {
     return _audioStream->currentVolume();
+}
+
+- (unsigned long long)totalCachedObjectsSize
+{
+    unsigned long long totalCacheSize = 0;
+    for (NSString *file in [[NSFileManager defaultManager] contentsOfDirectoryAtPath:self.configuration.cacheDirectory error:nil]) {
+        if ([file hasPrefix:@"FSCache-"]) {
+            NSString *fullPath = [NSString stringWithFormat:@"%@/%@", self.configuration.cacheDirectory, file];
+            NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:fullPath error:nil];
+        
+            totalCacheSize += [[attributes objectForKey:NSFileSize] longLongValue];
+        }
+    }
+    return totalCacheSize;
 }
 
 - (void)setVolume:(float)volume
@@ -1081,6 +1112,11 @@ public:
     return [_private isPlaying];
 }
 
+- (void)expungeCache
+{
+    [_private expungeCache];
+}
+
 - (FSStreamPosition)currentTimePlayed
 {
     FSStreamPosition pos;
@@ -1162,6 +1198,11 @@ public:
 - (float)volume
 {
     return [_private currentVolume];
+}
+
+- (unsigned long long)totalCachedObjectsSize
+{
+    return [_private totalCachedObjectsSize];
 }
 
 - (void)setVolume:(float)volume
