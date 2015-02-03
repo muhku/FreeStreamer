@@ -37,6 +37,8 @@
     
     _stream.volume = 0;
     _controller.volume = 0;
+    
+    [_stream expungeCache];
 }
 
 - (void)tearDown
@@ -148,6 +150,8 @@
             
             XCTAssertTrue(((unsigned)_controller.stream.bitRate == 56000), @"Invalid bit rate");
             
+            XCTAssertTrue((_stream.totalCachedObjectsSize == 0), @"System has cached objects");
+            
             return;
         }
     }
@@ -245,6 +249,8 @@
             XCTAssertTrue((_stream.contentLength == 0), @"Invalid content length");
             
             [_controller pause];
+            
+            XCTAssertTrue((_stream.totalCachedObjectsSize == 0), @"System has cached objects");
             
             return;
         }
@@ -508,6 +514,8 @@
                 // Checks done, we are done.
                 _keepRunning = NO;
                 
+                XCTAssertTrue((_stream.totalCachedObjectsSize == 0), @"System has cached objects");
+                
                 return;
             } else {
                 tickCounter++;
@@ -516,5 +524,5 @@
     }
     XCTAssertFalse(timedOut, @"Timed out - the stream did not start playing");
 }
-
+ 
 @end
