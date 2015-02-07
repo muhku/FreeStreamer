@@ -365,11 +365,7 @@ float Audio_Stream::durationInSeconds()
     
 void Audio_Stream::seekToOffset(float offset)
 {
-    if (state() != PLAYING) {
-        // Do not allow seeking if we are not currently playing the stream
-        // This allows a previous seek to be completed
-        AS_TRACE("the stream is not playing, disallowing this seek\n");
-        
+    if (state() == SEEKING) {
         return;
     }
     
@@ -427,22 +423,6 @@ void Audio_Stream::seekToOffset(float offset)
         }
     } else {
         AS_TRACE("Seeking from cache disabled\n");
-    }
-    
-    // Check if this cache lookup actually gives us a reasonable buffer
-    if (foundCachedPacket) {
-        int count = 0;
-        queued_packet_t *cur = seekPacket;
-        while (cur) {
-            cur = cur->next;
-            count++;
-        }
-        
-        if (count < config->decodeQueueSize) {
-            AS_TRACE("The seeked region too close to the end of the buffer, reopening the stream, count %i\n", count);
-            
-            foundCachedPacket = false;
-        }
     }
     
     if (!foundCachedPacket) {
