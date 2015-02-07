@@ -365,9 +365,16 @@ float Audio_Stream::durationInSeconds()
     
 void Audio_Stream::seekToOffset(float offset)
 {
-    if (state() == SEEKING) {
+    if (state() != PLAYING) {
+        // Do not allow seeking if we are not currently playing the stream
+        // This allows a previous seek to be completed
         return;
     }
+    
+    m_inputStream->setScheduledInRunLoop(false);
+    
+    // Close the audio queue so that it won't ask any more data
+    closeAudioQueue();
     
     setState(SEEKING);
     
@@ -446,30 +453,27 @@ void Audio_Stream::seekToOffset(float offset)
             setContentLength(originalContentLength);
             
             m_inputStreamRunning = true;
-            
-            audioQueue()->init();
-            
-            setState(BUFFERING);
+
         } else {
             closeAndSignalError(AS_ERR_OPEN, CFSTR("Input stream open error"));
+            return;
         }
     } else {
         AS_TRACE("Seeked packet found from cache!\n");
         
         // Found the packet from the cache, let's use the cache directly.
-        m_inputStream->setScheduledInRunLoop(false);
-        
-        closeAudioQueue();
         
         m_playPacket    = seekPacket;
         m_discontinuity = true;
         
         setSeekOffset(offset);
-        
-        audioQueue()->init();
-        
-        m_inputStream->setScheduledInRunLoop(true);
     }
+    
+    audioQueue()->init();
+    
+    setState(BUFFERING);
+    
+    m_inputStream->setScheduledInRunLoop(true);
 }
     
 Input_Stream_Position Audio_Stream::streamPositionForOffset(float offset)
@@ -1184,6 +1188,10 @@ void Audio_Stream::audioQueueTimerCallback(CFRunLoopTimerRef timer, void *info)
     AS_TRACE("audioQueueTimerCallback called\n");
     
     Audio_Stream *THIS = (Audio_Stream *)info;
+
+    if (THIS->state() == SEEKING || THIS->state() == PAUSED) {
+        return;
+    }
     
     if (THIS->m_inputStreamRunning) {
         /* We are not needed, the input stream will drive the queue */
@@ -1248,7 +1256,7 @@ void Audio_Stream::enqueueCachedData(int minPacketsRequired)
         m_converterRunOutOfData = false;
     }
     
-    if (state() == PAUSED) {
+    if (state() == PAUSED || state() == SEEKING) {
         return;
     }
     
