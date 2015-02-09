@@ -524,5 +524,72 @@
     }
     XCTAssertFalse(timedOut, @"Timed out - the stream did not start playing");
 }
+
+- (void)testSeeking
+{
+    __weak FreeStreamerMobileTests *weakSelf = self;
+    
+    _stream.onStateChange = ^(FSAudioStreamState state) {
+        if (state == kFsAudioStreamPlaying) {
+            weakSelf.checkStreamState = YES;
+            
+            NSLog(@"Seek: stream started playing!");
+        }
+    };
+    
+    _stream.url = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"test" ofType:@"mp3"]];
+    [_stream play];
+    
+    NSTimeInterval timeout = 15.0;
+    NSTimeInterval idle = 0.1;
+    BOOL timedOut;
+    NSDate *timeoutDate;
+    int loopCount = 1;
+    NSUInteger tickCounter = 0;
+    
+wait_for_playing:
+    
+    tickCounter = 0;
+    _checkStreamState = NO;
+    
+    NSLog(@"Seek try %i", loopCount);
+    
+    if (loopCount > 50) {
+        /* Done */
+        return;
+    }
+    
+    timedOut = NO;
+    timeoutDate = [[NSDate alloc] initWithTimeIntervalSinceNow:timeout];
+    while (!timedOut && _keepRunning) {
+        NSDate *tick = [[NSDate alloc] initWithTimeIntervalSinceNow:idle];
+        [[NSRunLoop currentRunLoop] runUntilDate:tick];
+        timedOut = ([tick compare:timeoutDate] == NSOrderedDescending);
+        
+        if (_checkStreamState) {
+            if (tickCounter > 3) {
+                NSLog(@"0.3 seconds passed since the stream started playing, checking the state");
+                
+                // Stream started playing.
+                FSStreamPosition pos = {0};
+                
+                if (loopCount % 2 == 0) {
+                    pos.position = 0.9;
+                } else {
+                    pos.position = 0.1;
+                }
+                
+                [_stream seekToPosition:pos];
+                
+                loopCount++;
+                
+                goto wait_for_playing;
+            } else {
+                tickCounter++;
+            }
+        }
+    }
+    XCTAssertFalse(timedOut, @"Timed out - the stream did not start playing");
+}
  
 @end
