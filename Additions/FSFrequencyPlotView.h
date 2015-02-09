@@ -6,6 +6,8 @@
  * https://github.com/muhku/FreeStreamer
  */
 
+#import <UIKit/UIKit.h>
+
 #include "FSFrequencyDomainAnalyzer.h"
 
 #define kFSFrequencyPlotViewMaxCount 64
