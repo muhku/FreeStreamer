@@ -21,6 +21,10 @@
 #import <UIKit/UIKit.h>
 #endif
 
+#if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
+static NSMutableDictionary *fsAudioStreamPrivateActiveSessions = nil;
+#endif
+
 @interface FSCacheObject : NSObject {
 }
 
@@ -279,6 +283,12 @@ public:
                                                    object:nil];
 
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
+        @synchronized (self) {
+            if (!fsAudioStreamPrivateActiveSessions) {
+                fsAudioStreamPrivateActiveSessions = [[NSMutableDictionary alloc] init];
+            }
+        }
+        
         [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
 #endif
         
@@ -353,6 +363,16 @@ public:
         }
         totalCacheSize -= [cacheObj fileSize];
     }
+    
+#if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
+    @synchronized (self) {
+        [fsAudioStreamPrivateActiveSessions removeObjectForKey:[NSNumber numberWithUnsignedLong:(unsigned long)self]];
+        
+        if ([fsAudioStreamPrivateActiveSessions count] == 0) {
+            [[AVAudioSession sharedInstance] setActive:NO error:nil];
+        }
+    }
+#endif
 }
 
 - (AudioStreamStateObserver *)streamStateObserver
@@ -648,7 +668,10 @@ public:
         if (self.wasInterrupted) {
             self.wasInterrupted = NO;
             
-            [[AVAudioSession sharedInstance] setActive:YES error:nil];
+            @synchronized (self) {
+                [[AVAudioSession sharedInstance] setActive:YES error:nil];
+                fsAudioStreamPrivateActiveSessions[[NSNumber numberWithUnsignedLong:(unsigned long)self]] = @"";
+            }
             
             if (self.wasContinuousStream) {
 #if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
@@ -675,7 +698,13 @@ public:
 - (void)notifyPlaybackStopped
 {
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
-    [[AVAudioSession sharedInstance] setActive:NO error:nil];
+    @synchronized (self) {
+        [fsAudioStreamPrivateActiveSessions removeObjectForKey:[NSNumber numberWithUnsignedLong:(unsigned long)self]];
+        
+        if ([fsAudioStreamPrivateActiveSessions count] == 0) {
+            [[AVAudioSession sharedInstance] setActive:NO error:nil];
+        }
+    }
 #endif
     
     [self notifyStateChange:kFsAudioStreamStopped];
@@ -689,7 +718,10 @@ public:
 - (void)notifyPlaybackPlaying
 {
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
-    [[AVAudioSession sharedInstance] setActive:YES error:nil];
+    @synchronized (self) {
+        [[AVAudioSession sharedInstance] setActive:YES error:nil];
+        fsAudioStreamPrivateActiveSessions[[NSNumber numberWithUnsignedLong:(unsigned long)self]] = @"";
+    }
 #endif
     
     [self notifyStateChange:kFsAudioStreamPlaying];
@@ -713,7 +745,13 @@ public:
 - (void)notifyPlaybackFailed
 {
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
-    [[AVAudioSession sharedInstance] setActive:NO error:nil];
+    @synchronized (self) {
+        [fsAudioStreamPrivateActiveSessions removeObjectForKey:[NSNumber numberWithUnsignedLong:(unsigned long)self]];
+        
+        if ([fsAudioStreamPrivateActiveSessions count] == 0) {
+            [[AVAudioSession sharedInstance] setActive:NO error:nil];
+        }
+    }
 #endif
     
     [self notifyStateChange:kFsAudioStreamFailed];
