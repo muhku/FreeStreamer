@@ -57,6 +57,26 @@
     [super tearDown];
 }
 
+- (void)testCacheDirectorySize
+{
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    
+    NSString *file = [documentsDirectory stringByAppendingPathComponent:@"FSCache-testing"];
+    
+    NSMutableData *data = [NSMutableData dataWithLength:12345];
+    [data writeToFile:file atomically:YES];
+    
+    XCTAssertTrue(_stream.totalCachedObjectsSize == 12345, @"Invalid cache size");
+    
+    NSString *file2 = [documentsDirectory stringByAppendingPathComponent:@"FSCache-testing2"];
+    
+    NSMutableData *data2 = [NSMutableData dataWithLength:12345];
+    [data2 writeToFile:file2 atomically:YES];
+    
+    XCTAssertTrue(_stream.totalCachedObjectsSize == 24690, @"Invalid cache size");
+}
+
 - (void)testLocalFilePlaybackTwice
 {
     __weak FreeStreamerMobileTests *weakSelf = self;
