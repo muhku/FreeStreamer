@@ -57,6 +57,55 @@
     [super tearDown];
 }
 
+- (void)testLocalFilePlaybackTwice
+{
+    __weak FreeStreamerMobileTests *weakSelf = self;
+
+    NSUInteger counter = 0;
+    
+playback_short_file:
+    
+    _stream = [[FSAudioStream alloc] init];
+    
+    _stream.volume = 0;
+    
+    _stream.onStateChange = ^(FSAudioStreamState state) {
+        if (state == kFsAudioStreamPlaybackCompleted) {
+            weakSelf.checkStreamState = YES;
+        }
+    };
+    
+    _stream.url = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"test-2sec" ofType:@"mp3"]];
+    [_stream play];
+    
+    NSTimeInterval timeout = 15.0;
+    NSTimeInterval idle = 0.1;
+    BOOL timedOut = NO;
+    
+    NSDate *timeoutDate = [[NSDate alloc] initWithTimeIntervalSinceNow:timeout];
+    while (!timedOut && _keepRunning) {
+        NSDate *tick = [[NSDate alloc] initWithTimeIntervalSinceNow:idle];
+        [[NSRunLoop currentRunLoop] runUntilDate:tick];
+        timedOut = ([tick compare:timeoutDate] == NSOrderedDescending);
+        
+        if (_checkStreamState) {
+            // Stream finished
+            
+            counter++;
+            
+            if (counter == 2) {
+                return;
+            }
+            
+            _stream = nil;
+            _checkStreamState = NO;
+            
+            goto playback_short_file;
+        }
+    }
+    XCTAssertFalse(timedOut, @"Timed out - the stream did not start playing");
+}
+
 - (void)testStreamNullURL
 {
     [_stream playFromURL:nil];
@@ -555,7 +604,7 @@ wait_for_playing:
     NSLog(@"Seek try %i", loopCount);
     
     if (loopCount > 50) {
-        /* Done */
+        // Done
         return;
     }
     
