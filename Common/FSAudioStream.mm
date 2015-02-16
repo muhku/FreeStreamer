@@ -1399,12 +1399,11 @@ void AudioStreamStateObserver::audioStreamStateChanged(astreamer::Audio_Stream::
             notificationHandler = @selector(notifyPlaybackStopped);
             break;
         case astreamer::Audio_Stream::BUFFERING:
+            priv.internetConnectionAvailable = YES;            
             notificationHandler = @selector(notifyPlaybackBuffering);
             break;
         case astreamer::Audio_Stream::PLAYING:
-            priv.internetConnectionAvailable = YES;
             priv.restartCount = 0;
-            
             notificationHandler = @selector(notifyPlaybackPlaying);
             break;
         case astreamer::Audio_Stream::PAUSED:
