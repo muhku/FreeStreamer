@@ -211,7 +211,8 @@ public:
 @property (nonatomic,assign) BOOL wasDisconnected;
 @property (nonatomic,assign) BOOL wasContinuousStream;
 @property (nonatomic,assign) BOOL internetConnectionAvailable;
-@property (nonatomic,assign) NSUInteger restartCount;
+@property (nonatomic,assign) NSUInteger maxRetryCount;
+@property (nonatomic,assign) NSUInteger retryCount;
 @property (readonly) size_t prebufferedByteCount;
 @property (readonly) FSSeekByteOffset currentSeekByteOffset;
 @property (readonly) float bitRate;
@@ -239,6 +240,9 @@ public:
 - (void)notifyPlaybackFailed;
 - (void)notifyPlaybackCompletion;
 - (void)notifyPlaybackUnknownState;
+- (void)notifyRetryingStarted;
+- (void)notifyRetryingSucceeded;
+- (void)notifyRetryingFailed;
 - (void)notifyStateChange:(FSAudioStreamState)streamerState;
 
 - (void)attemptRestart;
@@ -276,6 +280,8 @@ public:
         _reachability = nil;
         
         _delegate = nil;
+        
+        _maxRetryCount = 3;
         
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(reachabilityChanged:)
@@ -712,6 +718,7 @@ public:
 
 - (void)notifyPlaybackBuffering
 {
+    self.internetConnectionAvailable = YES;
     [self notifyStateChange:kFsAudioStreamBuffering];
 }
 
@@ -723,7 +730,14 @@ public:
         fsAudioStreamPrivateActiveSessions[[NSNumber numberWithUnsignedLong:(unsigned long)self]] = @"";
     }
 #endif
-    
+    if (self.retryCount > 0) {
+        [NSTimer scheduledTimerWithTimeInterval:0.1
+                                         target:self
+                                       selector:@selector(notifyRetryingSucceeded)
+                                       userInfo:nil
+                                        repeats:NO];
+    }
+    self.retryCount = 0;
     [self notifyStateChange:kFsAudioStreamPlaying];
 }
 
@@ -771,6 +785,21 @@ public:
     [self notifyStateChange:kFsAudioStreamUnknownState];
 }
 
+- (void)notifyRetryingStarted
+{
+    [self notifyStateChange:kFsAudioStreamRetryingStarted];
+}
+
+- (void)notifyRetryingSucceeded
+{
+    [self notifyStateChange:kFsAudioStreamRetryingSucceeded];
+}
+
+- (void)notifyRetryingFailed
+{
+    [self notifyStateChange:kFsAudioStreamRetryingFailed];
+}
+
 - (void)notifyStateChange:(FSAudioStreamState)streamerState
 {
     if (self.onStateChange) {
@@ -800,10 +829,15 @@ public:
         return;
     }
     
-    if (self.restartCount >= 3) {
+    if (self.retryCount >= self.maxRetryCount) {
 #if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
-        NSLog(@"FSAudioStream: Restart count %lu. Giving up.", (unsigned long)_restartCount);
+        NSLog(@"FSAudioStream: Retry count %lu. Giving up.", (unsigned long)self.retryCount);
 #endif
+        [NSTimer scheduledTimerWithTimeInterval:0.1
+                                         target:self
+                                       selector:@selector(notifyRetryingFailed)
+                                       userInfo:nil
+                                        repeats:NO];
         return;
     }
     
@@ -811,13 +845,19 @@ public:
     NSLog(@"FSAudioStream: Attempting restart.");
 #endif
     
+    [NSTimer scheduledTimerWithTimeInterval:0.1
+                                     target:self
+                                   selector:@selector(notifyRetryingStarted)
+                                   userInfo:nil
+                                    repeats:NO];
+    
     [NSTimer scheduledTimerWithTimeInterval:1
                                      target:self
                                    selector:@selector(play)
                                    userInfo:nil
                                     repeats:NO];
     
-    self.restartCount++;
+    self.retryCount++;
 }
 
 - (void)expungeCache
@@ -1155,6 +1195,11 @@ public:
     [_private expungeCache];
 }
 
+- (NSUInteger)retryCount
+{
+    return _private.retryCount;
+}
+
 - (FSStreamPosition)currentTimePlayed
 {
     FSStreamPosition pos;
@@ -1402,9 +1447,6 @@ void AudioStreamStateObserver::audioStreamStateChanged(astreamer::Audio_Stream::
             notificationHandler = @selector(notifyPlaybackBuffering);
             break;
         case astreamer::Audio_Stream::PLAYING:
-            priv.internetConnectionAvailable = YES;
-            priv.restartCount = 0;
-            
             notificationHandler = @selector(notifyPlaybackPlaying);
             break;
         case astreamer::Audio_Stream::PAUSED:

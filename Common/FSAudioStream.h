@@ -53,6 +53,9 @@ typedef enum {
     kFsAudioStreamSeeking,
     kFSAudioStreamEndOfFile,
     kFsAudioStreamFailed,
+    kFsAudioStreamRetryingStarted,
+    kFsAudioStreamRetryingSucceeded,
+    kFsAudioStreamRetryingFailed,
     kFsAudioStreamPlaybackCompleted,
     kFsAudioStreamUnknownState
 } FSAudioStreamState;
@@ -383,6 +386,11 @@ NSString*             freeStreamerReleaseVersion();
  * The current size of the disk cache.
  */
 @property (nonatomic,readonly) unsigned long long totalCachedObjectsSize;
+/**
+ * The property determines the amount of times the stream has tried to retry the playback
+ * in case of failure.
+ */
+@property (nonatomic,readonly) NSUInteger retryCount;
 /**
  * Called upon completion of the stream. Note that for continuous
  * streams this is never called.
