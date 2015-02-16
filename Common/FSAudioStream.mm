@@ -283,7 +283,7 @@ public:
                                                    object:nil];
 
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
-        @synchronized (self) {
+        @synchronized (fsAudioStreamPrivateActiveSessions) {
             if (!fsAudioStreamPrivateActiveSessions) {
                 fsAudioStreamPrivateActiveSessions = [[NSMutableDictionary alloc] init];
             }
@@ -365,7 +365,7 @@ public:
     }
     
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
-    @synchronized (self) {
+    @synchronized (fsAudioStreamPrivateActiveSessions) {
         [fsAudioStreamPrivateActiveSessions removeObjectForKey:[NSNumber numberWithUnsignedLong:(unsigned long)self]];
         
         if ([fsAudioStreamPrivateActiveSessions count] == 0) {
@@ -668,7 +668,7 @@ public:
         if (self.wasInterrupted) {
             self.wasInterrupted = NO;
             
-            @synchronized (self) {
+            @synchronized (fsAudioStreamPrivateActiveSessions) {
                 [[AVAudioSession sharedInstance] setActive:YES error:nil];
                 fsAudioStreamPrivateActiveSessions[[NSNumber numberWithUnsignedLong:(unsigned long)self]] = @"";
             }
@@ -698,7 +698,7 @@ public:
 - (void)notifyPlaybackStopped
 {
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
-    @synchronized (self) {
+    @synchronized (fsAudioStreamPrivateActiveSessions) {
         [fsAudioStreamPrivateActiveSessions removeObjectForKey:[NSNumber numberWithUnsignedLong:(unsigned long)self]];
         
         if ([fsAudioStreamPrivateActiveSessions count] == 0) {
@@ -718,7 +718,7 @@ public:
 - (void)notifyPlaybackPlaying
 {
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
-    @synchronized (self) {
+    @synchronized (fsAudioStreamPrivateActiveSessions) {
         [[AVAudioSession sharedInstance] setActive:YES error:nil];
         fsAudioStreamPrivateActiveSessions[[NSNumber numberWithUnsignedLong:(unsigned long)self]] = @"";
     }
@@ -745,7 +745,7 @@ public:
 - (void)notifyPlaybackFailed
 {
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
-    @synchronized (self) {
+    @synchronized (fsAudioStreamPrivateActiveSessions) {
         [fsAudioStreamPrivateActiveSessions removeObjectForKey:[NSNumber numberWithUnsignedLong:(unsigned long)self]];
         
         if ([fsAudioStreamPrivateActiveSessions count] == 0) {
