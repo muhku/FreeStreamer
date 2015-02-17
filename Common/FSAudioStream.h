@@ -53,6 +53,9 @@ typedef enum {
     kFsAudioStreamSeeking,
     kFSAudioStreamEndOfFile,
     kFsAudioStreamFailed,
+    kFsAudioStreamStartRetry,
+    kFsAudioStreamRetrySuccess,
+    kFsAudioStreamAllRetryFailed,
     kFsAudioStreamPlaybackCompleted,
     kFsAudioStreamUnknownState
 } FSAudioStreamState;
@@ -293,6 +296,11 @@ NSString*             freeStreamerReleaseVersion();
 - (void)setPlayRate:(float)playRate;
 
 /**
+ * For clean retry count
+ * @param restartCount The retry count.
+ */
+- (void)setRetryCount:(int)retryCount;
+/**
  * Returns the playback status: YES if the stream is playing, NO otherwise.
  */
 - (BOOL)isPlaying;
@@ -301,6 +309,11 @@ NSString*             freeStreamerReleaseVersion();
  * Cleans all cached data from the persistent storage.
  */
 - (void)expungeCache;
+
+/**
+ * Get current retry count.
+ */
+- (NSUInteger)retryCount;
 
 /**
  * The stream URL.
