@@ -187,6 +187,17 @@
             case kFsAudioStreamPlaybackCompleted:
                 [self toggleNextPreviousButtons];
                 break;
+            
+            case kFsAudioStreamRetryingStarted:
+                [self showStatus:@"Attempt to retry playback..."];
+                break;
+                
+            case kFsAudioStreamRetryingSucceeded:
+                break;
+                
+            case kFsAudioStreamRetryingFailed:
+                [self showErrorStatus:@"Failed to retry playback"];
+                break;
 
             default:
                 break;
