@@ -400,6 +400,12 @@
 - (void)applicationDidEnterBackgroundNotification:(NSNotification *)notification
 {
     _analyzer.enabled = NO;
+    
+    if (_paused && self.audioController.stream.continuous) {
+        // Don't leave paused continuous stream on background;
+        // Stream will eventually fail and restart
+        [self.audioController stop];
+    }
 }
 
 - (void)applicationWillEnterForegroundNotification:(NSNotification *)notification
