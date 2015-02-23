@@ -14,6 +14,8 @@
 #import "FSParseRssPodcastFeedRequest.h"
 
 @interface FSAudioController ()
+- (void)notifyRetrievingURL;
+
 @property (readonly) FSAudioStream *audioStream;
 @property (readonly) FSCheckContentTypeRequest *checkContentTypeRequest;
 @property (readonly) FSParsePlaylistRequest *parsePlaylistRequest;
@@ -47,14 +49,14 @@
 
 - (void)dealloc
 {
-    [_audioStream stop];
-    
-    _audioStream.delegate = nil;
-    _audioStream = nil;
-    
     [_checkContentTypeRequest cancel];
     [_parsePlaylistRequest cancel];
     [_parseRssPodcastFeedRequest cancel];
+    
+    [self.audioStream stop];
+    
+    _audioStream.delegate = nil;
+    _audioStream = nil;
 }
 
 /*
@@ -180,6 +182,11 @@
     return _parseRssPodcastFeedRequest;
 }
 
+- (void)notifyRetrievingURL
+{
+    self.audioStream.onStateChange(kFsAudioStreamRetrievingURL);
+}
+
 - (BOOL)isPlaying
 {
     return [self.audioStream isPlaying];
@@ -203,6 +210,14 @@
         NSDictionary *userInfo = @{FSAudioStreamNotificationKey_State: @(kFsAudioStreamRetrievingURL)};
         NSNotification *notification = [NSNotification notificationWithName:FSAudioStreamStateChangeNotification object:nil userInfo:userInfo];
         [[NSNotificationCenter defaultCenter] postNotification:notification];
+        
+        if (self.audioStream.onStateChange) {
+            [NSTimer scheduledTimerWithTimeInterval:0.1
+                                             target:self
+                                           selector:@selector(notifyRetrievingURL)
+                                           userInfo:nil
+                                            repeats:NO];
+        }
         
         return;
     }
@@ -230,6 +245,14 @@
 - (void)stop
 {
     [self.audioStream stop];
+    
+    [_checkContentTypeRequest cancel];
+    [_parsePlaylistRequest cancel];
+    [_parseRssPodcastFeedRequest cancel];
+    
+    self.playlistItems = [[NSMutableArray alloc] init];
+    
+    self.currentPlaylistItemIndex = 0;
     
     self.readyToPlay = NO;
 }
@@ -259,7 +282,7 @@
     if ([self hasNextItem]) {
         self.currentPlaylistItemIndex = self.currentPlaylistItemIndex + 1;
         
-        [self stop];
+        [self.audioStream stop];
         
         [self play];
     }
@@ -270,7 +293,7 @@
     if ([self hasPreviousItem]) {
         self.currentPlaylistItemIndex = self.currentPlaylistItemIndex - 1;
         
-        [self stop];
+        [self.audioStream stop];
         
         [self play];
     }
@@ -294,17 +317,7 @@
 
 - (void)setUrl:(NSURL *)url
 {
-    [self.audioStream stop];
-    
-    [self.checkContentTypeRequest cancel];
-    [self.parsePlaylistRequest cancel];
-    [self.parseRssPodcastFeedRequest cancel];
-    
-    self.playlistItems = [[NSMutableArray alloc] init];
-    
-    self.currentPlaylistItemIndex = 0;
-    
-    self.readyToPlay = NO;
+    [self stop];
     
     if (url) {
         NSURL *copyOfURL = [url copy];
