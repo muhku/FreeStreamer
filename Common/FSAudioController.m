@@ -69,6 +69,18 @@
 {
     if (!_audioStream) {
         _audioStream = [[FSAudioStream alloc] init];
+        
+        __weak FSAudioController *weakSelf = self;
+        
+        _audioStream.onCompletion = ^() {
+            if ([weakSelf.playlistItems count] > 0) {
+                if (weakSelf.currentPlaylistItemIndex + 1 < [weakSelf.playlistItems count]) {
+                    weakSelf.currentPlaylistItemIndex = weakSelf.currentPlaylistItemIndex + 1;
+                
+                    [weakSelf play];
+                }
+            }
+        };
     }
     return _audioStream;
 }
@@ -120,14 +132,6 @@
                 
                 weakSelf.readyToPlay = YES;
                 
-                weakSelf.audioStream.onCompletion = ^() {
-                    if (weakSelf.currentPlaylistItemIndex + 1 < [weakSelf.playlistItems count]) {
-                        weakSelf.currentPlaylistItemIndex = weakSelf.currentPlaylistItemIndex + 1;
-                        
-                        [weakSelf play];
-                    }
-                };
-                
                 [weakSelf play];
             }
         };
@@ -156,14 +160,6 @@
                 weakSelf.playlistItems = weakSelf.parseRssPodcastFeedRequest.playlistItems;
                 
                 weakSelf.readyToPlay = YES;
-                
-                weakSelf.audioStream.onCompletion = ^() {
-                    if (weakSelf.currentPlaylistItemIndex + 1 < [weakSelf.playlistItems count]) {
-                        weakSelf.currentPlaylistItemIndex = weakSelf.currentPlaylistItemIndex + 1;
-                        
-                        [weakSelf play];
-                    }
-                };
                 
                 [weakSelf play];
             }
