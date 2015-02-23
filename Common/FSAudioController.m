@@ -47,6 +47,8 @@
 
 - (void)dealloc
 {
+    [_audioStream stop];
+    
     _audioStream.delegate = nil;
     _audioStream = nil;
     
@@ -191,43 +193,35 @@
 
 - (void)play
 {
-    @synchronized (self) {
-        if ([self.url isFileURL] && [self.playlistItems count] == 0) {
-            /*
-             * Directly play file URLs without checking from network.
-             */
-            [self.audioStream play];
-        } else if (self.stream.cached && [self.playlistItems count] == 0) {
-            /*
-             * Start playing the cached streams immediately without checking from network.
-             */
-            [self.audioStream play];
-        } else if (self.readyToPlay) {
-            /*
-             * All prework done; we should have a playable URL for the stream.
-             * Start playback.
-             */
-            if ([self.playlistItems count] > 0) {
-                self.audioStream.url = self.currentPlaylistItem.nsURL;
-            }
-            
-            [self.audioStream play];
-        } else {
-            /*
-             * Not ready to play; start by checking the content type of the given
-             * URL.
-             */
-            [self.checkContentTypeRequest start];
+    if (!self.readyToPlay) {
+        /*
+         * Not ready to play; start by checking the content type of the given
+         * URL.
+         */
+        [self.checkContentTypeRequest start];
         
-            NSDictionary *userInfo = @{FSAudioStreamNotificationKey_State: @(kFsAudioStreamRetrievingURL)};
-            NSNotification *notification = [NSNotification notificationWithName:FSAudioStreamStateChangeNotification object:nil userInfo:userInfo];
-            [[NSNotificationCenter defaultCenter] postNotification:notification];
-        }
+        NSDictionary *userInfo = @{FSAudioStreamNotificationKey_State: @(kFsAudioStreamRetrievingURL)};
+        NSNotification *notification = [NSNotification notificationWithName:FSAudioStreamStateChangeNotification object:nil userInfo:userInfo];
+        [[NSNotificationCenter defaultCenter] postNotification:notification];
+        
+        return;
     }
+    
+    if ([self.playlistItems count] > 0) {
+        self.audioStream.url = self.currentPlaylistItem.nsURL;
+    }
+    
+    [self.audioStream play];
 }
 
 - (void)playFromURL:(NSURL*)url
 {
+    if (!url) {
+        return;
+    }
+    
+    [self stop];
+    
     self.url = url;
         
     [self play];
@@ -236,6 +230,7 @@
 - (void)stop
 {
     [self.audioStream stop];
+    
     self.readyToPlay = NO;
 }
 
@@ -261,9 +256,10 @@
 
 -(void)playNextItem
 {
-    if ([self hasNextItem])
-    {
+    if ([self hasNextItem]) {
         self.currentPlaylistItemIndex = self.currentPlaylistItemIndex + 1;
+        
+        [self stop];
         
         [self play];
     }
@@ -271,15 +267,14 @@
 
 -(void)playPreviousItem
 {
-    if ([self hasPreviousItem])
-    {
+    if ([self hasPreviousItem]) {
         self.currentPlaylistItemIndex = self.currentPlaylistItemIndex - 1;
+        
+        [self stop];
         
         [self play];
     }
-    
 }
-
 
 /*
  * =======================================
@@ -299,47 +294,36 @@
 
 - (void)setUrl:(NSURL *)url
 {
-    @synchronized (self) {
-        /*
-         * The URL set to nil; stop the audio stream.
-         */
-        if (!url) {
-            [self.audioStream stop];
-            _url = nil;
-            return;
-        }
-        
-        if (![url isEqual:_url]) {
-            /*
-             * Since the stream URL changed, the stream does not match
-             * the currently played URL. Thereby, stop the stream.
-             */
-            [self.audioStream stop];
-            
-            /*
-             * Reset the content checks as they may be invalid
-             * now when the URL changed.
-             */
-            [self.checkContentTypeRequest cancel];
-            [self.parsePlaylistRequest cancel];
-            [self.parseRssPodcastFeedRequest cancel];
-            
-            self.checkContentTypeRequest.url = url;
-            self.parsePlaylistRequest.url = url;
-            self.parseRssPodcastFeedRequest.url = url;
-            
-            NSURL *copyOfURL = [url copy];
-            _url = copyOfURL;
-            
-            /*
-             * Reset the state.
-             */
-            self.readyToPlay = NO;
-            self.playlistItems = [[NSMutableArray alloc] init];
-        }
+    [self.audioStream stop];
     
-        self.currentPlaylistItemIndex = 0;
+    [self.checkContentTypeRequest cancel];
+    [self.parsePlaylistRequest cancel];
+    [self.parseRssPodcastFeedRequest cancel];
+    
+    self.playlistItems = [[NSMutableArray alloc] init];
+    
+    self.currentPlaylistItemIndex = 0;
+    
+    self.readyToPlay = NO;
+    
+    if (url) {
+        NSURL *copyOfURL = [url copy];
+        _url = copyOfURL;
+        
         self.audioStream.url = _url;
+    
+        self.checkContentTypeRequest.url = _url;
+        self.parsePlaylistRequest.url = _url;
+        self.parseRssPodcastFeedRequest.url = _url;
+        
+        if ([_url isFileURL]) {
+            /*
+             * Local file URLs can be directly played
+             */
+            self.readyToPlay = YES;
+        }
+    } else {
+        _url = nil;
     }
 }
 
