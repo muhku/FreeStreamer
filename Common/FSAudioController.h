@@ -57,6 +57,24 @@
 - (void)playFromURL:(NSURL *)url;
 
 /**
+ * Starts playing the stream from the given playlist. Each item in the array
+ * must an FSPlaylistItem.
+ *
+ * @param playlist The playlist items.
+ */
+- (void)playFromPlaylist:(NSArray *)playlist;
+
+/**
+ * Starts playing the stream from the given playlist. Each item in the array
+ * must an FSPlaylistItem. The playback starts from the given index
+ * in the playlist.
+ *
+ * @param playlist The playlist items.
+ * @param itemIndex The playlist index where to start playback from.
+ */
+- (void)playFromPlaylist:(NSArray *)playlist itemIndex:(NSUInteger)index;
+
+/**
  * Stops the stream playback.
  */
 - (void)stop;

@@ -11,11 +11,25 @@
 
 static NSString *const kXPathQueryItems = @"/rss/channel/item";
 
-@interface FSParseRssPodcastFeedRequest (PrivateMethods)
+@interface FSParseRssPodcastFeedRequest ()
+- (NSURL *)parseLocalFileUrl:(NSString *)fileUrl;
 - (void)parseItems:(xmlNodePtr)node;
 @end
 
 @implementation FSParseRssPodcastFeedRequest
+
+- (NSURL *)parseLocalFileUrl:(NSString *)fileUrl
+{
+    // Resolve the local bundle URL
+    NSString *path = [fileUrl substringFromIndex:7];
+    
+    NSRange range = [path rangeOfString:@"." options:NSBackwardsSearch];
+    
+    NSString *fileName = [path substringWithRange:NSMakeRange(0, range.location)];
+    NSString *suffix = [path substringWithRange:NSMakeRange(range.location + 1, [path length] - [fileName length] - 1)];
+    
+    return [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:fileName ofType:suffix]];
+}
 
 - (void)parseItems:(xmlNodePtr)node
 {
@@ -26,9 +40,21 @@ static NSString *const kXPathQueryItems = @"/rss/channel/item";
         if ([nodeName isEqualToString:@"title"]) {
             item.title = [self contentForNode:n];
         } else if ([nodeName isEqualToString:@"enclosure"]) {
-            item.url = [self contentForNodeAttribute:n attribute:"url"];
+            NSString *url = [self contentForNodeAttribute:n attribute:"url"];
+            
+            if ([url hasPrefix:@"file://"]) {
+                item.url = [self parseLocalFileUrl:url];
+            } else {
+                item.url = [NSURL URLWithString:url];
+            }
         } else if ([nodeName isEqualToString:@"link"]) {
-            item.originatingUrl = [self contentForNode:n];
+            NSString *url = [self contentForNode:n];
+            
+            if ([url hasPrefix:@"file://"]) {
+                item.originatingUrl = [self parseLocalFileUrl:url];
+            } else {
+                item.originatingUrl = [NSURL URLWithString:url];
+            }
         }
     }
     

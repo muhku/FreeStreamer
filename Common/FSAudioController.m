@@ -212,7 +212,7 @@
         [[NSNotificationCenter defaultCenter] postNotification:notification];
         
         if (self.audioStream.onStateChange) {
-            [NSTimer scheduledTimerWithTimeInterval:0.1
+            [NSTimer scheduledTimerWithTimeInterval:0
                                              target:self
                                            selector:@selector(notifyRetrievingURL)
                                            userInfo:nil
@@ -223,7 +223,11 @@
     }
     
     if ([self.playlistItems count] > 0) {
-        self.audioStream.url = self.currentPlaylistItem.nsURL;
+        if (self.currentPlaylistItem.originatingUrl) {
+            self.audioStream.url = self.currentPlaylistItem.originatingUrl;
+        } else {
+            self.audioStream.url = self.currentPlaylistItem.url;
+        }
     }
     
     [self.audioStream play];
@@ -239,6 +243,24 @@
     
     self.url = url;
         
+    [self play];
+}
+
+- (void)playFromPlaylist:(NSArray *)playlist
+{
+    [self playFromPlaylist:playlist itemIndex:0];
+}
+
+- (void)playFromPlaylist:(NSArray *)playlist itemIndex:(NSUInteger)index
+{
+    [self stop];
+    
+    [self.playlistItems addObjectsFromArray:playlist];
+    
+    self.currentPlaylistItemIndex = index;
+    
+    self.readyToPlay = YES;
+    
     [self play];
 }
 

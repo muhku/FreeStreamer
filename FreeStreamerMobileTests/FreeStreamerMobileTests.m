@@ -10,6 +10,7 @@
 #import "FSAudioStream.h"
 #import "FSAudioController.h"
 #import "FSParsePlaylistRequest.h"
+#import "FSPlaylistItem.h"
 
 @interface FreeStreamerMobileTests : XCTestCase {
 }
@@ -55,6 +56,43 @@
                                                   object:nil];
     
     [super tearDown];
+}
+
+- (void)testPlaylistPlayback
+{
+    _controller.stream.onStateChange = ^(FSAudioStreamState state) {
+        NSLog(@"FSAudioStreamStateChangeNotification received!");
+        
+        if (state == kFsAudioStreamPlaying) {
+            _checkStreamState = YES;
+        }
+    };
+    
+    FSPlaylistItem *item1 = [[FSPlaylistItem alloc] init];
+    item1.url = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"test-2sec" ofType:@"mp3"]];
+    
+    NSMutableArray *playlistItems = [[NSMutableArray alloc] init];
+    [playlistItems addObject:item1];
+    
+    [_controller playFromPlaylist:playlistItems];
+    
+    NSTimeInterval timeout = 15.0;
+    NSTimeInterval idle = 0.1;
+    BOOL timedOut = NO;
+    
+    NSDate *timeoutDate = [[NSDate alloc] initWithTimeIntervalSinceNow:timeout];
+    while (!timedOut && _keepRunning) {
+        NSDate *tick = [[NSDate alloc] initWithTimeIntervalSinceNow:idle];
+        [[NSRunLoop currentRunLoop] runUntilDate:tick];
+        timedOut = ([tick compare:timeoutDate] == NSOrderedDescending);
+        
+        if (_checkStreamState) {
+            // Stream started playing.
+            
+            return;
+        }
+    }
+    XCTAssertFalse(timedOut, @"Timed out - the stream did not start playing");
 }
 
 - (void)testCacheDirectorySize

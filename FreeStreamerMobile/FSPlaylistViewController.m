@@ -131,7 +131,7 @@
     
     FSPlaylistItem *item = [[FSPlaylistItem alloc] init];
     item.title = url;
-    item.url = url;
+    item.url = [NSURL URLWithString:url];
     
     for (FSPlaylistItem *existingItem in self.userPlaylistItems) {
         if ([existingItem isEqual:item]) {
