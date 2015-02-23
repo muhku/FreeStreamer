@@ -70,7 +70,7 @@
  * in the playlist.
  *
  * @param playlist The playlist items.
- * @param itemIndex The playlist index where to start playback from.
+ * @param index The playlist index where to start playback from.
  */
 - (void)playFromPlaylist:(NSArray *)playlist itemIndex:(NSUInteger)index;
 
