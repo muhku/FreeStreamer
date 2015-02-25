@@ -94,6 +94,13 @@
 - (void)addItem:(FSPlaylistItem *)item;
 
 /**
+ * Removes a playlist item.
+ *
+ * @param index The index of the playlist item to be removed.
+ */
+- (void)removeItemAtIndex:(NSUInteger)index;
+
+/**
  * Stops the stream playback.
  */
 - (void)stop;

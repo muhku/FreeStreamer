@@ -35,6 +35,7 @@
         _checkContentTypeRequest = nil;
         _parsePlaylistRequest = nil;
         _readyToPlay = NO;
+        _playlistItems = [[NSMutableArray alloc] init];
     }
     return self;
 }
@@ -277,6 +278,40 @@
     }
     
     [self.playlistItems addObject:item];
+}
+
+- (void)removeItemAtIndex:(NSUInteger)index
+{
+    NSUInteger count = [self countOfItems];
+    
+    if (count == 0) {
+        return;
+    }
+    
+    if (index >= count) {
+        return;
+    }
+    
+    if (self.currentPlaylistItemIndex == index) {
+        // If the item is currently playing, do not allow the removal
+        return;
+    }
+    
+    FSPlaylistItem *current = self.currentPlaylistItem;
+    
+    [self.playlistItems removeObjectAtIndex:index];
+    
+    // Update the current playlist item to be correct after the removal
+    NSUInteger itemIndex = 0;
+    for (FSPlaylistItem *item in self.playlistItems) {
+        if (item == current) {
+            self.currentPlaylistItemIndex = itemIndex;
+            
+            break;
+        }
+        
+        itemIndex++;
+    }
 }
 
 - (void)stop

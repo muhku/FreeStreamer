@@ -58,6 +58,64 @@
     [super tearDown];
 }
 
+- (void)testPlaylistItemAddAndRemoval
+{
+    FSPlaylistItem *item1 = [[FSPlaylistItem alloc] init];
+    item1.url = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"test-2sec" ofType:@"mp3"]];
+    
+    FSPlaylistItem *item2 = [[FSPlaylistItem alloc] init];
+    item2.url = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"test-2sec" ofType:@"mp3"]];
+    
+    FSPlaylistItem *item3 = [[FSPlaylistItem alloc] init];
+    item3.url = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"test-2sec" ofType:@"mp3"]];
+    
+    FSPlaylistItem *item4 = [[FSPlaylistItem alloc] init];
+    item4.url = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"test-2sec" ofType:@"mp3"]];
+    
+    FSPlaylistItem *item5 = [[FSPlaylistItem alloc] init];
+    item5.url = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"test-2sec" ofType:@"mp3"]];
+    
+    [_controller addItem:item1];
+    
+    XCTAssertTrue(([_controller countOfItems] == 1), @"Invalid count of playlist items");
+    
+    [_controller addItem:item2];
+    
+    XCTAssertTrue(([_controller countOfItems] == 2), @"Invalid count of playlist items");
+    
+    [_controller addItem:item3];
+    
+    XCTAssertTrue(([_controller countOfItems] == 3), @"Invalid count of playlist items");
+    
+    [_controller addItem:item4];
+    
+    XCTAssertTrue(([_controller countOfItems] == 4), @"Invalid count of playlist items");
+    
+    [_controller addItem:item5];
+    
+    XCTAssertTrue(([_controller countOfItems] == 5), @"Invalid count of playlist items");
+    
+    [_controller playItemAtIndex:3]; // start playing item 4
+    
+    [_controller removeItemAtIndex:2]; // item 3 removed
+    
+    XCTAssertTrue(([_controller countOfItems] == 4), @"Invalid count of playlist items");
+    
+    XCTAssertTrue((_controller.currentPlaylistItem == item4), @"Item 4 not the current playback item");
+    
+    [_controller removeItemAtIndex:0]; // item 1 removed
+    
+    XCTAssertTrue((_controller.currentPlaylistItem == item4), @"Item 4 not the current playback item");
+    
+    XCTAssertTrue(([_controller countOfItems] == 3), @"Invalid count of playlist items");
+    
+    [_controller removeItemAtIndex:2]; // item 5 removed
+    
+    XCTAssertTrue((_controller.currentPlaylistItem == item4), @"Item 4 not the current playback item");
+    
+    XCTAssertTrue(([_controller countOfItems] == 2), @"Invalid count of playlist items");
+}
+
 - (void)testPlaylistPlayback
 {
     _controller.stream.onStateChange = ^(FSAudioStreamState state) {
