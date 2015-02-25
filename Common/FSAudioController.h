@@ -75,6 +75,25 @@
 - (void)playFromPlaylist:(NSArray *)playlist itemIndex:(NSUInteger)index;
 
 /**
+ * Plays a playlist item at the specified index.
+ *
+ * @param index The playlist index where to start playback from.
+ */
+- (void)playItemAtIndex:(NSUInteger)index;
+
+/**
+ * Returns the count of playlist items.
+ */
+- (NSUInteger)countOfItems;
+
+/**
+ * Adds an item to the playlist.
+ *
+ * @param item The playlist item to be added.
+ */
+- (void)addItem:(FSPlaylistItem *)item;
+
+/**
  * Stops the stream playback.
  */
 - (void)stop;

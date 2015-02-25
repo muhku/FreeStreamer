@@ -76,6 +76,8 @@
     
     [_controller playFromPlaylist:playlistItems];
     
+    XCTAssertTrue(([_controller countOfItems] == 1), @"Invalid count of playlist items");
+    
     NSTimeInterval timeout = 15.0;
     NSTimeInterval idle = 0.1;
     BOOL timedOut = NO;

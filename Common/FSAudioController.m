@@ -53,7 +53,7 @@
     [_parsePlaylistRequest cancel];
     [_parseRssPodcastFeedRequest cancel];
     
-    [self.audioStream stop];
+    [_audioStream stop];
     
     _audioStream.delegate = nil;
     _audioStream = nil;
@@ -127,13 +127,7 @@
         
         _parsePlaylistRequest = [[FSParsePlaylistRequest alloc] init];
         _parsePlaylistRequest.onCompletion = ^() {
-            if ([weakSelf.parsePlaylistRequest.playlistItems count] > 0) {
-                weakSelf.playlistItems = weakSelf.parsePlaylistRequest.playlistItems;
-                
-                weakSelf.readyToPlay = YES;
-                
-                [weakSelf play];
-            }
+            [weakSelf playFromPlaylist:weakSelf.parsePlaylistRequest.playlistItems];
         };
         _parsePlaylistRequest.onFailure = ^() {
             // Failed to parse the playlist; try playing anyway
@@ -156,13 +150,7 @@
         
         _parseRssPodcastFeedRequest = [[FSParseRssPodcastFeedRequest alloc] init];
         _parseRssPodcastFeedRequest.onCompletion = ^() {
-            if ([weakSelf.parseRssPodcastFeedRequest.playlistItems count] > 0) {
-                weakSelf.playlistItems = weakSelf.parseRssPodcastFeedRequest.playlistItems;
-                
-                weakSelf.readyToPlay = YES;
-                
-                [weakSelf play];
-            }
+            [weakSelf playFromPlaylist:weakSelf.parseRssPodcastFeedRequest.playlistItems];
         };
         _parseRssPodcastFeedRequest.onFailure = ^() {
             // Failed to parse the XML file; try playing anyway
@@ -253,11 +241,42 @@
     
     [self.playlistItems addObjectsFromArray:playlist];
     
+    [self playItemAtIndex:index];
+}
+
+- (void)playItemAtIndex:(NSUInteger)index
+{
+    NSUInteger count = [self countOfItems];
+    
+    if (count == 0) {
+        return;
+    }
+    
+    if (index >= count) {
+        return;
+    }
+    
+    [self.audioStream stop];
+    
     self.currentPlaylistItemIndex = index;
     
     self.readyToPlay = YES;
     
     [self play];
+}
+
+- (NSUInteger)countOfItems
+{
+    return [self.playlistItems count];
+}
+
+- (void)addItem:(FSPlaylistItem *)item
+{
+    if (!item) {
+        return;
+    }
+    
+    [self.playlistItems addObject:item];
 }
 
 - (void)stop
