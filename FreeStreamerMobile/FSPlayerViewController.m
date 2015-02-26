@@ -24,6 +24,19 @@
 
 @interface FSPlayerViewController ()
 
+@property (nonatomic,assign) BOOL paused;
+@property (nonatomic,strong) NSTimer *progressUpdateTimer;
+@property (nonatomic,assign) float volumeBeforeRamping;
+@property (nonatomic,assign) int rampStep;
+@property (nonatomic,assign) int rampStepCount;
+@property (nonatomic,assign) bool rampUp;
+@property (nonatomic,assign) SEL postRampAction;
+@property (nonatomic,strong) NSTimer *playbackSeekTimer;
+@property (nonatomic,strong) NSTimer *volumeRampTimer;
+@property (nonatomic,assign) double seekToPoint;
+@property (nonatomic,copy) NSURL *stationURL;
+@property (nonatomic,strong) UIBarButtonItem *infoButton;
+
 - (void)clearStatus;
 - (void)showStatus:(NSString *)status;
 - (void)showErrorStatus:(NSString *)status;
@@ -72,7 +85,7 @@
     self.nextButton.hidden = YES;
     self.previousButton.hidden = YES;
     
-    _stationURL = nil;
+    self.stationURL = nil;
     self.navigationItem.rightBarButtonItem = nil;
     
     self.view.backgroundColor = [UIColor clearColor];
@@ -85,118 +98,120 @@
     
     _maxPrebufferedByteCount = (float)self.audioController.stream.configuration.maxPrebufferedByteCount;
     
-    self.audioController.stream.onStateChange = ^(FSAudioStreamState state) {
+    __weak FSPlayerViewController *weakSelf = self;
+    
+    self.audioController.onStateChange = ^(FSAudioStreamState state) {
         switch (state) {
             case kFsAudioStreamRetrievingURL:
                 [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
                 
-                [self showStatus:@"Retrieving URL..."];
+                [weakSelf showStatus:@"Retrieving URL..."];
                 
-                self.statusLabel.text = @"";
+                weakSelf.statusLabel.text = @"";
                 
-                self.progressSlider.enabled = NO;
-                self.playButton.hidden = YES;
-                self.pauseButton.hidden = NO;
-                _paused = NO;
+                weakSelf.progressSlider.enabled = NO;
+                weakSelf.playButton.hidden = YES;
+                weakSelf.pauseButton.hidden = NO;
+                weakSelf.paused = NO;
                 break;
                 
             case kFsAudioStreamStopped:
                 [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
                 
-                self.statusLabel.text = @"";
+                weakSelf.statusLabel.text = @"";
                 
-                self.progressSlider.enabled = NO;
-                self.playButton.hidden = NO;
-                self.pauseButton.hidden = YES;
-                _paused = NO;
+                weakSelf.progressSlider.enabled = NO;
+                weakSelf.playButton.hidden = NO;
+                weakSelf.pauseButton.hidden = YES;
+                weakSelf.paused = NO;
                 break;
                 
             case kFsAudioStreamBuffering:
-                [self showStatus:@"Buffering..."];
+                [weakSelf showStatus:@"Buffering..."];
                 
                 [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-                self.progressSlider.enabled = NO;
-                self.playButton.hidden = YES;
-                self.pauseButton.hidden = NO;
-                _paused = NO;
+                weakSelf.progressSlider.enabled = NO;
+                weakSelf.playButton.hidden = YES;
+                weakSelf.pauseButton.hidden = NO;
+                weakSelf.paused = NO;
                 break;
                 
             case kFsAudioStreamSeeking:
-                [self showStatus:@"Seeking..."];
+                [weakSelf showStatus:@"Seeking..."];
                 
                 [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-                self.progressSlider.enabled = NO;
-                self.playButton.hidden = YES;
-                self.pauseButton.hidden = NO;
-                _paused = NO;
+                weakSelf.progressSlider.enabled = NO;
+                weakSelf.playButton.hidden = YES;
+                weakSelf.pauseButton.hidden = NO;
+                weakSelf.paused = NO;
                 break;
                 
             case kFsAudioStreamPlaying:
-                [self determineStationNameWithMetaData:nil];
+                [weakSelf determineStationNameWithMetaData:nil];
                 
-                [self clearStatus];
+                [weakSelf clearStatus];
                 
                 [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
                 
-                self.progressSlider.enabled = YES;
+                weakSelf.progressSlider.enabled = YES;
                 
-                if (!_progressUpdateTimer) {
-                    _progressUpdateTimer = [NSTimer scheduledTimerWithTimeInterval:0.5
-                                                                            target:self
+                if (!weakSelf.progressUpdateTimer) {
+                    weakSelf.progressUpdateTimer = [NSTimer scheduledTimerWithTimeInterval:0.5
+                                                                            target:weakSelf
                                                                           selector:@selector(updatePlaybackProgress)
                                                                           userInfo:nil
                                                                            repeats:YES];
                 }
                 
-                if (_volumeBeforeRamping > 0) {
+                if (weakSelf.volumeBeforeRamping > 0) {
                     // If we have volume before ramping set, it means we were seeked
                     
 #if PAUSE_AFTER_SEEKING
-                    [self pause:self];
-                    self.audioController.volume = _volumeBeforeRamping;
-                    _volumeBeforeRamping = 0;
+                    [weakSelf pause:weakSelf];
+                    weakSelf.audioController.volume = weakSelf.volumeBeforeRamping;
+                    weakSelf.volumeBeforeRamping = 0;
                     
                     break;
 #else
-                    _rampStep = 1;
-                    _rampStepCount = 5; // 50ms and 5 steps = 250ms ramp
-                    _rampUp = true;
-                    _postRampAction = @selector(finalizeSeeking);
+                    weakSelf.rampStep = 1;
+                    weakSelf.rampStepCount = 5; // 50ms and 5 steps = 250ms ramp
+                    weakSelf.rampUp = true;
+                    weakSelf.postRampAction = @selector(finalizeSeeking);
                     
-                    _volumeRampTimer = [NSTimer scheduledTimerWithTimeInterval:0.05 // 50ms
-                                                                        target:self
+                    weakSelf.volumeRampTimer = [NSTimer scheduledTimerWithTimeInterval:0.05 // 50ms
+                                                                        target:weakSelf
                                                                       selector:@selector(rampVolume)
                                                                       userInfo:nil
                                                                        repeats:YES];
 #endif
                 }
-                [self toggleNextPreviousButtons];
-                self.playButton.hidden = YES;
-                self.pauseButton.hidden = NO;
-                _paused = NO;
+                [weakSelf toggleNextPreviousButtons];
+                weakSelf.playButton.hidden = YES;
+                weakSelf.pauseButton.hidden = NO;
+                weakSelf.paused = NO;
                 
                 break;
                 
             case kFsAudioStreamFailed:
                 [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-                self.progressSlider.enabled = NO;
-                self.playButton.hidden = NO;
-                self.pauseButton.hidden = YES;
-                _paused = NO;
+                weakSelf.progressSlider.enabled = NO;
+                weakSelf.playButton.hidden = NO;
+                weakSelf.pauseButton.hidden = YES;
+                weakSelf.paused = NO;
                 break;
             case kFsAudioStreamPlaybackCompleted:
-                [self toggleNextPreviousButtons];
+                [weakSelf toggleNextPreviousButtons];
                 break;
             
             case kFsAudioStreamRetryingStarted:
-                [self showStatus:@"Attempt to retry playback..."];
+                [weakSelf showStatus:@"Attempt to retry playback..."];
                 break;
                 
             case kFsAudioStreamRetryingSucceeded:
                 break;
                 
             case kFsAudioStreamRetryingFailed:
-                [self showErrorStatus:@"Failed to retry playback"];
+                [weakSelf showErrorStatus:@"Failed to retry playback"];
                 break;
 
             default:
@@ -204,7 +219,7 @@
         }
     };
     
-    self.audioController.stream.onFailure = ^(FSAudioStreamError error, NSString *errorDescription) {
+    self.audioController.onFailure = ^(FSAudioStreamError error, NSString *errorDescription) {
         NSString *errorCategory;
         
         switch (error) {
@@ -230,13 +245,13 @@
         
         NSString *formattedError = [NSString stringWithFormat:@"%@ %@", errorCategory, errorDescription];
         
-        [self showErrorStatus:formattedError];
+        [weakSelf showErrorStatus:formattedError];
     };
     
-    self.audioController.stream.onMetaDataAvailable = ^(NSDictionary *metaData) {
+    self.audioController.onMetaDataAvailable = ^(NSDictionary *metaData) {
         NSMutableString *streamInfo = [[NSMutableString alloc] init];
         
-        [self determineStationNameWithMetaData:metaData];
+        [weakSelf determineStationNameWithMetaData:metaData];
         
         NSMutableDictionary *songInfo = [[NSMutableDictionary alloc] init];
         
@@ -262,13 +277,13 @@
         }
         
         if (metaData[@"StreamUrl"] && [metaData[@"StreamUrl"] length] > 0) {
-            _stationURL = [NSURL URLWithString:metaData[@"StreamUrl"]];
+            weakSelf.stationURL = [NSURL URLWithString:metaData[@"StreamUrl"]];
             
-            self.navigationItem.rightBarButtonItem = _infoButton;
+            weakSelf.navigationItem.rightBarButtonItem = weakSelf.infoButton;
         }
         
-        [_statusLabel setHidden:NO];
-        self.statusLabel.text = streamInfo;
+        [weakSelf.statusLabel setHidden:NO];
+        weakSelf.statusLabel.text = streamInfo;
     };
 }
 
@@ -385,7 +400,7 @@
             case UIEventSubtypeRemoteControlPause: /* FALLTHROUGH */
             case UIEventSubtypeRemoteControlPlay:  /* FALLTHROUGH */
             case UIEventSubtypeRemoteControlTogglePlayPause:
-                if (_paused) {
+                if (self.paused) {
                     [self play:self];
                 } else {
                     [self pause:self];
@@ -401,7 +416,7 @@
 {
     _analyzer.enabled = NO;
     
-    if (_paused && self.audioController.stream.continuous) {
+    if (self.paused && self.audioController.stream.continuous) {
         // Don't leave paused continuous stream on background;
         // Stream will eventually fail and restart
         [self.audioController stop];
@@ -421,13 +436,13 @@
 
 - (IBAction)play:(id)sender
 {
-    if (_paused) {
+    if (self.paused) {
         /*
          * If we are paused, call pause again to unpause so
          * that the stream playback will continue.
          */
         [self.audioController pause];
-        _paused = NO;
+        self.paused = NO;
     } else {
         /*
          * Not paused, just directly call play.
@@ -443,7 +458,7 @@
 {
     [self.audioController pause];
     
-    _paused = YES;
+    self.paused = YES;
     
     self.playButton.hidden = NO;
     self.pauseButton.hidden = YES;
