@@ -8,7 +8,8 @@
 
 #import <Foundation/Foundation.h>
 
-@class FSAudioStream;
+#include "FSAudioStream.h"
+
 @class FSCheckContentTypeRequest;
 @class FSParsePlaylistRequest;
 @class FSParseRssPodcastFeedRequest;
@@ -18,21 +19,37 @@
  * FSAudioController is functionally equivalent to FSAudioStream with
  * one addition: it can be directly fed with a playlist (PLS, M3U) URL
  * or an RSS podcast feed. It determines the content type and forms
- * a playlist for playback.
+ * a playlist for playback. Notice that this generates more traffic and
+ * is generally more slower than using an FSAudioStream directly.
  *
- * Do not use this class but FSAudioStream, if you already know the content type
- * of the URL. Using this class will generate more traffic, as the
- * content type is checked for each URL.
+ * It is also possible to construct a playlist by yourself by providing
+ * the playlist items. In this case see the methods for managing the playlist.
+ *
+ * If you have a playlist with multiple items, FSAudioController attemps
+ * automatically preload the next item in the playlist. This helps to
+ * start the next item playback immediately without the need for the
+ * user to wait for buffering.
+ *
+ * Notice that do not attempt to set your own blocks to the audio stream
+ * owned by the controller. FSAudioController uses the blocks internally
+ * and any user set blocks will be overwritten. Instead use the blocks
+ * offered by FSAudioController.
  */
 @interface FSAudioController : NSObject {
     NSURL *_url;
-    FSAudioStream *_audioStream;
+    NSMutableArray *_streams;
+    
+    float _volume;
     
     BOOL _readyToPlay;
     
     FSCheckContentTypeRequest *_checkContentTypeRequest;
     FSParsePlaylistRequest *_parsePlaylistRequest;
     FSParseRssPodcastFeedRequest *_parseRssPodcastFeedRequest;
+    
+    void (^_onStateChangeBlock)(FSAudioStreamState);
+    void (^_onMetaDataAvailableBlock)(NSDictionary*);
+    void (^_onFailureBlock)(FSAudioStreamError error, NSString *errorDescription);
 }
 
 /**
@@ -119,24 +136,22 @@
 /**
  * Returns if the current multiple-item playlist has next item
  */
--(BOOL)hasNextItem;
+- (BOOL)hasNextItem;
 
 /**
  * Returns if the current multiple-item playlist has Previous item
  */
--(BOOL)hasPreviousItem;
+- (BOOL)hasPreviousItem;
 
 /**
  * Play the next item of multiple-item playlist
  */
--(void)playNextItem;
+- (void)playNextItem;
 
 /**
  * Play the previous item of multiple-item playlist
  */
-
--(void)playPreviousItem;
-
+- (void)playPreviousItem;
 
 /**
  * This property holds the current playback volume of the stream,
@@ -161,5 +176,24 @@
  * The playlist item the controller is currently using.
  */
 @property (nonatomic,readonly) FSPlaylistItem *currentPlaylistItem;
+
+/**
+ * This property determines if the next playlist item should be loaded
+ * automatically. This is YES by default.
+ */
+@property (nonatomic,assign) BOOL preloadNextPlaylistItemAutomatically;
+
+/**
+ * Called upon a state change.
+ */
+@property (copy) void (^onStateChange)(FSAudioStreamState state);
+/**
+ * Called upon a meta data is available.
+ */
+@property (copy) void (^onMetaDataAvailable)(NSDictionary *metadata);
+/**
+ * Called upon a failure.
+ */
+@property (copy) void (^onFailure)(FSAudioStreamError error, NSString *errorDescription);
 
 @end

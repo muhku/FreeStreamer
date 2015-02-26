@@ -816,7 +816,7 @@ public:
     
     NSDictionary *userInfo = @{FSAudioStreamNotificationKey_State: [NSNumber numberWithInt:streamerState],
                                FSAudioStreamNotificationKey_Stream: [NSValue valueWithPointer:_audioStream]};
-    NSNotification *notification = [NSNotification notificationWithName:FSAudioStreamStateChangeNotification object:nil userInfo:userInfo];
+    NSNotification *notification = [NSNotification notificationWithName:FSAudioStreamStateChangeNotification object:self.stream userInfo:userInfo];
     
     [[NSNotificationCenter defaultCenter] postNotification:notification];
 }
@@ -1529,7 +1529,7 @@ void AudioStreamStateObserver::audioStreamErrorOccurred(int errorCode, CFStringR
     NSDictionary *userInfo = @{FSAudioStreamNotificationKey_Error: @(errorCode),
                             FSAudioStreamNotificationKey_ErrorDescription: errorForObjC,
                               FSAudioStreamNotificationKey_Stream: [NSValue valueWithPointer:source]};
-    NSNotification *notification = [NSNotification notificationWithName:FSAudioStreamErrorNotification object:nil userInfo:userInfo];
+    NSNotification *notification = [NSNotification notificationWithName:FSAudioStreamErrorNotification object:priv.stream userInfo:userInfo];
     
     [[NSNotificationCenter defaultCenter] postNotification:notification];
     
@@ -1600,7 +1600,7 @@ void AudioStreamStateObserver::audioStreamMetaDataAvailable(std::map<CFStringRef
     
     NSDictionary *userInfo = @{FSAudioStreamNotificationKey_MetaData: metaDataDictionary,
                               FSAudioStreamNotificationKey_Stream: [NSValue valueWithPointer:source]};
-    NSNotification *notification = [NSNotification notificationWithName:FSAudioStreamMetaDataNotification object:nil userInfo:userInfo];
+    NSNotification *notification = [NSNotification notificationWithName:FSAudioStreamMetaDataNotification object:priv.stream userInfo:userInfo];
     
     [[NSNotificationCenter defaultCenter] postNotification:notification];
 }

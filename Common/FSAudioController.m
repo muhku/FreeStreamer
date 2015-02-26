@@ -7,12 +7,14 @@
  */
 
 #import "FSAudioController.h"
-#import "FSAudioStream.h"
 #import "FSPlaylistItem.h"
 #import "FSCheckContentTypeRequest.h"
 #import "FSParsePlaylistRequest.h"
 #import "FSParseRssPodcastFeedRequest.h"
 
+/**
+ * Private interface for FSAudioController.
+ */
 @interface FSAudioController ()
 - (void)notifyRetrievingURL;
 
@@ -23,7 +25,120 @@
 @property (nonatomic,assign) BOOL readyToPlay;
 @property (nonatomic,assign) NSUInteger currentPlaylistItemIndex;
 @property (nonatomic,strong) NSMutableArray *playlistItems;
+@property (nonatomic,strong) NSMutableArray *streams;
+@property (nonatomic,assign) BOOL needToSetVolume;
+@property (nonatomic,assign) float outputVolume;
+
+- (void)audioStreamStateDidChange:(NSNotification *)notification;
+- (void)deactivateInactivateStreams:(NSUInteger)currentActiveStream;
+
 @end
+
+/**
+ * Acts as a proxy object for FSAudioStream. Lazily initializes
+ * the stream when it is needed.
+ *
+ * A call to deactivate releases the stream.
+ */
+@interface FSAudioStreamProxy : NSObject {
+    FSAudioStream *_audioStream;
+}
+
+@property (readonly) FSAudioStream *audioStream;
+@property (nonatomic,copy) NSURL *url;
+@property (nonatomic,weak) FSAudioController *audioController;
+
+- (void)deactivate;
+
+@end
+
+/*
+ * =======================================
+ * FSAudioStreamProxy implementation.
+ * =======================================
+ */
+
+@implementation FSAudioStreamProxy
+
+- (id)init
+{
+    if (self = [super init]) {
+    }
+    return self;
+}
+
+- (id)initWithAudioController:(FSAudioController *)controller
+{
+    if (self = [self init]) {
+        self.audioController = controller;
+    }
+    return self;
+}
+
+- (void)dealloc
+{
+    [self deactivate];
+}
+
+- (FSAudioStream *)audioStream
+{
+    if (!_audioStream) {
+        _audioStream = [[FSAudioStream alloc] init];
+        
+        if (self.audioController.needToSetVolume) {
+            _audioStream.volume = self.audioController.outputVolume;
+        }
+        
+        __weak FSAudioStreamProxy *weakSelf = self;
+        
+        _audioStream.onCompletion = ^() {
+            if ([weakSelf.audioController.playlistItems count] > 0) {
+                if (weakSelf.audioController.currentPlaylistItemIndex > 0) {
+                    // Release the previous stream
+                    FSAudioStreamProxy *prevStream = [weakSelf.audioController.streams objectAtIndex:weakSelf.audioController.currentPlaylistItemIndex - 1];
+                    
+                    [prevStream deactivate];
+                }
+                
+                if (weakSelf.audioController.currentPlaylistItemIndex + 1 < [weakSelf.audioController.playlistItems count]) {
+                    weakSelf.audioController.currentPlaylistItemIndex = weakSelf.audioController.currentPlaylistItemIndex + 1;
+                    
+                    if (weakSelf.audioController.onStateChange) {
+                        weakSelf.audioController.stream.onStateChange = weakSelf.audioController.onStateChange;
+                    }
+                    if (weakSelf.audioController.onMetaDataAvailable) {
+                        weakSelf.audioController.stream.onMetaDataAvailable = weakSelf.audioController.onMetaDataAvailable;
+                    }
+                    if (weakSelf.audioController.onFailure) {
+                        weakSelf.audioController.stream.onFailure = weakSelf.audioController.onFailure;
+                    }
+                    
+                    [weakSelf.audioController play];
+                }
+            }
+        };
+        
+        if (self.url) {
+            _audioStream.url = self.url;
+        }
+    }
+    return _audioStream;
+}
+
+- (void)deactivate
+{
+    [_audioStream stop];
+    
+    _audioStream = nil;
+}
+
+@end
+
+/*
+ * =======================================
+ * FSAudioController implementation
+ * =======================================
+ */
 
 @implementation FSAudioController
 
@@ -31,11 +146,17 @@
 {
     if (self = [super init]) {
         _url = nil;
-        _audioStream = nil;
         _checkContentTypeRequest = nil;
         _parsePlaylistRequest = nil;
         _readyToPlay = NO;
         _playlistItems = [[NSMutableArray alloc] init];
+        _streams = [[NSMutableArray alloc] init];
+        self.preloadNextPlaylistItemAutomatically = YES;
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(audioStreamStateDidChange:)
+                                                     name:FSAudioStreamStateChangeNotification
+                                                   object:nil];
     }
     return self;
 }
@@ -50,14 +171,54 @@
 
 - (void)dealloc
 {
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    
     [_checkContentTypeRequest cancel];
     [_parsePlaylistRequest cancel];
     [_parseRssPodcastFeedRequest cancel];
     
-    [_audioStream stop];
+    for (FSAudioStreamProxy *proxy in _streams) {
+        [proxy deactivate];
+    }
+}
+
+- (void)audioStreamStateDidChange:(NSNotification *)notification
+{
+    if (!(notification.object == self.audioStream)) {
+        // This doesn't concern us, return
+        return;
+    }
     
-    _audioStream.delegate = nil;
-    _audioStream = nil;
+    if (!self.preloadNextPlaylistItemAutomatically) {
+        // No preloading wanted, skip
+        return;
+    }
+    
+    NSDictionary *dict = [notification userInfo];
+    int state = [[dict valueForKey:FSAudioStreamNotificationKey_State] intValue];
+    
+    if (state == kFSAudioStreamEndOfFile) {
+        // Reached EOF for this stream, do we have another item waiting in the playlist?
+        if ([self hasNextItem]) {
+            FSAudioStreamProxy *proxy = [_streams objectAtIndex:self.currentPlaylistItemIndex + 1];
+            FSAudioStream *nextStream = proxy.audioStream;
+            
+            // Start preloading the next stream
+            [nextStream preload];
+        }
+    }
+}
+
+- (void)deactivateInactivateStreams:(NSUInteger)currentActiveStream
+{
+    NSUInteger streamIndex = 0;
+    
+    for (FSAudioStreamProxy *proxy in _streams) {
+        if (streamIndex != currentActiveStream) {
+            [proxy deactivate];
+        }
+        streamIndex++;
+    }
 }
 
 /*
@@ -68,22 +229,18 @@
 
 - (FSAudioStream *)audioStream
 {
-    if (!_audioStream) {
-        _audioStream = [[FSAudioStream alloc] init];
-        
-        __weak FSAudioController *weakSelf = self;
-        
-        _audioStream.onCompletion = ^() {
-            if ([weakSelf.playlistItems count] > 0) {
-                if (weakSelf.currentPlaylistItemIndex + 1 < [weakSelf.playlistItems count]) {
-                    weakSelf.currentPlaylistItemIndex = weakSelf.currentPlaylistItemIndex + 1;
-                
-                    [weakSelf play];
-                }
-            }
-        };
+    FSAudioStream *stream = nil;
+    
+    if ([_streams count] == 0) {
+        FSAudioStreamProxy *proxy = [[FSAudioStreamProxy alloc] initWithAudioController:self];
+        [_streams addObject:proxy];
     }
-    return _audioStream;
+    
+    FSAudioStreamProxy *proxy = [_streams objectAtIndex:self.currentPlaylistItemIndex];
+    
+    stream = proxy.audioStream;
+    
+    return stream;
 }
 
 - (FSCheckContentTypeRequest *)checkContentTypeRequest
@@ -215,6 +372,16 @@
         }
     }
     
+    if (self.onStateChange) {
+        self.audioStream.onStateChange = self.onStateChange;
+    }
+    if (self.onMetaDataAvailable) {
+        self.audioStream.onMetaDataAvailable = self.onMetaDataAvailable;
+    }
+    if (self.onFailure) {
+        self.audioStream.onFailure = self.onFailure;
+    }
+    
     [self.audioStream play];
 }
 
@@ -242,6 +409,13 @@
     
     [self.playlistItems addObjectsFromArray:playlist];
     
+    for (FSPlaylistItem *item in playlist) {
+        FSAudioStreamProxy *proxy = [[FSAudioStreamProxy alloc] initWithAudioController:self];
+        proxy.url = item.url;
+        
+        [_streams addObject:proxy];
+    }
+    
     [self playItemAtIndex:index];
 }
 
@@ -263,6 +437,8 @@
     
     self.readyToPlay = YES;
     
+    [self deactivateInactivateStreams:index];
+    
     [self play];
 }
 
@@ -278,6 +454,11 @@
     }
     
     [self.playlistItems addObject:item];
+    
+    FSAudioStreamProxy *proxy = [[FSAudioStreamProxy alloc] initWithAudioController:self];
+    proxy.url = item.url;
+    
+    [_streams addObject:proxy];
 }
 
 - (void)removeItemAtIndex:(NSUInteger)index
@@ -300,6 +481,7 @@
     FSPlaylistItem *current = self.currentPlaylistItem;
     
     [self.playlistItems removeObjectAtIndex:index];
+    [_streams removeObjectAtIndex:index];
     
     // Update the current playlist item to be correct after the removal
     NSUInteger itemIndex = 0;
@@ -323,6 +505,7 @@
     [_parseRssPodcastFeedRequest cancel];
     
     self.playlistItems = [[NSMutableArray alloc] init];
+    _streams = [[NSMutableArray alloc] init];
     
     self.currentPlaylistItemIndex = 0;
     
@@ -356,6 +539,8 @@
         
         [self.audioStream stop];
         
+        [self deactivateInactivateStreams:self.currentPlaylistItemIndex];
+        
         [self play];
     }
 }
@@ -366,6 +551,8 @@
         self.currentPlaylistItemIndex = self.currentPlaylistItemIndex - 1;
         
         [self.audioStream stop];
+        
+        [self deactivateInactivateStreams:self.currentPlaylistItemIndex];
         
         [self play];
     }
@@ -379,7 +566,10 @@
 
 - (void)setVolume:(float)volume
 {
-    self.audioStream.volume = volume;
+    self.outputVolume = volume;
+    self.needToSetVolume = YES;
+    
+    self.audioStream.volume = self.outputVolume;
 }
 
 - (float)volume
@@ -436,6 +626,42 @@
         }
     }
     return nil;
+}
+
+- (void (^)(FSAudioStreamState state))onStateChange
+{
+    return _onStateChangeBlock;
+}
+
+- (void (^)(NSDictionary *metaData))onMetaDataAvailable
+{
+    return _onMetaDataAvailableBlock;
+}
+
+- (void (^)(FSAudioStreamError error, NSString *errorDescription))onFailure
+{
+    return _onFailureBlock;
+}
+
+- (void)setOnStateChange:(void (^)(FSAudioStreamState))newOnStateValue
+{
+    _onStateChangeBlock = newOnStateValue;
+    
+    self.stream.onStateChange = _onStateChangeBlock;
+}
+
+- (void)setOnMetaDataAvailable:(void (^)(NSDictionary *))newOnMetaDataAvailableValue
+{
+    _onMetaDataAvailableBlock = newOnMetaDataAvailableValue;
+    
+    self.stream.onMetaDataAvailable = _onMetaDataAvailableBlock;
+}
+
+- (void)setOnFailure:(void (^)(FSAudioStreamError error, NSString *errorDescription))newOnFailureValue
+{
+    _onFailureBlock = newOnFailureValue;
+    
+    self.stream.onFailure = _onFailureBlock;
 }
 
 @end
