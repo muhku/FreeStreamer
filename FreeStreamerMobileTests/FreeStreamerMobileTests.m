@@ -118,11 +118,13 @@
 
 - (void)testPlaylistPlayback
 {
-    _controller.stream.onStateChange = ^(FSAudioStreamState state) {
+    __weak FreeStreamerMobileTests *weakSelf = self;
+    
+    _controller.onStateChange = ^(FSAudioStreamState state) {
         NSLog(@"FSAudioStreamStateChangeNotification received!");
         
         if (state == kFsAudioStreamPlaying) {
-            _checkStreamState = YES;
+            weakSelf.checkStreamState = YES;
         }
     };
     
@@ -282,11 +284,13 @@ playback_short_file:
 
 - (void)testSomaGrooveSaladPlays
 {
-    _controller.stream.onStateChange = ^(FSAudioStreamState state) {
+    __weak FreeStreamerMobileTests *weakSelf = self;
+    
+    _controller.onStateChange = ^(FSAudioStreamState state) {
         NSLog(@"FSAudioStreamStateChangeNotification received!");
         
         if (state == kFsAudioStreamPlaying) {
-            _checkStreamState = YES;
+            weakSelf.checkStreamState = YES;
         }
     };
     
