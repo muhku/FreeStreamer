@@ -184,6 +184,12 @@
 @property (nonatomic,assign) BOOL preloadNextPlaylistItemAutomatically;
 
 /**
+ * This property determines if the debug output is enabled. Disabled
+ * by default
+ */
+@property (nonatomic,assign) BOOL enableDebugOutput;
+
+/**
  * Called upon a state change.
  */
 @property (copy) void (^onStateChange)(FSAudioStreamState state);

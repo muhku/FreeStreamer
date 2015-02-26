@@ -77,6 +77,10 @@
 
 - (void)dealloc
 {
+    if (self.audioController.enableDebugOutput) {
+        NSLog(@"[FSAudioController.m:%i] FSAudioStreamProxy.dealloc: %@", __LINE__, self.url);
+    }
+    
     [self deactivate];
 }
 
@@ -92,10 +96,18 @@
         __weak FSAudioStreamProxy *weakSelf = self;
         
         _audioStream.onCompletion = ^() {
+            if (weakSelf.audioController.enableDebugOutput) {
+                NSLog(@"[FSAudioController.m:%i] onCompletion(): %@", __LINE__, weakSelf.url);
+            }
+            
             if ([weakSelf.audioController.playlistItems count] > 0) {
                 if (weakSelf.audioController.currentPlaylistItemIndex > 0) {
                     // Release the previous stream
                     FSAudioStreamProxy *prevStream = [weakSelf.audioController.streams objectAtIndex:weakSelf.audioController.currentPlaylistItemIndex - 1];
+                    
+                    if (weakSelf.audioController.enableDebugOutput) {
+                        NSLog(@"[FSAudioController.m:%i] deactivating the previous stream: %@", __LINE__, prevStream.url);
+                    }
                     
                     [prevStream deactivate];
                 }
@@ -152,6 +164,7 @@
         _playlistItems = [[NSMutableArray alloc] init];
         _streams = [[NSMutableArray alloc] init];
         self.preloadNextPlaylistItemAutomatically = YES;
+        self.enableDebugOutput = NO;
         
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(audioStreamStateDidChange:)
@@ -178,6 +191,10 @@
     [_parseRssPodcastFeedRequest cancel];
     
     for (FSAudioStreamProxy *proxy in _streams) {
+        if (self.enableDebugOutput) {
+            NSLog(@"[FSAudioController.m:%i] dealloc. Deactivating stream %@", __LINE__, proxy.url);
+        }
+        
         [proxy deactivate];
     }
 }
@@ -191,6 +208,10 @@
     
     if (!self.preloadNextPlaylistItemAutomatically) {
         // No preloading wanted, skip
+        if (self.enableDebugOutput) {
+            NSLog(@"[FSAudioController.m:%i] Preloading disabled, return.", __LINE__);
+        }
+        
         return;
     }
     
@@ -198,10 +219,18 @@
     int state = [[dict valueForKey:FSAudioStreamNotificationKey_State] intValue];
     
     if (state == kFSAudioStreamEndOfFile) {
+        if (self.enableDebugOutput) {
+            NSLog(@"[FSAudioController.m:%i] EOF reached for %@", __LINE__, self.audioStream.url);
+        }
+        
         // Reached EOF for this stream, do we have another item waiting in the playlist?
         if ([self hasNextItem]) {
             FSAudioStreamProxy *proxy = [_streams objectAtIndex:self.currentPlaylistItemIndex + 1];
             FSAudioStream *nextStream = proxy.audioStream;
+            
+            if (self.enableDebugOutput) {
+                NSLog(@"[FSAudioController.m:%i] Preloading %@", __LINE__, nextStream.url);
+            }
             
             // Start preloading the next stream
             [nextStream preload];
@@ -215,6 +244,10 @@
     
     for (FSAudioStreamProxy *proxy in _streams) {
         if (streamIndex != currentActiveStream) {
+            if (self.enableDebugOutput) {
+                NSLog(@"[FSAudioController.m:%i] Deactivating stream %@", __LINE__, proxy.url);
+            }
+            
             [proxy deactivate];
         }
         streamIndex++;
@@ -232,6 +265,10 @@
     FSAudioStream *stream = nil;
     
     if ([_streams count] == 0) {
+        if (self.enableDebugOutput) {
+            NSLog(@"[FSAudioController.m:%i] Stream count %lu, creating a proxy object", __LINE__, (unsigned long)[_streams count]);
+        }
+        
         FSAudioStreamProxy *proxy = [[FSAudioStreamProxy alloc] initWithAudioController:self];
         [_streams addObject:proxy];
     }
@@ -413,6 +450,10 @@
         FSAudioStreamProxy *proxy = [[FSAudioStreamProxy alloc] initWithAudioController:self];
         proxy.url = item.url;
         
+        if (self.enableDebugOutput) {
+            NSLog(@"[FSAudioController.m:%i] playFromPlaylist. Adding stream proxy for %@", __LINE__, proxy.url);
+        }
+        
         [_streams addObject:proxy];
     }
     
@@ -458,6 +499,10 @@
     FSAudioStreamProxy *proxy = [[FSAudioStreamProxy alloc] initWithAudioController:self];
     proxy.url = item.url;
     
+    if (self.enableDebugOutput) {
+        NSLog(@"[FSAudioController.m:%i] addItem. Adding stream proxy for %@", __LINE__, proxy.url);
+    }
+    
     [_streams addObject:proxy];
 }
 
@@ -481,6 +526,12 @@
     FSPlaylistItem *current = self.currentPlaylistItem;
     
     [self.playlistItems removeObjectAtIndex:index];
+    
+    if (self.enableDebugOutput) {
+        FSAudioStreamProxy *proxy = [_streams objectAtIndex:index];
+        NSLog(@"[FSAudioController.m:%i] removeItemAtIndex. Removing stream proxy %@", __LINE__, proxy.url);
+    }
+    
     [_streams removeObjectAtIndex:index];
     
     // Update the current playlist item to be correct after the removal
