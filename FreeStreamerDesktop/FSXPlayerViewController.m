@@ -92,7 +92,7 @@
     _record = (!_record);
     
     if (!_record) {
-        self.audioController.stream.outputFile = nil;
+        self.audioController.activeStream.outputFile = nil;
         return;
     }
     
@@ -106,11 +106,11 @@
     unsigned index = 0;
     
     do {
-        fileName = [[NSString alloc] initWithFormat:@"%@-%i.%@", basePath, index, self.audioController.stream.suggestedFileExtension];
+        fileName = [[NSString alloc] initWithFormat:@"%@-%i.%@", basePath, index, self.audioController.activeStream.suggestedFileExtension];
         index++;
     } while ([[NSFileManager defaultManager] fileExistsAtPath:fileName]);
     
-    self.audioController.stream.outputFile = [NSURL fileURLWithPath:fileName];
+    self.audioController.activeStream.outputFile = [NSURL fileURLWithPath:fileName];
 }
 
 /*
@@ -121,11 +121,11 @@
 
 - (void)updatePlaybackProgress
 {
-    if (self.audioController.stream.continuous) {
+    if (self.audioController.activeStream.continuous) {
         [self.progressTextFieldCell setTitle:@""];
     } else {
-        FSStreamPosition cur = self.audioController.stream.currentTimePlayed;
-        FSStreamPosition end = self.audioController.stream.duration;
+        FSStreamPosition cur = self.audioController.activeStream.currentTimePlayed;
+        FSStreamPosition end = self.audioController.activeStream.duration;
         
         [self.progressTextFieldCell setTitle:[NSString stringWithFormat:@"%i:%02i / %i:%02i",
                                          cur.minute, cur.second,
@@ -141,6 +141,10 @@
 
 - (void)audioStreamStateDidChange:(NSNotification *)notification
 {
+    if (!(notification.object == self.audioController.activeStream)) {
+        return;
+    }
+    
     NSString *statusRetrievingURL = @"Retrieving stream URL";
     NSString *statusBuffering = @"Buffering...";
     NSString *statusSeeking = @"Seeking...";
@@ -246,6 +250,10 @@
 
 - (void)audioStreamErrorOccurred:(NSNotification *)notification
 {
+    if (!(notification.object == self.audioController.activeStream)) {
+        return;
+    }
+    
     NSDictionary *dict = [notification userInfo];
     int errorCode = [[dict valueForKey:FSAudioStreamNotificationKey_Error] intValue];
     
@@ -273,6 +281,10 @@
 
 - (void)audioStreamMetaDataAvailable:(NSNotification *)notification
 {
+    if (!(notification.object == self.audioController.activeStream)) {
+        return;
+    }
+    
     NSDictionary *dict = [notification userInfo];
     NSDictionary *metaData = [dict valueForKey:FSAudioStreamNotificationKey_MetaData];
     
