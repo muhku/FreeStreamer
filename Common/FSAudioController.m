@@ -590,9 +590,12 @@
 -(void)playNextItem
 {
     if ([self hasNextItem]) {
-        self.currentPlaylistItemIndex = self.currentPlaylistItemIndex + 1;
-        
+        if (self.enableDebugOutput) {
+            NSLog(@"[FSAudioController.m:%i] playNexItem. Stopping stream %@", __LINE__, self.audioStream.url);
+        }
         [self.audioStream stop];
+        
+        self.currentPlaylistItemIndex = self.currentPlaylistItemIndex + 1;
         
         [self deactivateInactivateStreams:self.currentPlaylistItemIndex];
         
@@ -603,9 +606,12 @@
 -(void)playPreviousItem
 {
     if ([self hasPreviousItem]) {
-        self.currentPlaylistItemIndex = self.currentPlaylistItemIndex - 1;
-        
+        if (self.enableDebugOutput) {
+            NSLog(@"[FSAudioController.m:%i] playPreviousItem. Stopping stream %@", __LINE__, self.audioStream.url);
+        }
         [self.audioStream stop];
+        
+        self.currentPlaylistItemIndex = self.currentPlaylistItemIndex - 1;
         
         [self deactivateInactivateStreams:self.currentPlaylistItemIndex];
         
