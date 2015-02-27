@@ -165,11 +165,14 @@
  */
 @property (nonatomic,assign) float volume;
 /**
- * The stream URL.
+ * The controller URL.
  */
 @property (nonatomic,assign) NSURL *url;
 /**
- * The audio stream.
+ * The the active playing stream, which may change
+ * from time to time during the playback. In this way, do not
+ * set your own blocks to the stream but use the blocks
+ * provides by FSAudioController.
  */
 @property (readonly) FSAudioStream *stream;
 /**
