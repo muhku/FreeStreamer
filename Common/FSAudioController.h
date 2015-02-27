@@ -219,6 +219,16 @@
 @protocol FSAudioControllerDelegate <NSObject>
 
 @optional
+
+/**
+ * Called when the controller wants to start preloading an item. Return YES or NO
+ * depending if you want this item to be preloaded.
+ *
+ * @param audioController The audio controller which is doing the preloading.
+ * @param stream The stream which is wanted to be preloaded.
+ */
+- (BOOL)audioController:(FSAudioController *)audioController allowPreloadingForStream:(FSAudioStream *)stream;
+
 /**
  * Called when the controller starts to preload an item.
  *

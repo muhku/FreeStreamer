@@ -573,6 +573,14 @@
  * Delegates
  * =======================================
  */
+
+- (BOOL)audioController:(FSAudioController *)audioController allowPreloadingForStream:(FSAudioStream *)stream
+{
+    // We could do some fine-grained control here depending on the connectivity status, for example.
+    // Allow all preloads for now.
+    return YES;
+}
+
 - (void)audioController:(FSAudioController *)audioController preloadStartedForStream:(FSAudioStream *)stream
 {
     // Should we display the preloading status somehow?

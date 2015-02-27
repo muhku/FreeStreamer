@@ -232,8 +232,18 @@
                 NSLog(@"[FSAudioController.m:%i] Preloading %@", __LINE__, nextStream.url);
             }
             
-            // Start preloading the next stream
-            [nextStream preload];
+            if ([self.delegate respondsToSelector:@selector(audioController:allowPreloadingForStream:)]) {
+                if ([self.delegate audioController:self allowPreloadingForStream:nextStream]) {
+                    [nextStream preload];
+                } else {
+                    if (self.enableDebugOutput) {
+                        NSLog(@"[FSAudioController.m:%i] Preloading disallowed for stream %@", __LINE__, nextStream.url);
+                    }
+                }
+            } else {
+                // Start preloading the next stream; we can load this as there is no override
+                [nextStream preload];
+            }
             
             if ([self.delegate respondsToSelector:@selector(audioController:preloadStartedForStream:)]) {
                 [self.delegate audioController:self preloadStartedForStream:nextStream];
