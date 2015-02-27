@@ -563,8 +563,19 @@
 {
     if (!_audioController) {
         _audioController = [[FSAudioController alloc] init];
+        _audioController.delegate = self;
     }
     return _audioController;
+}
+
+/*
+ * =======================================
+ * Delegates
+ * =======================================
+ */
+- (void)audioController:(FSAudioController *)audioController preloadStartedForStream:(FSAudioStream *)stream
+{
+    // Should we display the preloading status somehow?
 }
 
 /*

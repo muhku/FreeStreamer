@@ -8,10 +8,10 @@
 
 #import <UIKit/UIKit.h>
 
-#import "FSAudioStream.h"
+#import "FSAudioController.h"
 
+@class FSAudioStream;
 @class FSPlaylistItem;
-@class FSAudioController;
 @class FSFrequencyDomainAnalyzer;
 @class FSFrequencyPlotView;
 
@@ -21,7 +21,7 @@
  * The view allows the user to control the player. See the
  * play:, pause: and seek: actions.
  */
-@interface FSPlayerViewController : UIViewController <FSPCMAudioStreamDelegate> {
+@interface FSPlayerViewController : UIViewController <FSAudioControllerDelegate> {
     FSPlaylistItem *_selectedPlaylistItem;
     
     // State

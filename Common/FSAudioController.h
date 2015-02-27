@@ -14,6 +14,7 @@
 @class FSParsePlaylistRequest;
 @class FSParseRssPodcastFeedRequest;
 @class FSPlaylistItem;
+@protocol FSAudioControllerDelegate;
 
 /**
  * FSAudioController is functionally equivalent to FSAudioStream with
@@ -205,4 +206,24 @@
  */
 @property (copy) void (^onFailure)(FSAudioStreamError error, NSString *errorDescription);
 
+/**
+ * Delegate.
+ */
+@property (nonatomic,unsafe_unretained) IBOutlet id<FSAudioControllerDelegate> delegate;
+
+@end
+
+/**
+ * To check the preloading status, use this delegate.
+ */
+@protocol FSAudioControllerDelegate <NSObject>
+
+@optional
+/**
+ * Called when the controller starts to preload an item.
+ *
+ * @param audioController The audio controller which is doing the preloading.
+ * @param stream The stream which is preloaded.
+ */
+- (void)audioController:(FSAudioController *)audioController preloadStartedForStream:(FSAudioStream *)stream;
 @end

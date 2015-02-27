@@ -234,6 +234,10 @@
             
             // Start preloading the next stream
             [nextStream preload];
+            
+            if ([self.delegate respondsToSelector:@selector(audioController:preloadStartedForStream:)]) {
+                [self.delegate audioController:self preloadStartedForStream:nextStream];
+            }
         }
     }
 }
