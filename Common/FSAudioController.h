@@ -174,7 +174,7 @@
  * set your own blocks to the stream but use the blocks
  * provides by FSAudioController.
  */
-@property (readonly) FSAudioStream *stream;
+@property (readonly) FSAudioStream *activeStream;
 /**
  * The playlist item the controller is currently using.
  */

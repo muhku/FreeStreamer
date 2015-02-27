@@ -96,7 +96,7 @@
     [self.audioController setVolume:_outputVolume];
     self.volumeSlider.value = _outputVolume;
     
-    _maxPrebufferedByteCount = (float)self.audioController.stream.configuration.maxPrebufferedByteCount;
+    _maxPrebufferedByteCount = (float)self.audioController.activeStream.configuration.maxPrebufferedByteCount;
     
     __weak FSPlayerViewController *weakSelf = self;
     
@@ -296,7 +296,7 @@
         
         if ([self.audioController.url isEqual:_lastPlaybackURL]) {
             // The same file was playing from a position, resume
-            [self.audioController.stream playFromOffset:_lastSeekByteOffset];
+            [self.audioController.activeStream playFromOffset:_lastSeekByteOffset];
         } else {
             [self.audioController play];
         }
@@ -357,12 +357,12 @@
     
     [self resignFirstResponder];
     
-    if (!self.audioController.stream.continuous && self.audioController.isPlaying) {
+    if (!self.audioController.activeStream.continuous && self.audioController.isPlaying) {
         // If a file with a duration is playing, store its last known playback position
         // so that we can resume from the same position, if the same file
         // is played again
         
-        _lastSeekByteOffset = self.audioController.stream.currentSeekByteOffset;
+        _lastSeekByteOffset = self.audioController.activeStream.currentSeekByteOffset;
         _lastPlaybackURL = [self.audioController.url copy];
     } else {
         _lastPlaybackURL = nil;
@@ -416,7 +416,7 @@
 {
     _analyzer.enabled = NO;
     
-    if (self.paused && self.audioController.stream.continuous) {
+    if (self.paused && self.audioController.activeStream.continuous) {
         // Don't leave paused continuous stream on background;
         // Stream will eventually fail and restart
         [self.audioController stop];
@@ -521,9 +521,9 @@
         _analyzer.enabled = YES;
         
         self.frequencyPlotView.hidden = NO;
-        _audioController.stream.delegate = _analyzer;
+        _audioController.activeStream.delegate = _analyzer;
     } else {
-        _audioController.stream.delegate = nil;
+        _audioController.activeStream.delegate = nil;
         
         [self.frequencyPlotView reset];
         self.frequencyPlotView.hidden = YES;
@@ -601,15 +601,15 @@
 
 - (void)updatePlaybackProgress
 {
-    if (self.audioController.stream.continuous) {
+    if (self.audioController.activeStream.continuous) {
         self.progressSlider.enabled = NO;
         self.progressSlider.value = 0;
         self.currentPlaybackTime.text = @"";
     } else {
         self.progressSlider.enabled = YES;
         
-        FSStreamPosition cur = self.audioController.stream.currentTimePlayed;
-        FSStreamPosition end = self.audioController.stream.duration;
+        FSStreamPosition cur = self.audioController.activeStream.currentTimePlayed;
+        FSStreamPosition end = self.audioController.activeStream.duration;
         
         self.progressSlider.value = cur.position;
         
@@ -621,15 +621,15 @@
     self.bufferingIndicator.hidden = NO;
     self.prebufferStatus.hidden = YES;
     
-    if (self.audioController.stream.contentLength > 0) {
+    if (self.audioController.activeStream.contentLength > 0) {
         // A non-continuous stream, show the buffering progress within the whole file
-        FSSeekByteOffset currentOffset = self.audioController.stream.currentSeekByteOffset;
+        FSSeekByteOffset currentOffset = self.audioController.activeStream.currentSeekByteOffset;
         
-        UInt64 totalBufferedData = currentOffset.start + self.audioController.stream.prebufferedByteCount;
+        UInt64 totalBufferedData = currentOffset.start + self.audioController.activeStream.prebufferedByteCount;
         
-        float bufferedDataFromTotal = (float)totalBufferedData / self.audioController.stream.contentLength;
+        float bufferedDataFromTotal = (float)totalBufferedData / self.audioController.activeStream.contentLength;
         
-        self.bufferingIndicator.progress = (float)currentOffset.start / self.audioController.stream.contentLength;
+        self.bufferingIndicator.progress = (float)currentOffset.start / self.audioController.activeStream.contentLength;
         
         // Use the status to show how much data we have in the buffers
         self.prebufferStatus.frame = CGRectMake(self.bufferingIndicator.frame.origin.x,
@@ -640,7 +640,7 @@
     } else {
         // A continuous stream, use the buffering indicator to show progress
         // among the filled prebuffer
-        self.bufferingIndicator.progress = (float)self.audioController.stream.prebufferedByteCount / _maxPrebufferedByteCount;
+        self.bufferingIndicator.progress = (float)self.audioController.activeStream.prebufferedByteCount / _maxPrebufferedByteCount;
     }
 }
 
@@ -713,7 +713,7 @@
     FSStreamPosition pos = {0};
     pos.position = _seekToPoint;
     
-    [self.audioController.stream seekToPosition:pos];
+    [self.audioController.activeStream seekToPosition:pos];
 }
 
 - (void)finalizeSeeking

@@ -116,13 +116,13 @@
                     weakSelf.audioController.currentPlaylistItemIndex = weakSelf.audioController.currentPlaylistItemIndex + 1;
                     
                     if (weakSelf.audioController.onStateChange) {
-                        weakSelf.audioController.stream.onStateChange = weakSelf.audioController.onStateChange;
+                        weakSelf.audioController.audioStream.onStateChange = weakSelf.audioController.onStateChange;
                     }
                     if (weakSelf.audioController.onMetaDataAvailable) {
-                        weakSelf.audioController.stream.onMetaDataAvailable = weakSelf.audioController.onMetaDataAvailable;
+                        weakSelf.audioController.audioStream.onMetaDataAvailable = weakSelf.audioController.onMetaDataAvailable;
                     }
                     if (weakSelf.audioController.onFailure) {
-                        weakSelf.audioController.stream.onFailure = weakSelf.audioController.onFailure;
+                        weakSelf.audioController.audioStream.onFailure = weakSelf.audioController.onFailure;
                     }
                     
                     [weakSelf.audioController play];
@@ -663,7 +663,7 @@
     return copyOfURL;
 }
 
-- (FSAudioStream *)stream
+- (FSAudioStream *)activeStream
 {
     return self.audioStream;
 }
@@ -698,21 +698,21 @@
 {
     _onStateChangeBlock = newOnStateValue;
     
-    self.stream.onStateChange = _onStateChangeBlock;
+    self.audioStream.onStateChange = _onStateChangeBlock;
 }
 
 - (void)setOnMetaDataAvailable:(void (^)(NSDictionary *))newOnMetaDataAvailableValue
 {
     _onMetaDataAvailableBlock = newOnMetaDataAvailableValue;
     
-    self.stream.onMetaDataAvailable = _onMetaDataAvailableBlock;
+    self.audioStream.onMetaDataAvailable = _onMetaDataAvailableBlock;
 }
 
 - (void)setOnFailure:(void (^)(FSAudioStreamError error, NSString *errorDescription))newOnFailureValue
 {
     _onFailureBlock = newOnFailureValue;
     
-    self.stream.onFailure = _onFailureBlock;
+    self.audioStream.onFailure = _onFailureBlock;
 }
 
 @end

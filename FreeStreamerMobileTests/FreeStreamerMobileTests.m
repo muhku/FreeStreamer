@@ -312,14 +312,14 @@ playback_short_file:
             
             XCTAssertTrue((_controller.volume == 0), @"Invalid controller volume");
             
-            XCTAssertTrue((_controller.stream.volume == 0), @"Invalid stream volume");
+            XCTAssertTrue((_controller.activeStream.volume == 0), @"Invalid stream volume");
             
-            XCTAssertTrue(([_controller.stream.contentType isEqualToString:@"audio/mpeg"]), @"Invalid content type");
-            XCTAssertTrue(([_controller.stream.suggestedFileExtension isEqualToString:@"mp3"]), @"Invalid file extension");
+            XCTAssertTrue(([_controller.activeStream.contentType isEqualToString:@"audio/mpeg"]), @"Invalid content type");
+            XCTAssertTrue(([_controller.activeStream.suggestedFileExtension isEqualToString:@"mp3"]), @"Invalid file extension");
             
-            XCTAssertTrue((_controller.stream.prebufferedByteCount > 0), @"No cached bytes");
+            XCTAssertTrue((_controller.activeStream.prebufferedByteCount > 0), @"No cached bytes");
             
-            XCTAssertTrue(((unsigned)_controller.stream.bitRate == 56000), @"Invalid bit rate");
+            XCTAssertTrue(((unsigned)_controller.activeStream.bitRate == 56000), @"Invalid bit rate");
             
             XCTAssertTrue((_stream.totalCachedObjectsSize == 0), @"System has cached objects");
             
@@ -570,11 +570,11 @@ playback_short_file:
         
         if (_checkStreamState) {
             // Stream started playing.
-            XCTAssertTrue(([_controller.stream.contentType isEqualToString:@"audio/mpeg"]), @"Invalid content type");
-            XCTAssertTrue(([_controller.stream.suggestedFileExtension isEqualToString:@"mp3"]), @"Invalid file extension");
+            XCTAssertTrue(([_controller.activeStream.contentType isEqualToString:@"audio/mpeg"]), @"Invalid content type");
+            XCTAssertTrue(([_controller.activeStream.suggestedFileExtension isEqualToString:@"mp3"]), @"Invalid file extension");
             
-            XCTAssertTrue((_controller.stream.duration.minute == 0), @"Invalid stream duration (minutes)");
-            XCTAssertTrue((_controller.stream.duration.second == 31), @"Invalid stream duration (seconds)");
+            XCTAssertTrue((_controller.activeStream.duration.minute == 0), @"Invalid stream duration (minutes)");
+            XCTAssertTrue((_controller.activeStream.duration.second == 31), @"Invalid stream duration (seconds)");
             
             return;
         }
@@ -613,12 +613,12 @@ playback_short_file:
         
         if (_checkStreamState) {
             // Stream started playing.
-            XCTAssertTrue(([_controller.stream.contentType isEqualToString:@"audio/mpeg"]), @"Invalid content type");
-            XCTAssertTrue(([_controller.stream.suggestedFileExtension isEqualToString:@"mp3"]), @"Invalid file extension");
-            XCTAssertTrue((_controller.stream.contentLength == 33285), @"Invalid content length");
+            XCTAssertTrue(([_controller.activeStream.contentType isEqualToString:@"audio/mpeg"]), @"Invalid content type");
+            XCTAssertTrue(([_controller.activeStream.suggestedFileExtension isEqualToString:@"mp3"]), @"Invalid file extension");
+            XCTAssertTrue((_controller.activeStream.contentLength == 33285), @"Invalid content length");
             
-            XCTAssertTrue((_controller.stream.duration.minute == 0), @"Invalid stream duration (minutes)");
-            XCTAssertTrue((_controller.stream.duration.second == 2), @"Invalid stream duration (seconds)");
+            XCTAssertTrue((_controller.activeStream.duration.minute == 0), @"Invalid stream duration (minutes)");
+            XCTAssertTrue((_controller.activeStream.duration.second == 2), @"Invalid stream duration (seconds)");
             
             return;
         }
@@ -658,7 +658,7 @@ playback_short_file:
                                                       XCTAssertTrue([stationName isEqualToString:@"BBC 5Live"], @"Station name does not match.");
                                                   }];
     
-    _controller.stream.onMetaDataAvailable = ^(NSDictionary *metaData) {
+    _controller.activeStream.onMetaDataAvailable = ^(NSDictionary *metaData) {
         NSString *stationName = metaData[@"IcecastStationName"];
         
         XCTAssertTrue([stationName isEqualToString:@"BBC 5Live"], @"Station name does not match.");
