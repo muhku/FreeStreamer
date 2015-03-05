@@ -655,7 +655,7 @@ playback_short_file:
                                                       
                                                       NSString *stationName = metaData[@"IcecastStationName"];
                                                       
-                                                      XCTAssertTrue([stationName isEqualToString:@"BBC 5Live"], @"Station name does not match.");
+                                                      XCTAssertTrue([stationName isEqualToString:@"bbc_radio_five_live"], @"Station name does not match.");
                                                   }];
     
     _controller.activeStream.onMetaDataAvailable = ^(NSDictionary *metaData) {
@@ -664,7 +664,7 @@ playback_short_file:
         XCTAssertTrue([stationName isEqualToString:@"BBC 5Live"], @"Station name does not match.");
     };
     
-    _controller.url = [NSURL URLWithString:@"http://www.bbc.co.uk/radio/listen/live/r5l_aaclca.pls"];
+    _controller.url = [NSURL URLWithString:@"http://www.radiofeeds.co.uk/bbc5live.pls"];
     [_controller play];
     
     NSTimeInterval timeout = 15.0;
