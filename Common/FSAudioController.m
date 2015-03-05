@@ -312,7 +312,7 @@
                 // Not a playlist; try directly playing the URL
                 
                 weakSelf.readyToPlay = YES;
-                [weakSelf.audioStream play];
+                [weakSelf play];
             }
         };
         _checkContentTypeRequest.onFailure = ^() {
@@ -323,7 +323,7 @@
 #endif
             
             weakSelf.readyToPlay = YES;
-            [weakSelf.audioStream play];
+            [weakSelf play];
         };
     }
     return _checkContentTypeRequest;
@@ -346,7 +346,7 @@
 #endif
             
             weakSelf.readyToPlay = YES;
-            [weakSelf.audioStream play];
+            [weakSelf play];
         };
     }
     return _parsePlaylistRequest;
@@ -369,7 +369,7 @@
 #endif
             
             weakSelf.readyToPlay = YES;
-            [weakSelf.audioStream play];
+            [weakSelf play];
         };
     }
     return _parseRssPodcastFeedRequest;
