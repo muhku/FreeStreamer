@@ -11,6 +11,7 @@
 #import "FSPlayerViewController.h"
 #import "FSParseRssPodcastFeedRequest.h"
 #import "AJNotificationView.h"
+#include "FSAudioController.h"
 
 @interface FSPlaylistViewController (PrivateMethods)
 
@@ -87,6 +88,8 @@
     
     self.navigationController.navigationBar.barStyle = UIBarStyleDefault;
     self.navigationController.navigationBarHidden = NO;
+    
+    self.navigationController.navigationBar.topItem.title = [[NSString alloc] initWithFormat:@"FreeStreamer %i.%i.%i", FREESTREAMER_VERSION_MAJOR, FREESTREAMER_VERSION_MINOR, FREESTREAMER_VERSION_REVISION];
     
     self.view.backgroundColor = [UIColor whiteColor];
 }
