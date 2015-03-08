@@ -377,7 +377,9 @@
 
 - (void)notifyRetrievingURL
 {
-    self.audioStream.onStateChange(kFsAudioStreamRetrievingURL);
+    if (self.onStateChange) {
+        self.onStateChange(kFsAudioStreamRetrievingURL);
+    }
 }
 
 - (BOOL)isPlaying
