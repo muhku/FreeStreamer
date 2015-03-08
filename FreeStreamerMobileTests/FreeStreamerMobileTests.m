@@ -114,6 +114,17 @@
     XCTAssertTrue((_controller.currentPlaylistItem == item4), @"Item 4 not the current playback item");
     
     XCTAssertTrue(([_controller countOfItems] == 2), @"Invalid count of playlist items");
+    
+    FSPlaylistItem *newItem = [[FSPlaylistItem alloc] init];
+    newItem.url = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"test-2sec" ofType:@"mp3"]];
+    
+    [_controller replaceItemAtIndex:0 withItem:newItem];
+    
+    XCTAssertTrue(([_controller countOfItems] == 2), @"Invalid count of playlist items");
+    
+    [_controller playItemAtIndex:0];
+    
+    XCTAssertTrue((_controller.currentPlaylistItem == newItem), @"newItem not the current playback item");
 }
 
 - (void)testPlaylistPlayback

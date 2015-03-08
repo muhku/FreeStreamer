@@ -520,6 +520,31 @@
     [_streams addObject:proxy];
 }
 
+- (void)replaceItemAtIndex:(NSUInteger)index withItem:(FSPlaylistItem *)item
+{
+    NSUInteger count = [self countOfItems];
+    
+    if (count == 0) {
+        return;
+    }
+    
+    if (index >= count) {
+        return;
+    }
+    
+    if (self.currentPlaylistItemIndex == index) {
+        // If the item is currently playing, do not allow the replacement
+        return;
+    }
+    
+    [self.playlistItems replaceObjectAtIndex:index withObject:item];
+    
+    FSAudioStreamProxy *proxy = [[FSAudioStreamProxy alloc] initWithAudioController:self];
+    proxy.url = item.url;
+    
+    [_streams replaceObjectAtIndex:index withObject:proxy];
+}
+
 - (void)removeItemAtIndex:(NSUInteger)index
 {
     NSUInteger count = [self countOfItems];

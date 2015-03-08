@@ -112,6 +112,14 @@
 - (void)addItem:(FSPlaylistItem *)item;
 
 /**
+ * Replaces a playlist item.
+ *
+ * @param index The index of the playlist item to be replaced.
+ * @param item The playlist item used the replace the existing one.
+ */
+- (void)replaceItemAtIndex:(NSUInteger)index withItem:(FSPlaylistItem *)item;
+
+/**
  * Removes a playlist item.
  *
  * @param index The index of the playlist item to be removed.
