@@ -34,6 +34,7 @@
     FSAudioController *_controller;
     FSSeekByteOffset _lastSeekByteOffset;
     NSURL *_lastPlaybackURL;
+    FSStreamConfiguration *_configuration;
     
     float _maxPrebufferedByteCount;
 }
@@ -102,6 +103,10 @@
  * Reference to the prebuffer status.
  */
 @property (nonatomic,strong) IBOutlet UIView *prebufferStatus;
+/**
+ * Reference to the stream configuration.
+ */
+@property (nonatomic,strong) FSStreamConfiguration *configuration;
 /**
  * Handles the notification upon entering background.
  *

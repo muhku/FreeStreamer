@@ -30,7 +30,7 @@
                 <autoresizingMask key="autoresizingMask"/>
             </navigationBar>
             <viewControllers>
-                <viewController id="gtm-Fd-MXs" customClass="FSPlaylistViewController">
+                <viewController title="Playlist" id="gtm-Fd-MXs" customClass="FSPlaylistViewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="UV3-sf-xfv"/>
                         <viewControllerLayoutGuide type="bottom" id="kEg-kH-rx1"/>
@@ -42,11 +42,14 @@
                             <segmentedControl opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="giw-fG-Xpz">
                                 <rect key="frame" x="0.0" y="72" width="320" height="29"/>
                                 <segments>
-                                    <segment title="Buffer"/>
+                                    <segment title="Prebuffer"/>
                                     <segment title="0 KB"/>
                                     <segment title="100 KB"/>
                                     <segment title="200 KB"/>
                                 </segments>
+                                <connections>
+                                    <action selector="selectBufferSize:" destination="gtm-Fd-MXs" eventType="valueChanged" id="LxE-Vx-2xb"/>
+                                </connections>
                             </segmentedControl>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" alwaysBounceVertical="YES" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="Tsn-Xc-gDH">
                                 <rect key="frame" x="0.0" y="120" width="320" height="448"/>
@@ -59,7 +62,13 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     </view>
-                    <navigationItem key="navigationItem" title="Item" id="3Fs-W8-6Li"/>
+                    <navigationItem key="navigationItem" title="Playlist" id="3Fs-W8-6Li">
+                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="9Ec-kA-ROh">
+                            <connections>
+                                <action selector="addPlaylistItem:" destination="gtm-Fd-MXs" id="acF-A4-bfZ"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                     <connections>
                         <outlet property="navigationController" destination="7" id="2e8-GM-lhx"/>
                         <outlet property="playerViewController" destination="17" id="hIz-4K-Uuq"/>
@@ -178,9 +187,9 @@
                     </view>
                     <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="572">
                         <rect key="frame" x="18" y="310" width="284" height="31"/>
-                        <color key="minimumTrackTintColor" cocoaTouchSystemColor="darkTextColor"/>
-                        <color key="maximumTrackTintColor" cocoaTouchSystemColor="darkTextColor"/>
-                        <color key="thumbTintColor" cocoaTouchSystemColor="darkTextColor"/>
+                        <color key="minimumTrackTintColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                        <color key="maximumTrackTintColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                        <color key="thumbTintColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                         <connections>
                             <action selector="changeVolume:" destination="17" eventType="valueChanged" id="591"/>
                         </connections>

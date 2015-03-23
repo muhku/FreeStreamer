@@ -10,6 +10,7 @@
 
 @class FSPlayerViewController;
 @class FSParseRssPodcastFeedRequest;
+@class FSStreamConfiguration;
 
 /**
  * The playlist view controller of the iOS example application.
@@ -19,6 +20,7 @@
  */
 @interface FSPlaylistViewController : UIViewController<UITableViewDataSource,UITableViewDelegate,UIAlertViewDelegate> {
     FSParseRssPodcastFeedRequest *_request;
+    FSStreamConfiguration *_configuration;
 }
 
 /**
@@ -41,6 +43,10 @@
  * Reference to a table view.
  */
 @property (nonatomic,strong) IBOutlet UITableView *tableView;
+/**
+ * Reference to the buffer size control.
+ */
+@property (nonatomic,strong) IBOutlet UISegmentedControl *bufferSizeControl;
 
 /**
  * An IBAction to add a new playlist item.
@@ -48,5 +54,12 @@
  * @param sender The sender of the action.
  */
 - (IBAction)addPlaylistItem:(id)sender;
+
+/**
+ * An IBAction to select the buffer size.
+ *
+ * @param sender The sender of the action.
+ */
+- (IBAction)selectBufferSize:(id)sender;
 
 @end

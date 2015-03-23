@@ -96,7 +96,7 @@
     [self.audioController setVolume:_outputVolume];
     self.volumeSlider.value = _outputVolume;
     
-    _maxPrebufferedByteCount = (float)self.audioController.activeStream.configuration.maxPrebufferedByteCount;
+    _maxPrebufferedByteCount = (float)_configuration.maxPrebufferedByteCount;
     
     __weak FSPlayerViewController *weakSelf = self;
     
@@ -566,6 +566,20 @@
         _audioController.delegate = self;
     }
     return _audioController;
+}
+
+- (void)setConfiguration:(FSStreamConfiguration *)configuration
+{
+    _configuration = configuration;
+    
+    _audioController = nil;
+    
+    self.audioController.configuration = _configuration;
+}
+
+- (FSStreamConfiguration *)configuration
+{
+    return _configuration;
 }
 
 /*

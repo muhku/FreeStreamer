@@ -57,6 +57,8 @@
 {
     [super viewDidLoad];
     
+    _configuration = [[FSStreamConfiguration alloc] init];
+    
     self.userPlaylistItems = [[NSMutableArray alloc] init];
     
     __weak FSPlaylistViewController *weakSelf = self;
@@ -116,6 +118,35 @@
                            cancelButtonTitle:@"Cancel" otherButtonTitles:@"Ok", nil];
     alert.alertViewStyle = UIAlertViewStylePlainTextInput;
     [alert show];
+}
+
+- (IBAction)selectBufferSize:(id)sender
+{
+    UISegmentedControl *segmentedControl = sender;
+    
+    _configuration = [[FSStreamConfiguration alloc] init];
+    
+    switch ([segmentedControl selectedSegmentIndex]) {
+        case 1:
+            // 0 KB
+            _configuration.requiredInitialPrebufferedByteCountForContinuousStream = 0;
+            _configuration.requiredInitialPrebufferedByteCountForNonContinuousStream = 0;
+            break;
+        case 2:
+            // 100 KB
+            _configuration.requiredInitialPrebufferedByteCountForContinuousStream = 100000;
+            _configuration.requiredInitialPrebufferedByteCountForNonContinuousStream = 100000;
+            break;
+        case 3:
+            // 200 KB
+            _configuration.requiredInitialPrebufferedByteCountForContinuousStream = 200000;
+            _configuration.requiredInitialPrebufferedByteCountForNonContinuousStream = 200000;
+            break;
+            
+        default:
+            // Use defaults
+            break;
+    }
 }
 
 /*
@@ -182,7 +213,8 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
 	FSPlaylistItem *item = [self playlistItems][indexPath.row];
-    
+
+    self.playerViewController.configuration = _configuration;
     self.playerViewController.selectedPlaylistItem = item;
     self.playerViewController.shouldStartPlaying = YES;
     
