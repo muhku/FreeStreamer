@@ -149,6 +149,26 @@ static NSInteger sortCacheObjects(id co1, id co2, void *keyForSorting)
 
 @end
 
+static NSDateFormatter *statisticsDateFormatter = nil;
+
+@implementation FSStreamStatistics
+
+-(NSString *)description
+{
+    if (!statisticsDateFormatter) {
+        statisticsDateFormatter = [[NSDateFormatter alloc] init];
+        [statisticsDateFormatter setDateFormat:@"yyyy-MM-dd hh:mm:ss"];
+    }
+    
+    return [[NSString alloc] initWithFormat:@"%@\t%lu\t%lu\t%lu",
+                [statisticsDateFormatter stringFromDate:self.snapshotTime],
+                (unsigned long)self.audioStreamPacketCount,
+                (unsigned long)self.audioQueueUsedBufferCount,
+                (unsigned long)self.audioQueuePCMPacketQueueCount];
+}
+
+@end
+
 NSString *freeStreamerReleaseVersion()
 {
     NSString *version = [NSString stringWithFormat:@"%i.%i.%i",
@@ -213,6 +233,7 @@ public:
 @property (nonatomic,assign) BOOL internetConnectionAvailable;
 @property (nonatomic,assign) NSUInteger maxRetryCount;
 @property (nonatomic,assign) NSUInteger retryCount;
+@property (readonly) FSStreamStatistics *statistics;
 @property (readonly) size_t prebufferedByteCount;
 @property (readonly) FSSeekByteOffset currentSeekByteOffset;
 @property (readonly) float bitRate;
@@ -534,6 +555,18 @@ public:
     }
     NSURL *copyOfURL = [outputFile copy];
     _audioStream->setOutputFile((__bridge CFURLRef)copyOfURL);
+}
+
+- (FSStreamStatistics *)statistics
+{
+    FSStreamStatistics *stats = [[FSStreamStatistics alloc] init];
+    
+    stats.snapshotTime                  = [[NSDate alloc] init];
+    stats.audioStreamPacketCount        = _audioStream->playbackDataCount();
+    stats.audioQueueUsedBufferCount     = _audioStream->audioQueueNumberOfBuffersInUse();
+    stats.audioQueuePCMPacketQueueCount = _audioStream->audioQueuePacketCount();
+    
+    return stats;
 }
 
 - (size_t)prebufferedByteCount
@@ -1258,6 +1291,11 @@ public:
     NSAssert([NSThread isMainThread], @"FSAudioStream.retryCount needs to be called in the main thread");
     
     return _private.retryCount;
+}
+
+- (FSStreamStatistics *)statistics
+{
+    return _private.statistics;
 }
 
 - (FSStreamPosition)currentTimePlayed

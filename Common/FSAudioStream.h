@@ -194,6 +194,31 @@ typedef struct {
 
 @end
 
+/**
+ * Statistics on the stream state.
+ */
+@interface FSStreamStatistics : NSObject {
+}
+
+/**
+ * Time when the statistics were gathered.
+ */
+@property (nonatomic,strong) NSDate *snapshotTime;
+/**
+ * Audio stream packet count.
+ */
+@property (nonatomic,assign) NSUInteger audioStreamPacketCount;
+/**
+ * Audio queue used buffers count.
+ */
+@property (nonatomic,assign) NSUInteger audioQueueUsedBufferCount;
+/**
+ * Audio stream PCM packet queue count.
+ */
+@property (nonatomic,assign) NSUInteger audioQueuePCMPacketQueueCount;
+
+@end
+
 NSString*             freeStreamerReleaseVersion();
 
 /**
@@ -391,6 +416,10 @@ NSString*             freeStreamerReleaseVersion();
  * in case of failure.
  */
 @property (nonatomic,readonly) NSUInteger retryCount;
+/**
+ * This property holds the current statistics for the stream state.
+ */
+@property (nonatomic,readonly) FSStreamStatistics *statistics;
 /**
  * Called upon completion of the stream. Note that for continuous
  * streams this is never called.

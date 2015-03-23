@@ -1229,6 +1229,24 @@ int Audio_Stream::playbackDataCount()
     return count;
 }
     
+int Audio_Stream::audioQueueNumberOfBuffersInUse()
+{
+    int count = 0;
+    if (m_audioQueue) {
+        count = audioQueue()->numberOfBuffersInUse();
+    }
+    return count;
+}
+    
+int Audio_Stream::audioQueuePacketCount()
+{
+    int count = 0;
+    if (m_audioQueue) {
+        count = audioQueue()->packetCount();
+    }
+    return count;
+}
+    
 void Audio_Stream::enqueueCachedData(int minPacketsRequired)
 {
     if (!m_queueCanAcceptPackets) {

@@ -100,6 +100,9 @@ public:
     float bitrate();
     
     UInt64 contentLength();
+    int playbackDataCount();
+    int audioQueueNumberOfBuffersInUse();
+    int audioQueuePacketCount();
     
     /* Audio_Queue_Delegate */
     void audioQueueStateChanged(Audio_Queue::State state);
@@ -193,7 +196,6 @@ private:
     void setCookiesForStream(AudioFileStreamID inAudioFileStream);
     
     int cachedDataCount();
-    int playbackDataCount();
     void enqueueCachedData(int minPacketsRequired);
     void cleanupCachedData();
     

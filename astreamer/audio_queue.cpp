@@ -205,6 +205,29 @@ AudioTimeStamp Audio_Queue::currentTime()
     
     return queueTime;
 }
+    
+int Audio_Queue::numberOfBuffersInUse()
+{
+    Stream_Configuration *config = Stream_Configuration::configuration();
+    int count = 0;
+    for (size_t i=0; i < config->bufferCount; i++) {
+        if (m_bufferInUse[i]) {
+            count++;
+        }
+    }
+    return count;
+}
+    
+int Audio_Queue::packetCount()
+{
+    int count = 0;
+    queued_packet_t *cur = m_queuedHead;
+    while (cur) {
+        cur = cur->next;
+        count++;
+    }
+    return count;
+}
 
 void Audio_Queue::init()
 {

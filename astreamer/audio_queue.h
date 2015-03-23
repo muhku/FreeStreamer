@@ -50,6 +50,8 @@ public:
     void setPlayRate(float playRate);
     
     AudioTimeStamp currentTime();
+    int numberOfBuffersInUse();
+    int packetCount();
 	
 private:
     Audio_Queue(const Audio_Queue&);
