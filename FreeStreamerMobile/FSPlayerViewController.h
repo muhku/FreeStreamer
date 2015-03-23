@@ -88,6 +88,10 @@
  */
 @property (nonatomic,strong) IBOutlet UILabel *currentPlaybackTime;
 /**
+ * Reference to the label displaying the current playback time.
+ */
+@property (nonatomic,strong) IBOutlet UILabel *snapshotLabel;
+/**
  * Reference to the audio controller.
  */
 @property (nonatomic,strong) FSAudioController *audioController;

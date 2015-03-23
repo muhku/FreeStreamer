@@ -22,6 +22,11 @@
  */
 //#define PAUSE_AFTER_SEEKING 1
 
+/*
+ * To keep statistics, uncomment the following line
+ */
+//#define DO_STATKEEPING 1
+
 @interface FSPlayerViewController ()
 
 @property (nonatomic,assign) BOOL paused;
@@ -33,6 +38,7 @@
 @property (nonatomic,assign) SEL postRampAction;
 @property (nonatomic,strong) NSTimer *playbackSeekTimer;
 @property (nonatomic,strong) NSTimer *volumeRampTimer;
+@property (nonatomic,strong) NSTimer *statisticsSnapshotTimer;
 @property (nonatomic,assign) double seekToPoint;
 @property (nonatomic,copy) NSURL *stationURL;
 @property (nonatomic,strong) UIBarButtonItem *infoButton;
@@ -46,6 +52,7 @@
 - (void)determineStationNameWithMetaData:(NSDictionary *)metaData;
 - (void)doSeeking;
 - (void)finalizeSeeking;
+- (void)snapshotStats;
 
 @end
 
@@ -116,6 +123,8 @@
                 break;
                 
             case kFsAudioStreamStopped:
+                [weakSelf.statisticsSnapshotTimer invalidate];
+                
                 [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
                 
                 weakSelf.statusLabel.text = @"";
@@ -151,6 +160,14 @@
                 break;
                 
             case kFsAudioStreamPlaying:
+#if DO_STATKEEPING
+                weakSelf.statisticsSnapshotTimer = [NSTimer scheduledTimerWithTimeInterval:1
+                                                                                target:weakSelf
+                                                                              selector:@selector(snapshotStats)
+                                                                              userInfo:nil
+                                                                               repeats:YES];
+#endif
+                
                 [weakSelf determineStationNameWithMetaData:nil];
                 
                 [weakSelf clearStatus];
@@ -197,6 +214,8 @@
                 break;
                 
             case kFsAudioStreamFailed:
+                [weakSelf.statisticsSnapshotTimer invalidate];
+                
                 [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
                 weakSelf.progressSlider.enabled = NO;
                 weakSelf.playButton.hidden = NO;
@@ -756,6 +775,21 @@
 - (void)finalizeSeeking
 {
     _volumeBeforeRamping = 0;
+}
+
+- (void)snapshotStats
+{
+    FSStreamStatistics *stat = self.audioController.activeStream.statistics;
+    
+    if (stat.audioStreamPacketCount < 50) {
+        self.snapshotLabel.textColor = [UIColor redColor];
+    } else if (stat.audioStreamPacketCount < 100) {
+        self.snapshotLabel.textColor = [UIColor yellowColor];
+    } else {
+        self.snapshotLabel.textColor = [UIColor greenColor];
+    }
+    
+    self.snapshotLabel.text = [stat description];
 }
 
 @end

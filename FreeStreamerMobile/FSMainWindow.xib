@@ -3,6 +3,7 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6736"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="UIApplication">
@@ -210,8 +211,17 @@
                         </connections>
                     </button>
                     <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" progressViewStyle="bar" progress="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="526">
-                        <rect key="frame" x="0.0" y="250" width="320" height="3"/>
+                        <rect key="frame" x="0.0" y="250" width="320" height="2.5"/>
                     </progressView>
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nVL-92-4nI">
+                        <rect key="frame" x="8" y="189" width="292" height="38"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="38" id="Dfq-wD-pOH"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="boldSystem" pointSize="19"/>
+                        <color key="textColor" red="0.99717881944444442" green="0.98617448250167705" blue="0.41994490982344185" alpha="1" colorSpace="calibratedRGB"/>
+                        <nil key="highlightedColor"/>
+                    </label>
                 </subviews>
                 <color key="backgroundColor" red="0.87438434099999995" green="0.87438434099999995" blue="0.87438434099999995" alpha="0.59999999999999998" colorSpace="calibratedRGB"/>
                 <constraints>
@@ -252,8 +262,11 @@
                     <constraint firstItem="28" firstAttribute="leading" secondItem="3Dl-E5-tXf" secondAttribute="trailing" constant="50" id="Hzr-Xn-r1X"/>
                     <constraint firstItem="w85-te-F6p" firstAttribute="leading" secondItem="28" secondAttribute="trailing" constant="50" id="PoY-yP-EAA"/>
                     <constraint firstItem="3Dl-E5-tXf" firstAttribute="width" secondItem="28" secondAttribute="width" id="ayT-Aw-WSZ"/>
+                    <constraint firstItem="nVL-92-4nI" firstAttribute="top" secondItem="592" secondAttribute="bottom" constant="4" id="edl-tp-azV"/>
                     <constraint firstItem="3Dl-E5-tXf" firstAttribute="height" secondItem="28" secondAttribute="height" id="o8H-Z6-rZP"/>
                     <constraint firstItem="w85-te-F6p" firstAttribute="top" secondItem="28" secondAttribute="top" id="pJU-Vd-Ngv"/>
+                    <constraint firstItem="nVL-92-4nI" firstAttribute="trailing" secondItem="572" secondAttribute="trailing" id="twt-Ci-Khd"/>
+                    <constraint firstItem="nVL-92-4nI" firstAttribute="leading" secondItem="23" secondAttribute="leadingMargin" constant="-8" id="uOj-7C-SfO"/>
                     <constraint firstItem="w85-te-F6p" firstAttribute="width" secondItem="28" secondAttribute="width" id="xBO-hf-5x1"/>
                 </constraints>
             </view>
@@ -279,6 +292,7 @@
                 <outlet property="prebufferStatus" destination="MEj-tS-Sp2" id="ggL-qT-eGg"/>
                 <outlet property="previousButton" destination="3Dl-E5-tXf" id="ZlX-W0-2U9"/>
                 <outlet property="progressSlider" destination="48" id="49"/>
+                <outlet property="snapshotLabel" destination="nVL-92-4nI" id="KAA-ae-ShN"/>
                 <outlet property="statusLabel" destination="26" id="30"/>
                 <outlet property="volumeSlider" destination="572" id="585"/>
             </connections>
