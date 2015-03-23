@@ -153,15 +153,19 @@ static NSDateFormatter *statisticsDateFormatter = nil;
 
 @implementation FSStreamStatistics
 
--(NSString *)description
+- (NSString *)snapshotTimeFormatted
 {
     if (!statisticsDateFormatter) {
         statisticsDateFormatter = [[NSDateFormatter alloc] init];
-        [statisticsDateFormatter setDateFormat:@"yyyy-MM-dd hh:mm:ss"];
+        [statisticsDateFormatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
     }
-    
+    return [statisticsDateFormatter stringFromDate:self.snapshotTime];
+}
+
+- (NSString *)description
+{
     return [[NSString alloc] initWithFormat:@"%@\t%lu\t%lu\t%lu",
-                [statisticsDateFormatter stringFromDate:self.snapshotTime],
+                self.snapshotTimeFormatted,
                 (unsigned long)self.audioStreamPacketCount,
                 (unsigned long)self.audioQueueUsedBufferCount,
                 (unsigned long)self.audioQueuePCMPacketQueueCount];

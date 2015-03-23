@@ -205,6 +205,10 @@ typedef struct {
  */
 @property (nonatomic,strong) NSDate *snapshotTime;
 /**
+ * Time in a pretty format.
+ */
+@property (nonatomic,readonly) NSString *snapshotTimeFormatted;
+/**
  * Audio stream packet count.
  */
 @property (nonatomic,assign) NSUInteger audioStreamPacketCount;
