@@ -39,8 +39,8 @@
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <segmentedControl opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="giw-fG-Xpz">
-                                <rect key="frame" x="0.0" y="72" width="320" height="29"/>
+                            <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="q8y-aA-nly">
+                                <rect key="frame" x="0.0" y="540" width="320" height="29"/>
                                 <segments>
                                     <segment title="Prebuffer"/>
                                     <segment title="0 KB"/>
@@ -48,19 +48,28 @@
                                     <segment title="200 KB"/>
                                 </segments>
                                 <connections>
-                                    <action selector="selectBufferSize:" destination="gtm-Fd-MXs" eventType="valueChanged" id="LxE-Vx-2xb"/>
+                                    <action selector="selectBufferSize:" destination="gtm-Fd-MXs" eventType="valueChanged" id="400-VP-UwH"/>
                                 </connections>
                             </segmentedControl>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" alwaysBounceVertical="YES" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="Tsn-Xc-gDH">
-                                <rect key="frame" x="0.0" y="120" width="320" height="448"/>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="FsJ-KS-FxN">
+                                <rect key="frame" x="0.0" y="64" width="320" height="473"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <connections>
-                                    <outlet property="dataSource" destination="gtm-Fd-MXs" id="6fL-LS-0wS"/>
-                                    <outlet property="delegate" destination="gtm-Fd-MXs" id="e4K-Mc-UR6"/>
+                                    <outlet property="dataSource" destination="gtm-Fd-MXs" id="kpO-Ih-Ygb"/>
+                                    <outlet property="delegate" destination="gtm-Fd-MXs" id="o8x-5N-nNI"/>
                                 </connections>
                             </tableView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="q8y-aA-nly" firstAttribute="bottom" secondItem="kEg-kH-rx1" secondAttribute="top" id="5cN-xq-PK9"/>
+                            <constraint firstItem="FsJ-KS-FxN" firstAttribute="leading" secondItem="4vn-yb-2gX" secondAttribute="leading" id="Bjw-qM-QyS"/>
+                            <constraint firstItem="FsJ-KS-FxN" firstAttribute="top" secondItem="UV3-sf-xfv" secondAttribute="bottom" id="J1e-o2-EgP"/>
+                            <constraint firstItem="q8y-aA-nly" firstAttribute="top" secondItem="FsJ-KS-FxN" secondAttribute="bottom" constant="3" id="PIq-ze-AYQ"/>
+                            <constraint firstItem="q8y-aA-nly" firstAttribute="leading" secondItem="FsJ-KS-FxN" secondAttribute="leading" id="WmO-M9-yjh"/>
+                            <constraint firstItem="q8y-aA-nly" firstAttribute="trailing" secondItem="FsJ-KS-FxN" secondAttribute="trailing" id="gjp-F2-5e8"/>
+                            <constraint firstAttribute="trailing" secondItem="FsJ-KS-FxN" secondAttribute="trailing" id="p9h-hh-SwP"/>
+                        </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Playlist" id="3Fs-W8-6Li">
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="9Ec-kA-ROh">
@@ -72,7 +81,7 @@
                     <connections>
                         <outlet property="navigationController" destination="7" id="2e8-GM-lhx"/>
                         <outlet property="playerViewController" destination="17" id="hIz-4K-Uuq"/>
-                        <outlet property="tableView" destination="Tsn-Xc-gDH" id="co0-qL-k01"/>
+                        <outlet property="tableView" destination="FsJ-KS-FxN" id="bPt-Dn-x2e"/>
                     </connections>
                 </viewController>
             </viewControllers>
