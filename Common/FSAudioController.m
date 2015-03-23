@@ -95,6 +95,17 @@
         
         __weak FSAudioStreamProxy *weakSelf = self;
         
+        static const char *const hum[] = { "Kb", "Mb", "Gb"};
+        static const UInt64 byte[] = {1024, 1048576, 1073741824};
+        _audioStream.onUpdateReceivedSize = ^(UInt64 receivedBufferSize) {
+            for (int x = 2; x>=0; x--){
+                if (receivedBufferSize>=byte[x])
+                {
+                    NSLog(@"onUpdateReceivedSize %0.2f %s", (float)receivedBufferSize/byte[x], hum[x]);
+                    break;
+                }
+            }
+        };
         _audioStream.onCompletion = ^() {
             if (weakSelf.audioController.enableDebugOutput) {
                 NSLog(@"[FSAudioController.m:%i] onCompletion(): %@", __LINE__, weakSelf.url);

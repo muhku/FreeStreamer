@@ -409,6 +409,10 @@ NSString*             freeStreamerReleaseVersion();
  */
 @property (copy) void (^onFailure)(FSAudioStreamError error, NSString *errorDescription);
 /**
+ *  Called upon update receviced buffer size.
+ */
+@property (copy) void (^onUpdateReceivedSize)(UInt64 receivedSize);
+/**
  * The property has the low-level stream configuration.
  */
 @property (readonly) FSStreamConfiguration *configuration;

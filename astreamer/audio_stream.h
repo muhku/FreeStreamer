@@ -64,6 +64,7 @@ public:
     void open(Input_Stream_Position *position);
     void close(bool closeParser);
     void pause();
+    void closeForNetworkDisconnectAndBufferEmpty();
     
     void startCachedDataPlayback();
     
@@ -213,6 +214,8 @@ public:
     virtual void audioStreamErrorOccurred(int errorCode, CFStringRef errorDescription) = 0;
     virtual void audioStreamMetaDataAvailable(std::map<CFStringRef,CFStringRef> metaData) = 0;
     virtual void samplesAvailable(AudioBufferList samples, AudioStreamPacketDescription description) = 0;
+    virtual void audioStreamReceivedSize(UInt64 receivedSize) = 0;
+    virtual void audioStreamBufferEmpty() = 0;
 };    
 
 } // namespace astreamer

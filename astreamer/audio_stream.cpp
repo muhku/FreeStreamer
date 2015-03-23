@@ -301,6 +301,10 @@ void Audio_Stream::close(bool closeParser)
     AS_TRACE("%s: leave\n", __PRETTY_FUNCTION__);
 }
     
+void Audio_Stream::closeForNetworkDisconnectAndBufferEmpty()
+{
+    closeAndSignalError(AS_ERR_NETWORK, CFSTR("Network disconnect once and buffer empty"));
+}
 void Audio_Stream::pause()
 {
     audioQueue()->pause();
@@ -765,6 +769,11 @@ void Audio_Stream::audioQueueBuffersEmpty()
                 
                 AS_TRACE("%i seconds passed from last buffering, increasing bounce count to %zu, interval %i\n", diff, m_bounceCount, config->bounceInterval);
             }
+            
+        }
+        if (m_delegate)
+        {
+            m_delegate->audioStreamBufferEmpty();                       
         }
         
         // Check if we have reached the bounce state
@@ -911,6 +920,13 @@ void Audio_Stream::streamHasBytesAvailable(UInt8 *data, UInt32 numBytes)
     }
     
     m_bytesReceived += numBytes;
+    /*!
+     *  here to nofiy received size
+     */
+    if (m_delegate) {
+        m_delegate->audioStreamReceivedSize(m_bytesReceived);
+    }
+    
     
     if (m_fileOutput) {
         m_fileOutput->write(data, numBytes);
