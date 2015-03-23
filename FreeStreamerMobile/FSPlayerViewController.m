@@ -126,8 +126,11 @@
                 weakSelf.paused = NO;
                 break;
                 
-            case kFsAudioStreamBuffering:
-                [weakSelf showStatus:@"Buffering..."];
+            case kFsAudioStreamBuffering: {
+                NSString *bufferingStatus = [[NSString alloc] initWithFormat:@"Buffering %i bytes...", (weakSelf.audioController.activeStream.continuous ? weakSelf.configuration.requiredInitialPrebufferedByteCountForContinuousStream :
+                    weakSelf.configuration.requiredInitialPrebufferedByteCountForNonContinuousStream)];
+                
+                [weakSelf showStatus:bufferingStatus];
                 
                 [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
                 weakSelf.progressSlider.enabled = NO;
@@ -135,6 +138,7 @@
                 weakSelf.pauseButton.hidden = NO;
                 weakSelf.paused = NO;
                 break;
+            }
                 
             case kFsAudioStreamSeeking:
                 [weakSelf showStatus:@"Seeking..."];
