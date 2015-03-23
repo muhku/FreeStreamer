@@ -200,6 +200,10 @@
  * by default
  */
 @property (nonatomic,assign) BOOL enableDebugOutput;
+/**
+ * This property holds the configuration used for the streaming.
+ */
+@property (nonatomic,strong) FSStreamConfiguration *configuration;
 
 /**
  * Called upon a state change.

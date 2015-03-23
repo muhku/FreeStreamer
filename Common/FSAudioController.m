@@ -87,7 +87,11 @@
 - (FSAudioStream *)audioStream
 {
     if (!_audioStream) {
-        _audioStream = [[FSAudioStream alloc] init];
+        if (self.audioController.configuration) {
+            _audioStream = [[FSAudioStream alloc] initWithConfiguration:self.audioController.configuration];
+        } else {
+            _audioStream = [[FSAudioStream alloc] init];
+        }
         
         if (self.audioController.needToSetVolume) {
             _audioStream.volume = self.audioController.outputVolume;
@@ -165,6 +169,7 @@
         _streams = [[NSMutableArray alloc] init];
         self.preloadNextPlaylistItemAutomatically = YES;
         self.enableDebugOutput = NO;
+        self.configuration = [[FSStreamConfiguration alloc] init];
         
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(audioStreamStateDidChange:)
