@@ -8,10 +8,10 @@
 
 #import <UIKit/UIKit.h>
 
-#import "FSAudioStream.h"
+#import "FSAudioController.h"
 
+@class FSAudioStream;
 @class FSPlaylistItem;
-@class FSAudioController;
 @class FSFrequencyDomainAnalyzer;
 @class FSFrequencyPlotView;
 
@@ -21,30 +21,15 @@
  * The view allows the user to control the player. See the
  * play:, pause: and seek: actions.
  */
-@interface FSPlayerViewController : UIViewController <FSPCMAudioStreamDelegate> {
+@interface FSPlayerViewController : UIViewController <FSAudioControllerDelegate> {
     FSPlaylistItem *_selectedPlaylistItem;
     
     // State
-    BOOL _paused;
     BOOL _shouldStartPlaying;
     float _outputVolume;
     BOOL _analyzerEnabled;
     
-    // UI
-    NSTimer *_progressUpdateTimer;
-    NSTimer *_playbackSeekTimer;
-    NSTimer *_volumeRampTimer;
-    double _seekToPoint;
-    float _volumeBeforeRamping;
-    int _rampStep;
-    int _rampStepCount;
-    bool _rampUp;
-    SEL _postRampAction;
-    
     FSFrequencyDomainAnalyzer *_analyzer;
-    
-    NSURL *_stationURL;
-    UIBarButtonItem *_infoButton;
     
     FSAudioController *_controller;
     FSSeekByteOffset _lastSeekByteOffset;

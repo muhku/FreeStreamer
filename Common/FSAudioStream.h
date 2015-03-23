@@ -16,12 +16,12 @@
 /**
  * The minor version of the current release.
  */
-#define FREESTREAMER_VERSION_MINOR          11
+#define FREESTREAMER_VERSION_MINOR          12
 
 /**
  * The reversion of the current release
  */
-#define FREESTREAMER_VERSION_REVISION       1
+#define FREESTREAMER_VERSION_REVISION       5
 
 /**
  * Follow this notification for the audio stream state changes.
@@ -53,9 +53,9 @@ typedef enum {
     kFsAudioStreamSeeking,
     kFSAudioStreamEndOfFile,
     kFsAudioStreamFailed,
-    kFsAudioStreamStartRetry,
-    kFsAudioStreamRetrySuccess,
-    kFsAudioStreamAllRetryFailed,
+    kFsAudioStreamRetryingStarted,
+    kFsAudioStreamRetryingSucceeded,
+    kFsAudioStreamRetryingFailed,
     kFsAudioStreamPlaybackCompleted,
     kFsAudioStreamUnknownState
 } FSAudioStreamState;
@@ -296,11 +296,6 @@ NSString*             freeStreamerReleaseVersion();
 - (void)setPlayRate:(float)playRate;
 
 /**
- * For clean retry count
- * @param restartCount The retry count.
- */
-- (void)setRetryCount:(int)retryCount;
-/**
  * Returns the playback status: YES if the stream is playing, NO otherwise.
  */
 - (BOOL)isPlaying;
@@ -309,11 +304,6 @@ NSString*             freeStreamerReleaseVersion();
  * Cleans all cached data from the persistent storage.
  */
 - (void)expungeCache;
-
-/**
- * Get current retry count.
- */
-- (NSUInteger)retryCount;
 
 /**
  * The stream URL.
@@ -396,6 +386,11 @@ NSString*             freeStreamerReleaseVersion();
  * The current size of the disk cache.
  */
 @property (nonatomic,readonly) unsigned long long totalCachedObjectsSize;
+/**
+ * The property determines the amount of times the stream has tried to retry the playback
+ * in case of failure.
+ */
+@property (nonatomic,readonly) NSUInteger retryCount;
 /**
  * Called upon completion of the stream. Note that for continuous
  * streams this is never called.

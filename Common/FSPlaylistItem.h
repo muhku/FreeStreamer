@@ -21,14 +21,10 @@
 /**
  * The URL of the playlist item.
  */
-@property (nonatomic,copy) NSString *url;
+@property (nonatomic,copy) NSURL *url;
 /**
  * The originating URL of the playlist item.
  */
-@property (nonatomic,copy) NSString *originatingUrl;
-/**
- * The NSURL of the playlist item.
- */
-@property (weak, readonly) NSURL *nsURL;
+@property (nonatomic,copy) NSURL *originatingUrl;
 
 @end

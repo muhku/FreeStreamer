@@ -10,28 +10,6 @@
 
 @implementation FSPlaylistItem
 
-- (NSURL *)nsURL
-{
-    if ([self.originatingUrl hasPrefix:@"file://"]) {
-        // Resolve the local bundle URL
-        NSString *path = [self.originatingUrl substringFromIndex:7];
-        
-        NSRange range = [path rangeOfString:@"." options:NSBackwardsSearch];
-        
-        NSString *fileName = [path substringWithRange:NSMakeRange(0, range.location)];
-        NSString *suffix = [path substringWithRange:NSMakeRange(range.location + 1, [path length] - [fileName length] - 1)];
-        
-        return [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:fileName ofType:suffix]];
-    }
-    if (self.url) {
-        return [NSURL URLWithString:self.url];
-    }
-    if (self.originatingUrl) {
-        return [NSURL URLWithString:self.originatingUrl];
-    }
-    return nil;
-}
-
 - (BOOL)isEqual:(id)anObject
 {
     FSPlaylistItem *otherObject = anObject;

@@ -92,7 +92,7 @@ static NSInteger sortCacheObjects(id co1, id co2, void *keyForSorting)
         self.userAgent = [NSString stringWithFormat:@"FreeStreamer/%@ (%@)", freeStreamerReleaseVersion(), systemVersion];
         self.cacheEnabled = YES;
         self.seekingFromCacheEnabled = YES;
-        self.maxDiskCacheSize = 100000000;
+        self.maxDiskCacheSize = 256000000; // 256 MB
         self.requiredInitialPrebufferedByteCountForContinuousStream = 100000;
         self.requiredInitialPrebufferedByteCountForNonContinuousStream = 50000;
         
@@ -212,7 +212,7 @@ public:
 @property (nonatomic,assign) BOOL wasContinuousStream;
 @property (nonatomic,assign) BOOL internetConnectionAvailable;
 @property (nonatomic,assign) NSUInteger maxRetryCount;
-@property (nonatomic,assign) NSUInteger restartCount;
+@property (nonatomic,assign) NSUInteger retryCount;
 @property (readonly) size_t prebufferedByteCount;
 @property (readonly) FSSeekByteOffset currentSeekByteOffset;
 @property (readonly) float bitRate;
@@ -240,6 +240,9 @@ public:
 - (void)notifyPlaybackFailed;
 - (void)notifyPlaybackCompletion;
 - (void)notifyPlaybackUnknownState;
+- (void)notifyRetryingStarted;
+- (void)notifyRetryingSucceeded;
+- (void)notifyRetryingFailed;
 - (void)notifyStateChange:(FSAudioStreamState)streamerState;
 
 - (void)attemptRestart;
@@ -263,6 +266,8 @@ public:
 
 -(id)init
 {
+    NSAssert([NSThread isMainThread], @"FSAudioStreamPrivate.init needs to be called in the main thread");
+    
     if (self = [super init]) {
         _url = nil;
         
@@ -277,6 +282,8 @@ public:
         _reachability = nil;
         
         _delegate = nil;
+        
+        _maxRetryCount = 3;
         
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(reachabilityChanged:)
@@ -299,13 +306,14 @@ public:
                                                      name:AVAudioSessionInterruptionNotification
                                                    object:nil];
 #endif
-        _maxRetryCount = 3;
     }
     return self;
 }
 
 - (void)dealloc
 {
+    NSAssert([NSThread isMainThread], @"FSAudioStreamPrivate.dealloc needs to be called in the main thread");
+    
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     
     [self stop];
@@ -621,6 +629,8 @@ public:
 
 - (void)reachabilityChanged:(NSNotification *)note
 {
+    NSAssert([NSThread isMainThread], @"FSAudioStreamPrivate.reachabilityChanged needs to be called in the main thread");
+    
     Reachability *reach = [note object];
     NetworkStatus netStatus = [reach currentReachabilityStatus];
     self.internetConnectionAvailable = (netStatus == ReachableViaWiFi || netStatus == ReachableViaWWAN);
@@ -645,6 +655,8 @@ public:
 
 - (void)interruptionOccurred:(NSNotification *)notification
 {
+    NSAssert([NSThread isMainThread], @"FSAudioStreamPrivate.interruptionOccurred needs to be called in the main thread");
+    
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 60000)
     NSNumber *interruptionType = [[notification userInfo] valueForKey:AVAudioSessionInterruptionTypeKey];
     if ([interruptionType intValue] == AVAudioSessionInterruptionTypeBegan) {
@@ -726,10 +738,14 @@ public:
         fsAudioStreamPrivateActiveSessions[[NSNumber numberWithUnsignedLong:(unsigned long)self]] = @"";
     }
 #endif
-    if (self.restartCount > 0){
-        [self notifyStateChange:kFsAudioStreamRetrySuccess];
+    if (self.retryCount > 0) {
+        [NSTimer scheduledTimerWithTimeInterval:0.1
+                                         target:self
+                                       selector:@selector(notifyRetryingSucceeded)
+                                       userInfo:nil
+                                        repeats:NO];
     }
-    self.restartCount = 0;
+    self.retryCount = 0;
     [self notifyStateChange:kFsAudioStreamPlaying];
 }
 
@@ -777,6 +793,21 @@ public:
     [self notifyStateChange:kFsAudioStreamUnknownState];
 }
 
+- (void)notifyRetryingStarted
+{
+    [self notifyStateChange:kFsAudioStreamRetryingStarted];
+}
+
+- (void)notifyRetryingSucceeded
+{
+    [self notifyStateChange:kFsAudioStreamRetryingSucceeded];
+}
+
+- (void)notifyRetryingFailed
+{
+    [self notifyStateChange:kFsAudioStreamRetryingFailed];
+}
+
 - (void)notifyStateChange:(FSAudioStreamState)streamerState
 {
     if (self.onStateChange) {
@@ -785,7 +816,7 @@ public:
     
     NSDictionary *userInfo = @{FSAudioStreamNotificationKey_State: [NSNumber numberWithInt:streamerState],
                                FSAudioStreamNotificationKey_Stream: [NSValue valueWithPointer:_audioStream]};
-    NSNotification *notification = [NSNotification notificationWithName:FSAudioStreamStateChangeNotification object:nil userInfo:userInfo];
+    NSNotification *notification = [NSNotification notificationWithName:FSAudioStreamStateChangeNotification object:self.stream userInfo:userInfo];
     
     [[NSNotificationCenter defaultCenter] postNotification:notification];
 }
@@ -806,11 +837,15 @@ public:
         return;
     }
     
-    if (self.restartCount >= self.maxRetryCount) {
+    if (self.retryCount >= self.maxRetryCount) {
 #if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
-        NSLog(@"FSAudioStream: Restart count %lu. Giving up.", (unsigned long)_restartCount);
+        NSLog(@"FSAudioStream: Retry count %lu. Giving up.", (unsigned long)self.retryCount);
 #endif
-        [self notifyStateChange:kFsAudioStreamAllRetryFailed];
+        [NSTimer scheduledTimerWithTimeInterval:0.1
+                                         target:self
+                                       selector:@selector(notifyRetryingFailed)
+                                       userInfo:nil
+                                        repeats:NO];
         return;
     }
     
@@ -818,14 +853,19 @@ public:
     NSLog(@"FSAudioStream: Attempting restart.");
 #endif
     
-    [self notifyStateChange:kFsAudioStreamStartRetry];
+    [NSTimer scheduledTimerWithTimeInterval:0.1
+                                     target:self
+                                   selector:@selector(notifyRetryingStarted)
+                                   userInfo:nil
+                                    repeats:NO];
+    
     [NSTimer scheduledTimerWithTimeInterval:1
                                      target:self
                                    selector:@selector(play)
                                    userInfo:nil
                                     repeats:NO];
     
-    self.restartCount++;
+    self.retryCount++;
 }
 
 - (void)expungeCache
@@ -971,6 +1011,8 @@ public:
 
 -(id)init
 {
+    NSAssert([NSThread isMainThread], @"FSAudioStream.init needs to be called in the main thread");
+    
     FSStreamConfiguration *defaultConfiguration = [[FSStreamConfiguration alloc] init];
     
     if (self = [self initWithConfiguration:defaultConfiguration]) {
@@ -980,6 +1022,8 @@ public:
 
 - (id)initWithUrl:(NSURL *)url
 {
+    NSAssert([NSThread isMainThread], @"FSAudioStream.initWithURL needs to be called in the main thread");
+    
     if (self = [self init]) {
         _private.url = url;
     }
@@ -988,6 +1032,8 @@ public:
 
 - (id)initWithConfiguration:(FSStreamConfiguration *)configuration
 {
+    NSAssert([NSThread isMainThread], @"FSAudioStream.initWithConfiguration needs to be called in the main thread");
+    
     if (self = [super init]) {
         astreamer::Stream_Configuration *c = astreamer::Stream_Configuration::configuration();
         
@@ -1039,6 +1085,8 @@ public:
 
 - (void)dealloc
 {
+    NSAssert([NSThread isMainThread], @"FSAudioStream.dealloc needs to be called in the main thread");
+    
     AudioStreamStateObserver *observer = [_private streamStateObserver];
     
     // Break the cyclic loop so that dealloc() may be called
@@ -1052,91 +1100,127 @@ public:
 
 - (void)setUrl:(NSURL *)url
 {
+    NSAssert([NSThread isMainThread], @"FSAudioStream.setUrl needs to be called in the main thread");
+    
     [_private setUrl:url];
 }
 
 - (NSURL*)url
 {
+    NSAssert([NSThread isMainThread], @"FSAudioStream.url needs to be called in the main thread");
+    
     return [_private url];
 }
 
 - (void)setStrictContentTypeChecking:(BOOL)strictContentTypeChecking
 {
+    NSAssert([NSThread isMainThread], @"FSAudioStream.setStrictContentTypeChecking needs to be called in the main thread");
+    
     [_private setStrictContentTypeChecking:strictContentTypeChecking];
 }
 
 - (BOOL)strictContentTypeChecking
 {
+    NSAssert([NSThread isMainThread], @"FSAudioStream.strictContentTypeChecking needs to be called in the main thread");
+    
     return [_private strictContentTypeChecking];
 }
 
 - (NSURL*)outputFile
 {
+    NSAssert([NSThread isMainThread], @"FSAudioStream.outputFile needs to be called in the main thread");
+    
     return [_private outputFile];
 }
 
 - (void)setOutputFile:(NSURL *)outputFile
 {
+    NSAssert([NSThread isMainThread], @"FSAudioStream.setOutputFile needs to be called in the main thread");
+    
     [_private setOutputFile:outputFile];
 }
 
 - (void)setDefaultContentType:(NSString *)defaultContentType
 {
+    NSAssert([NSThread isMainThread], @"FSAudioStream.setDefaultContentType needs to be called in the main thread");
+    
     [_private setDefaultContentType:defaultContentType];
 }
 
 - (NSString*)defaultContentType
 {
+    NSAssert([NSThread isMainThread], @"FSAudioStream.defaultContentType needs to be called in the main thread");
+    
     return [_private defaultContentType];
 }
 
 - (NSString*)contentType
 {
+    NSAssert([NSThread isMainThread], @"FSAudioStream.contentType needs to be called in the main thread");
+    
     return [_private contentType];
 }
 
 - (NSString*)suggestedFileExtension
 {
+    NSAssert([NSThread isMainThread], @"FSAudioStream.suggestedFileExtension needs to be called in the main thread");
+    
     return [_private suggestedFileExtension];
 }
 
 - (UInt64)contentLength
 {
+    NSAssert([NSThread isMainThread], @"FSAudioStream.contentLength needs to be called in the main thread");
+    
     return [_private contentLength];
 }
 
 - (void)preload
 {
+    NSAssert([NSThread isMainThread], @"FSAudioStream.preload needs to be called in the main thread");
+    
     [_private preload];
 }
 
 - (void)play
 {
+    NSAssert([NSThread isMainThread], @"FSAudioStream.play needs to be called in the main thread");
+    
     [_private play];   
 }
 
 - (void)playFromURL:(NSURL*)url
 {
+    NSAssert([NSThread isMainThread], @"FSAudioStream.playFromURL needs to be called in the main thread");
+    
     [_private playFromURL:url];
 }
 
 - (void)playFromOffset:(FSSeekByteOffset)offset
 {
+    NSAssert([NSThread isMainThread], @"FSAudioStream.playFromOffset needs to be called in the main thread");
+    
     [_private playFromOffset:offset];
 }
 
 - (void)stop
 {
+    NSAssert([NSThread isMainThread], @"FSAudioStream.stop needs to be called in the main thread");
+    
     [_private stop];
 }
 
 - (void)pause
 {
+    NSAssert([NSThread isMainThread], @"FSAudioStream.pause needs to be called in the main thread");
+    
     [_private pause];
 }
 
 - (void)seekToPosition:(FSStreamPosition)position
 {
+    NSAssert([NSThread isMainThread], @"FSAudioStream.seekToPosition needs to be called in the main thread");
+    
     if (!(position.position > 0)) {
         // To retain compatibility with older implementations,
         // fallback to using less accurate position.minute and position.second, if needed
@@ -1150,28 +1234,36 @@ public:
 
 - (void)setPlayRate:(float)playRate
 {
+    NSAssert([NSThread isMainThread], @"FSAudioStream.setPlayRate needs to be called in the main thread");
+    
     [_private setPlayRate:playRate];
-}
-- (void)setRetryCount:(int)retryCount{
-    _private.restartCount = retryCount;
 }
 
 - (BOOL)isPlaying
 {
+    NSAssert([NSThread isMainThread], @"FSAudioStream.isPlaying needs to be called in the main thread");
+    
     return [_private isPlaying];
 }
 
 - (void)expungeCache
 {
+    NSAssert([NSThread isMainThread], @"FSAudioStream.expungeCache needs to be called in the main thread");
+    
     [_private expungeCache];
 }
-- (NSUInteger)retryCount{
-    return _private.restartCount;
-}
 
+- (NSUInteger)retryCount
+{
+    NSAssert([NSThread isMainThread], @"FSAudioStream.retryCount needs to be called in the main thread");
+    
+    return _private.retryCount;
+}
 
 - (FSStreamPosition)currentTimePlayed
 {
+    NSAssert([NSThread isMainThread], @"FSAudioStream.currentTimePlayed needs to be called in the main thread");
+    
     FSStreamPosition pos;
     pos.position = 0;
     pos.playbackTimeInSeconds = [_private playbackPosition].timePlayed;
@@ -1201,6 +1293,8 @@ public:
 
 - (FSStreamPosition)duration
 {
+    NSAssert([NSThread isMainThread], @"FSAudioStream.duration needs to be called in the main thread");
+    
     FSStreamPosition pos;
     pos.minute = 0;
     pos.second = 0;
@@ -1225,101 +1319,141 @@ public:
 
 - (FSSeekByteOffset)currentSeekByteOffset
 {
+    NSAssert([NSThread isMainThread], @"FSAudioStream.currentSeekByteOffset needs to be called in the main thread");
+    
     return _private.currentSeekByteOffset;
 }
 
 - (float)bitRate
 {
+    NSAssert([NSThread isMainThread], @"FSAudioStream.bitRate needs to be called in the main thread");
+    
     return _private.bitRate;
 }
 
 - (BOOL)continuous
 {
+    NSAssert([NSThread isMainThread], @"FSAudioStream.continuous needs to be called in the main thread");
+    
     return !([_private durationInSeconds] > 0);
 }
 
 - (BOOL)cached
 {
+    NSAssert([NSThread isMainThread], @"FSAudioStream.cached needs to be called in the main thread");
+    
     return _private.cached;
 }
 
 - (size_t)prebufferedByteCount
 {
+    NSAssert([NSThread isMainThread], @"FSAudioStream.prebufferedByteCount needs to be called in the main thread");
+    
     return _private.prebufferedByteCount;
 }
 
 - (float)volume
 {
+    NSAssert([NSThread isMainThread], @"FSAudioStream.volume needs to be called in the main thread");
+    
     return [_private currentVolume];
 }
 
 - (unsigned long long)totalCachedObjectsSize
 {
+    NSAssert([NSThread isMainThread], @"FSAudioStream.totalCachedObjectsSize needs to be called in the main thread");
+    
     return [_private totalCachedObjectsSize];
 }
 
 - (void)setVolume:(float)volume
 {
+    NSAssert([NSThread isMainThread], @"FSAudioStream.setVolume needs to be called in the main thread");
+    
     [_private setVolume:volume];
 }
 
 - (void (^)())onCompletion
 {
+    NSAssert([NSThread isMainThread], @"FSAudioStream.onCompletion needs to be called in the main thread");
+    
     return _private.onCompletion;
 }
 
 - (void)setOnCompletion:(void (^)())onCompletion
 {
+    NSAssert([NSThread isMainThread], @"FSAudioStream.setOnCompletion needs to be called in the main thread");
+    
     _private.onCompletion = onCompletion;
 }
 
 - (void (^)(FSAudioStreamState state))onStateChange
 {
+    NSAssert([NSThread isMainThread], @"FSAudioStream.onStateChange needs to be called in the main thread");
+    
     return _private.onStateChange;
 }
 
 - (void (^)(NSDictionary *metaData))onMetaDataAvailable
 {
+    NSAssert([NSThread isMainThread], @"FSAudioStream.onMetaDataAvailable needs to be called in the main thread");
+    
     return _private.onMetaDataAvailable;
 }
 
 - (void (^)(FSAudioStreamError error, NSString *errorDescription))onFailure
 {
+    NSAssert([NSThread isMainThread], @"FSAudioStream.onFailure needs to be called in the main thread");
+    
     return _private.onFailure;
 }
 
 - (void)setOnStateChange:(void (^)(FSAudioStreamState))onStateChange
 {
+    NSAssert([NSThread isMainThread], @"FSAudioStream.setOnStateChange needs to be called in the main thread");
+    
     _private.onStateChange = onStateChange;
 }
 
 - (void)setOnMetaDataAvailable:(void (^)(NSDictionary *))onMetaDataAvailable
 {
+    NSAssert([NSThread isMainThread], @"FSAudioStream.setOnMetaDataAvailable needs to be called in the main thread");
+    
     _private.onMetaDataAvailable = onMetaDataAvailable;
 }
 
 - (void)setOnFailure:(void (^)(FSAudioStreamError error, NSString *errorDescription))onFailure
 {
+    NSAssert([NSThread isMainThread], @"FSAudioStream.setOnFailure needs to be called in the main thread");
+    
     _private.onFailure = onFailure;
 }
 
 - (FSStreamConfiguration *)configuration
 {
+    NSAssert([NSThread isMainThread], @"FSAudioStream.configuration needs to be called in the main thread");
+    
     return _private.configuration;
 }
 
 - (void)setDelegate:(id<FSPCMAudioStreamDelegate>)delegate
 {
+    NSAssert([NSThread isMainThread], @"FSAudioStream.setDelegate needs to be called in the main thread");
+    
     _private.delegate = delegate;
 }
 
 - (id<FSPCMAudioStreamDelegate>)delegate
 {
+    NSAssert([NSThread isMainThread], @"FSAudioStream.delegate needs to be called in the main thread");
+    
     return _private.delegate;
 }
 
 -(NSString *)description
 {
+    NSAssert([NSThread isMainThread], @"FSAudioStream.description needs to be called in the main thread");
+    
     return [_private description];
 }
 
@@ -1395,7 +1529,7 @@ void AudioStreamStateObserver::audioStreamErrorOccurred(int errorCode, CFStringR
     NSDictionary *userInfo = @{FSAudioStreamNotificationKey_Error: @(errorCode),
                             FSAudioStreamNotificationKey_ErrorDescription: errorForObjC,
                               FSAudioStreamNotificationKey_Stream: [NSValue valueWithPointer:source]};
-    NSNotification *notification = [NSNotification notificationWithName:FSAudioStreamErrorNotification object:nil userInfo:userInfo];
+    NSNotification *notification = [NSNotification notificationWithName:FSAudioStreamErrorNotification object:priv.stream userInfo:userInfo];
     
     [[NSNotificationCenter defaultCenter] postNotification:notification];
     
@@ -1466,7 +1600,7 @@ void AudioStreamStateObserver::audioStreamMetaDataAvailable(std::map<CFStringRef
     
     NSDictionary *userInfo = @{FSAudioStreamNotificationKey_MetaData: metaDataDictionary,
                               FSAudioStreamNotificationKey_Stream: [NSValue valueWithPointer:source]};
-    NSNotification *notification = [NSNotification notificationWithName:FSAudioStreamMetaDataNotification object:nil userInfo:userInfo];
+    NSNotification *notification = [NSNotification notificationWithName:FSAudioStreamMetaDataNotification object:priv.stream userInfo:userInfo];
     
     [[NSNotificationCenter defaultCenter] postNotification:notification];
 }

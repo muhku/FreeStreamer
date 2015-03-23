@@ -13,6 +13,7 @@
 - (void)parsePlaylistFromData:(NSData *)data;
 - (void)parsePlaylistM3U:(NSString *)playlist;
 - (void)parsePlaylistPLS:(NSString *)playlist;
+- (NSURL *)parseLocalFileUrl:(NSString *)fileUrl;
 
 @property (readonly) FSPlaylistFormat format;
 
@@ -130,7 +131,12 @@
         if ([line hasPrefix:@"http://"] ||
             [line hasPrefix:@"https://"]) {
             FSPlaylistItem *item = [[FSPlaylistItem alloc] init];
-            item.url = [line stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+            item.url = [NSURL URLWithString:[line stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]];
+            
+            [_playlistItems addObject:item];
+        } else if ([line hasPrefix:@"file://"]) {
+            FSPlaylistItem *item = [[FSPlaylistItem alloc] init];
+            item.url = [self parseLocalFileUrl:line];
             
             [_playlistItems addObject:item];
         }
@@ -197,12 +203,28 @@
         
         if ([file hasPrefix:@"http://"] ||
             [file hasPrefix:@"https://"]) {
+            item.url = [NSURL URLWithString:file];
             
-            item.url = file;
+            [_playlistItems addObject:item];
+        } else if ([file hasPrefix:@"file://"]) {
+            item.url = [self parseLocalFileUrl:file];
             
             [_playlistItems addObject:item];
         }
     }
+}
+
+- (NSURL *)parseLocalFileUrl:(NSString *)fileUrl
+{
+    // Resolve the local bundle URL
+    NSString *path = [fileUrl substringFromIndex:7];
+    
+    NSRange range = [path rangeOfString:@"." options:NSBackwardsSearch];
+    
+    NSString *fileName = [path substringWithRange:NSMakeRange(0, range.location)];
+    NSString *suffix = [path substringWithRange:NSMakeRange(range.location + 1, [path length] - [fileName length] - 1)];
+    
+    return [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:fileName ofType:suffix]];
 }
 
 /*

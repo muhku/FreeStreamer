@@ -10,6 +10,7 @@
 #import "FSAudioStream.h"
 #import "FSAudioController.h"
 #import "FSParsePlaylistRequest.h"
+#import "FSPlaylistItem.h"
 
 @interface FreeStreamerMobileTests : XCTestCase {
 }
@@ -55,6 +56,116 @@
                                                   object:nil];
     
     [super tearDown];
+}
+
+- (void)testPlaylistItemAddAndRemoval
+{
+    FSPlaylistItem *item1 = [[FSPlaylistItem alloc] init];
+    item1.url = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"test-2sec" ofType:@"mp3"]];
+    
+    FSPlaylistItem *item2 = [[FSPlaylistItem alloc] init];
+    item2.url = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"test-2sec" ofType:@"mp3"]];
+    
+    FSPlaylistItem *item3 = [[FSPlaylistItem alloc] init];
+    item3.url = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"test-2sec" ofType:@"mp3"]];
+    
+    FSPlaylistItem *item4 = [[FSPlaylistItem alloc] init];
+    item4.url = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"test-2sec" ofType:@"mp3"]];
+    
+    FSPlaylistItem *item5 = [[FSPlaylistItem alloc] init];
+    item5.url = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"test-2sec" ofType:@"mp3"]];
+    
+    [_controller addItem:item1];
+    
+    XCTAssertTrue(([_controller countOfItems] == 1), @"Invalid count of playlist items");
+    
+    [_controller addItem:item2];
+    
+    XCTAssertTrue(([_controller countOfItems] == 2), @"Invalid count of playlist items");
+    
+    [_controller addItem:item3];
+    
+    XCTAssertTrue(([_controller countOfItems] == 3), @"Invalid count of playlist items");
+    
+    [_controller addItem:item4];
+    
+    XCTAssertTrue(([_controller countOfItems] == 4), @"Invalid count of playlist items");
+    
+    [_controller addItem:item5];
+    
+    XCTAssertTrue(([_controller countOfItems] == 5), @"Invalid count of playlist items");
+    
+    [_controller playItemAtIndex:3]; // start playing item 4
+    
+    [_controller removeItemAtIndex:2]; // item 3 removed
+    
+    XCTAssertTrue(([_controller countOfItems] == 4), @"Invalid count of playlist items");
+    
+    XCTAssertTrue((_controller.currentPlaylistItem == item4), @"Item 4 not the current playback item");
+    
+    [_controller removeItemAtIndex:0]; // item 1 removed
+    
+    XCTAssertTrue((_controller.currentPlaylistItem == item4), @"Item 4 not the current playback item");
+    
+    XCTAssertTrue(([_controller countOfItems] == 3), @"Invalid count of playlist items");
+    
+    [_controller removeItemAtIndex:2]; // item 5 removed
+    
+    XCTAssertTrue((_controller.currentPlaylistItem == item4), @"Item 4 not the current playback item");
+    
+    XCTAssertTrue(([_controller countOfItems] == 2), @"Invalid count of playlist items");
+    
+    FSPlaylistItem *newItem = [[FSPlaylistItem alloc] init];
+    newItem.url = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"test-2sec" ofType:@"mp3"]];
+    
+    [_controller replaceItemAtIndex:0 withItem:newItem];
+    
+    XCTAssertTrue(([_controller countOfItems] == 2), @"Invalid count of playlist items");
+    
+    [_controller playItemAtIndex:0];
+    
+    XCTAssertTrue((_controller.currentPlaylistItem == newItem), @"newItem not the current playback item");
+}
+
+- (void)testPlaylistPlayback
+{
+    __weak FreeStreamerMobileTests *weakSelf = self;
+    
+    _controller.onStateChange = ^(FSAudioStreamState state) {
+        NSLog(@"FSAudioStreamStateChangeNotification received!");
+        
+        if (state == kFsAudioStreamPlaying) {
+            weakSelf.checkStreamState = YES;
+        }
+    };
+    
+    FSPlaylistItem *item1 = [[FSPlaylistItem alloc] init];
+    item1.url = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"test-2sec" ofType:@"mp3"]];
+    
+    NSMutableArray *playlistItems = [[NSMutableArray alloc] init];
+    [playlistItems addObject:item1];
+    
+    [_controller playFromPlaylist:playlistItems];
+    
+    XCTAssertTrue(([_controller countOfItems] == 1), @"Invalid count of playlist items");
+    
+    NSTimeInterval timeout = 15.0;
+    NSTimeInterval idle = 0.1;
+    BOOL timedOut = NO;
+    
+    NSDate *timeoutDate = [[NSDate alloc] initWithTimeIntervalSinceNow:timeout];
+    while (!timedOut && _keepRunning) {
+        NSDate *tick = [[NSDate alloc] initWithTimeIntervalSinceNow:idle];
+        [[NSRunLoop currentRunLoop] runUntilDate:tick];
+        timedOut = ([tick compare:timeoutDate] == NSOrderedDescending);
+        
+        if (_checkStreamState) {
+            // Stream started playing.
+            
+            return;
+        }
+    }
+    XCTAssertFalse(timedOut, @"Timed out - the stream did not start playing");
 }
 
 - (void)testCacheDirectorySize
@@ -184,11 +295,13 @@ playback_short_file:
 
 - (void)testSomaGrooveSaladPlays
 {
-    _controller.stream.onStateChange = ^(FSAudioStreamState state) {
+    __weak FreeStreamerMobileTests *weakSelf = self;
+    
+    _controller.onStateChange = ^(FSAudioStreamState state) {
         NSLog(@"FSAudioStreamStateChangeNotification received!");
         
         if (state == kFsAudioStreamPlaying) {
-            _checkStreamState = YES;
+            weakSelf.checkStreamState = YES;
         }
     };
     
@@ -210,14 +323,14 @@ playback_short_file:
             
             XCTAssertTrue((_controller.volume == 0), @"Invalid controller volume");
             
-            XCTAssertTrue((_controller.stream.volume == 0), @"Invalid stream volume");
+            XCTAssertTrue((_controller.activeStream.volume == 0), @"Invalid stream volume");
             
-            XCTAssertTrue(([_controller.stream.contentType isEqualToString:@"audio/mpeg"]), @"Invalid content type");
-            XCTAssertTrue(([_controller.stream.suggestedFileExtension isEqualToString:@"mp3"]), @"Invalid file extension");
+            XCTAssertTrue(([_controller.activeStream.contentType isEqualToString:@"audio/mpeg"]), @"Invalid content type");
+            XCTAssertTrue(([_controller.activeStream.suggestedFileExtension isEqualToString:@"mp3"]), @"Invalid file extension");
             
-            XCTAssertTrue((_controller.stream.prebufferedByteCount > 0), @"No cached bytes");
+            XCTAssertTrue((_controller.activeStream.prebufferedByteCount > 0), @"No cached bytes");
             
-            XCTAssertTrue(((unsigned)_controller.stream.bitRate == 56000), @"Invalid bit rate");
+            XCTAssertTrue(((unsigned)_controller.activeStream.bitRate == 56000), @"Invalid bit rate");
             
             XCTAssertTrue((_stream.totalCachedObjectsSize == 0), @"System has cached objects");
             
@@ -468,11 +581,11 @@ playback_short_file:
         
         if (_checkStreamState) {
             // Stream started playing.
-            XCTAssertTrue(([_controller.stream.contentType isEqualToString:@"audio/mpeg"]), @"Invalid content type");
-            XCTAssertTrue(([_controller.stream.suggestedFileExtension isEqualToString:@"mp3"]), @"Invalid file extension");
+            XCTAssertTrue(([_controller.activeStream.contentType isEqualToString:@"audio/mpeg"]), @"Invalid content type");
+            XCTAssertTrue(([_controller.activeStream.suggestedFileExtension isEqualToString:@"mp3"]), @"Invalid file extension");
             
-            XCTAssertTrue((_controller.stream.duration.minute == 0), @"Invalid stream duration (minutes)");
-            XCTAssertTrue((_controller.stream.duration.second == 31), @"Invalid stream duration (seconds)");
+            XCTAssertTrue((_controller.activeStream.duration.minute == 0), @"Invalid stream duration (minutes)");
+            XCTAssertTrue((_controller.activeStream.duration.second == 31), @"Invalid stream duration (seconds)");
             
             return;
         }
@@ -511,12 +624,12 @@ playback_short_file:
         
         if (_checkStreamState) {
             // Stream started playing.
-            XCTAssertTrue(([_controller.stream.contentType isEqualToString:@"audio/mpeg"]), @"Invalid content type");
-            XCTAssertTrue(([_controller.stream.suggestedFileExtension isEqualToString:@"mp3"]), @"Invalid file extension");
-            XCTAssertTrue((_controller.stream.contentLength == 33285), @"Invalid content length");
+            XCTAssertTrue(([_controller.activeStream.contentType isEqualToString:@"audio/mpeg"]), @"Invalid content type");
+            XCTAssertTrue(([_controller.activeStream.suggestedFileExtension isEqualToString:@"mp3"]), @"Invalid file extension");
+            XCTAssertTrue((_controller.activeStream.contentLength == 33285), @"Invalid content length");
             
-            XCTAssertTrue((_controller.stream.duration.minute == 0), @"Invalid stream duration (minutes)");
-            XCTAssertTrue((_controller.stream.duration.second == 2), @"Invalid stream duration (seconds)");
+            XCTAssertTrue((_controller.activeStream.duration.minute == 0), @"Invalid stream duration (minutes)");
+            XCTAssertTrue((_controller.activeStream.duration.second == 2), @"Invalid stream duration (seconds)");
             
             return;
         }
@@ -553,16 +666,16 @@ playback_short_file:
                                                       
                                                       NSString *stationName = metaData[@"IcecastStationName"];
                                                       
-                                                      XCTAssertTrue([stationName isEqualToString:@"BBC 5Live"], @"Station name does not match.");
+                                                      XCTAssertTrue([stationName isEqualToString:@"bbc_radio_five_live"], @"Station name does not match.");
                                                   }];
     
-    _controller.stream.onMetaDataAvailable = ^(NSDictionary *metaData) {
+    _controller.activeStream.onMetaDataAvailable = ^(NSDictionary *metaData) {
         NSString *stationName = metaData[@"IcecastStationName"];
         
         XCTAssertTrue([stationName isEqualToString:@"BBC 5Live"], @"Station name does not match.");
     };
     
-    _controller.url = [NSURL URLWithString:@"http://www.bbc.co.uk/radio/listen/live/r5l_aaclca.pls"];
+    _controller.url = [NSURL URLWithString:@"http://www.radiofeeds.co.uk/bbc5live.pls"];
     [_controller play];
     
     NSTimeInterval timeout = 15.0;
