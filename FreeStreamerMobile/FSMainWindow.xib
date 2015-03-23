@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6250" systemVersion="14A389" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6751" systemVersion="14C1514" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6244"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6736"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="UIApplication">
@@ -16,6 +16,7 @@
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <point key="canvasLocation" x="357" y="388"/>
         </window>
         <customObject id="37" customClass="FSAppDelegate">
             <connections>
@@ -29,30 +30,44 @@
                 <autoresizingMask key="autoresizingMask"/>
             </navigationBar>
             <viewControllers>
-                <tableViewController id="12" customClass="FSPlaylistViewController">
-                    <tableView key="view" opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="13">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="504"/>
+                <viewController id="gtm-Fd-MXs" customClass="FSPlaylistViewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="UV3-sf-xfv"/>
+                        <viewControllerLayoutGuide type="bottom" id="kEg-kH-rx1"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="4vn-yb-2gX">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <segmentedControl opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="giw-fG-Xpz">
+                                <rect key="frame" x="0.0" y="72" width="320" height="29"/>
+                                <segments>
+                                    <segment title="Buffer"/>
+                                    <segment title="0 KB"/>
+                                    <segment title="100 KB"/>
+                                    <segment title="200 KB"/>
+                                </segments>
+                            </segmentedControl>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" alwaysBounceVertical="YES" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="Tsn-Xc-gDH">
+                                <rect key="frame" x="0.0" y="120" width="320" height="448"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <connections>
+                                    <outlet property="dataSource" destination="gtm-Fd-MXs" id="6fL-LS-0wS"/>
+                                    <outlet property="delegate" destination="gtm-Fd-MXs" id="e4K-Mc-UR6"/>
+                                </connections>
+                            </tableView>
+                        </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                        <connections>
-                            <outlet property="dataSource" destination="12" id="15"/>
-                            <outlet property="delegate" destination="12" id="14"/>
-                        </connections>
-                    </tableView>
-                    <extendedEdge key="edgesForExtendedLayout"/>
-                    <navigationItem key="navigationItem" title="Playlist" id="16">
-                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="468">
-                            <connections>
-                                <action selector="addPlaylistItem:" destination="12" id="469"/>
-                            </connections>
-                        </barButtonItem>
-                    </navigationItem>
+                    </view>
+                    <navigationItem key="navigationItem" title="Item" id="3Fs-W8-6Li"/>
                     <connections>
-                        <outlet property="navigationController" destination="7" id="18"/>
-                        <outlet property="playerViewController" destination="17" id="19"/>
+                        <outlet property="navigationController" destination="7" id="2e8-GM-lhx"/>
+                        <outlet property="playerViewController" destination="17" id="hIz-4K-Uuq"/>
+                        <outlet property="tableView" destination="Tsn-Xc-gDH" id="co0-qL-k01"/>
                     </connections>
-                </tableViewController>
+                </viewController>
             </viewControllers>
+            <point key="canvasLocation" x="75" y="150"/>
         </navigationController>
         <viewController id="17" customClass="FSPlayerViewController">
             <layoutGuides>

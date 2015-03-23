@@ -17,7 +17,7 @@
  * Uses a table view. The table view items are retrieved using the
  * FSParsePlaylistFeedRequest class.
  */
-@interface FSPlaylistViewController : UITableViewController<UITableViewDataSource,UITableViewDelegate,UIAlertViewDelegate> {
+@interface FSPlaylistViewController : UIViewController<UITableViewDataSource,UITableViewDelegate,UIAlertViewDelegate> {
     FSParseRssPodcastFeedRequest *_request;
 }
 
@@ -37,6 +37,10 @@
  * Reference to a player view controller.
  */
 @property (nonatomic,strong) IBOutlet FSPlayerViewController *playerViewController;
+/**
+ * Reference to a table view.
+ */
+@property (nonatomic,strong) IBOutlet UITableView *tableView;
 
 /**
  * An IBAction to add a new playlist item.
