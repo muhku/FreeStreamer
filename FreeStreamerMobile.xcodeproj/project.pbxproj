@@ -16,6 +16,7 @@
 		60412CD518D0B150007A0277 /* player-bg-image-pad.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 60412CCF18D0B150007A0277 /* player-bg-image-pad.jpg */; };
 		60412CD618D0B150007A0277 /* player-bg-image.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 60412CD018D0B150007A0277 /* player-bg-image.jpg */; };
 		60412CD718D0B150007A0277 /* player-top-bg.png in Resources */ = {isa = PBXBuildFile; fileRef = 60412CD118D0B150007A0277 /* player-top-bg.png */; };
+		604A581A1AC1C4FB008F3C95 /* FSLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = 604A58191AC1C4FB008F3C95 /* FSLogger.m */; };
 		6052B2BB19ACA11F00EAA7C8 /* input_stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6052B2B919ACA11F00EAA7C8 /* input_stream.cpp */; };
 		6052B2BE19ACB30200EAA7C8 /* file_stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6052B2BC19ACB30200EAA7C8 /* file_stream.cpp */; };
 		6080FAC61A5CF3F500129D79 /* test-2sec.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 6080FAC51A5CF3F500129D79 /* test-2sec.mp3 */; };
@@ -79,6 +80,8 @@
 		60412CCF18D0B150007A0277 /* player-bg-image-pad.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = "player-bg-image-pad.jpg"; path = "Assets/Images/player-bg-image-pad.jpg"; sourceTree = "<group>"; };
 		60412CD018D0B150007A0277 /* player-bg-image.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = "player-bg-image.jpg"; path = "Assets/Images/player-bg-image.jpg"; sourceTree = "<group>"; };
 		60412CD118D0B150007A0277 /* player-top-bg.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "player-top-bg.png"; path = "Assets/Images/player-top-bg.png"; sourceTree = "<group>"; };
+		604A58181AC1C4FB008F3C95 /* FSLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSLogger.h; sourceTree = "<group>"; };
+		604A58191AC1C4FB008F3C95 /* FSLogger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSLogger.m; sourceTree = "<group>"; };
 		6052B2B919ACA11F00EAA7C8 /* input_stream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = input_stream.cpp; sourceTree = "<group>"; };
 		6052B2BA19ACA11F00EAA7C8 /* input_stream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = input_stream.h; sourceTree = "<group>"; };
 		6052B2BC19ACB30200EAA7C8 /* file_stream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = file_stream.cpp; sourceTree = "<group>"; };
@@ -245,6 +248,8 @@
 				60B813E518C532F8001CC5A7 /* FSAppDelegate.m */,
 				60B813E718C532F8001CC5A7 /* Images.xcassets */,
 				60B813DC18C532F8001CC5A7 /* Supporting Files */,
+				604A58181AC1C4FB008F3C95 /* FSLogger.h */,
+				604A58191AC1C4FB008F3C95 /* FSLogger.m */,
 			);
 			path = FreeStreamerMobile;
 			sourceTree = "<group>";
@@ -479,6 +484,7 @@
 				60CF8BD618C5332F00C657A8 /* audio_stream.cpp in Sources */,
 				60CF8C0118C5337000C657A8 /* FSParseRssPodcastFeedRequest.m in Sources */,
 				60CF8BD518C5332F00C657A8 /* audio_queue.cpp in Sources */,
+				604A581A1AC1C4FB008F3C95 /* FSLogger.m in Sources */,
 				6052B2BE19ACB30200EAA7C8 /* file_stream.cpp in Sources */,
 				60CF8BD718C5332F00C657A8 /* file_output.cpp in Sources */,
 				60CF8BDF18C5333B00C657A8 /* FSFrequencyDomainAnalyzer.m in Sources */,

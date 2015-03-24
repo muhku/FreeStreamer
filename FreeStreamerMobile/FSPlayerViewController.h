@@ -14,6 +14,7 @@
 @class FSPlaylistItem;
 @class FSFrequencyDomainAnalyzer;
 @class FSFrequencyPlotView;
+@class FSLogger;
 
 /**
  * The player view controller of the iOS example application.
@@ -37,6 +38,9 @@
     FSStreamConfiguration *_configuration;
     
     float _maxPrebufferedByteCount;
+    
+    FSLogger *_stateLogger;
+    FSLogger *_bufferStatLogger;
 }
 
 /**

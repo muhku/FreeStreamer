@@ -16,6 +16,7 @@
 #import "FSFrequencyDomainAnalyzer.h"
 #import "FSFrequencyPlotView.h"
 #import "AJNotificationView.h"
+#import "FSLogger.h"
 
 /*
  * To pause after seeking, uncomment the following line:
@@ -42,6 +43,7 @@
 @property (nonatomic,assign) double seekToPoint;
 @property (nonatomic,copy) NSURL *stationURL;
 @property (nonatomic,strong) UIBarButtonItem *infoButton;
+@property (nonatomic,readonly) FSLogger *stateLogger;
 
 - (void)clearStatus;
 - (void)showStatus:(NSString *)status;
@@ -77,6 +79,23 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+    
+#if DO_STATKEEPING
+    _stateLogger = [[FSLogger alloc] init];
+    _bufferStatLogger = [[FSLogger alloc] init];
+    
+    _stateLogger.baseDirectory = @"FreeStreamer";
+    _bufferStatLogger.baseDirectory = @"FreeStreamer";
+    
+    _stateLogger.logName = @"statelog";
+    _bufferStatLogger.logName = @"bufferlog";
+    
+    [_stateLogger logMessageWithTimestamp:[self.audioController.activeStream description]];
+    
+    NSLog(@"FreeStreamer logs will be available in\n%@ and\n%@",
+          _stateLogger.logName,
+          _bufferStatLogger.logName);
+#endif
     
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 70000)
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent
@@ -120,6 +139,9 @@
                 weakSelf.playButton.hidden = YES;
                 weakSelf.pauseButton.hidden = NO;
                 weakSelf.paused = NO;
+                
+                [weakSelf.stateLogger logMessageWithTimestamp:@"State change: retrieving URL"];
+                
                 break;
                 
             case kFsAudioStreamStopped:
@@ -133,6 +155,9 @@
                 weakSelf.playButton.hidden = NO;
                 weakSelf.pauseButton.hidden = YES;
                 weakSelf.paused = NO;
+                
+                [weakSelf.stateLogger logMessageWithTimestamp:@"State change: stopped"];
+                
                 break;
                 
             case kFsAudioStreamBuffering: {
@@ -146,6 +171,9 @@
                 weakSelf.playButton.hidden = YES;
                 weakSelf.pauseButton.hidden = NO;
                 weakSelf.paused = NO;
+                
+                [weakSelf.stateLogger logMessageWithTimestamp:@"State change: buffering"];
+                
                 break;
             }
                 
@@ -157,6 +185,9 @@
                 weakSelf.playButton.hidden = YES;
                 weakSelf.pauseButton.hidden = NO;
                 weakSelf.paused = NO;
+                
+                [weakSelf.stateLogger logMessageWithTimestamp:@"State change: seeking"];
+                
                 break;
                 
             case kFsAudioStreamPlaying:
@@ -211,6 +242,8 @@
                 weakSelf.pauseButton.hidden = NO;
                 weakSelf.paused = NO;
                 
+                [weakSelf.stateLogger logMessageWithTimestamp:@"State change: playing"];
+                
                 break;
                 
             case kFsAudioStreamFailed:
@@ -221,20 +254,35 @@
                 weakSelf.playButton.hidden = NO;
                 weakSelf.pauseButton.hidden = YES;
                 weakSelf.paused = NO;
+                
+                [weakSelf.stateLogger logMessageWithTimestamp:@"State change: failed"];
+                
                 break;
             case kFsAudioStreamPlaybackCompleted:
                 [weakSelf toggleNextPreviousButtons];
+                
+                [weakSelf.stateLogger logMessageWithTimestamp:@"State change: playback completed"];
+                
                 break;
             
             case kFsAudioStreamRetryingStarted:
                 [weakSelf showStatus:@"Attempt to retry playback..."];
+                
+                [weakSelf.stateLogger logMessageWithTimestamp:@"State change: retrying started"];
+                
                 break;
                 
             case kFsAudioStreamRetryingSucceeded:
+                
+                [weakSelf.stateLogger logMessageWithTimestamp:@"State change: retrying succeeded"];
+                
                 break;
                 
             case kFsAudioStreamRetryingFailed:
                 [weakSelf showErrorStatus:@"Failed to retry playback"];
+                
+                [weakSelf.stateLogger logMessageWithTimestamp:@"State change: retrying failed"];
+                
                 break;
 
             default:
@@ -267,6 +315,8 @@
         }
         
         NSString *formattedError = [NSString stringWithFormat:@"%@ %@", errorCategory, errorDescription];
+        
+        [weakSelf.stateLogger logMessageWithTimestamp:[NSString stringWithFormat:@"Audio stream failure: %@", formattedError]];
         
         [weakSelf showErrorStatus:formattedError];
     };
@@ -307,6 +357,8 @@
         
         [weakSelf.statusLabel setHidden:NO];
         weakSelf.statusLabel.text = streamInfo;
+        
+        [weakSelf.stateLogger logMessageWithTimestamp:[NSString stringWithFormat:@"Meta data received: %@", streamInfo]];
     };
 }
 
@@ -398,6 +450,13 @@
 {
     [super viewDidDisappear:animated];
     
+#if DO_STATKEEPING
+    _stateLogger = nil;
+    _bufferStatLogger = nil;
+    
+    [_stateLogger logMessageWithTimestamp:@"Player view will disappear. Freeing up the player."];
+#endif
+    
     // Free the resources (audio queue, etc.)
     _audioController = nil;
     
@@ -424,8 +483,12 @@
             case UIEventSubtypeRemoteControlPlay:  /* FALLTHROUGH */
             case UIEventSubtypeRemoteControlTogglePlayPause:
                 if (self.paused) {
+                    [_stateLogger logMessageWithTimestamp:@"Remote control event: unpausing"];
+                    
                     [self play:self];
                 } else {
+                    [_stateLogger logMessageWithTimestamp:@"Remote control event: pausing"];
+                    
                     [self pause:self];
                 }
                 break;
@@ -439,6 +502,8 @@
 {
     _analyzer.enabled = NO;
     
+    [_stateLogger logMessageWithTimestamp:@"Application entering background"];
+    
     if (self.paused && self.audioController.activeStream.continuous) {
         // Don't leave paused continuous stream on background;
         // Stream will eventually fail and restart
@@ -449,6 +514,8 @@
 - (void)applicationWillEnterForegroundNotification:(NSNotification *)notification
 {
     _analyzer.enabled = _analyzerEnabled;
+    
+    [_stateLogger logMessageWithTimestamp:@"Application entering foreground"];
 }
 
 /*
@@ -485,11 +552,15 @@
     
     self.playButton.hidden = NO;
     self.pauseButton.hidden = YES;
+    
+    [_stateLogger logMessageWithTimestamp:@"Player paused"];
 }
 
 - (IBAction)seek:(id)sender
 {
     _seekToPoint = self.progressSlider.value;
+    
+    [_stateLogger logMessageWithTimestamp:@"Seek requested"];
     
     [_progressUpdateTimer invalidate], _progressUpdateTimer = nil;
     
@@ -603,6 +674,11 @@
 - (FSStreamConfiguration *)configuration
 {
     return _configuration;
+}
+
+- (FSLogger *)stateLogger
+{
+    return _stateLogger;
 }
 
 /*
@@ -789,7 +865,11 @@
         self.snapshotLabel.textColor = [UIColor greenColor];
     }
     
-    self.snapshotLabel.text = [stat description];
+    NSString *statDescription = [stat description];
+    
+    self.snapshotLabel.text = statDescription;
+    
+    [_bufferStatLogger logMessage:statDescription];
 }
 
 @end
