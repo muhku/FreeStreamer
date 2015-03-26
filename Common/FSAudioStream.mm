@@ -203,6 +203,8 @@ public:
     void audioStreamStateChanged(astreamer::Audio_Stream::State state);
     void audioStreamMetaDataAvailable(std::map<CFStringRef,CFStringRef> metaData);
     void samplesAvailable(AudioBufferList samples, AudioStreamPacketDescription description);
+    void audioStreamReceivedSize(UInt64 receivedSize);
+    void audioStreamBufferEmpty();
 };
 
 /*
@@ -248,6 +250,7 @@ public:
 @property (copy) void (^onStateChange)(FSAudioStreamState state);
 @property (copy) void (^onMetaDataAvailable)(NSDictionary *metaData);
 @property (copy) void (^onFailure)(FSAudioStreamError error, NSString *errorDescription);
+@property (copy) void (^onUpdateReceivedSize)(UInt64 receivedSize);
 @property (nonatomic,unsafe_unretained) id<FSPCMAudioStreamDelegate> delegate;
 @property (nonatomic,unsafe_unretained) FSAudioStream *stream;
 
@@ -1450,6 +1453,13 @@ public:
     return _private.onFailure;
 }
 
+- (void (^)(UInt64 receivedSize))onUpdateReceivedSize
+{
+    NSAssert([NSThread isMainThread], @"FSAudioStream.onUpdateReceivedSize needs to be called in the main thread");
+    
+    return _private.onUpdateReceivedSize;
+}
+
 - (void)setOnStateChange:(void (^)(FSAudioStreamState))onStateChange
 {
     NSAssert([NSThread isMainThread], @"FSAudioStream.setOnStateChange needs to be called in the main thread");
@@ -1469,6 +1479,13 @@ public:
     NSAssert([NSThread isMainThread], @"FSAudioStream.setOnFailure needs to be called in the main thread");
     
     _private.onFailure = onFailure;
+}
+
+- (void) setOnUpdateReceivedSize:(void (^)(UInt64 receivedSize))onUpdateReceivedSize
+{
+    NSAssert([NSThread isMainThread], @"FSAudioStream.setOnUpdateReceivedSize needs to be called in the main thread");
+    
+    _private.onUpdateReceivedSize = onUpdateReceivedSize;
 }
 
 - (FSStreamConfiguration *)configuration
@@ -1654,5 +1671,19 @@ void AudioStreamStateObserver::samplesAvailable(AudioBufferList samples, AudioSt
         NSUInteger count = description.mDataByteSize / sizeof(int16_t);
         
         [priv.delegate audioStream:priv.stream samplesAvailable:buffer count:count];
+    }
+}void AudioStreamStateObserver::audioStreamReceivedSize(UInt64 receivedSize){
+    
+    if (priv.onUpdateReceivedSize) {
+        priv.onUpdateReceivedSize(receivedSize);
+    }
+}
+void AudioStreamStateObserver::audioStreamBufferEmpty()
+{
+    if (priv.internetConnectionAvailable && !priv.wasDisconnected ){
+    /*!
+     //network had been disconnect need to reopen a http stream
+     */
+        source->closeForNetworkDisconnectAndBufferEmpty();
     }
 }
