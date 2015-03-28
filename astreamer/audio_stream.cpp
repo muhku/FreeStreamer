@@ -174,10 +174,7 @@ void Audio_Stream::open(Input_Stream_Position *position)
     m_ignoreDecodeQueueSize = false;
     m_audioQueueConsumedPackets = false;
     
-    if (m_watchdogTimer) {
-        CFRunLoopTimerInvalidate(m_watchdogTimer);
-        CFRelease(m_watchdogTimer), m_watchdogTimer = 0;
-    }
+    invalidateWatchdogTimer();
     
     if (m_audioQueueTimer) {
         CFRunLoopTimerInvalidate(m_audioQueueTimer);
@@ -215,25 +212,7 @@ void Audio_Stream::open(Input_Stream_Position *position)
         setState(BUFFERING);
         
         if (!m_preloading && config->startupWatchdogPeriod > 0) {
-            /*
-             * Start the WD if we have one requested. In this way we can track
-             * that the stream doesn't stuck forever on the buffering state
-             * (for instance some network error condition)
-             */
-            
-            CFRunLoopTimerContext ctx = {0, this, NULL, NULL, NULL};
-            
-            m_watchdogTimer = CFRunLoopTimerCreate(NULL,
-                                                   CFAbsoluteTimeGetCurrent() + config->startupWatchdogPeriod,
-                                                   0,
-                                                   0,
-                                                   0,
-                                                   watchdogTimerCallback,
-                                                   &ctx);
-            
-            AS_TRACE("Starting the startup watchdog, period %i seconds\n", config->startupWatchdogPeriod);
-            
-            CFRunLoopAddTimer(CFRunLoopGetCurrent(), m_watchdogTimer, kCFRunLoopCommonModes);
+            createWatchdogTimer();
         }
     } else {
         closeAndSignalError(AS_ERR_OPEN, CFSTR("Input stream open error"));
@@ -244,10 +223,7 @@ void Audio_Stream::close(bool closeParser)
 {
     AS_TRACE("%s: enter\n", __PRETTY_FUNCTION__);
     
-    if (m_watchdogTimer) {
-        CFRunLoopTimerInvalidate(m_watchdogTimer);
-        CFRelease(m_watchdogTimer), m_watchdogTimer = 0;
-    }
+    invalidateWatchdogTimer();
     
     if (m_audioQueueTimer) {
         CFRunLoopTimerInvalidate(m_audioQueueTimer);
@@ -777,6 +753,9 @@ void Audio_Stream::audioQueueBuffersEmpty()
             }
         }
         
+        // Create the watchdog in case the input stream gets stuck
+        createWatchdogTimer();
+        
         return;
     }
     
@@ -1206,6 +1185,47 @@ void Audio_Stream::audioQueueTimerCallback(CFRunLoopTimerRef timer, void *info)
         THIS->enqueueCachedData(config->decodeQueueSize);
     }
 }
+    
+void Audio_Stream::createWatchdogTimer()
+{
+    Stream_Configuration *config = Stream_Configuration::configuration();
+    
+    if (!(config->startupWatchdogPeriod > 0)) {
+        return;
+    }
+    
+    invalidateWatchdogTimer();
+    
+    /*
+     * Start the WD if we have one requested. In this way we can track
+     * that the stream doesn't stuck forever on the buffering state
+     * (for instance some network error condition)
+     */
+    
+    CFRunLoopTimerContext ctx = {0, this, NULL, NULL, NULL};
+    
+    m_watchdogTimer = CFRunLoopTimerCreate(NULL,
+                                           CFAbsoluteTimeGetCurrent() + config->startupWatchdogPeriod,
+                                           0,
+                                           0,
+                                           0,
+                                           watchdogTimerCallback,
+                                           &ctx);
+    
+    AS_TRACE("Starting the startup watchdog, period %i seconds\n", config->startupWatchdogPeriod);
+    
+    CFRunLoopAddTimer(CFRunLoopGetCurrent(), m_watchdogTimer, kCFRunLoopCommonModes);
+}
+    
+void Audio_Stream::invalidateWatchdogTimer()
+{
+    if (m_watchdogTimer) {
+        CFRunLoopTimerInvalidate(m_watchdogTimer);
+        CFRelease(m_watchdogTimer), m_watchdogTimer = 0;
+        
+        AS_TRACE("Watchdog invalidated\n");
+    }
+}
 
 int Audio_Stream::cachedDataCount()
 {
@@ -1353,12 +1373,7 @@ void Audio_Stream::enqueueCachedData(int minPacketsRequired)
         if (err == noErr) {
             AS_TRACE("%i output bytes available for the audio queue\n", (unsigned int)ioOutputDataPackets);
             
-            if (m_watchdogTimer) {
-                AS_TRACE("The stream started to play, canceling the watchdog\n");
-                
-                CFRunLoopTimerInvalidate(m_watchdogTimer);
-                CFRelease(m_watchdogTimer), m_watchdogTimer = 0;
-            }
+            invalidateWatchdogTimer();
             
             setState(PLAYING);
             

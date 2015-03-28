@@ -195,6 +195,9 @@ private:
     void setState(State state);
     void setCookiesForStream(AudioFileStreamID inAudioFileStream);
     
+    void createWatchdogTimer();
+    void invalidateWatchdogTimer();
+    
     int cachedDataCount();
     void enqueueCachedData(int minPacketsRequired);
     void cleanupCachedData();
