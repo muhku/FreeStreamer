@@ -93,8 +93,12 @@ static NSInteger sortCacheObjects(id co1, id co2, void *keyForSorting)
         self.cacheEnabled = YES;
         self.seekingFromCacheEnabled = YES;
         self.maxDiskCacheSize = 256000000; // 256 MB
-        self.requiredInitialPrebufferedByteCountForContinuousStream = 100000;
-        self.requiredInitialPrebufferedByteCountForNonContinuousStream = 50000;
+        self.usePrebufferSizeCalculationInSeconds = YES;
+        self.requiredPrebufferSizeInSeconds = 12;
+        // With dynamic calculation, these are actually the maximum sizes, the dynamic
+        // calculation may lower the sizes based on the stream bitrate
+        self.requiredInitialPrebufferedByteCountForContinuousStream = 200000;
+        self.requiredInitialPrebufferedByteCountForNonContinuousStream = 300000;
         
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
         
@@ -203,6 +207,7 @@ public:
     void audioStreamStateChanged(astreamer::Audio_Stream::State state);
     void audioStreamMetaDataAvailable(std::map<CFStringRef,CFStringRef> metaData);
     void samplesAvailable(AudioBufferList samples, AudioStreamPacketDescription description);
+    void bitrateAvailable();
 };
 
 /*
@@ -285,6 +290,7 @@ public:
 - (void)setPlayRate:(float)playRate;
 - (astreamer::AS_Playback_Position)playbackPosition;
 - (float)durationInSeconds;
+- (void)bitrateAvailable;
 @end
 
 @implementation FSAudioStreamPrivate
@@ -1008,9 +1014,52 @@ public:
     return _audioStream->durationInSeconds();
 }
 
+- (void)bitrateAvailable
+{
+    if (!self.configuration.usePrebufferSizeCalculationInSeconds) {
+        return;
+    }
+    
+    float bitrate = (int)_audioStream->bitrate();
+    
+    if (!(bitrate > 0)) {
+        // No bitrate provided, use the defaults
+        return;
+    }
+    
+    const float bufferSizeForSecond = bitrate / 8.0;
+    
+    int bufferSize = bufferSizeForSecond * self.configuration.requiredPrebufferSizeInSeconds;
+    
+    // Check that we still got somewhat sane buffer size
+    if (bufferSize < 50000) {
+        bufferSize = 50000;
+    }
+    
+    if (!([self durationInSeconds] > 0)) {
+        // continuous
+        if (bufferSize > self.configuration.requiredInitialPrebufferedByteCountForContinuousStream) {
+            bufferSize = self.configuration.requiredInitialPrebufferedByteCountForContinuousStream;
+        }
+    } else {
+        if (bufferSize > self.configuration.requiredInitialPrebufferedByteCountForNonContinuousStream) {
+            bufferSize = self.configuration.requiredInitialPrebufferedByteCountForNonContinuousStream;
+        }
+    }
+    
+    // Update the configuration
+    self.configuration.requiredInitialPrebufferedByteCountForContinuousStream = bufferSize;
+    self.configuration.requiredInitialPrebufferedByteCountForNonContinuousStream = bufferSize;
+
+    astreamer::Stream_Configuration *c = astreamer::Stream_Configuration::configuration();
+    
+    c->requiredInitialPrebufferedByteCountForContinuousStream = bufferSize;
+    c->requiredInitialPrebufferedByteCountForNonContinuousStream = bufferSize;
+}
+
 -(NSString *)description
 {
-    return [NSString stringWithFormat:@"[FreeStreamer %@] URL: %@\nbufferCount: %i\nbufferSize: %i\nmaxPacketDescs: %i\ndecodeQueueSize: %i\nhttpConnectionBufferSize: %i\noutputSampleRate: %f\noutputNumChannels: %ld\nbounceInterval: %i\nmaxBounceCount: %i\nstartupWatchdogPeriod: %i\nmaxPrebufferedByteCount: %i\nformat: %@\nuserAgent: %@\ncacheDirectory: %@\npredefinedHttpHeaderValues: %@\ncacheEnabled: %@\nseekingFromCacheEnabled: %@\nmaxDiskCacheSize: %i\nrequiredInitialPrebufferedByteCountForContinuousStream: %i\nrequiredInitialPrebufferedByteCountForNonContinuousStream: %i",
+    return [NSString stringWithFormat:@"[FreeStreamer %@] URL: %@\nbufferCount: %i\nbufferSize: %i\nmaxPacketDescs: %i\ndecodeQueueSize: %i\nhttpConnectionBufferSize: %i\noutputSampleRate: %f\noutputNumChannels: %ld\nbounceInterval: %i\nmaxBounceCount: %i\nstartupWatchdogPeriod: %i\nmaxPrebufferedByteCount: %i\nformat: %@\nbit rate: %f\nuserAgent: %@\ncacheDirectory: %@\npredefinedHttpHeaderValues: %@\ncacheEnabled: %@\nseekingFromCacheEnabled: %@\nmaxDiskCacheSize: %i\nusePrebufferSizeCalculationInSeconds: %@\nrequiredPrebufferSizeInSeconds: %f\nrequiredInitialPrebufferedByteCountForContinuousStream: %i\nrequiredInitialPrebufferedByteCountForNonContinuousStream: %i",
             freeStreamerReleaseVersion(),
             self.url,
             self.configuration.bufferCount,
@@ -1025,12 +1074,15 @@ public:
             self.configuration.startupWatchdogPeriod,
             self.configuration.maxPrebufferedByteCount,
             self.formatDescription,
+            self.bitRate,
             self.configuration.userAgent,
             self.configuration.cacheDirectory,
             self.configuration.predefinedHttpHeaderValues,
             (self.configuration.cacheEnabled ? @"YES" : @"NO"),
             (self.configuration.seekingFromCacheEnabled ? @"YES" : @"NO"),
             self.configuration.maxDiskCacheSize,
+            (self.configuration.usePrebufferSizeCalculationInSeconds ? @"YES" : @"NO"),
+            self.configuration.requiredPrebufferSizeInSeconds,
             self.configuration.requiredInitialPrebufferedByteCountForContinuousStream,
             self.configuration.requiredInitialPrebufferedByteCountForNonContinuousStream];
 }
@@ -1656,4 +1708,9 @@ void AudioStreamStateObserver::samplesAvailable(AudioBufferList samples, AudioSt
         
         [priv.delegate audioStream:priv.stream samplesAvailable:buffer count:count];
     }
+}
+
+void AudioStreamStateObserver::bitrateAvailable()
+{
+    [priv bitrateAvailable];
 }

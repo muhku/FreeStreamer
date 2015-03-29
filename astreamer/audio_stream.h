@@ -218,6 +218,7 @@ public:
     virtual void audioStreamErrorOccurred(int errorCode, CFStringRef errorDescription) = 0;
     virtual void audioStreamMetaDataAvailable(std::map<CFStringRef,CFStringRef> metaData) = 0;
     virtual void samplesAvailable(AudioBufferList samples, AudioStreamPacketDescription description) = 0;
+    virtual void bitrateAvailable() = 0;
 };    
 
 } // namespace astreamer

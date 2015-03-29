@@ -1501,12 +1501,17 @@ void Audio_Stream::propertyValueCallback(void *inClientData, AudioFileStreamID i
     
     switch (inPropertyID) {
         case kAudioFileStreamProperty_BitRate: {
+            bool sizeReceivedForFirstTime = (THIS->m_bitRate == 0);
             UInt32 bitRateSize = sizeof(THIS->m_bitRate);
             OSStatus err = AudioFileStreamGetProperty(inAudioFileStream,
                                                       kAudioFileStreamProperty_BitRate,
                                                       &bitRateSize, &THIS->m_bitRate);
             if (err) {
                 THIS->m_bitRate = 0;
+            } else {
+                if (THIS->m_delegate && sizeReceivedForFirstTime) {
+                    THIS->m_delegate->bitrateAvailable();
+                }
             }
             break;
         }
@@ -1625,6 +1630,12 @@ void Audio_Stream::streamDataCallback(void *inClientData, UInt32 inNumberBytes, 
             // stable.
             
             THIS->m_bitrateBuffer[THIS->m_bitrateBufferIndex++] = 8 * inPacketDescriptions[i].mDataByteSize / THIS->m_packetDuration;
+            
+            if (THIS->m_bitrateBufferIndex == kAudioStreamBitrateBufferSize) {
+                if (THIS->m_delegate) {
+                    THIS->m_delegate->bitrateAvailable();
+                }
+            }
         }
         
         /* Prepare the packet */

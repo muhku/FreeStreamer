@@ -158,6 +158,14 @@ typedef struct {
  */
 @property (nonatomic,assign) int      maxPrebufferedByteCount;
 /**
+ * Calculate prebuffer sizes dynamically using the stream bitrate in seconds instead of bytes.
+ */
+@property (nonatomic,assign) BOOL     usePrebufferSizeCalculationInSeconds;
+/**
+ * Require buffering of this many bytes before the playback can start for a continuous stream.
+ */
+@property (nonatomic,assign) float      requiredPrebufferSizeInSeconds;
+/**
  * Require buffering of this many bytes before the playback can start for a continuous stream.
  */
 @property (nonatomic,assign) int      requiredInitialPrebufferedByteCountForContinuousStream;
