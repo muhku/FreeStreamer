@@ -25,6 +25,7 @@ struct Stream_Configuration {
     int maxBounceCount;
     int startupWatchdogPeriod;
     int maxPrebufferedByteCount;
+    bool usePrebufferSizeCalculationInSeconds;
     int requiredInitialPrebufferedByteCountForContinuousStream;
     int requiredInitialPrebufferedByteCountForNonContinuousStream;
     CFStringRef userAgent;

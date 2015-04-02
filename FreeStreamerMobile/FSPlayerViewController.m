@@ -207,6 +207,10 @@
             case kFsAudioStreamPlaying:
                 weakSelf.enableLogging = YES;
                 
+#if DO_STATKEEPING
+                NSLog(@"%@", weakSelf.audioController.activeStream);
+#endif
+                
                 [weakSelf determineStationNameWithMetaData:nil];
                 
                 [weakSelf clearStatus];

@@ -628,6 +628,7 @@ public:
     config.maxBounceCount           = c->maxBounceCount;
     config.startupWatchdogPeriod    = c->startupWatchdogPeriod;
     config.maxPrebufferedByteCount  = c->maxPrebufferedByteCount;
+    config.usePrebufferSizeCalculationInSeconds = c->usePrebufferSizeCalculationInSeconds;
     config.requiredInitialPrebufferedByteCountForContinuousStream = c->requiredInitialPrebufferedByteCountForContinuousStream;
     config.requiredInitialPrebufferedByteCountForNonContinuousStream = c->requiredInitialPrebufferedByteCountForNonContinuousStream;
     config.cacheEnabled             = c->cacheEnabled;
@@ -1137,6 +1138,7 @@ public:
         c->bounceInterval           = configuration.bounceInterval;
         c->startupWatchdogPeriod    = configuration.startupWatchdogPeriod;
         c->maxPrebufferedByteCount  = configuration.maxPrebufferedByteCount;
+        c->usePrebufferSizeCalculationInSeconds = configuration.usePrebufferSizeCalculationInSeconds;
         c->cacheEnabled             = configuration.cacheEnabled;
         c->seekingFromCacheEnabled  = configuration.seekingFromCacheEnabled;
         c->maxDiskCacheSize         = configuration.maxDiskCacheSize;
