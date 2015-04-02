@@ -129,22 +129,26 @@
     switch ([segmentedControl selectedSegmentIndex]) {
         case 1:
             // 0 KB
+            _configuration.usePrebufferSizeCalculationInSeconds = NO;
             _configuration.requiredInitialPrebufferedByteCountForContinuousStream = 0;
             _configuration.requiredInitialPrebufferedByteCountForNonContinuousStream = 0;
             break;
         case 2:
             // 100 KB
+            _configuration.usePrebufferSizeCalculationInSeconds = NO;
             _configuration.requiredInitialPrebufferedByteCountForContinuousStream = 100000;
             _configuration.requiredInitialPrebufferedByteCountForNonContinuousStream = 100000;
             break;
         case 3:
             // 200 KB
+            _configuration.usePrebufferSizeCalculationInSeconds = NO;
             _configuration.requiredInitialPrebufferedByteCountForContinuousStream = 200000;
             _configuration.requiredInitialPrebufferedByteCountForNonContinuousStream = 200000;
             break;
             
         default:
             // Use defaults
+            _configuration.usePrebufferSizeCalculationInSeconds = YES;
             break;
     }
 }
