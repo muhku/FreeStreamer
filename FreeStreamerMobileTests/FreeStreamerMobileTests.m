@@ -257,6 +257,18 @@ playback_short_file:
     [stream play];
 }
 
+- (void)testSettingBufferSizes
+{
+    FSStreamConfiguration *config = [[FSStreamConfiguration alloc] init];
+    config.usePrebufferSizeCalculationInSeconds = NO;
+    config.requiredInitialPrebufferedByteCountForContinuousStream = 123456;
+    
+    FSAudioStream *stream = [_stream initWithConfiguration:config];
+    
+    XCTAssertTrue((stream.configuration.usePrebufferSizeCalculationInSeconds == NO), @"Invalid configuration value for usePrebufferSizeCalculationInSeconds");
+    XCTAssertTrue((stream.configuration.requiredInitialPrebufferedByteCountForContinuousStream == 123456), @"Invalid configuration value for requiredInitialPrebufferedByteCountForContinuousStream");
+}
+
 - (void)testPlaylistRetrieval
 {
     __weak FreeStreamerMobileTests *weakSelf = self;
