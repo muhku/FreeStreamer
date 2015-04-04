@@ -42,5 +42,9 @@
         <title>M3U playlist test</title>
         <link>https://raw.githubusercontent.com/muhku/FreeStreamer/master/Extra/test-playlist.m3u</link>
     </item>
+    <item>
+        <title>Isaac Asimov Foundations Series BBC</title>
+        <link>https://archive.org/download/IsaacAsimovFoundation6Of864kb/IsaacAsimov-Foundation1Of8_64kb.mp3</link>
+    </item>
   </channel>
 </rss>
