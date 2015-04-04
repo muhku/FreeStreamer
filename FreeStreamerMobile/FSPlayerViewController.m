@@ -187,8 +187,13 @@
                     weakSelf.enableLogging = YES;
                 }
                 
-                NSString *bufferingStatus = [[NSString alloc] initWithFormat:@"Buffering %i bytes...", (weakSelf.audioController.activeStream.continuous ? weakSelf.configuration.requiredInitialPrebufferedByteCountForContinuousStream :
-                    weakSelf.configuration.requiredInitialPrebufferedByteCountForNonContinuousStream)];
+                NSString *bufferingStatus = nil;
+                if (weakSelf.configuration.usePrebufferSizeCalculationInSeconds) {
+                    bufferingStatus = [[NSString alloc] initWithFormat:@"Buffering %f seconds...", weakSelf.audioController.activeStream.configuration.requiredPrebufferSizeInSeconds];
+                } else {
+                    bufferingStatus = [[NSString alloc] initWithFormat:@"Buffering %i bytes...", (weakSelf.audioController.activeStream.continuous ? weakSelf.configuration.requiredInitialPrebufferedByteCountForContinuousStream :
+                                                                                                  weakSelf.configuration.requiredInitialPrebufferedByteCountForNonContinuousStream)];
+                }
                 
                 [weakSelf showStatus:bufferingStatus];
                 
