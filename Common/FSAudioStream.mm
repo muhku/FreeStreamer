@@ -94,11 +94,11 @@ static NSInteger sortCacheObjects(id co1, id co2, void *keyForSorting)
         self.seekingFromCacheEnabled = YES;
         self.maxDiskCacheSize = 256000000; // 256 MB
         self.usePrebufferSizeCalculationInSeconds = YES;
-        self.requiredPrebufferSizeInSeconds = 12;
+        self.requiredPrebufferSizeInSeconds = 7;
         // With dynamic calculation, these are actually the maximum sizes, the dynamic
         // calculation may lower the sizes based on the stream bitrate
-        self.requiredInitialPrebufferedByteCountForContinuousStream = 200000;
-        self.requiredInitialPrebufferedByteCountForNonContinuousStream = 300000;
+        self.requiredInitialPrebufferedByteCountForContinuousStream = 256000;
+        self.requiredInitialPrebufferedByteCountForNonContinuousStream = 256000;
         
         NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
         
@@ -1028,9 +1028,13 @@ public:
         return;
     }
     
-    const float bufferSizeForSecond = bitrate / 8.0;
+    const Float64 audioQueueBufferSizeInSeconds = (Float64)(self.configuration.bufferSize * self.configuration.bufferCount) / (Float64)(176400);
     
-    int bufferSize = bufferSizeForSecond * self.configuration.requiredPrebufferSizeInSeconds;
+    const Float64 totalBufferingTimeInSeconds = self.configuration.requiredPrebufferSizeInSeconds + audioQueueBufferSizeInSeconds;
+    
+    const Float64 bufferSizeForSecond = bitrate / 8.0;
+    
+    int bufferSize = (bufferSizeForSecond * totalBufferingTimeInSeconds);
     
     // Check that we still got somewhat sane buffer size
     if (bufferSize < 50000) {
