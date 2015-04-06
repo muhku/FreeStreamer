@@ -58,6 +58,7 @@
 		60CF8C0C18C5346700C657A8 /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60CF8C0B18C5346700C657A8 /* MediaPlayer.framework */; };
 		60CF8C0E18C5346F00C657A8 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 60CF8C0D18C5346F00C657A8 /* AVFoundation.framework */; };
 		60DB926519E4143A00326783 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 60DB926419E4143A00326783 /* Reachability.m */; };
+		60F1451B1AD2C02D007D465B /* example-rss-feed.xml in Resources */ = {isa = PBXBuildFile; fileRef = 60F1451A1AD2C02D007D465B /* example-rss-feed.xml */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -149,6 +150,7 @@
 		60CF8C0D18C5346F00C657A8 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		60DB926319E4143A00326783 /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
 		60DB926419E4143A00326783 /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
+		60F1451A1AD2C02D007D465B /* example-rss-feed.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; name = "example-rss-feed.xml"; path = "Extra/example-rss-feed.xml"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -257,6 +259,7 @@
 		60B813DC18C532F8001CC5A7 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				60F1451A1AD2C02D007D465B /* example-rss-feed.xml */,
 				6080FAC51A5CF3F500129D79 /* test-2sec.mp3 */,
 				60349C1219AD0D1C009E05F9 /* test.mp3 */,
 				60412CCB18D0B144007A0277 /* Images */,
@@ -449,6 +452,7 @@
 				60412CD518D0B150007A0277 /* player-bg-image-pad.jpg in Resources */,
 				6080FAC61A5CF3F500129D79 /* test-2sec.mp3 in Resources */,
 				60412CD718D0B150007A0277 /* player-top-bg.png in Resources */,
+				60F1451B1AD2C02D007D465B /* example-rss-feed.xml in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

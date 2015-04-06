@@ -64,7 +64,7 @@
     __weak FSPlaylistViewController *weakSelf = self;
     
     _request = [[FSParseRssPodcastFeedRequest alloc] init];
-    _request.url = [NSURL URLWithString:@"https://raw.github.com/muhku/FreeStreamer/master/Extra/example-rss-feed.xml"];
+    _request.url = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"example-rss-feed" ofType:@"xml"]];
     _request.onCompletion = ^() {
         [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
         
