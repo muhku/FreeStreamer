@@ -63,6 +63,8 @@
     
     __weak FSPlaylistViewController *weakSelf = self;
     
+    _diskCachingAllowed = YES;
+    
     _request = [[FSParseRssPodcastFeedRequest alloc] init];
     _request.url = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"example-rss-feed" ofType:@"xml"]];
     _request.onCompletion = ^() {
@@ -94,6 +96,12 @@
     self.navigationController.navigationBar.topItem.title = [[NSString alloc] initWithFormat:@"FreeStreamer %i.%i.%i", FREESTREAMER_VERSION_MAJOR, FREESTREAMER_VERSION_MINOR, FREESTREAMER_VERSION_REVISION];
     
     self.view.backgroundColor = [UIColor whiteColor];
+    
+    if (_diskCachingAllowed) {
+        self.diskCacheControl.selectedSegmentIndex = 0;
+    } else {
+        self.diskCacheControl.selectedSegmentIndex = 1;
+    }
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -117,6 +125,32 @@
                            delegate:self
                            cancelButtonTitle:@"Cancel" otherButtonTitles:@"Ok", nil];
     alert.alertViewStyle = UIAlertViewStylePlainTextInput;
+    [alert show];
+}
+
+- (IBAction)switchDiskCache:(id)sender
+{
+    NSString *message = nil;
+    switch (self.diskCacheControl.selectedSegmentIndex) {
+        case 0:
+            message = @"Disk caching enabled.";
+            _diskCachingAllowed = YES;
+            break;
+            
+        case 1:
+            message = @"Disk caching disabled.";
+            _diskCachingAllowed = NO;
+            break;
+            
+        default:
+            break;
+    }
+    
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Cache setting"
+                                                    message:message
+                                                   delegate:nil
+                                          cancelButtonTitle:@"OK"
+                                          otherButtonTitles:nil];
     [alert show];
 }
 
@@ -217,6 +251,8 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
 	FSPlaylistItem *item = [self playlistItems][indexPath.row];
+    
+    _configuration.cacheEnabled = _diskCachingAllowed;
 
     self.playerViewController.configuration = _configuration;
     self.playerViewController.selectedPlaylistItem = item;

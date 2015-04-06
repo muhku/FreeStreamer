@@ -63,16 +63,29 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
+                            <constraint firstItem="FsJ-KS-FxN" firstAttribute="leading" secondItem="4vn-yb-2gX" secondAttribute="leading" id="2zb-Ih-C0k"/>
                             <constraint firstItem="q8y-aA-nly" firstAttribute="bottom" secondItem="kEg-kH-rx1" secondAttribute="top" id="5cN-xq-PK9"/>
-                            <constraint firstItem="FsJ-KS-FxN" firstAttribute="leading" secondItem="4vn-yb-2gX" secondAttribute="leading" id="Bjw-qM-QyS"/>
-                            <constraint firstItem="FsJ-KS-FxN" firstAttribute="top" secondItem="UV3-sf-xfv" secondAttribute="bottom" id="J1e-o2-EgP"/>
-                            <constraint firstItem="q8y-aA-nly" firstAttribute="top" secondItem="FsJ-KS-FxN" secondAttribute="bottom" constant="3" id="PIq-ze-AYQ"/>
-                            <constraint firstItem="q8y-aA-nly" firstAttribute="leading" secondItem="FsJ-KS-FxN" secondAttribute="leading" id="WmO-M9-yjh"/>
-                            <constraint firstItem="q8y-aA-nly" firstAttribute="trailing" secondItem="FsJ-KS-FxN" secondAttribute="trailing" id="gjp-F2-5e8"/>
-                            <constraint firstAttribute="trailing" secondItem="FsJ-KS-FxN" secondAttribute="trailing" id="p9h-hh-SwP"/>
+                            <constraint firstItem="q8y-aA-nly" firstAttribute="top" secondItem="FsJ-KS-FxN" secondAttribute="bottom" constant="3" id="Brh-HT-I5P"/>
+                            <constraint firstAttribute="trailing" secondItem="FsJ-KS-FxN" secondAttribute="trailing" id="Csx-MV-SyX"/>
+                            <constraint firstItem="FsJ-KS-FxN" firstAttribute="top" secondItem="UV3-sf-xfv" secondAttribute="bottom" id="fa3-8j-PGO"/>
+                            <constraint firstItem="FsJ-KS-FxN" firstAttribute="leading" secondItem="q8y-aA-nly" secondAttribute="leading" id="jpO-ve-lkz"/>
+                            <constraint firstItem="FsJ-KS-FxN" firstAttribute="trailing" secondItem="q8y-aA-nly" secondAttribute="trailing" id="lMm-kv-UCJ"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Playlist" id="3Fs-W8-6Li">
+                        <barButtonItem key="leftBarButtonItem" id="dg1-q8-CP2">
+                            <segmentedControl key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="bar" selectedSegmentIndex="0" id="txO-s1-Mo8">
+                                <rect key="frame" x="-61" y="-14" width="71" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <segments>
+                                    <segment title="On"/>
+                                    <segment title="Off"/>
+                                </segments>
+                                <connections>
+                                    <action selector="switchDiskCache:" destination="gtm-Fd-MXs" eventType="valueChanged" id="k24-rX-ZhR"/>
+                                </connections>
+                            </segmentedControl>
+                        </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="9Ec-kA-ROh">
                             <connections>
                                 <action selector="addPlaylistItem:" destination="gtm-Fd-MXs" id="acF-A4-bfZ"/>
@@ -80,6 +93,7 @@
                         </barButtonItem>
                     </navigationItem>
                     <connections>
+                        <outlet property="diskCacheControl" destination="txO-s1-Mo8" id="l2B-ad-hDM"/>
                         <outlet property="navigationController" destination="7" id="2e8-GM-lhx"/>
                         <outlet property="playerViewController" destination="17" id="hIz-4K-Uuq"/>
                         <outlet property="tableView" destination="FsJ-KS-FxN" id="bPt-Dn-x2e"/>

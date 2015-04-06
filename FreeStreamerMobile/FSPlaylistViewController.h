@@ -21,6 +21,7 @@
 @interface FSPlaylistViewController : UIViewController<UITableViewDataSource,UITableViewDelegate,UIAlertViewDelegate> {
     FSParseRssPodcastFeedRequest *_request;
     FSStreamConfiguration *_configuration;
+    BOOL _diskCachingAllowed;
 }
 
 /**
@@ -47,6 +48,10 @@
  * Reference to the buffer size control.
  */
 @property (nonatomic,strong) IBOutlet UISegmentedControl *bufferSizeControl;
+/**
+ * Reference to the disk cache control.
+ */
+@property (nonatomic,strong) IBOutlet UISegmentedControl *diskCacheControl;
 
 /**
  * An IBAction to add a new playlist item.
@@ -54,6 +59,13 @@
  * @param sender The sender of the action.
  */
 - (IBAction)addPlaylistItem:(id)sender;
+
+/**
+ * An IBAction to switch the disk caching on/off.
+ *
+ * @param sender The sender of the action.
+ */
+- (IBAction)switchDiskCache:(id)sender;
 
 /**
  * An IBAction to select the buffer size.
