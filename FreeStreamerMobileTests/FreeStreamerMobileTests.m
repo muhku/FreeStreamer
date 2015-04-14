@@ -518,7 +518,7 @@ playback_short_file:
                 
                 XCTAssertTrue((_stream.duration.minute == 4), @"Invalid stream duration (minutes)");
                 XCTAssertTrue((_stream.duration.second == 17), @"Invalid stream duration (seconds)");
-                XCTAssertTrue((_stream.contentLength == 8227656), @"Invalid content length");
+                XCTAssertTrue((_stream.contentLength == 9473902), @"Invalid content length");
                 
                 // Checks done, we are done.
                 _keepRunning = NO;
