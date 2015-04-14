@@ -326,7 +326,7 @@ float Audio_Stream::durationInSeconds()
     if (m_audioDataByteCount > 0) {
         audioFileLength = m_audioDataByteCount;
     } else {
-        audioFileLength = contentLength();
+        audioFileLength = contentLength() - m_metaDataSizeInBytes;
     }
     
     if (audioFileLength > 0) {
