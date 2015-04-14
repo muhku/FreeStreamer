@@ -16,12 +16,6 @@
     [self.window setRootViewController:self.navigationController];
     [self.window makeKeyAndVisible];
     
-    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
-        self.window.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"player-bg-image.jpg"]];
-    } else {
-        self.window.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"player-bg-image-pad.jpg"]];
-    }
-    
     return YES;
 }
 
@@ -62,6 +56,15 @@
      Save data if appropriate.
      See also applicationDidEnterBackground:.
      */
+}
+
+- (void)resetBackground
+{
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone) {
+        self.window.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"player-bg-image.jpg"]];
+    } else {
+        self.window.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"player-bg-image-pad.jpg"]];
+    }
 }
 
 @end

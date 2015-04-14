@@ -19,6 +19,92 @@
 #endif
 
 namespace astreamer {
+
+// Code from:
+// http://www.opensource.apple.com/source/libsecurity_manifest/libsecurity_manifest-29384/lib/SecureDownloadInternal.c
+
+// Returns a CFString containing the base64 representation of the data.
+// boolean argument for whether to line wrap at 64 columns or not.
+CFStringRef createBase64EncodedString(const UInt8* ptr, size_t len, int wrap) {
+    const char* alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    "abcdefghijklmnopqrstuvwxyz"
+    "0123456789+/=";
+    
+    // base64 encoded data uses 4 ASCII characters to represent 3 octets.
+    // There can be up to two == at the end of the base64 data for padding.
+    // If we are line wrapping then we need space for one newline character
+    // every 64 characters of output.
+    // Rounded 4/3 up to 2 to avoid floating point math.
+    
+    //CFIndex max_len = (2*len) + 2;
+    //if (wrap) len = len + ((2*len) / 64) + 1;
+    
+    CFMutableStringRef string = CFStringCreateMutable(NULL, 0);
+    if (!string) return NULL;
+    
+    /*
+     http://www.faqs.org/rfcs/rfc3548.html
+     +--first octet--+-second octet--+--third octet--+
+     |7 6 5 4 3 2 1 0|7 6 5 4 3 2 1 0|7 6 5 4 3 2 1 0|
+     +-----------+---+-------+-------+---+-----------+
+     |5 4 3 2 1 0|5 4 3 2 1 0|5 4 3 2 1 0|5 4 3 2 1 0|
+     +--1.index--+--2.index--+--3.index--+--4.index--+
+     */
+    int i = 0;		// octet offset into input data
+    int column = 0;		// output column number (used for line wrapping)
+    for (;;) {
+        UniChar c[16];	// buffer of characters to add to output
+        int j = 0;	// offset to place next character in buffer
+        int index;	// index into output alphabet
+        
+#define ADDCHAR(_X_) do { c[j++] = _X_; if (wrap && (++column == 64)) { column = 0; c[j++] = '\n'; } } while (0);
+        
+        // 1.index
+        index = (ptr[i] >> 2) & 0x3F;
+        ADDCHAR(alphabet[index]);
+        
+        // 2.index
+        index = (ptr[i] << 4) & 0x30;
+        if ((i+1) < len) {
+            index = index | ((ptr[i+1] >> 4) & 0x0F);
+            ADDCHAR(alphabet[index]);
+        } else {	// end of input, pad as necessary
+            ADDCHAR(alphabet[index]);
+            ADDCHAR('=');
+            ADDCHAR('=');
+        }
+        
+        // 3.index
+        if ((i+1) < len) {
+            index = (ptr[i+1] << 2) & 0x3C;
+            if ((i+2) < len) {
+                index = index | ((ptr[i+2] >> 6) & 0x03);
+                ADDCHAR(alphabet[index]);
+            } else {	// end of input, pad as necessary
+                ADDCHAR(alphabet[index]);
+                ADDCHAR('=');
+            }
+        }
+        
+        // 4.index
+        if ((i+2) < len) {
+            index = (ptr[i+2]) & 0x3F;
+            ADDCHAR(alphabet[index]);
+        }
+        
+        CFStringAppendCharacters(string, c, j);
+        i += 3; // we processed 3 bytes of input
+        if (i >= len) {
+            // end of data, append newline if we haven't already
+            if (wrap && c[j-1] != '\n') {
+                c[0] = '\n';
+                CFStringAppendCharacters(string, c, 1);
+            }
+            break;
+        }
+    }
+    return string;
+}
     
 enum ID3_Parser_State {
     ID3_Parser_State_Initial = 0,
@@ -55,6 +141,7 @@ public:
     bool m_usesExtendedHeader;
     CFStringRef m_title;
     CFStringRef m_performer;
+    CFStringRef m_coverArt;
     
     std::vector<UInt8> m_tagData;
 };
@@ -75,7 +162,8 @@ ID3_Parser_Private::ID3_Parser_Private() :
     m_usesUnsynchronisation(false),
     m_usesExtendedHeader(false),
     m_title(NULL),
-    m_performer(NULL)
+    m_performer(NULL),
+    m_coverArt(NULL)
 {
 }
     
@@ -86,6 +174,9 @@ ID3_Parser_Private::~ID3_Parser_Private()
     }
     if (m_title) {
         CFRelease(m_title), m_title = NULL;
+    }
+    if (m_coverArt) {
+        CFRelease(m_coverArt), m_coverArt = NULL;
     }
 }
     
@@ -284,6 +375,37 @@ void ID3_Parser_Private::feedData(UInt8 *data, UInt32 numBytes)
                         m_performer = parseContent(framesize, pos + 1, encoding, byteOrderMark);
                         
                         ID3_TRACE("ID3 performer parsed: '%s'\n", CFStringGetCStringPtr(m_performer, CFStringGetSystemEncoding()));
+                    } else if (!strcmp(frameName, "APIC")) {
+                        if (m_tagData[pos+1] == 'i' &&
+                            m_tagData[pos+2] == 'm' &&
+                            m_tagData[pos+3] == 'a' &&
+                            m_tagData[pos+4] == 'g' &&
+                            m_tagData[pos+5] == 'e' &&
+                            m_tagData[pos+6] == '/' &&
+                            m_tagData[pos+7] == 'j' &&
+                            m_tagData[pos+8] == 'p' &&
+                            m_tagData[pos+9] == 'e' &&
+                            m_tagData[pos+10] == 'g') {
+                            
+                            if (m_tagData[pos+11] != 0 || m_tagData[pos+12] != 0 || m_tagData[pos+13] != 0) {
+                                ID3_TRACE("Assuming there is no picture comment, don't know how to parse\n");
+                            } else {
+                                const size_t coverArtSize = framesize - 14;
+                                
+                                UInt8 *bytes = new UInt8[coverArtSize];
+                                
+                                for (int i=0; i < coverArtSize; i++) {
+                                    bytes[i] = m_tagData[pos+14+i];
+                                }
+                                
+                                if (m_coverArt) {
+                                    CFRelease(m_coverArt);
+                                }
+                                m_coverArt = createBase64EncodedString(bytes, coverArtSize, 0);
+                                
+                                delete [] bytes;
+                            }
+                        }
                     } else {
                         // Unknown/unhandled frame
                         ID3_TRACE("Unknown/unhandled frame: %s, size %i\n", frameName, framesize);
@@ -304,6 +426,11 @@ void ID3_Parser_Private::feedData(UInt8 *data, UInt32 numBytes)
                     if (m_title && CFStringGetLength(m_title) > 0) {
                         metadataMap[CFSTR("MPMediaItemPropertyTitle")] =
                             CFStringCreateCopy(kCFAllocatorDefault, m_title);
+                    }
+                    
+                    if (m_coverArt && CFStringGetLength(m_coverArt) > 0) {
+                        metadataMap[CFSTR("CoverArt")] =
+                            CFStringCreateCopy(kCFAllocatorDefault, m_coverArt);
                     }
                     
                     m_parser->m_delegate->id3metaDataAvailable(metadataMap);
@@ -341,6 +468,9 @@ void ID3_Parser_Private::reset()
     }
     if (m_performer) {
         CFRelease(m_performer), m_performer = NULL;
+    }
+    if (m_coverArt) {
+        CFRelease(m_coverArt), m_coverArt = NULL;
     }
     
     m_tagData.clear();

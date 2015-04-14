@@ -23,4 +23,6 @@
  */
 @property (nonatomic,strong) IBOutlet UINavigationController *navigationController;
 
+- (void)resetBackground;
+
 @end

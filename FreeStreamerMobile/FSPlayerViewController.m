@@ -17,6 +17,7 @@
 #import "FSFrequencyPlotView.h"
 #import "AJNotificationView.h"
 #import "FSLogger.h"
+#import "FSAppDelegate.h"
 
 /*
  * To pause after seeking, uncomment the following line:
@@ -121,6 +122,9 @@
     [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleBlackOpaque
                                                 animated:NO];
 #endif
+    
+    FSAppDelegate *delegate = [UIApplication sharedApplication].delegate;
+    [delegate resetBackground];
     
     self.navigationController.navigationBar.barStyle = UIBarStyleBlack;
     self.navigationController.navigationBarHidden = NO;
@@ -391,6 +395,16 @@
             weakSelf.stationURL = [NSURL URLWithString:metaData[@"StreamUrl"]];
             
             weakSelf.navigationItem.rightBarButtonItem = weakSelf.infoButton;
+        }
+        
+        if (metaData[@"CoverArt"]) {
+            FSAppDelegate *delegate = [UIApplication sharedApplication].delegate;
+            
+            NSData *data = [[NSData alloc] initWithBase64EncodedString:metaData[@"CoverArt"] options:0];
+            
+            UIImage *coverArt = [UIImage imageWithData:data];
+            
+            delegate.window.backgroundColor = [UIColor colorWithPatternImage:coverArt];
         }
         
         [weakSelf.statusLabel setHidden:NO];
