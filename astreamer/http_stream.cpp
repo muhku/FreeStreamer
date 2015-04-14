@@ -277,6 +277,13 @@ void HTTP_Stream::id3metaDataAvailable(std::map<CFStringRef,CFStringRef> metaDat
     }
 }
     
+void HTTP_Stream::id3tagSizeAvailable(UInt32 tagSize)
+{
+    if (m_delegate) {
+        m_delegate->streamMetaDataByteSizeAvailable(tagSize);
+    }
+}
+
 /* private */
     
 CFReadStreamRef HTTP_Stream::createReadStream(CFURLRef url)

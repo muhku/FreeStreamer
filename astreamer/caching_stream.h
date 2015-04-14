@@ -57,12 +57,14 @@ public:
     
     /* ID3_Parser_Delegate */
     void id3metaDataAvailable(std::map<CFStringRef,CFStringRef> metaData);
+    void id3tagSizeAvailable(UInt32 tagSize);
     
     void streamIsReadyRead();
     void streamHasBytesAvailable(UInt8 *data, UInt32 numBytes);
     void streamEndEncountered();
     void streamErrorOccurred(CFStringRef errorDesc);
     void streamMetaDataAvailable(std::map<CFStringRef,CFStringRef> metaData);
+    void streamMetaDataByteSizeAvailable(UInt32 sizeInBytes);
 };
     
     

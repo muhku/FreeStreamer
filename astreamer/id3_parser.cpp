@@ -170,6 +170,10 @@ void ID3_Parser_Private::feedData(UInt8 *data, UInt32 numBytes)
                     
                     ID3_TRACE("tag size: %i\n", m_tagSize);
                     
+                    if (m_parser->m_delegate) {
+                        m_parser->m_delegate->id3tagSizeAvailable(m_tagSize);
+                    }
+                    
                     setState(ID3_Parser_State_Parse_Frames);
                     break;
                 }

@@ -48,6 +48,7 @@ public:
     virtual void streamEndEncountered() = 0;
     virtual void streamErrorOccurred(CFStringRef errorDesc) = 0;
     virtual void streamMetaDataAvailable(std::map<CFStringRef,CFStringRef> metaData) = 0;
+    virtual void streamMetaDataByteSizeAvailable(UInt32 sizeInBytes) = 0;
 };
 
 } // namespace astreamer

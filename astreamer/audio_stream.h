@@ -118,6 +118,7 @@ public:
     void streamEndEncountered();
     void streamErrorOccurred(CFStringRef errorDesc);
     void streamMetaDataAvailable(std::map<CFStringRef,CFStringRef> metaData);
+    void streamMetaDataByteSizeAvailable(UInt32 sizeInBytes);
 
 private:
     
@@ -176,6 +177,7 @@ private:
     UInt64 m_audioDataByteCount;
     UInt64 m_audioDataPacketCount;
     UInt32 m_bitRate;
+    UInt32 m_metaDataSizeInBytes;
     
     double m_packetDuration;
     double m_bitrateBuffer[kAudioStreamBitrateBufferSize];

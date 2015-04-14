@@ -98,6 +98,7 @@ Audio_Stream::Audio_Stream() :
     m_audioDataByteCount(0),
     m_audioDataPacketCount(0),
     m_bitRate(0),
+    m_metaDataSizeInBytes(0),
     m_packetDuration(0),
     m_bitrateBufferIndex(0),
     m_outputVolume(1.0),
@@ -170,6 +171,7 @@ void Audio_Stream::open(Input_Stream_Position *position)
     m_converterRunOutOfData = false;
     m_audioDataPacketCount = 0;
     m_bitRate = 0;
+    m_metaDataSizeInBytes = 0;
     m_discontinuity = true;
     m_ignoreDecodeQueueSize = false;
     m_audioQueueConsumedPackets = false;
@@ -995,6 +997,13 @@ void Audio_Stream::streamMetaDataAvailable(std::map<CFStringRef,CFStringRef> met
     }
 }
     
+void Audio_Stream::streamMetaDataByteSizeAvailable(UInt32 sizeInBytes)
+{
+    m_metaDataSizeInBytes = sizeInBytes;
+    
+    AS_TRACE("metadata size received %i\n", m_metaDataSizeInBytes);
+}
+
 /* private */
     
 CFStringRef Audio_Stream::createHashForString(CFStringRef str)

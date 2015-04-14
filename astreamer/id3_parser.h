@@ -36,6 +36,7 @@ private:
 class ID3_Parser_Delegate {
 public:
     virtual void id3metaDataAvailable(std::map<CFStringRef,CFStringRef> metaData) = 0;
+    virtual void id3tagSizeAvailable(UInt32 tagSize) = 0;
 };
     
 } // namespace astreamer

@@ -288,6 +288,13 @@ void File_Stream::id3metaDataAvailable(std::map<CFStringRef,CFStringRef> metaDat
     }
 }
     
+void File_Stream::id3tagSizeAvailable(UInt32 tagSize)
+{
+    if (m_delegate) {
+        m_delegate->streamMetaDataByteSizeAvailable(tagSize);
+    }
+}
+    
 void File_Stream::readCallBack(CFReadStreamRef stream, CFStreamEventType eventType, void *clientCallBackInfo)
 {
     File_Stream *THIS = static_cast<File_Stream*>(clientCallBackInfo);

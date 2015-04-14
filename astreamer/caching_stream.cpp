@@ -293,6 +293,13 @@ void Caching_Stream::id3metaDataAvailable(std::map<CFStringRef,CFStringRef> meta
     }
 }
     
+void Caching_Stream::id3tagSizeAvailable(UInt32 tagSize)
+{
+    if (m_delegate) {
+        m_delegate->streamMetaDataByteSizeAvailable(tagSize);
+    }
+}
+
 /* Input_Stream_Delegate */
 
 void Caching_Stream::streamIsReadyRead()
@@ -413,4 +420,11 @@ void Caching_Stream::streamMetaDataAvailable(std::map<CFStringRef,CFStringRef> m
     }
 }
     
+void Caching_Stream::streamMetaDataByteSizeAvailable(UInt32 sizeInBytes)
+{
+    if (m_delegate) {
+        m_delegate->streamMetaDataByteSizeAvailable(sizeInBytes);
+    }
+}
+
 } // namespace astreamer
