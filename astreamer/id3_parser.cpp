@@ -376,35 +376,39 @@ void ID3_Parser_Private::feedData(UInt8 *data, UInt32 numBytes)
                         
                         ID3_TRACE("ID3 performer parsed: '%s'\n", CFStringGetCStringPtr(m_performer, CFStringGetSystemEncoding()));
                     } else if (!strcmp(frameName, "APIC")) {
-                        if (m_tagData[pos+1] == 'i' &&
-                            m_tagData[pos+2] == 'm' &&
-                            m_tagData[pos+3] == 'a' &&
-                            m_tagData[pos+4] == 'g' &&
-                            m_tagData[pos+5] == 'e' &&
-                            m_tagData[pos+6] == '/' &&
-                            m_tagData[pos+7] == 'j' &&
-                            m_tagData[pos+8] == 'p' &&
-                            m_tagData[pos+9] == 'e' &&
-                            m_tagData[pos+10] == 'g') {
+                        char imageType[65] = {0};
+                        
+                        size_t dataPos = pos+1;
+                        
+                        for (int i=0; m_tagData[dataPos]; i++,dataPos++) {
+                            imageType[i] = m_tagData[dataPos];
+                        }
+                        dataPos++;
+                        
+                        if (!strcmp(imageType, "image/jpeg") ||
+                            !strcmp(imageType, "image/png")) {
                             
-                            if (m_tagData[pos+11] != 0 || m_tagData[pos+12] != 0 || m_tagData[pos+13] != 0) {
-                                ID3_TRACE("Assuming there is no picture comment, don't know how to parse\n");
-                            } else {
-                                const size_t coverArtSize = framesize - 14;
-                                
-                                UInt8 *bytes = new UInt8[coverArtSize];
-                                
-                                for (int i=0; i < coverArtSize; i++) {
-                                    bytes[i] = m_tagData[pos+14+i];
-                                }
-                                
-                                if (m_coverArt) {
-                                    CFRelease(m_coverArt);
-                                }
-                                m_coverArt = createBase64EncodedString(bytes, coverArtSize, 0);
-                                
-                                delete [] bytes;
+                            ID3_TRACE("Image type %s, parsing, dataPos %zu\n", imageType, dataPos);
+                            
+                            // Skip the image description
+                            while (!m_tagData[++dataPos]);
+                            
+                            const size_t coverArtSize = framesize - ((dataPos - pos) + 5);
+                            
+                            UInt8 *bytes = new UInt8[coverArtSize];
+                            
+                            for (int i=0; i < coverArtSize; i++) {
+                                bytes[i] = m_tagData[dataPos+i];
                             }
+                            
+                            if (m_coverArt) {
+                                CFRelease(m_coverArt);
+                            }
+                            m_coverArt = createBase64EncodedString(bytes, coverArtSize, 0);
+                            
+                            delete [] bytes;
+                        } else {
+                            ID3_TRACE("%s is an unknown type for image data, skipping\n", imageType);
                         }
                     } else {
                         // Unknown/unhandled frame
