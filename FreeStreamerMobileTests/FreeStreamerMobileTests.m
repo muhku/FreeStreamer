@@ -487,7 +487,7 @@ playback_short_file:
         
         [_stream playFromURL:url];
         
-        NSLog(@"Cycle %lu", ++i);
+        NSLog(@"Cycle %lu", (unsigned long)++i);
     }
 }
 
