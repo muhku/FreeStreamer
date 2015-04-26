@@ -267,6 +267,15 @@ playback_short_file:
     
     XCTAssertTrue((stream.configuration.usePrebufferSizeCalculationInSeconds == NO), @"Invalid configuration value for usePrebufferSizeCalculationInSeconds");
     XCTAssertTrue((stream.configuration.requiredInitialPrebufferedByteCountForContinuousStream == 123456), @"Invalid configuration value for requiredInitialPrebufferedByteCountForContinuousStream");
+    
+    FSStreamConfiguration *config2 = [[FSStreamConfiguration alloc] init];
+    config2.usePrebufferSizeCalculationInSeconds = YES;
+    config2.requiredPrebufferSizeInSeconds = 1234;
+    
+    FSAudioStream *stream2 = [_stream initWithConfiguration:config2];
+    
+    XCTAssertTrue((stream2.configuration.usePrebufferSizeCalculationInSeconds == YES), @"Invalid configuration value for usePrebufferSizeCalculationInSeconds");
+    XCTAssertTrue((stream2.configuration.requiredPrebufferSizeInSeconds == 1234), @"Invalid configuration value for requiredPrebufferSizeInSeconds");
 }
 
 - (void)testPlaylistRetrieval

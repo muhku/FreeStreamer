@@ -28,6 +28,7 @@ struct Stream_Configuration {
     bool usePrebufferSizeCalculationInSeconds;
     int requiredInitialPrebufferedByteCountForContinuousStream;
     int requiredInitialPrebufferedByteCountForNonContinuousStream;
+    int requiredPrebufferSizeInSeconds;
     CFStringRef userAgent;
     CFStringRef cacheDirectory;
     CFDictionaryRef predefinedHttpHeaderValues;

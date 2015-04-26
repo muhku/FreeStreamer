@@ -631,6 +631,7 @@ public:
     config.usePrebufferSizeCalculationInSeconds = c->usePrebufferSizeCalculationInSeconds;
     config.requiredInitialPrebufferedByteCountForContinuousStream = c->requiredInitialPrebufferedByteCountForContinuousStream;
     config.requiredInitialPrebufferedByteCountForNonContinuousStream = c->requiredInitialPrebufferedByteCountForNonContinuousStream;
+    config.requiredPrebufferSizeInSeconds = c->requiredPrebufferSizeInSeconds;
     config.cacheEnabled             = c->cacheEnabled;
     config.seekingFromCacheEnabled  = c->seekingFromCacheEnabled;
     config.maxDiskCacheSize         = c->maxDiskCacheSize;
@@ -1148,6 +1149,7 @@ public:
         c->maxDiskCacheSize         = configuration.maxDiskCacheSize;
         c->requiredInitialPrebufferedByteCountForContinuousStream = configuration.requiredInitialPrebufferedByteCountForContinuousStream;
         c->requiredInitialPrebufferedByteCountForNonContinuousStream = configuration.requiredInitialPrebufferedByteCountForNonContinuousStream;
+        c->requiredPrebufferSizeInSeconds = configuration.requiredPrebufferSizeInSeconds;
         
         if (c->userAgent) {
             CFRelease(c->userAgent);
