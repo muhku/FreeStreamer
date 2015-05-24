@@ -554,6 +554,11 @@ void Audio_Stream::setSeekOffset(float offset)
 {
     m_seekOffset = offset;
 }
+ 
+void Audio_Stream::setDefaultContentLength(UInt64 defaultContentLength)
+{
+    m_defaultContentLength = defaultContentLength;
+}
     
 void Audio_Stream::setContentLength(UInt64 contentLength)
 {
@@ -1071,11 +1076,19 @@ void Audio_Stream::closeAudioQueue()
     delete m_audioQueue, m_audioQueue = 0;
 }
     
+UInt64 Audio_Stream::defaultContentLength()
+{
+    return m_defaultContentLength;
+}
+    
 UInt64 Audio_Stream::contentLength()
 {
     if (m_contentLength == 0) {
         if (m_inputStream) {
             m_contentLength = m_inputStream->contentLength();
+            if (m_contentLength == 0) {
+                m_contentLength = defaultContentLength();
+            }
         }
     }
     return m_contentLength;

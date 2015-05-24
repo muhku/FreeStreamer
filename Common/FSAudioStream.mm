@@ -234,6 +234,7 @@ public:
 @property (nonatomic,assign) NSString *defaultContentType;
 @property (readonly) NSString *contentType;
 @property (readonly) NSString *suggestedFileExtension;
+@property (nonatomic, assign) UInt64 defaultContentLength;
 @property (readonly) UInt64 contentLength;
 @property (nonatomic,assign) NSURL *outputFile;
 @property (nonatomic,assign) BOOL wasInterrupted;
@@ -540,6 +541,11 @@ public:
         suggestedFileExtension = @"aac";
     }
     return suggestedFileExtension;
+}
+
+- (UInt64)defaultContentLength
+{
+    return _audioStream->defaultContentLength();
 }
 
 - (UInt64)contentLength
@@ -1263,6 +1269,13 @@ public:
     NSAssert([NSThread isMainThread], @"FSAudioStream.suggestedFileExtension needs to be called in the main thread");
     
     return [_private suggestedFileExtension];
+}
+
+- (UInt64)defaultContentLength
+{
+    NSAssert([NSThread isMainThread], @"FSAudioStream.defaultContentLength needs to be called in the main thread");
+    
+    return [_private defaultContentLength];
 }
 
 - (UInt64)contentLength
