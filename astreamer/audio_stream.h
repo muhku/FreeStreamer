@@ -81,6 +81,7 @@ public:
     void setStrictContentTypeChecking(bool strictChecking);
     void setDefaultContentType(CFStringRef defaultContentType);
     void setSeekOffset(float offset);
+    void setDefaultContentLength(UInt64 defaultContentLength);
     void setContentLength(UInt64 contentLength);
     void setPreloading(bool preloading);
     bool isPreloading();
@@ -99,6 +100,7 @@ public:
     bool strictContentTypeChecking();
     float bitrate();
     
+    UInt64 defaultContentLength();
     UInt64 contentLength();
     int playbackDataCount();
     int audioQueueNumberOfBuffersInUse();
@@ -133,6 +135,7 @@ private:
     bool m_ignoreDecodeQueueSize;
     bool m_audioQueueConsumedPackets;
     
+    UInt64 m_defaultContentLength;
     UInt64 m_contentLength;
     UInt64 m_bytesReceived;
     

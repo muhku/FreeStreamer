@@ -372,6 +372,11 @@ NSString*             freeStreamerReleaseVersion();
  */
 @property (nonatomic,readonly) NSString *suggestedFileExtension;
 /**
+ * Sets a default content length for the stream.  Used if
+ * the stream content-length is not available.
+ */
+@property (nonatomic, assign) UInt64 defaultContentLength;
+/**
  * The property has the content length of the stream (in bytes). The length is zero if
  * the stream is continuous.
  */
