@@ -196,6 +196,11 @@ typedef struct {
  */
 @property (nonatomic,assign) BOOL seekingFromCacheEnabled;
 /**
+ * The property determining if FreeStreamer should handle audio session automatically.
+ * Leave it on if you don't want to handle the audio session by yourself.
+ */
+@property (nonatomic,assign) BOOL automaticAudioSessionHandlingEnabled;
+/**
  * The maximum size of the disk cache in bytes.
  */
 @property (nonatomic,assign) int maxDiskCacheSize;

@@ -34,6 +34,7 @@ struct Stream_Configuration {
     CFDictionaryRef predefinedHttpHeaderValues;
     bool cacheEnabled;
     bool seekingFromCacheEnabled;
+    bool automaticAudioSessionHandlingEnabled;
     int maxDiskCacheSize;
     
     static Stream_Configuration *configuration();
