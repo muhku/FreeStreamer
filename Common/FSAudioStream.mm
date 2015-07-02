@@ -415,7 +415,11 @@ public:
         
         if ([fsAudioStreamPrivateActiveSessions count] == 0) {
             if (self.configuration.automaticAudioSessionHandlingEnabled) {
+#if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 60000)
+                [[AVAudioSession sharedInstance] setActive:NO withOptions:AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation error:nil];
+#else
                 [[AVAudioSession sharedInstance] setActive:NO error:nil];
+#endif
             }
         }
     }
@@ -776,7 +780,11 @@ public:
         
         if ([fsAudioStreamPrivateActiveSessions count] == 0) {
             if (self.configuration.automaticAudioSessionHandlingEnabled) {
+#if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 60000)
+                [[AVAudioSession sharedInstance] setActive:NO withOptions:AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation error:nil];
+#else
                 [[AVAudioSession sharedInstance] setActive:NO error:nil];
+#endif
             }
         }
     }
@@ -835,7 +843,11 @@ public:
         
         if ([fsAudioStreamPrivateActiveSessions count] == 0) {
             if (self.configuration.automaticAudioSessionHandlingEnabled) {
+#if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 60000)
+                [[AVAudioSession sharedInstance] setActive:NO withOptions:AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation error:nil];
+#else
                 [[AVAudioSession sharedInstance] setActive:NO error:nil];
+#endif
             }
         }
     }
@@ -1708,7 +1720,7 @@ void AudioStreamStateObserver::audioStreamStateChanged(astreamer::Audio_Stream::
     
     // Detach from the player so that the event loop can complete its cycle.
     // This ensures that the stream gets closed, if needs to be.
-    [NSTimer scheduledTimerWithTimeInterval:0.1
+    [NSTimer scheduledTimerWithTimeInterval:0
                                      target:priv
                                    selector:notificationHandler
                                    userInfo:nil
