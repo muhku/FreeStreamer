@@ -65,6 +65,7 @@ Audio_Stream::Audio_Stream() :
     m_ignoreDecodeQueueSize(false),
     m_audioQueueConsumedPackets(false),
     m_contentLength(0),
+    m_defaultContentLength(0),
     m_bytesReceived(0),
     m_state(STOPPED),
     m_inputStream(0),
