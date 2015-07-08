@@ -342,6 +342,9 @@ playback_short_file:
         if (_checkStreamState) {
             // Stream started playing.
             
+            XCTAssertTrue((_controller.activeStream.continuous), @"Stream must be continuous");
+            XCTAssertTrue((_controller.activeStream.contentLength == 0), @"Invalid content length");
+            
             XCTAssertTrue((_controller.volume == 0), @"Invalid controller volume");
             
             XCTAssertTrue((_controller.activeStream.volume == 0), @"Invalid stream volume");
@@ -524,6 +527,8 @@ playback_short_file:
         if (_checkStreamState) {
             if (tickCounter > 20) {
                 NSLog(@"2 seconds passed since the stream started playing, checking the state");
+                
+                XCTAssertFalse((_stream.continuous), @"Stream must be non-continuous");
                 
                 XCTAssertTrue((_stream.duration.minute == 4), @"Invalid stream duration (minutes)");
                 XCTAssertTrue((_stream.duration.second == 17), @"Invalid stream duration (seconds)");
