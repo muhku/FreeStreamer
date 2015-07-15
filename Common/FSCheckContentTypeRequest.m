@@ -104,7 +104,11 @@
     _format = kFSFileFormatUnknown;
     _playlist = NO;
     
-    if ([_contentType isEqualToString:@"audio/mpeg"]) {
+    if (((NSHTTPURLResponse*)response).statusCode / 100 != 2) {
+        //ignore response if statusCode is not 2xx
+        [self guessContentTypeByUrl:response];
+    }
+    else if ([_contentType isEqualToString:@"audio/mpeg"]) {
         _format = kFSFileFormatMP3;
     } else if ([_contentType isEqualToString:@"audio/x-wav"]) {
         _format = kFSFileFormatWAVE;
