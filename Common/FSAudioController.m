@@ -12,6 +12,8 @@
 #import "FSParsePlaylistRequest.h"
 #import "FSParseRssPodcastFeedRequest.h"
 
+#import <AVFoundation/AVFoundation.h>
+
 /**
  * Private interface for FSAudioController.
  */
@@ -87,11 +89,17 @@
 - (FSAudioStream *)audioStream
 {
     if (!_audioStream) {
+        FSStreamConfiguration *conf;
         if (self.audioController.configuration) {
-            _audioStream = [[FSAudioStream alloc] initWithConfiguration:self.audioController.configuration];
+            conf = self.audioController.configuration;
         } else {
-            _audioStream = [[FSAudioStream alloc] init];
+            conf = [[FSStreamConfiguration alloc] init];
         }
+        
+        // Disable audio session handling
+        conf.automaticAudioSessionHandlingEnabled = NO;
+        
+        _audioStream = [[FSAudioStream alloc] initWithConfiguration:conf];
         
         if (self.audioController.needToSetVolume) {
             _audioStream.volume = self.audioController.outputVolume;
@@ -202,6 +210,13 @@
         
         [proxy deactivate];
     }
+#if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 60000)
+    [[AVAudioSession sharedInstance] setActive:NO withOptions:AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation error:nil];
+#else
+    #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
+        [[AVAudioSession sharedInstance] setActive:NO error:nil];
+    #endif
+#endif
 }
 
 - (void)audioStreamStateDidChange:(NSNotification *)notification
@@ -254,6 +269,28 @@
                 [self.delegate audioController:self preloadStartedForStream:nextStream];
             }
         }
+    } else if (state == kFsAudioStreamStopped || state == kFsAudioStreamFailed) {
+        if (self.enableDebugOutput) {
+            NSLog(@"Stream stopped or failed. Deactivating audio session");
+        }
+#if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 60000)
+        [[AVAudioSession sharedInstance] setActive:NO withOptions:AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation error:nil];
+#else
+    #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
+        [[AVAudioSession sharedInstance] setActive:NO error:nil];
+    #endif
+#endif
+    } else if (state == kFsAudioStreamBuffering) {
+        if (self.enableDebugOutput) {
+            NSLog(@"Stream buffering. Activating audio session");
+        }
+#if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 60000)
+        [[AVAudioSession sharedInstance] setActive:YES withOptions:AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation error:nil];
+#else
+#if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
+        [[AVAudioSession sharedInstance] setActive:YES error:nil];
+#endif
+#endif
     }
 }
 
