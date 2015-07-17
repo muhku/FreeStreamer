@@ -220,7 +220,9 @@
         _format = kFSFileFormatXML;
         _xml = YES;
     } else {
-        
+#if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
+        NSLog(@"FSCheckContentTypeRequest: Failed to determine content type from the URL: %@", _url);
+#endif
         /*
          * Failed to guess the content type based on the URL.
          */
