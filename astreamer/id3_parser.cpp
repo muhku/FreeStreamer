@@ -337,7 +337,8 @@ void ID3_Parser_Private::feedData(UInt8 *data, UInt32 numBytes)
                     if (framesize == 0) {
                         setState(ID3_Parser_State_Not_Valid_Tag);
                         enoughBytesToParse = false;
-                        break;
+                        // Break from the loop and then out of the case context
+                        goto ParseFramesExit;
                     }
                     
                     if (m_majorVersion >= 3) {
@@ -442,6 +443,7 @@ void ID3_Parser_Private::feedData(UInt8 *data, UInt32 numBytes)
                 
                 setState(ID3_Parser_State_Tag_Parsed);
                 enoughBytesToParse = false;
+ParseFramesExit:
                 break;
             }
                 
