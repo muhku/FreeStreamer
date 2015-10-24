@@ -1,5 +1,6 @@
 FreeStreamer
 ====================
+[![BuddyBuild](https://dashboard.buddybuild.com/api/statusImage?appID=562ad6e924925601002113d5&branch=master&build=latest)](https://dashboard.buddybuild.com/apps/562ad6e924925601002113d5/build/latest)
 
 A streaming audio player for iOS and OS X.
 
