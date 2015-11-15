@@ -285,6 +285,8 @@
             NSLog(@"Stream buffering. Activating audio session");
         }
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 60000)
+        [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
+        
         [[AVAudioSession sharedInstance] setActive:YES withOptions:AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation error:nil];
 #else
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
