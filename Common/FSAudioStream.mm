@@ -912,6 +912,13 @@ public:
 
 - (void)attemptRestart
 {
+    if (_wasPaused) {
+#if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
+        NSLog(@"FSAudioStream: Stream was paused. Not attempting a restart");
+#endif
+        return;
+    }
+    
     if (!self.internetConnectionAvailable) {
 #if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
         NSLog(@"FSAudioStream: Internet connection not available. Not attempting a restart");
