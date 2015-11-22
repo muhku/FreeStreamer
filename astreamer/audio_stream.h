@@ -132,7 +132,6 @@ private:
     bool m_initialBufferingCompleted;
     bool m_discontinuity;
     bool m_preloading;
-    bool m_ignoreDecodeQueueSize;
     bool m_audioQueueConsumedPackets;
     
     UInt64 m_defaultContentLength;
@@ -190,6 +189,15 @@ private:
     
     bool m_queueCanAcceptPackets;
     bool m_converterRunOutOfData;
+    bool m_decoderShouldRun;
+    
+    pthread_cond_t m_converterHasData;
+    pthread_mutex_t m_converterMutex;
+    pthread_mutex_t m_packetQueueMutex;
+    
+    pthread_t m_decodeThread;
+    
+    CFRunLoopRef m_decodeRunLoop;
     
     CFStringRef createHashForString(CFStringRef str);
     
@@ -204,11 +212,16 @@ private:
     void invalidateWatchdogTimer();
     
     int cachedDataCount();
-    void enqueueCachedData(int minPacketsRequired);
+    void enqueueCachedData();
     void cleanupCachedData();
+    
+    void convertedAudioCallback(AudioBufferList outputBufferList, AudioStreamPacketDescription description);
     
     static void watchdogTimerCallback(CFRunLoopTimerRef timer, void *info);
     static void audioQueueTimerCallback(CFRunLoopTimerRef timer, void *info);
+    
+    static void decodeSinglePacket(CFRunLoopTimerRef timer, void *info);
+    static void *decodeLoop(void *arg);
     
     static OSStatus encoderDataCallback(AudioConverterRef inAudioConverter, UInt32 *ioNumberDataPackets, AudioBufferList *ioData, AudioStreamPacketDescription **outDataPacketDescription, void *inUserData);
     static void propertyValueCallback(void *inClientData, AudioFileStreamID inAudioFileStream, AudioFileStreamPropertyID inPropertyID, UInt32 *ioFlags);

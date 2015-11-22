@@ -78,7 +78,7 @@ static NSInteger sortCacheObjects(id co1, id co2, void *keyForSorting)
         [systemVersion appendString:@"OS X"];
 #endif
         
-        self.bufferCount    = 8;
+        self.bufferCount    = 3;
         self.bufferSize     = 32768;
         self.maxPacketDescs = 512;
         self.decodeQueueSize = 128;
@@ -1706,9 +1706,18 @@ void AudioStreamStateObserver::audioStreamStateChanged(astreamer::Audio_Stream::
         case astreamer::Audio_Stream::BUFFERING:
             notificationHandler = @selector(notifyPlaybackBuffering);
             break;
-        case astreamer::Audio_Stream::PLAYING:
-            notificationHandler = @selector(notifyPlaybackPlaying);
-            break;
+        case astreamer::Audio_Stream::PLAYING: {
+            // Special case: the PLAYING state comes from the audio converter thread
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [NSTimer scheduledTimerWithTimeInterval:0
+                                                 target:priv
+                                               selector:@selector(notifyPlaybackPlaying)
+                                               userInfo:nil
+                                                repeats:NO];
+            });
+            
+            return;
+        }
         case astreamer::Audio_Stream::PAUSED:
             notificationHandler = @selector(notifyPlaybackPaused);
             break;
@@ -1767,7 +1776,9 @@ void AudioStreamStateObserver::samplesAvailable(AudioBufferList samples, AudioSt
         int16_t *buffer = (int16_t *)samples.mBuffers[0].mData;
         NSUInteger count = description.mDataByteSize / sizeof(int16_t);
         
-        [priv.delegate audioStream:priv.stream samplesAvailable:buffer count:count];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [priv.delegate audioStream:priv.stream samplesAvailable:buffer count:count];
+        });
     }
 }
 
