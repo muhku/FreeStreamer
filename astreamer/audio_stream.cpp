@@ -1333,6 +1333,19 @@ void Audio_Stream::decodeSinglePacket(CFRunLoopTimerRef timer, void *info)
         }
     } else {
         AS_TRACE("AudioConverterFillComplexBuffer failed, error %i\n", err);
+        
+        if (THIS->m_decoderShouldRun) {
+            if (THIS->m_audioConverter) {
+                AudioConverterDispose(THIS->m_audioConverter);
+            }
+            
+            err = AudioConverterNew(&(THIS->m_srcFormat),
+                                    &(THIS->m_dstFormat),
+                                    &(THIS->m_audioConverter));
+            if (err) {
+                AS_TRACE("Error in creating an audio converter, error %i\n", err);
+            }
+        }
     }
 }
     
