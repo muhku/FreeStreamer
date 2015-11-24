@@ -1324,6 +1324,10 @@ void Audio_Stream::decodeSinglePacket(CFRunLoopTimerRef timer, void *info)
     if (err == noErr) {
         if (THIS->m_decoderShouldRun) {
             THIS->convertedAudioCallback(outputBufferList, description);
+            
+            if (THIS->m_delegate) {
+                THIS->m_delegate->samplesAvailable(outputBufferList, description);
+            }
         } else {
             AS_TRACE("decoder: disgard a converted audio packet, we are stopping\n");
         }
@@ -1338,7 +1342,7 @@ void *Audio_Stream::decodeLoop(void *data)
     
     THIS->m_decodeRunLoop = CFRunLoopGetCurrent();
     
-    // Set up a timer ticking once every 0.1 seconds to
+    // Set up a timer ticking once every 40ms to
     // run the decoder
     CFRunLoopTimerContext ctx;
     ctx.version = 0;
@@ -1348,8 +1352,8 @@ void *Audio_Stream::decodeLoop(void *data)
     ctx.copyDescription = NULL;
     CFRunLoopTimerRef timer =
     CFRunLoopTimerCreate (NULL,
-                          CFAbsoluteTimeGetCurrent() + 0.1,
-                          0.1,
+                          CFAbsoluteTimeGetCurrent() + 0.04,
+                          0.04,
                           0,
                           0,
                           decodeSinglePacket,
@@ -1606,10 +1610,6 @@ void Audio_Stream::convertedAudioCallback(AudioBufferList outputBufferList, Audi
                                      outputBufferList.mNumberBuffers,
                                      outputBufferList.mBuffers[0].mData,
                                      &description);
-    
-    if (m_delegate) {
-        m_delegate->samplesAvailable(outputBufferList, description);
-    }
     
     AS_LOCK_TRACE("convertedAudioCallback: unlock\n");
     pthread_mutex_unlock(&m_packetQueueMutex);
