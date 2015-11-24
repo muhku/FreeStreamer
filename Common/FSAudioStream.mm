@@ -81,7 +81,6 @@ static NSInteger sortCacheObjects(id co1, id co2, void *keyForSorting)
         self.bufferCount    = 3;
         self.bufferSize     = 32768;
         self.maxPacketDescs = 512;
-        self.decodeQueueSize = 128;
         self.httpConnectionBufferSize = 1024;
         self.outputSampleRate = 44100;
         self.outputNumChannels = 2;
@@ -640,7 +639,6 @@ public:
     config.bufferCount              = c->bufferCount;
     config.bufferSize               = c->bufferSize;
     config.maxPacketDescs           = c->maxPacketDescs;
-    config.decodeQueueSize          = c->decodeQueueSize;
     config.httpConnectionBufferSize = c->httpConnectionBufferSize;
     config.outputSampleRate         = c->outputSampleRate;
     config.outputNumChannels        = c->outputNumChannels;
@@ -1109,13 +1107,12 @@ public:
 
 -(NSString *)description
 {
-    return [NSString stringWithFormat:@"[FreeStreamer %@] URL: %@\nbufferCount: %i\nbufferSize: %i\nmaxPacketDescs: %i\ndecodeQueueSize: %i\nhttpConnectionBufferSize: %i\noutputSampleRate: %f\noutputNumChannels: %ld\nbounceInterval: %i\nmaxBounceCount: %i\nstartupWatchdogPeriod: %i\nmaxPrebufferedByteCount: %i\nformat: %@\nbit rate: %f\nuserAgent: %@\ncacheDirectory: %@\npredefinedHttpHeaderValues: %@\ncacheEnabled: %@\nseekingFromCacheEnabled: %@\nautomaticAudioSessionHandlingEnabled: %@\nmaxDiskCacheSize: %i\nusePrebufferSizeCalculationInSeconds: %@\nrequiredPrebufferSizeInSeconds: %f\nrequiredInitialPrebufferedByteCountForContinuousStream: %i\nrequiredInitialPrebufferedByteCountForNonContinuousStream: %i",
+    return [NSString stringWithFormat:@"[FreeStreamer %@] URL: %@\nbufferCount: %i\nbufferSize: %i\nmaxPacketDescs: %i\nhttpConnectionBufferSize: %i\noutputSampleRate: %f\noutputNumChannels: %ld\nbounceInterval: %i\nmaxBounceCount: %i\nstartupWatchdogPeriod: %i\nmaxPrebufferedByteCount: %i\nformat: %@\nbit rate: %f\nuserAgent: %@\ncacheDirectory: %@\npredefinedHttpHeaderValues: %@\ncacheEnabled: %@\nseekingFromCacheEnabled: %@\nautomaticAudioSessionHandlingEnabled: %@\nmaxDiskCacheSize: %i\nusePrebufferSizeCalculationInSeconds: %@\nrequiredPrebufferSizeInSeconds: %f\nrequiredInitialPrebufferedByteCountForContinuousStream: %i\nrequiredInitialPrebufferedByteCountForNonContinuousStream: %i",
             freeStreamerReleaseVersion(),
             self.url,
             self.configuration.bufferCount,
             self.configuration.bufferSize,
             self.configuration.maxPacketDescs,
-            self.configuration.decodeQueueSize,
             self.configuration.httpConnectionBufferSize,
             self.configuration.outputSampleRate,
             self.configuration.outputNumChannels,
@@ -1180,7 +1177,6 @@ public:
         c->bufferCount              = configuration.bufferCount;
         c->bufferSize               = configuration.bufferSize;
         c->maxPacketDescs           = configuration.maxPacketDescs;
-        c->decodeQueueSize          = configuration.decodeQueueSize;
         c->httpConnectionBufferSize = configuration.httpConnectionBufferSize;
         c->outputSampleRate         = configuration.outputSampleRate;
         c->outputNumChannels        = configuration.outputNumChannels;

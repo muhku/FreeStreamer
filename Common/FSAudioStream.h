@@ -126,10 +126,6 @@ typedef struct {
  */
 @property (nonatomic,assign) unsigned maxPacketDescs;
 /**
- * The decode queue size.
- */
-@property (nonatomic,assign) unsigned decodeQueueSize;
-/**
  * The HTTP connection buffer size.
  */
 @property (nonatomic,assign) unsigned httpConnectionBufferSize;
