@@ -1315,38 +1315,40 @@ void Audio_Stream::decodeSinglePacket(CFRunLoopTimerRef timer, void *info)
     
     AS_TRACE("calling AudioConverterFillComplexBuffer\n");
     
-    OSStatus err = AudioConverterFillComplexBuffer(THIS->m_audioConverter,
-                                                   &encoderDataCallback,
-                                                   THIS,
-                                                   &ioOutputDataPackets,
-                                                   &outputBufferList,
-                                                   NULL);
-    if (err == noErr) {
-        if (THIS->m_decoderShouldRun) {
-            THIS->convertedAudioCallback(outputBufferList, description);
-            
-            if (THIS->m_delegate) {
-                THIS->m_delegate->samplesAvailable(outputBufferList, description);
+    do {
+        OSStatus err = AudioConverterFillComplexBuffer(THIS->m_audioConverter,
+                                                       &encoderDataCallback,
+                                                       THIS,
+                                                       &ioOutputDataPackets,
+                                                       &outputBufferList,
+                                                       NULL);
+        if (err == noErr) {
+            if (THIS->m_decoderShouldRun) {
+                THIS->convertedAudioCallback(outputBufferList, description);
+                
+                if (THIS->m_delegate) {
+                    THIS->m_delegate->samplesAvailable(outputBufferList, description);
+                }
+            } else {
+                AS_TRACE("decoder: disgard a converted audio packet, we are stopping\n");
             }
         } else {
-            AS_TRACE("decoder: disgard a converted audio packet, we are stopping\n");
-        }
-    } else {
-        AS_TRACE("AudioConverterFillComplexBuffer failed, error %i\n", err);
-        
-        if (THIS->m_decoderShouldRun) {
-            if (THIS->m_audioConverter) {
-                AudioConverterDispose(THIS->m_audioConverter);
-            }
+            AS_TRACE("AudioConverterFillComplexBuffer failed, error %i\n", err);
             
-            err = AudioConverterNew(&(THIS->m_srcFormat),
-                                    &(THIS->m_dstFormat),
-                                    &(THIS->m_audioConverter));
-            if (err) {
-                AS_TRACE("Error in creating an audio converter, error %i\n", err);
+            if (THIS->m_decoderShouldRun) {
+                if (THIS->m_audioConverter) {
+                    AudioConverterDispose(THIS->m_audioConverter);
+                }
+                
+                err = AudioConverterNew(&(THIS->m_srcFormat),
+                                        &(THIS->m_dstFormat),
+                                        &(THIS->m_audioConverter));
+                if (err) {
+                    AS_TRACE("Error in creating an audio converter, error %i\n", err);
+                }
             }
         }
-    }
+    } while (THIS->m_decoderShouldRun && THIS->m_queueCanAcceptPackets);
 }
     
 void *Audio_Stream::decodeLoop(void *data)
@@ -1355,7 +1357,7 @@ void *Audio_Stream::decodeLoop(void *data)
     
     THIS->m_decodeRunLoop = CFRunLoopGetCurrent();
     
-    // Set up a timer ticking once every 40ms to
+    // Set up a timer ticking once every 20ms to
     // run the decoder
     CFRunLoopTimerContext ctx;
     ctx.version = 0;
@@ -1365,8 +1367,8 @@ void *Audio_Stream::decodeLoop(void *data)
     ctx.copyDescription = NULL;
     CFRunLoopTimerRef timer =
     CFRunLoopTimerCreate (NULL,
-                          CFAbsoluteTimeGetCurrent() + 0.04,
-                          0.04,
+                          CFAbsoluteTimeGetCurrent() + 0.02,
+                          0.02,
                           0,
                           0,
                           decodeSinglePacket,
