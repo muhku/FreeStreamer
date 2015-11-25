@@ -495,6 +495,10 @@
         _lastPlaybackURL = nil;
     }
     
+    if (_analyzerEnabled) {
+        [self toggleAnalyzer:self];
+    }
+    
     [super viewWillDisappear:animated];
 }
 
