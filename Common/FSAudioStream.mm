@@ -78,8 +78,8 @@ static NSInteger sortCacheObjects(id co1, id co2, void *keyForSorting)
         [systemVersion appendString:@"OS X"];
 #endif
         
-        self.bufferCount    = 10;
-        self.bufferSize     = 32768 / 2;
+        self.bufferCount    = 16;
+        self.bufferSize     = 32768 / 4;
         self.maxPacketDescs = 512;
         self.httpConnectionBufferSize = 1024;
         self.outputSampleRate = 44100;
@@ -126,23 +126,6 @@ static NSInteger sortCacheObjects(id co1, id co2, void *keyForSorting)
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
         /* iOS */
             
-#ifdef __LP64__
-        /* Running on iPhone 5s or later,
-         * so the default configuration is OK
-         */
-#else
-        /* 32-bit CPU, a bit older iPhone/iPad, increase
-         *  the buffer sizes a bit.
-         *
-         * Discussed here:
-         * https://github.com/muhku/FreeStreamer/issues/41
-         */
-        int scale = 2;
-            
-        self.bufferCount    *= scale;
-        self.bufferSize     *= scale;
-        self.maxPacketDescs *= scale;
-#endif
 #else
             /* OS X */
             
