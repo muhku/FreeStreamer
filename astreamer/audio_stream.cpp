@@ -449,6 +449,9 @@ void Audio_Stream::seekToOffset(float offset)
     queued_packet_t *seekPacket = 0;
     
     if (config->seekingFromCacheEnabled) {
+        AS_LOCK_TRACE("lock: seekToOffset\n");
+        pthread_mutex_lock(&m_packetQueueMutex);
+        
         queued_packet_t *cur = m_queuedHead;
         while (cur) {
             if (cur->identifier == m_packetIdentifier) {
@@ -460,6 +463,9 @@ void Audio_Stream::seekToOffset(float offset)
             queued_packet_t *tmp = cur->next;
             cur = tmp;
         }
+        
+        AS_LOCK_TRACE("unlock: seekToOffset\n");
+        pthread_mutex_unlock(&m_packetQueueMutex);
     } else {
         AS_TRACE("Seeking from cache disabled\n");
     }

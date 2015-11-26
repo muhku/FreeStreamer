@@ -738,10 +738,50 @@ playback_short_file:
     __weak FreeStreamerMobileTests *weakSelf = self;
     
     _stream.onStateChange = ^(FSAudioStreamState state) {
-        if (state == kFsAudioStreamPlaying) {
-            weakSelf.checkStreamState = YES;
-            
-            NSLog(@"Seek: stream started playing!");
+        switch (state) {
+            case kFsAudioStreamRetrievingURL:
+                NSLog(@"seek: kFsAudioStreamRetrievingURL");
+                break;
+            case kFsAudioStreamStopped:
+                NSLog(@"seek: kFsAudioStreamStopped");
+                break;
+            case kFsAudioStreamBuffering:
+                NSLog(@"seek: kFsAudioStreamBuffering");
+                break;
+            case kFsAudioStreamPlaying:
+                NSLog(@"seek: kFsAudioStreamPlaying");
+                weakSelf.checkStreamState = YES;
+                break;
+            case kFsAudioStreamPaused:
+                NSLog(@"seek: kFsAudioStreamPaused");
+                break;
+            case kFsAudioStreamSeeking:
+                NSLog(@"seek: kFsAudioStreamSeeking");
+                break;
+            case kFSAudioStreamEndOfFile:
+                NSLog(@"seek: kFSAudioStreamEndOfFile");
+                break;
+            case kFsAudioStreamFailed:
+                NSLog(@"seek: kFsAudioStreamFailed");
+                break;
+            case kFsAudioStreamRetryingStarted:
+                NSLog(@"seek: kFsAudioStreamRetryingStarted");
+                break;
+            case kFsAudioStreamRetryingSucceeded:
+                NSLog(@"seek: kFsAudioStreamRetryingSucceeded");
+                break;
+            case kFsAudioStreamRetryingFailed:
+                NSLog(@"seek: kFsAudioStreamRetryingFailed");
+                break;
+            case kFsAudioStreamPlaybackCompleted:
+                NSLog(@"seek: kFsAudioStreamPlaybackCompleted");
+                break;
+            case kFsAudioStreamUnknownState:
+                NSLog(@"seek: kFsAudioStreamUnknownState");
+                break;
+                
+            default:
+                break;
         }
     };
     
@@ -782,7 +822,7 @@ wait_for_playing:
                 FSStreamPosition pos = {0};
                 
                 if (loopCount % 2 == 0) {
-                    pos.position = 0.9;
+                    pos.position = 0.7;
                 } else {
                     pos.position = 0.1;
                 }
