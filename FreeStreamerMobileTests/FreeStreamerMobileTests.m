@@ -19,6 +19,7 @@
 @property (nonatomic,strong) FSAudioController *controller;
 @property (nonatomic,assign) BOOL keepRunning;
 @property (nonatomic,assign) BOOL checkStreamState;
+@property (nonatomic,assign) BOOL correctMetaDataReceived;
 @property (nonatomic,strong) FSParsePlaylistRequest *playlistRequest;
 
 @end
@@ -665,6 +666,10 @@ playback_short_file:
 
 - (void)testMetaData
 {
+    __weak FreeStreamerMobileTests *weakSelf = self;
+    
+    self.correctMetaDataReceived = NO;
+    
     [[NSNotificationCenter defaultCenter] addObserverForName:FSAudioStreamStateChangeNotification
                                                       object:nil
                                                        queue:nil
@@ -684,24 +689,25 @@ playback_short_file:
                                                       object:nil
                                                        queue:nil
                                                   usingBlock:^(NSNotification *notification) {
-                                                      
                                                       NSDictionary *dict = [notification userInfo];
                                                       NSDictionary *metaData = [dict valueForKey:FSAudioStreamNotificationKey_MetaData];
                                                       
                                                       NSLog(@"FSAudioStreamMetaDataNotification received!");
                                                       
-                                                      NSString *stationName = metaData[@"IcecastStationName"];
+                                                      NSString *artist = metaData[@"MPMediaItemPropertyArtist"];
                                                       
-                                                      XCTAssertTrue([stationName isEqualToString:@"bbc_radio_five_live"], @"Station name does not match.");
+                                                      XCTAssertTrue([artist isEqualToString:@"Matias Muhonen"], @"Artist name does not match.");
                                                   }];
     
-    _controller.activeStream.onMetaDataAvailable = ^(NSDictionary *metaData) {
-        NSString *stationName = metaData[@"IcecastStationName"];
+    _controller.onMetaDataAvailable = ^(NSDictionary *metaData) {
+        NSString *artist = metaData[@"MPMediaItemPropertyArtist"];
         
-        XCTAssertTrue([stationName isEqualToString:@"BBC 5Live"], @"Station name does not match.");
+        if ([artist isEqualToString:@"Matias Muhonen"]) {
+            weakSelf.correctMetaDataReceived = YES;
+        }
     };
     
-    _controller.url = [NSURL URLWithString:@"http://www.radiofeeds.co.uk/bbc5live.pls"];
+    _controller.url = [NSURL URLWithString:@"https://dl.dropboxusercontent.com/u/995250/FreeStreamer/As%20long%20as%20the%20stars%20shine.mp3"];
     [_controller play];
     
     NSTimeInterval timeout = 15.0;
@@ -719,10 +725,10 @@ playback_short_file:
             if (tickCounter > 20) {
                 NSLog(@"2 seconds passed since the stream started playing, checking the state");
                 
+                XCTAssertTrue((self.correctMetaDataReceived), @"Invalid meta data received");
+                
                 // Checks done, we are done.
                 _keepRunning = NO;
-                
-                XCTAssertTrue((_stream.totalCachedObjectsSize == 0), @"System has cached objects");
                 
                 return;
             } else {
