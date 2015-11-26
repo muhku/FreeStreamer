@@ -394,6 +394,15 @@ void Audio_Stream::seekToOffset(float offset)
         return;
     }
     
+    m_decoderShouldRun = false;
+    
+    /* If the converter is waiting for more data, signal it so that it doesn't
+     get stuck to pthread wait */
+    pthread_mutex_lock(&m_converterMutex);
+    m_converterRunOutOfData = false;
+    pthread_cond_signal(&m_converterHasData);
+    pthread_mutex_unlock(&m_converterMutex);
+    
     m_inputStream->setScheduledInRunLoop(false);
     
     // Close the audio queue so that it won't ask any more data
