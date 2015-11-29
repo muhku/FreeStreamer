@@ -39,6 +39,12 @@
 #define AS_LOCK_TRACE(...) printf("[audio_stream.cpp:%i thread %x] ", __LINE__, pthread_mach_thread_np(pthread_self())); printf(__VA_ARGS__)
 #endif
 
+#if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
+    #define AS_WARN(...) printf("[audio_stream.cpp:%i thread %x] ", __LINE__, pthread_mach_thread_np(pthread_self())); printf(__VA_ARGS__)
+#else
+    #define AS_WARN(...) do {} while (0)
+#endif
+
 namespace astreamer {
     
 static CFStringRef coreAudioErrorToCFString(CFStringRef basicErrorDescription, OSStatus error)
@@ -781,6 +787,8 @@ void Audio_Stream::audioQueueBuffersEmpty()
         // Always make sure we are scheduled to receive data if we start buffering
         m_inputStream->setScheduledInRunLoop(true);
         
+        AS_WARN("Audio queue run out data, starting buffering\n");
+        
         setState(BUFFERING);
         
         if (m_firstBufferingTime == 0) {
@@ -1353,7 +1361,7 @@ void Audio_Stream::decodeSinglePacket(CFRunLoopTimerRef timer, void *info)
                 AS_TRACE("decoder: disgard a converted audio packet, we are stopping\n");
             }
         } else {
-            AS_TRACE("AudioConverterFillComplexBuffer failed, error %i\n", err);
+            AS_WARN("AudioConverterFillComplexBuffer failed, error %i\n", err);
             
             if (THIS->m_decoderShouldRun) {
                 if (THIS->m_audioConverter) {
@@ -1815,7 +1823,7 @@ void Audio_Stream::propertyValueCallback(void *inClientData, AudioFileStreamID i
                                     &(THIS->m_audioConverter));
             
             if (err) {
-                AS_TRACE("Error in creating an audio converter, error %i\n", err);
+                AS_WARN("Error in creating an audio converter, error %i\n", err);
                 
                 THIS->m_initializationError = err;
             }
