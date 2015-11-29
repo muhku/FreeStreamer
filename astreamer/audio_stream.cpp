@@ -224,9 +224,9 @@ void Audio_Stream::open(Input_Stream_Position *position)
     m_bitRate = 0;
     m_metaDataSizeInBytes = 0;
     m_discontinuity = true;
-    m_audioQueueConsumedPackets = false;
     
     pthread_mutex_lock(&m_streamStateMutex);
+    m_audioQueueConsumedPackets = false;
     m_decoderShouldRun = false;
     pthread_mutex_unlock(&m_streamStateMutex);
     
@@ -1170,7 +1170,9 @@ void Audio_Stream::closeAudioQueue()
     
     AS_TRACE("Releasing audio queue\n");
     
+    pthread_mutex_lock(&m_streamStateMutex);
     m_audioQueueConsumedPackets = false;
+    pthread_mutex_unlock(&m_streamStateMutex);
     
     m_audioQueue->m_delegate = 0;
     delete m_audioQueue, m_audioQueue = 0;
@@ -1319,6 +1321,24 @@ void Audio_Stream::audioQueueTimerCallback(CFRunLoopTimerRef timer, void *info)
     AS_TRACE("audioQueueTimerCallback called\n");
     
     Audio_Stream *THIS = (Audio_Stream *)info;
+    
+    if (THIS->state() == BUFFERING) {
+        /*
+         * Notify the state change here, as NSNotification only works
+         * in the main thread.
+         */
+        
+        bool audioQueueConsumedPackets = false;
+        pthread_mutex_lock(&THIS->m_streamStateMutex);
+        audioQueueConsumedPackets = THIS->m_audioQueueConsumedPackets;
+        pthread_mutex_unlock(&THIS->m_streamStateMutex);
+        
+        if (audioQueueConsumedPackets) {
+            THIS->invalidateWatchdogTimer();
+            
+            THIS->setState(PLAYING);
+        }
+    }
 
     if (THIS->state() == SEEKING || THIS->state() == PAUSED) {
         return;
@@ -1620,7 +1640,12 @@ void Audio_Stream::enqueueCachedData()
     
     // If the stream has never started playing and we have received 90% of the data of the stream,
     // let's override the limits
-    if (!m_audioQueueConsumedPackets && contentLength() > 0) {
+    bool audioQueueConsumedPackets = false;
+    pthread_mutex_lock(&m_streamStateMutex);
+    audioQueueConsumedPackets = m_audioQueueConsumedPackets;
+    pthread_mutex_unlock(&m_streamStateMutex);
+    
+    if (!audioQueueConsumedPackets && contentLength() > 0) {
         const UInt64 seekLength = contentLength() * m_seekOffset;
         
         AS_TRACE("seek length %llu\n", seekLength);
@@ -1707,11 +1732,9 @@ void Audio_Stream::cleanupCachedData()
     
 void Audio_Stream::convertedAudioCallback(AudioBufferList outputBufferList, AudioStreamPacketDescription description)
 {
-    invalidateWatchdogTimer();
-    
-    setState(PLAYING);
-    
+    pthread_mutex_lock(&m_streamStateMutex);
     m_audioQueueConsumedPackets = true;
+    pthread_mutex_unlock(&m_streamStateMutex);
     
     AS_LOCK_TRACE("convertedAudioCallback: lock\n");
     pthread_mutex_lock(&m_packetQueueMutex);

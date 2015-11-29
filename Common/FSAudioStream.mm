@@ -1685,18 +1685,9 @@ void AudioStreamStateObserver::audioStreamStateChanged(astreamer::Audio_Stream::
         case astreamer::Audio_Stream::BUFFERING:
             notificationHandler = @selector(notifyPlaybackBuffering);
             break;
-        case astreamer::Audio_Stream::PLAYING: {
-            // Special case: the PLAYING state comes from the audio converter thread
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [NSTimer scheduledTimerWithTimeInterval:0
-                                                 target:priv
-                                               selector:@selector(notifyPlaybackPlaying)
-                                               userInfo:nil
-                                                repeats:NO];
-            });
-            
-            return;
-        }
+        case astreamer::Audio_Stream::PLAYING:
+            notificationHandler = @selector(notifyPlaybackPlaying);
+            break;
         case astreamer::Audio_Stream::PAUSED:
             notificationHandler = @selector(notifyPlaybackPaused);
             break;
