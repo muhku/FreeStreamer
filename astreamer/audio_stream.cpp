@@ -121,6 +121,7 @@ Audio_Stream::Audio_Stream() :
     m_converterHasData(PTHREAD_COND_INITIALIZER),
     m_converterMutex(PTHREAD_MUTEX_INITIALIZER),
     m_packetQueueMutex(PTHREAD_MUTEX_INITIALIZER),
+    m_streamStateMutex(PTHREAD_MUTEX_INITIALIZER),
     m_decodeRunLoop(NULL)
 {
     memset(&m_srcFormat, 0, sizeof m_srcFormat);
@@ -144,6 +145,9 @@ Audio_Stream::Audio_Stream() :
     if (pthread_mutex_init(&m_packetQueueMutex, NULL) != 0) {
         AS_TRACE("m_packetQueueMutex init failed!\n");
     }
+    if (pthread_mutex_init(&m_streamStateMutex, NULL) != 0) {
+        AS_TRACE("m_streamStateMutex init failed!\n");
+    }
     if (pthread_cond_init(&m_converterHasData, NULL) != 0) {
         AS_TRACE("m_converterHasData init failed!\n");
     }
@@ -154,7 +158,9 @@ Audio_Stream::Audio_Stream() :
 
 Audio_Stream::~Audio_Stream()
 {
+    pthread_mutex_lock(&m_streamStateMutex);
     m_decoderShouldRun = false;
+    pthread_mutex_unlock(&m_streamStateMutex);
     
     /* If the converter is waiting for more data, signal it so that it doesn't
      get stuck to pthread wait */
@@ -191,6 +197,7 @@ Audio_Stream::~Audio_Stream()
     pthread_cond_destroy(&m_converterHasData);
     pthread_mutex_destroy(&m_converterMutex);
     pthread_mutex_destroy(&m_packetQueueMutex);
+    pthread_mutex_destroy(&m_streamStateMutex);
 }
     
 void Audio_Stream::open()
@@ -218,7 +225,10 @@ void Audio_Stream::open(Input_Stream_Position *position)
     m_metaDataSizeInBytes = 0;
     m_discontinuity = true;
     m_audioQueueConsumedPackets = false;
+    
+    pthread_mutex_lock(&m_streamStateMutex);
     m_decoderShouldRun = false;
+    pthread_mutex_unlock(&m_streamStateMutex);
     
     invalidateWatchdogTimer();
     
@@ -257,8 +267,13 @@ void Audio_Stream::open(Input_Stream_Position *position)
         
         setState(BUFFERING);
         
+        pthread_mutex_lock(&m_streamStateMutex);
         if (!m_preloading && config->startupWatchdogPeriod > 0) {
+            pthread_mutex_unlock(&m_streamStateMutex);
+            
             createWatchdogTimer();
+        } else {
+            pthread_mutex_unlock(&m_streamStateMutex);
         }
     } else {
         closeAndSignalError(AS_ERR_OPEN, CFSTR("Input stream open error"));
@@ -269,7 +284,9 @@ void Audio_Stream::close(bool closeParser)
 {
     AS_TRACE("%s: enter\n", __PRETTY_FUNCTION__);
     
+    pthread_mutex_lock(&m_streamStateMutex);
     m_decoderShouldRun = false;
+    pthread_mutex_unlock(&m_streamStateMutex);
     
     /* If the converter is waiting for more data, signal it so that it doesn't
        get stuck to pthread wait */
@@ -339,7 +356,9 @@ void Audio_Stream::pause()
     
 void Audio_Stream::startCachedDataPlayback()
 {
+    pthread_mutex_lock(&m_streamStateMutex);
     m_preloading = false;
+    pthread_mutex_unlock(&m_streamStateMutex);
     
     enqueueCachedData();
 }
@@ -400,7 +419,9 @@ void Audio_Stream::seekToOffset(float offset)
         return;
     }
     
+    pthread_mutex_lock(&m_streamStateMutex);
     m_decoderShouldRun = false;
+    pthread_mutex_unlock(&m_streamStateMutex);
     
     /* If the converter is waiting for more data, signal it so that it doesn't
      get stuck to pthread wait */
@@ -633,12 +654,17 @@ void Audio_Stream::setContentLength(UInt64 contentLength)
     
 void Audio_Stream::setPreloading(bool preloading)
 {
+    pthread_mutex_lock(&m_streamStateMutex);
     m_preloading = preloading;
+    pthread_mutex_unlock(&m_streamStateMutex);
 }
     
 bool Audio_Stream::isPreloading()
 {
-    return m_preloading;
+    pthread_mutex_lock(&m_streamStateMutex);
+    bool preloading = m_preloading;
+    pthread_mutex_unlock(&m_streamStateMutex);
+    return preloading;
 }
     
 void Audio_Stream::setOutputFile(CFURLRef url)
@@ -851,12 +877,16 @@ void Audio_Stream::audioQueueBuffersEmpty()
     
 void Audio_Stream::audioQueueOverflow()
 {
+    pthread_mutex_lock(&m_streamStateMutex);
     m_queueCanAcceptPackets = false;
+    pthread_mutex_unlock(&m_streamStateMutex);
 }
     
 void Audio_Stream::audioQueueUnderflow()
 {
+    pthread_mutex_lock(&m_streamStateMutex);
     m_queueCanAcceptPackets = true;
+    pthread_mutex_unlock(&m_streamStateMutex);
 }
     
 void Audio_Stream::audioQueueInitializationFailed()
@@ -1125,7 +1155,9 @@ Audio_Queue* Audio_Stream::audioQueue()
         
         m_audioQueue->m_initialOutputVolume = m_outputVolume;
         
+        pthread_mutex_lock(&m_streamStateMutex);
         m_queueCanAcceptPackets = true;
+        pthread_mutex_unlock(&m_streamStateMutex);
     }
     return m_audioQueue;
 }
@@ -1308,25 +1340,33 @@ void Audio_Stream::decodeSinglePacket(CFRunLoopTimerRef timer, void *info)
 {
     Audio_Stream *THIS = (Audio_Stream *)info;
     
+    pthread_mutex_lock(&THIS->m_streamStateMutex);
+    
     if (!THIS->m_decoderShouldRun) {
         AS_TRACE("decoder bail out: decoder should not run!\n");
+        pthread_mutex_unlock(&THIS->m_streamStateMutex);
         return;
     }
     
     if (THIS->m_preloading) {
         AS_TRACE("decoder bail out: preloading!\n");
+        pthread_mutex_unlock(&THIS->m_streamStateMutex);
         return;
     }
     
     if (!THIS->m_queueCanAcceptPackets) {
         AS_TRACE("decoder bail out: queue cannot accept packets!\n");
+        pthread_mutex_unlock(&THIS->m_streamStateMutex);
         return;
     }
     
     if (THIS->m_dstFormat.mBytesPerPacket == 0) {
         AS_TRACE("decoder bail out: invalid dst format!\n");
+        pthread_mutex_unlock(&THIS->m_streamStateMutex);
         return;
     }
+    
+    pthread_mutex_unlock(&THIS->m_streamStateMutex);
     
     AudioBufferList outputBufferList;
     outputBufferList.mNumberBuffers = 1;
@@ -1343,7 +1383,16 @@ void Audio_Stream::decodeSinglePacket(CFRunLoopTimerRef timer, void *info)
     
     AS_TRACE("calling AudioConverterFillComplexBuffer\n");
     
-    do {
+    for (;;) {
+        pthread_mutex_lock(&THIS->m_streamStateMutex);
+        
+        if (!THIS->m_decoderShouldRun || !THIS->m_queueCanAcceptPackets) {
+            pthread_mutex_unlock(&THIS->m_streamStateMutex);
+            break;
+        } else {
+            pthread_mutex_unlock(&THIS->m_streamStateMutex);
+        }
+        
         OSStatus err = AudioConverterFillComplexBuffer(THIS->m_audioConverter,
                                                        &encoderDataCallback,
                                                        THIS,
@@ -1351,19 +1400,26 @@ void Audio_Stream::decodeSinglePacket(CFRunLoopTimerRef timer, void *info)
                                                        &outputBufferList,
                                                        NULL);
         if (err == noErr) {
+            pthread_mutex_lock(&THIS->m_streamStateMutex);
             if (THIS->m_decoderShouldRun) {
+                pthread_mutex_unlock(&THIS->m_streamStateMutex);
+                
                 THIS->convertedAudioCallback(outputBufferList, description);
                 
                 if (THIS->m_delegate) {
                     THIS->m_delegate->samplesAvailable(outputBufferList, description);
                 }
             } else {
+                pthread_mutex_unlock(&THIS->m_streamStateMutex);
                 AS_TRACE("decoder: disgard a converted audio packet, we are stopping\n");
             }
         } else {
             AS_WARN("AudioConverterFillComplexBuffer failed, error %i\n", err);
             
+            pthread_mutex_lock(&THIS->m_streamStateMutex);
             if (THIS->m_decoderShouldRun) {
+                pthread_mutex_unlock(&THIS->m_streamStateMutex);
+                
                 if (THIS->m_audioConverter) {
                     AudioConverterDispose(THIS->m_audioConverter);
                 }
@@ -1374,9 +1430,11 @@ void Audio_Stream::decodeSinglePacket(CFRunLoopTimerRef timer, void *info)
                 if (err) {
                     AS_TRACE("Error in creating an audio converter, error %i\n", err);
                 }
+            } else {
+                pthread_mutex_unlock(&THIS->m_streamStateMutex);
             }
         }
-    } while (THIS->m_decoderShouldRun && THIS->m_queueCanAcceptPackets);
+    };
 }
     
 void *Audio_Stream::decodeLoop(void *data)
@@ -1513,9 +1571,13 @@ int Audio_Stream::audioQueuePacketCount()
     
 void Audio_Stream::enqueueCachedData()
 {
+    pthread_mutex_lock(&m_streamStateMutex);
     if (!m_queueCanAcceptPackets) {
         AS_TRACE("Queue cannot accept packets, return\n");
+        pthread_mutex_unlock(&m_streamStateMutex);
         return;
+    } else {
+        pthread_mutex_unlock(&m_streamStateMutex);
     }
     
     if (state() == PAUSED || state() == SEEKING) {
@@ -1547,7 +1609,10 @@ void Audio_Stream::enqueueCachedData()
             AS_TRACE("buffered %zu bytes, required for playback %i, starting playback\n", m_cachedDataSize, lim);
             
             m_initialBufferingCompleted = true;
+            
+            pthread_mutex_lock(&m_streamStateMutex);
             m_decoderShouldRun = true;
+            pthread_mutex_unlock(&m_streamStateMutex);
         } else {
             AS_TRACE("not enough cached data to start playback\n");
         }
@@ -1566,7 +1631,9 @@ void Audio_Stream::enqueueCachedData()
         
         if (m_bytesReceived >= numBytesRequiredToBeBuffered) {
             m_initialBufferingCompleted = true;
+            pthread_mutex_lock(&m_streamStateMutex);
             m_decoderShouldRun = true;
+            pthread_mutex_unlock(&m_streamStateMutex);
             
             AS_TRACE("%llu bytes received, overriding buffering limits\n", m_bytesReceived);
         }
