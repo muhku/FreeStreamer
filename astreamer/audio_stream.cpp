@@ -1666,7 +1666,7 @@ void Audio_Stream::enqueueCachedData()
     
     // For continuous streams, we don't need to accummulate the data for seeking
     if (continuous) {
-        //cleanupCachedData();
+        cleanupCachedData();
     } else {
         // For non-continuous streams, keep previous data for seeking
         AS_LOCK_TRACE("enqueueCachedData: lock\n");
@@ -1687,14 +1687,17 @@ void Audio_Stream::enqueueCachedData()
     
 void Audio_Stream::cleanupCachedData()
 {
+    AS_LOCK_TRACE("cleanupCachedData: lock\n");
+    pthread_mutex_lock(&m_packetQueueMutex);
+    
     if (m_processedPackets.size() == 0) {
+        AS_LOCK_TRACE("cleanupCachedData: unlock\n");
+        pthread_mutex_unlock(&m_packetQueueMutex);
+        
         // Nothing can be cleaned yet, sorry
         AS_TRACE("Cache cleanup called but no free packets\n");
         return;
     }
-    
-    AS_LOCK_TRACE("cleanupCachedData: lock\n");
-    pthread_mutex_lock(&m_packetQueueMutex);
     
     queued_packet_t *lastPacket = m_processedPackets.back();
     
@@ -1736,16 +1739,10 @@ void Audio_Stream::convertedAudioCallback(AudioBufferList outputBufferList, Audi
     m_audioQueueConsumedPackets = true;
     pthread_mutex_unlock(&m_streamStateMutex);
     
-    AS_LOCK_TRACE("convertedAudioCallback: lock\n");
-    pthread_mutex_lock(&m_packetQueueMutex);
-    
     audioQueue()->handleAudioPackets(outputBufferList.mBuffers[0].mDataByteSize,
                                      outputBufferList.mNumberBuffers,
                                      outputBufferList.mBuffers[0].mData,
                                      &description);
-    
-    AS_LOCK_TRACE("convertedAudioCallback: unlock\n");
-    pthread_mutex_unlock(&m_packetQueueMutex);
 }
     
 OSStatus Audio_Stream::encoderDataCallback(AudioConverterRef inAudioConverter, UInt32 *ioNumberDataPackets, AudioBufferList *ioData, AudioStreamPacketDescription **outDataPacketDescription, void *inUserData)
