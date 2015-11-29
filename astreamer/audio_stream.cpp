@@ -1301,17 +1301,22 @@ void Audio_Stream::decodeSinglePacket(CFRunLoopTimerRef timer, void *info)
     Audio_Stream *THIS = (Audio_Stream *)info;
     
     if (!THIS->m_decoderShouldRun) {
-        AS_TRACE("decoder bail out: decoder should not run!");
+        AS_TRACE("decoder bail out: decoder should not run!\n");
+        return;
+    }
+    
+    if (THIS->m_preloading) {
+        AS_TRACE("decoder bail out: preloading!\n");
         return;
     }
     
     if (!THIS->m_queueCanAcceptPackets) {
-        AS_TRACE("decoder bail out: queue cannot accept packets!");
+        AS_TRACE("decoder bail out: queue cannot accept packets!\n");
         return;
     }
     
     if (THIS->m_dstFormat.mBytesPerPacket == 0) {
-        AS_TRACE("decoder bail out: invalid dst format!");
+        AS_TRACE("decoder bail out: invalid dst format!\n");
         return;
     }
     
