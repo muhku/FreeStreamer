@@ -118,10 +118,6 @@ Audio_Stream::Audio_Stream() :
     m_queueCanAcceptPackets(true),
     m_converterRunOutOfData(false),
     m_decoderShouldRun(false),
-    m_converterHasData(PTHREAD_COND_INITIALIZER),
-    m_converterMutex(PTHREAD_MUTEX_INITIALIZER),
-    m_packetQueueMutex(PTHREAD_MUTEX_INITIALIZER),
-    m_streamStateMutex(PTHREAD_MUTEX_INITIALIZER),
     m_decodeRunLoop(NULL)
 {
     memset(&m_srcFormat, 0, sizeof m_srcFormat);

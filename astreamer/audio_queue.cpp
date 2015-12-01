@@ -61,8 +61,7 @@ Audio_Queue::Audio_Queue()
     m_queuedHead(0),
     m_queuedTail(0),
     m_lastError(noErr),
-    m_initialOutputVolume(1.0),
-    m_mutex(PTHREAD_MUTEX_INITIALIZER)
+    m_initialOutputVolume(1.0)
 {
     Stream_Configuration *config = Stream_Configuration::configuration();
     
