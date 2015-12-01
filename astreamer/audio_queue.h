@@ -76,6 +76,8 @@ private:
     struct queued_packet *m_queuedHead;
     struct queued_packet *m_queuedTail;
     
+    pthread_mutex_t m_mutex;
+    
 public:
     OSStatus m_lastError;
     AudioStreamBasicDescription m_streamDesc;
