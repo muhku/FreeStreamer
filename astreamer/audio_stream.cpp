@@ -1430,7 +1430,7 @@ void Audio_Stream::decodeSinglePacket(CFRunLoopTimerRef timer, void *info)
                 AS_TRACE("decoder: disgard a converted audio packet, we are stopping\n");
             }
         } else {
-            AS_WARN("AudioConverterFillComplexBuffer failed, error %i\n", err);
+            AS_WARN("AudioConverterFillComplexBuffer failed, error %i\n", (int)err);
             
             pthread_mutex_lock(&THIS->m_streamStateMutex);
             if (THIS->m_decoderShouldRun) {
@@ -1906,7 +1906,7 @@ void Audio_Stream::propertyValueCallback(void *inClientData, AudioFileStreamID i
                                     &(THIS->m_audioConverter));
             
             if (err) {
-                AS_WARN("Error in creating an audio converter, error %i\n", err);
+                AS_WARN("Error in creating an audio converter, error %i\n", (int)err);
                 
                 THIS->m_initializationError = err;
             }
