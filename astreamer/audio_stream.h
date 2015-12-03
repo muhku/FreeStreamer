@@ -193,8 +193,6 @@ private:
     bool m_decoderShouldRun;
     bool m_decoderFailed;
     
-    pthread_cond_t m_converterHasData;
-    pthread_mutex_t m_converterMutex;
     pthread_mutex_t m_packetQueueMutex;
     pthread_mutex_t m_streamStateMutex;
     

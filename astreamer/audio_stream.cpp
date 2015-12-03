@@ -136,17 +136,11 @@ Audio_Stream::Audio_Stream() :
     m_dstFormat.mChannelsPerFrame = 2;
     m_dstFormat.mBitsPerChannel = 16;
     
-    if (pthread_mutex_init(&m_converterMutex, NULL) != 0) {
-        AS_TRACE("m_convertexMutex init failed!\n");
-    }
     if (pthread_mutex_init(&m_packetQueueMutex, NULL) != 0) {
         AS_TRACE("m_packetQueueMutex init failed!\n");
     }
     if (pthread_mutex_init(&m_streamStateMutex, NULL) != 0) {
         AS_TRACE("m_streamStateMutex init failed!\n");
-    }
-    if (pthread_cond_init(&m_converterHasData, NULL) != 0) {
-        AS_TRACE("m_converterHasData init failed!\n");
     }
     
     pthread_create(&m_decodeThread, NULL, decodeLoop, this);
@@ -158,13 +152,6 @@ Audio_Stream::~Audio_Stream()
     pthread_mutex_lock(&m_streamStateMutex);
     m_decoderShouldRun = false;
     pthread_mutex_unlock(&m_streamStateMutex);
-    
-    /* If the converter is waiting for more data, signal it so that it doesn't
-     get stuck to pthread wait */
-    pthread_mutex_lock(&m_converterMutex);
-    m_converterRunOutOfData = false;
-    pthread_cond_signal(&m_converterHasData);
-    pthread_mutex_unlock(&m_converterMutex);
     
     if (m_decodeRunLoop) {
         CFRunLoopStop(m_decodeRunLoop);
@@ -191,8 +178,6 @@ Audio_Stream::~Audio_Stream()
         delete m_fileOutput, m_fileOutput = 0;
     }
     
-    pthread_cond_destroy(&m_converterHasData);
-    pthread_mutex_destroy(&m_converterMutex);
     pthread_mutex_destroy(&m_packetQueueMutex);
     pthread_mutex_destroy(&m_streamStateMutex);
 }
@@ -285,14 +270,6 @@ void Audio_Stream::close(bool closeParser)
     pthread_mutex_lock(&m_streamStateMutex);
     m_decoderShouldRun = false;
     pthread_mutex_unlock(&m_streamStateMutex);
-    
-    /* If the converter is waiting for more data, signal it so that it doesn't
-       get stuck to pthread wait */
-    pthread_mutex_lock(&m_converterMutex);
-    m_converterRunOutOfData = false;
-    m_decoderFailed         = false;
-    pthread_cond_signal(&m_converterHasData);
-    pthread_mutex_unlock(&m_converterMutex);
     
     invalidateWatchdogTimer();
     
@@ -421,13 +398,6 @@ void Audio_Stream::seekToOffset(float offset)
     pthread_mutex_lock(&m_streamStateMutex);
     m_decoderShouldRun = false;
     pthread_mutex_unlock(&m_streamStateMutex);
-    
-    /* If the converter is waiting for more data, signal it so that it doesn't
-     get stuck to pthread wait */
-    pthread_mutex_lock(&m_converterMutex);
-    m_converterRunOutOfData = false;
-    pthread_cond_signal(&m_converterHasData);
-    pthread_mutex_unlock(&m_converterMutex);
     
     m_inputStream->setScheduledInRunLoop(false);
     
@@ -1364,6 +1334,7 @@ void Audio_Stream::decodeSinglePacket(CFRunLoopTimerRef timer, void *info)
         
         if (THIS->m_preloading ||
             !THIS->m_decoderShouldRun ||
+            THIS->m_converterRunOutOfData ||
             !THIS->m_queueCanAcceptPackets ||
             THIS->m_decoderFailed ||
             THIS->m_dstFormat.mBytesPerPacket == 0) {
@@ -1571,6 +1542,28 @@ void Audio_Stream::enqueueCachedData()
         pthread_mutex_unlock(&m_streamStateMutex);
     }
     
+    pthread_mutex_lock(&m_streamStateMutex);
+    if (m_converterRunOutOfData) {
+        AS_TRACE("Converter run out of data\n");
+        
+        if (m_audioConverter) {
+            AudioConverterDispose(m_audioConverter);
+        }
+        
+        OSStatus err = AudioConverterNew(&(m_srcFormat),
+                                         &(m_dstFormat),
+                                         &(m_audioConverter));
+        
+        if (err) {
+            AS_TRACE("Error in creating an audio converter, error %i\n", err);
+            
+            m_initializationError = err;
+        }
+        
+        m_converterRunOutOfData = false;
+    }
+    pthread_mutex_unlock(&m_streamStateMutex);
+    
     if (state() == PAUSED || state() == SEEKING) {
         return;
     }
@@ -1731,34 +1724,26 @@ OSStatus Audio_Stream::encoderDataCallback(AudioConverterRef inAudioConverter, U
     if (!front) {
         /* Don't deadlock */
         AS_LOCK_TRACE("encoderDataCallback 2: unlock\n");
+        
         pthread_mutex_unlock(&THIS->m_packetQueueMutex);
         
-        /* Wait until we got some more packets for conversion */
-        pthread_mutex_lock(&THIS->m_converterMutex);
+        /*
+         * End of stream - Inside your input procedure, you must set the total amount of packets read and the sizes of the data in the AudioBufferList to zero. The input procedure should also return noErr. This will signal the AudioConverter that you are out of data. More specifically, set ioNumberDataPackets and ioBufferList->mDataByteSize to zero in your input proc and return noErr. Where ioNumberDataPackets is the amount of data converted and ioBufferList->mDataByteSize is the size of the amount of data converted in each AudioBuffer within your input procedure callback. Your input procedure may be called a few more times; you should just keep returning zero and noErr.
+         */
         
-        AS_TRACE("*** Converter run out of data, waiting...\n");
-        
+        pthread_mutex_lock(&THIS->m_streamStateMutex);
         THIS->m_converterRunOutOfData = true;
-        while (THIS->m_converterRunOutOfData) {
-            AS_LOCK_TRACE("encoderDataCallback: pthread_cond_wait\n");
-            pthread_cond_wait(&THIS->m_converterHasData, &THIS->m_converterMutex);
-        }
-        pthread_mutex_unlock(&THIS->m_converterMutex);
+        pthread_mutex_unlock(&THIS->m_streamStateMutex);
         
-        AS_LOCK_TRACE("encoderDataCallback 3: lock\n");
-        pthread_mutex_lock(&THIS->m_packetQueueMutex);
-        front = THIS->m_playPacket;
+        *ioNumberDataPackets = 0;
         
-        if (!front) {
-            AS_LOCK_TRACE("encoderDataCallback 4: unlock\n");
-            pthread_mutex_unlock(&THIS->m_packetQueueMutex);
-            
-            /* If we don't have front at this point, it means that we are closing.
-               Bail out. */
-            *ioNumberDataPackets = 0;
-            ioData->mBuffers[0].mDataByteSize = 0;
-            return noErr;
-        }
+        ioData->mBuffers[0].mDataByteSize = 0;
+        
+        return noErr;
+    } else {
+        pthread_mutex_lock(&THIS->m_streamStateMutex);
+        THIS->m_converterRunOutOfData = false;
+        pthread_mutex_unlock(&THIS->m_streamStateMutex);
     }
     
     *ioNumberDataPackets = 1;
@@ -1954,15 +1939,6 @@ void Audio_Stream::streamDataCallback(void *inClientData, UInt32 inNumberBytes, 
         
         AS_LOCK_TRACE("streamDataCallback: unlock\n");
         pthread_mutex_unlock(&THIS->m_packetQueueMutex);
-        
-        if (THIS->m_converterRunOutOfData) {
-            AS_TRACE("Converter run out of data, signaling there's more!\n");
-            
-            pthread_mutex_lock(&THIS->m_converterMutex);
-            THIS->m_converterRunOutOfData = false;
-            pthread_cond_signal(&THIS->m_converterHasData);
-            pthread_mutex_unlock(&THIS->m_converterMutex);
-        }
         
         if (THIS->m_cachedDataSize >= config->maxPrebufferedByteCount) {
             AS_TRACE("Cache overflow, disabling the HTTP stream\n");
