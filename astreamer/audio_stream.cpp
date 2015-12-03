@@ -1356,58 +1356,33 @@ void Audio_Stream::decodeSinglePacket(CFRunLoopTimerRef timer, void *info)
 {
     Audio_Stream *THIS = (Audio_Stream *)info;
     
-    pthread_mutex_lock(&THIS->m_streamStateMutex);
-    
-    if (!THIS->m_decoderShouldRun) {
-        AS_TRACE("decoder bail out: decoder should not run!\n");
-        pthread_mutex_unlock(&THIS->m_streamStateMutex);
-        return;
-    }
-    
-    if (THIS->m_preloading) {
-        AS_TRACE("decoder bail out: preloading!\n");
-        pthread_mutex_unlock(&THIS->m_streamStateMutex);
-        return;
-    }
-    
-    if (!THIS->m_queueCanAcceptPackets) {
-        AS_TRACE("decoder bail out: queue cannot accept packets!\n");
-        pthread_mutex_unlock(&THIS->m_streamStateMutex);
-        return;
-    }
-    
-    if (THIS->m_dstFormat.mBytesPerPacket == 0) {
-        AS_TRACE("decoder bail out: invalid dst format!\n");
-        pthread_mutex_unlock(&THIS->m_streamStateMutex);
-        return;
-    }
-    
-    pthread_mutex_unlock(&THIS->m_streamStateMutex);
-    
-    AudioBufferList outputBufferList;
-    outputBufferList.mNumberBuffers = 1;
-    outputBufferList.mBuffers[0].mNumberChannels = THIS->m_dstFormat.mChannelsPerFrame;
-    outputBufferList.mBuffers[0].mDataByteSize = THIS->m_outputBufferSize;
-    outputBufferList.mBuffers[0].mData = THIS->m_outputBuffer;
-    
-    AudioStreamPacketDescription description;
-    description.mStartOffset = 0;
-    description.mDataByteSize = THIS->m_outputBufferSize;
-    description.mVariableFramesInPacket = 0;
-    
-    UInt32 ioOutputDataPackets = THIS->m_outputBufferSize / THIS->m_dstFormat.mBytesPerPacket;
-    
     AS_TRACE("calling AudioConverterFillComplexBuffer\n");
     
     for (;;) {
         pthread_mutex_lock(&THIS->m_streamStateMutex);
         
-        if (!THIS->m_decoderShouldRun || !THIS->m_queueCanAcceptPackets) {
+        if (THIS->m_preloading ||
+            !THIS->m_decoderShouldRun ||
+            !THIS->m_queueCanAcceptPackets ||
+            THIS->m_dstFormat.mBytesPerPacket == 0) {
             pthread_mutex_unlock(&THIS->m_streamStateMutex);
-            break;
+            return;
         } else {
             pthread_mutex_unlock(&THIS->m_streamStateMutex);
         }
+        
+        AudioBufferList outputBufferList;
+        outputBufferList.mNumberBuffers = 1;
+        outputBufferList.mBuffers[0].mNumberChannels = THIS->m_dstFormat.mChannelsPerFrame;
+        outputBufferList.mBuffers[0].mDataByteSize = THIS->m_outputBufferSize;
+        outputBufferList.mBuffers[0].mData = THIS->m_outputBuffer;
+        
+        AudioStreamPacketDescription description;
+        description.mStartOffset = 0;
+        description.mDataByteSize = THIS->m_outputBufferSize;
+        description.mVariableFramesInPacket = 0;
+        
+        UInt32 ioOutputDataPackets = THIS->m_outputBufferSize / THIS->m_dstFormat.mBytesPerPacket;
         
         OSStatus err = AudioConverterFillComplexBuffer(THIS->m_audioConverter,
                                                        &encoderDataCallback,
@@ -1428,11 +1403,14 @@ void Audio_Stream::decodeSinglePacket(CFRunLoopTimerRef timer, void *info)
             } else {
                 pthread_mutex_unlock(&THIS->m_streamStateMutex);
                 AS_TRACE("decoder: disgard a converted audio packet, we are stopping\n");
+                return;
             }
         } else if (err == kAudio_ParamError) {
             AS_TRACE("decoder: converter param error\n");
+            return;
         } else {
             AS_WARN("AudioConverterFillComplexBuffer failed, error %i\n", (int)err);
+            return;
         }
     };
 }
