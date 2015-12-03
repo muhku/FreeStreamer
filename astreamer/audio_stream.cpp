@@ -1429,26 +1429,10 @@ void Audio_Stream::decodeSinglePacket(CFRunLoopTimerRef timer, void *info)
                 pthread_mutex_unlock(&THIS->m_streamStateMutex);
                 AS_TRACE("decoder: disgard a converted audio packet, we are stopping\n");
             }
+        } else if (err == kAudio_ParamError) {
+            AS_TRACE("decoder: converter param error\n");
         } else {
             AS_WARN("AudioConverterFillComplexBuffer failed, error %i\n", (int)err);
-            
-            pthread_mutex_lock(&THIS->m_streamStateMutex);
-            if (THIS->m_decoderShouldRun) {
-                pthread_mutex_unlock(&THIS->m_streamStateMutex);
-                
-                if (THIS->m_audioConverter) {
-                    AudioConverterDispose(THIS->m_audioConverter);
-                }
-                
-                err = AudioConverterNew(&(THIS->m_srcFormat),
-                                        &(THIS->m_dstFormat),
-                                        &(THIS->m_audioConverter));
-                if (err) {
-                    AS_TRACE("Error in creating an audio converter, error %i\n", err);
-                }
-            } else {
-                pthread_mutex_unlock(&THIS->m_streamStateMutex);
-            }
         }
     };
 }
