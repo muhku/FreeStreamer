@@ -1365,6 +1365,7 @@ void Audio_Stream::decodeSinglePacket(CFRunLoopTimerRef timer, void *info)
         if (THIS->m_preloading ||
             !THIS->m_decoderShouldRun ||
             !THIS->m_queueCanAcceptPackets ||
+            THIS->m_decoderFailed ||
             THIS->m_dstFormat.mBytesPerPacket == 0) {
             pthread_mutex_unlock(&THIS->m_streamStateMutex);
             return;
@@ -1415,7 +1416,6 @@ void Audio_Stream::decodeSinglePacket(CFRunLoopTimerRef timer, void *info)
              */
             pthread_mutex_lock(&THIS->m_streamStateMutex);
             
-            THIS->m_decoderShouldRun = false;
             THIS->m_decoderFailed = true;
             
             pthread_mutex_unlock(&THIS->m_streamStateMutex);
