@@ -118,6 +118,7 @@ Audio_Stream::Audio_Stream() :
     m_queueCanAcceptPackets(true),
     m_converterRunOutOfData(false),
     m_decoderShouldRun(false),
+    m_decoderFailed(false),
     m_decodeRunLoop(NULL)
 {
     memset(&m_srcFormat, 0, sizeof m_srcFormat);
@@ -224,6 +225,7 @@ void Audio_Stream::open(Input_Stream_Position *position)
     pthread_mutex_lock(&m_streamStateMutex);
     m_audioQueueConsumedPackets = false;
     m_decoderShouldRun = false;
+    m_decoderFailed    = false;
     pthread_mutex_unlock(&m_streamStateMutex);
     
     invalidateWatchdogTimer();
@@ -288,6 +290,7 @@ void Audio_Stream::close(bool closeParser)
        get stuck to pthread wait */
     pthread_mutex_lock(&m_converterMutex);
     m_converterRunOutOfData = false;
+    m_decoderFailed         = false;
     pthread_cond_signal(&m_converterHasData);
     pthread_mutex_unlock(&m_converterMutex);
     
@@ -773,6 +776,7 @@ out:
 void Audio_Stream::audioQueueStateChanged(Audio_Queue::State state)
 {
     if (state == Audio_Queue::RUNNING) {
+        invalidateWatchdogTimer();
         setState(PLAYING);
         
         float currentVolume = m_audioQueue->volume();
@@ -987,6 +991,17 @@ void Audio_Stream::streamHasBytesAvailable(UInt8 *data, UInt32 numBytes)
     
     if (!m_inputStreamRunning) {
         AS_TRACE("%s: stray callback detected!\n", __PRETTY_FUNCTION__);
+        return;
+    }
+    
+    bool decoderFailed = false;
+    
+    pthread_mutex_lock(&m_streamStateMutex);
+    decoderFailed = m_decoderFailed;
+    pthread_mutex_unlock(&m_streamStateMutex);
+    
+    if (decoderFailed) {
+        closeAndSignalError(AS_ERR_TERMINATED, CFSTR("Stream terminated abrubtly"));
         return;
     }
     
@@ -1316,25 +1331,11 @@ void Audio_Stream::audioQueueTimerCallback(CFRunLoopTimerRef timer, void *info)
 {
     AS_TRACE("audioQueueTimerCallback called\n");
     
-    Audio_Stream *THIS = (Audio_Stream *)info;
+    /*
+     * Notice that this timer is only called if the input stream is not running.
+     */
     
-    if (THIS->state() == BUFFERING) {
-        /*
-         * Notify the state change here, as NSNotification only works
-         * in the main thread.
-         */
-        
-        bool audioQueueConsumedPackets = false;
-        pthread_mutex_lock(&THIS->m_streamStateMutex);
-        audioQueueConsumedPackets = THIS->m_audioQueueConsumedPackets;
-        pthread_mutex_unlock(&THIS->m_streamStateMutex);
-        
-        if (audioQueueConsumedPackets) {
-            THIS->invalidateWatchdogTimer();
-            
-            THIS->setState(PLAYING);
-        }
-    }
+    Audio_Stream *THIS = (Audio_Stream *)info;
 
     if (THIS->state() == SEEKING || THIS->state() == PAUSED) {
         return;
@@ -1390,6 +1391,7 @@ void Audio_Stream::decodeSinglePacket(CFRunLoopTimerRef timer, void *info)
                                                        &ioOutputDataPackets,
                                                        &outputBufferList,
                                                        NULL);
+        
         if (err == noErr) {
             pthread_mutex_lock(&THIS->m_streamStateMutex);
             if (THIS->m_decoderShouldRun) {
@@ -1407,6 +1409,17 @@ void Audio_Stream::decodeSinglePacket(CFRunLoopTimerRef timer, void *info)
             }
         } else if (err == kAudio_ParamError) {
             AS_TRACE("decoder: converter param error\n");
+            /*
+             * This means that iOS terminated background audio. Stream must be restarted.
+             * Signal an error so that the app can handle it.
+             */
+            pthread_mutex_lock(&THIS->m_streamStateMutex);
+            
+            THIS->m_decoderShouldRun = false;
+            THIS->m_decoderFailed = true;
+            
+            pthread_mutex_unlock(&THIS->m_streamStateMutex);
+            
             return;
         } else {
             AS_WARN("AudioConverterFillComplexBuffer failed, error %i\n", (int)err);

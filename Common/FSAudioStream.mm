@@ -1652,6 +1652,14 @@ void AudioStreamStateObserver::audioStreamErrorOccurred(int errorCode, CFStringR
             
             break;
             
+        case kFsAudioStreamErrorTerminated:
+            error = kFsAudioStreamErrorTerminated;
+            
+#if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
+            NSLog(@"FSAudioStream: Stream terminated: %@ %@", errorForObjC, priv);
+#endif
+            break;
+            
         default:
             break;
     }

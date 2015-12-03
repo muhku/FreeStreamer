@@ -69,7 +69,8 @@ typedef enum {
     kFsAudioStreamErrorStreamParse = 2,
     kFsAudioStreamErrorNetwork = 3,
     kFsAudioStreamErrorUnsupportedFormat = 4,
-    kFsAudioStreamErrorStreamBouncing = 5
+    kFsAudioStreamErrorStreamBouncing = 5,
+    kFsAudioStreamErrorTerminated = 6
 } FSAudioStreamError;
 
 @protocol FSPCMAudioStreamDelegate;

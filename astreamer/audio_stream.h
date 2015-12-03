@@ -34,7 +34,8 @@ enum Audio_Stream_Error {
     AS_ERR_STREAM_PARSE = 2,  // Parse error
     AS_ERR_NETWORK = 3,        // Network error
     AS_ERR_UNSUPPORTED_FORMAT = 4,
-    AS_ERR_BOUNCING = 5
+    AS_ERR_BOUNCING = 5,
+    AS_ERR_TERMINATED = 6
 };
     
 class Audio_Stream_Delegate;
@@ -190,6 +191,7 @@ private:
     bool m_queueCanAcceptPackets;
     bool m_converterRunOutOfData;
     bool m_decoderShouldRun;
+    bool m_decoderFailed;
     
     pthread_cond_t m_converterHasData;
     pthread_mutex_t m_converterMutex;
