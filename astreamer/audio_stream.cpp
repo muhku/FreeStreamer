@@ -1443,7 +1443,7 @@ void *Audio_Stream::decodeLoop(void *data)
     
     THIS->m_decodeRunLoop = CFRunLoopGetCurrent();
     
-    // Set up a timer ticking once every 20ms to
+    // Set up a timer ticking once every 40ms to
     // run the decoder
     CFRunLoopTimerContext ctx;
     ctx.version = 0;
@@ -1453,8 +1453,8 @@ void *Audio_Stream::decodeLoop(void *data)
     ctx.copyDescription = NULL;
     CFRunLoopTimerRef timer =
     CFRunLoopTimerCreate (NULL,
-                          CFAbsoluteTimeGetCurrent() + 0.02,
-                          0.02,
+                          CFAbsoluteTimeGetCurrent() + 0.04,
+                          0.04,
                           0,
                           0,
                           decodeSinglePacket,
