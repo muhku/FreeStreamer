@@ -1327,16 +1327,21 @@ void Audio_Stream::decodeSinglePacket(CFRunLoopTimerRef timer, void *info)
 {
     Audio_Stream *THIS = (Audio_Stream *)info;
     
-    AS_TRACE("calling AudioConverterFillComplexBuffer\n");
-    
     for (;;) {
         pthread_mutex_lock(&THIS->m_streamStateMutex);
+        
+        const Audio_Stream::State state = THIS->state();
         
         if (THIS->m_preloading ||
             !THIS->m_decoderShouldRun ||
             THIS->m_converterRunOutOfData ||
             !THIS->m_queueCanAcceptPackets ||
             THIS->m_decoderFailed ||
+            state == PAUSED ||
+            state == STOPPED ||
+            state == SEEKING ||
+            state == FAILED ||
+            state == PLAYBACK_COMPLETED ||
             THIS->m_dstFormat.mBytesPerPacket == 0) {
             pthread_mutex_unlock(&THIS->m_streamStateMutex);
             return;
@@ -1356,6 +1361,8 @@ void Audio_Stream::decodeSinglePacket(CFRunLoopTimerRef timer, void *info)
         description.mVariableFramesInPacket = 0;
         
         UInt32 ioOutputDataPackets = THIS->m_outputBufferSize / THIS->m_dstFormat.mBytesPerPacket;
+        
+        AS_TRACE("calling AudioConverterFillComplexBuffer\n");
         
         OSStatus err = AudioConverterFillComplexBuffer(THIS->m_audioConverter,
                                                        &encoderDataCallback,
@@ -1378,6 +1385,25 @@ void Audio_Stream::decodeSinglePacket(CFRunLoopTimerRef timer, void *info)
                 pthread_mutex_unlock(&THIS->m_streamStateMutex);
                 AS_TRACE("decoder: disgard a converted audio packet, we are stopping\n");
                 return;
+            }
+            
+            pthread_mutex_lock(&THIS->m_streamStateMutex);
+            if (THIS->m_converterRunOutOfData) {
+                AS_TRACE("decoder: run out of data, restarting the audio converter\n");
+
+                if (THIS->m_audioConverter) {
+                    AudioConverterDispose(THIS->m_audioConverter);
+                }
+                OSStatus err = AudioConverterNew(&(THIS->m_srcFormat),
+                                                 &(THIS->m_dstFormat),
+                                                 &(THIS->m_audioConverter));
+                if (err) {
+                    AS_TRACE("Error in creating an audio converter, error %i\n", err);
+                    THIS->m_decoderFailed = true;
+                }
+                pthread_mutex_unlock(&THIS->m_streamStateMutex);
+            } else {
+                pthread_mutex_unlock(&THIS->m_streamStateMutex);
             }
         } else if (err == kAudio_ParamError) {
             AS_TRACE("decoder: converter param error\n");
@@ -1544,21 +1570,7 @@ void Audio_Stream::enqueueCachedData()
     
     pthread_mutex_lock(&m_streamStateMutex);
     if (m_converterRunOutOfData) {
-        AS_TRACE("Converter run out of data\n");
-        
-        if (m_audioConverter) {
-            AudioConverterDispose(m_audioConverter);
-        }
-        
-        OSStatus err = AudioConverterNew(&(m_srcFormat),
-                                         &(m_dstFormat),
-                                         &(m_audioConverter));
-        
-        if (err) {
-            AS_TRACE("Error in creating an audio converter, error %i\n", err);
-            
-            m_initializationError = err;
-        }
+        AS_TRACE("Converter run out of data: more data available\n");
         
         m_converterRunOutOfData = false;
     }
