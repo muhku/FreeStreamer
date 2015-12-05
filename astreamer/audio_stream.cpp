@@ -1390,9 +1390,16 @@ void Audio_Stream::decodeSinglePacket(CFRunLoopTimerRef timer, void *info)
                 
                 pthread_mutex_lock(&THIS->m_packetQueueMutex);
                 if (THIS->m_cachedDataSize >= config->maxPrebufferedByteCount) {
-                    AS_TRACE("decoder: cleaning up cached data\n");
                     pthread_mutex_unlock(&THIS->m_packetQueueMutex);
-                    THIS->cleanupCachedData();
+                    
+                    pthread_mutex_lock(&THIS->m_streamStateMutex);
+                    if (!THIS->m_converterRunOutOfData) {
+                        pthread_mutex_unlock(&THIS->m_streamStateMutex);
+                        AS_TRACE("decoder: cleaning up cached data\n");
+                        THIS->cleanupCachedData();
+                    } else {
+                        pthread_mutex_unlock(&THIS->m_streamStateMutex);
+                    }
                 } else {
                     pthread_mutex_unlock(&THIS->m_packetQueueMutex);
                 }
