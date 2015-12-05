@@ -1960,7 +1960,15 @@ void Audio_Stream::streamDataCallback(void *inClientData, UInt32 inNumberBytes, 
                 THIS->m_inputStream->setScheduledInRunLoop(false);
             }
             
+            pthread_mutex_lock(&THIS->m_streamStateMutex);
+            THIS->m_decoderShouldRun = false;
+            pthread_mutex_unlock(&THIS->m_streamStateMutex);
+            
             THIS->cleanupCachedData();
+            
+            pthread_mutex_lock(&THIS->m_streamStateMutex);
+            THIS->m_decoderShouldRun = true;
+            pthread_mutex_unlock(&THIS->m_streamStateMutex);
             
             if (THIS->m_inputStream) {
                 THIS->m_inputStream->setScheduledInRunLoop(true);
