@@ -692,7 +692,11 @@ CFStringRef Audio_Stream::createCacheIdentifierForURL(CFURLRef url)
     
 size_t Audio_Stream::cachedDataSize()
 {
-    return m_cachedDataSize;
+    size_t dataSize = 0;
+    pthread_mutex_lock(&m_packetQueueMutex);
+    dataSize = m_cachedDataSize;
+    pthread_mutex_unlock(&m_packetQueueMutex);
+    return dataSize;
 }
     
 bool Audio_Stream::strictContentTypeChecking()
@@ -1381,6 +1385,17 @@ void Audio_Stream::decodeSinglePacket(CFRunLoopTimerRef timer, void *info)
                 if (THIS->m_delegate) {
                     THIS->m_delegate->samplesAvailable(outputBufferList, description);
                 }
+                
+                Stream_Configuration *config = Stream_Configuration::configuration();
+                
+                pthread_mutex_lock(&THIS->m_packetQueueMutex);
+                if (THIS->m_cachedDataSize >= config->maxPrebufferedByteCount) {
+                    AS_TRACE("decoder: cleaning up cached data\n");
+                    pthread_mutex_unlock(&THIS->m_packetQueueMutex);
+                    THIS->cleanupCachedData();
+                } else {
+                    pthread_mutex_unlock(&THIS->m_packetQueueMutex);
+                }
             } else {
                 pthread_mutex_unlock(&THIS->m_streamStateMutex);
                 AS_TRACE("decoder: disgard a converted audio packet, we are stopping\n");
@@ -1402,6 +1417,7 @@ void Audio_Stream::decodeSinglePacket(CFRunLoopTimerRef timer, void *info)
                     THIS->m_decoderFailed = true;
                 }
                 pthread_mutex_unlock(&THIS->m_streamStateMutex);
+                return;
             } else {
                 pthread_mutex_unlock(&THIS->m_streamStateMutex);
             }
@@ -1601,7 +1617,9 @@ void Audio_Stream::enqueueCachedData()
             AS_TRACE("non-continuous stream, %i bytes must be cached to start the playback\n", lim);
         }
         
+        pthread_mutex_lock(&m_packetQueueMutex);
         if (m_cachedDataSize > lim) {
+            pthread_mutex_unlock(&m_packetQueueMutex);
             AS_TRACE("buffered %zu bytes, required for playback %i, starting playback\n", m_cachedDataSize, lim);
             
             m_initialBufferingCompleted = true;
@@ -1610,6 +1628,7 @@ void Audio_Stream::enqueueCachedData()
             m_decoderShouldRun = true;
             pthread_mutex_unlock(&m_streamStateMutex);
         } else {
+            pthread_mutex_unlock(&m_packetQueueMutex);
             AS_TRACE("not enough cached data to start playback\n");
         }
     }
@@ -1637,26 +1656,6 @@ void Audio_Stream::enqueueCachedData()
             pthread_mutex_unlock(&m_streamStateMutex);
             
             AS_TRACE("%llu bytes received, overriding buffering limits\n", m_bytesReceived);
-        }
-    }
-    
-    // For continuous streams, we don't need to accummulate the data for seeking
-    if (continuous) {
-        cleanupCachedData();
-    } else {
-        // For non-continuous streams, keep previous data for seeking
-        AS_LOCK_TRACE("enqueueCachedData: lock\n");
-        pthread_mutex_lock(&m_packetQueueMutex);
-        
-        if (m_cachedDataSize >= config->maxPrebufferedByteCount) {
-            /* Don't deadlock */
-            AS_LOCK_TRACE("enqueueCachedData: unlock\n");
-            pthread_mutex_unlock(&m_packetQueueMutex);
-            
-            cleanupCachedData();
-        } else {
-            AS_LOCK_TRACE("enqueueCachedData: unlock\n");
-            pthread_mutex_unlock(&m_packetQueueMutex);
         }
     }
 }
@@ -1702,11 +1701,6 @@ void Audio_Stream::cleanupCachedData()
     
     AS_LOCK_TRACE("cleanupCachedData: unlock\n");
     pthread_mutex_unlock(&m_packetQueueMutex);
-    
-    if (m_inputStream) {
-        AS_TRACE("Cache underflow, enabling the HTTP stream\n");
-        m_inputStream->setScheduledInRunLoop(true);
-    }
 }
     
 void Audio_Stream::convertedAudioCallback(AudioBufferList outputBufferList, AudioStreamPacketDescription description)
@@ -1949,10 +1943,10 @@ void Audio_Stream::streamDataCallback(void *inClientData, UInt32 inNumberBytes, 
         
         THIS->m_packetIdentifier++;
         
-        AS_LOCK_TRACE("streamDataCallback: unlock\n");
-        pthread_mutex_unlock(&THIS->m_packetQueueMutex);
-        
         if (THIS->m_cachedDataSize >= config->maxPrebufferedByteCount) {
+            AS_LOCK_TRACE("streamDataCallback: unlock\n");
+            pthread_mutex_unlock(&THIS->m_packetQueueMutex);
+            
             AS_TRACE("Cache overflow, disabling the HTTP stream\n");
             
             if (THIS->m_inputStream) {
@@ -1960,6 +1954,13 @@ void Audio_Stream::streamDataCallback(void *inClientData, UInt32 inNumberBytes, 
             }
             
             THIS->cleanupCachedData();
+            
+            if (THIS->m_inputStream) {
+                THIS->m_inputStream->setScheduledInRunLoop(true);
+            }
+        } else {
+            AS_LOCK_TRACE("streamDataCallback: unlock 2\n");
+            pthread_mutex_unlock(&THIS->m_packetQueueMutex);
         }
     }
     
