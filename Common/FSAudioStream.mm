@@ -266,6 +266,7 @@ public:
 
 - (void)attemptRestart;
 - (void)expungeCache;
+- (void)flush;
 - (void)play;
 - (void)playFromURL:(NSURL*)url;
 - (void)playFromOffset:(FSSeekByteOffset)offset;
@@ -953,6 +954,11 @@ public:
     }
 }
 
+- (void)flush
+{
+    _audioStream->flush();
+}
+
 - (void)play
 {
     _wasPaused = NO;
@@ -1380,6 +1386,13 @@ public:
     NSAssert([NSThread isMainThread], @"FSAudioStream.expungeCache needs to be called in the main thread");
     
     [_private expungeCache];
+}
+
+- (void)flush
+{
+    NSAssert([NSThread isMainThread], @"flush needs to be called in the main thread");
+    
+    [_private flush];
 }
 
 - (NSUInteger)retryCount

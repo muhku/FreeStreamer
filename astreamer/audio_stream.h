@@ -67,6 +67,7 @@ public:
     void pause();
     
     void startCachedDataPlayback();
+    void flush();
     
     AS_Playback_Position playbackPosition();
     float durationInSeconds();

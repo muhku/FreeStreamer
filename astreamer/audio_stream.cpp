@@ -339,6 +339,19 @@ void Audio_Stream::startCachedDataPlayback()
     enqueueCachedData();
 }
     
+void Audio_Stream::flush()
+{
+    pthread_mutex_lock(&m_streamStateMutex);
+    m_decoderShouldRun = false;
+    pthread_mutex_unlock(&m_streamStateMutex);
+    
+    cleanupCachedData();
+    
+    pthread_mutex_lock(&m_streamStateMutex);
+    m_decoderShouldRun = true;
+    pthread_mutex_unlock(&m_streamStateMutex);
+}
+    
 AS_Playback_Position Audio_Stream::playbackPosition()
 {
     AS_Playback_Position playbackPosition;
@@ -1960,15 +1973,7 @@ void Audio_Stream::streamDataCallback(void *inClientData, UInt32 inNumberBytes, 
                 THIS->m_inputStream->setScheduledInRunLoop(false);
             }
             
-            pthread_mutex_lock(&THIS->m_streamStateMutex);
-            THIS->m_decoderShouldRun = false;
-            pthread_mutex_unlock(&THIS->m_streamStateMutex);
-            
-            THIS->cleanupCachedData();
-            
-            pthread_mutex_lock(&THIS->m_streamStateMutex);
-            THIS->m_decoderShouldRun = true;
-            pthread_mutex_unlock(&THIS->m_streamStateMutex);
+            THIS->flush();
             
             if (THIS->m_inputStream) {
                 THIS->m_inputStream->setScheduledInRunLoop(true);
