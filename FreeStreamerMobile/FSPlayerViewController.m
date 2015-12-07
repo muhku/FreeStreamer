@@ -79,16 +79,6 @@
     [super didReceiveMemoryWarning];
     
     // Release any cached data, images, etc that aren't in use.
-    
-#if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
-    NSLog(@"Received a memory warning: flushing the player caches. Bytes used: %f", (float)self.audioController.activeStream.prebufferedByteCount);
-#endif
-    
-    [self.audioController.activeStream flush];
-    
-#if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
-    NSLog(@"Caches flushed. Bytes used %f", (float)self.audioController.activeStream.prebufferedByteCount);
-#endif
 }
 
 #pragma mark - View lifecycle

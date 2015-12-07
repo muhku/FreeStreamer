@@ -345,11 +345,6 @@ NSString*             freeStreamerReleaseVersion();
 - (void)expungeCache;
 
 /**
- * Flushes the in-memory cache.
- */
-- (void)flush;
-
-/**
  * The stream URL.
  */
 @property (nonatomic,assign) NSURL *url;
