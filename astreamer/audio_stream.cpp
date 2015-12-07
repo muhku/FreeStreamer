@@ -1356,6 +1356,43 @@ void Audio_Stream::decodeSinglePacket(CFRunLoopTimerRef timer, void *info)
 {
     Audio_Stream *THIS = (Audio_Stream *)info;
     
+    pthread_mutex_lock(&THIS->m_streamStateMutex);
+    
+    if (THIS->m_converterRunOutOfData) {
+        pthread_mutex_unlock(&THIS->m_streamStateMutex);
+        
+        // Check if we got more data so we can run the decoder again
+        pthread_mutex_lock(&THIS->m_packetQueueMutex);
+        
+        if (THIS->m_playPacket) {
+            // Yes, got data again
+            pthread_mutex_unlock(&THIS->m_packetQueueMutex);
+
+            AS_TRACE("Converter run out of data: more data available. Restarting the audio converter\n");
+            
+            pthread_mutex_lock(&THIS->m_streamStateMutex);
+            
+            if (THIS->m_audioConverter) {
+                AudioConverterDispose(THIS->m_audioConverter);
+            }
+            OSStatus err = AudioConverterNew(&(THIS->m_srcFormat),
+                                             &(THIS->m_dstFormat),
+                                             &(THIS->m_audioConverter));
+            if (err) {
+                AS_TRACE("Error in creating an audio converter, error %i\n", err);
+                THIS->m_decoderFailed = true;
+            }
+            THIS->m_converterRunOutOfData = false;
+            
+            pthread_mutex_unlock(&THIS->m_streamStateMutex);
+        } else {
+            AS_TRACE("decoder: converter run out data: bailing out\n");
+            pthread_mutex_unlock(&THIS->m_packetQueueMutex);
+        }
+    } else {
+        pthread_mutex_unlock(&THIS->m_streamStateMutex);
+    }
+    
     if (!THIS->decoderShouldRun()) {
         return;
     }
@@ -1382,9 +1419,11 @@ void Audio_Stream::decodeSinglePacket(CFRunLoopTimerRef timer, void *info)
                                                    &outputBufferList,
                                                    NULL);
     
-    if (!THIS->decoderShouldRun()) {
-        AS_TRACE("decoder: disgard a converted audio packet, decoder should not run\n");
-    } else if (err == noErr) {
+    pthread_mutex_lock(&THIS->m_streamStateMutex);
+    
+    if (err == noErr && THIS->m_decoderShouldRun) {
+        pthread_mutex_unlock(&THIS->m_streamStateMutex);
+        
         THIS->convertedAudioCallback(outputBufferList, description);
         
         if (THIS->m_delegate) {
@@ -1406,14 +1445,12 @@ void Audio_Stream::decodeSinglePacket(CFRunLoopTimerRef timer, void *info)
         /*
          * This means that iOS terminated background audio. Stream must be restarted.
          * Signal an error so that the app can handle it.
-         */
-        pthread_mutex_lock(&THIS->m_streamStateMutex);
-        
+         */        
         THIS->m_decoderFailed = true;
         
         pthread_mutex_unlock(&THIS->m_streamStateMutex);
     } else {
-        AS_WARN("AudioConverterFillComplexBuffer failed, error %i\n", (int)err);
+        pthread_mutex_unlock(&THIS->m_streamStateMutex);
     }
 }
     
@@ -1561,25 +1598,6 @@ void Audio_Stream::enqueueCachedData()
     } else {
         pthread_mutex_unlock(&m_streamStateMutex);
     }
-    
-    pthread_mutex_lock(&m_streamStateMutex);
-    if (m_converterRunOutOfData) {
-        AS_TRACE("Converter run out of data: more data available. Restarting the audio converter\n");
-        
-        if (m_audioConverter) {
-            AudioConverterDispose(m_audioConverter);
-        }
-        OSStatus err = AudioConverterNew(&(m_srcFormat),
-                                         &(m_dstFormat),
-                                         &(m_audioConverter));
-        if (err) {
-            AS_TRACE("Error in creating an audio converter, error %i\n", err);
-            m_decoderFailed = true;
-        }
-        
-        m_converterRunOutOfData = false;
-    }
-    pthread_mutex_unlock(&m_streamStateMutex);
     
     if (state() == PAUSED || state() == SEEKING) {
         return;
