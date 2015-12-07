@@ -1358,7 +1358,7 @@ void Audio_Stream::decodeSinglePacket(CFRunLoopTimerRef timer, void *info)
     
     pthread_mutex_lock(&THIS->m_streamStateMutex);
     
-    if (THIS->m_converterRunOutOfData) {
+    if (THIS->m_decoderShouldRun && THIS->m_converterRunOutOfData) {
         pthread_mutex_unlock(&THIS->m_streamStateMutex);
         
         // Check if we got more data so we can run the decoder again
@@ -1753,10 +1753,6 @@ OSStatus Audio_Stream::encoderDataCallback(AudioConverterRef inAudioConverter, U
         ioData->mBuffers[0].mDataByteSize = 0;
         
         return noErr;
-    } else {
-        pthread_mutex_lock(&THIS->m_streamStateMutex);
-        THIS->m_converterRunOutOfData = false;
-        pthread_mutex_unlock(&THIS->m_streamStateMutex);
     }
     
     *ioNumberDataPackets = 1;
