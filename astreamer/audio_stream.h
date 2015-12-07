@@ -221,6 +221,7 @@ private:
     static void watchdogTimerCallback(CFRunLoopTimerRef timer, void *info);
     static void audioQueueTimerCallback(CFRunLoopTimerRef timer, void *info);
     
+    bool decoderShouldRun();
     static void decodeSinglePacket(CFRunLoopTimerRef timer, void *info);
     static void *decodeLoop(void *arg);
     
