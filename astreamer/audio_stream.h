@@ -213,8 +213,6 @@ private:
     void enqueueCachedData();
     void cleanupCachedData();
     
-    void convertedAudioCallback(AudioBufferList outputBufferList, AudioStreamPacketDescription description);
-    
     static void watchdogTimerCallback(CFRunLoopTimerRef timer, void *info);
     static void audioQueueTimerCallback(CFRunLoopTimerRef timer, void *info);
     

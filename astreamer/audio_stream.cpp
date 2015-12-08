@@ -1402,9 +1402,15 @@ void Audio_Stream::decodeSinglePacket(CFRunLoopTimerRef timer, void *info)
     pthread_mutex_lock(&THIS->m_streamStateMutex);
     
     if (err == noErr && THIS->m_decoderShouldRun) {
+        THIS->m_audioQueueConsumedPackets = true;
+        
         pthread_mutex_unlock(&THIS->m_streamStateMutex);
         
-        THIS->convertedAudioCallback(outputBufferList, description);
+        // This blocks until the queue has been able to consume the packets
+        THIS->audioQueue()->handleAudioPackets(outputBufferList.mBuffers[0].mDataByteSize,
+                                         outputBufferList.mNumberBuffers,
+                                         outputBufferList.mBuffers[0].mData,
+                                         &description);
         
         if (THIS->m_delegate) {
             THIS->m_delegate->samplesAvailable(outputBufferList, description);
@@ -1673,18 +1679,6 @@ void Audio_Stream::cleanupCachedData()
     
     AS_LOCK_TRACE("cleanupCachedData: unlock\n");
     pthread_mutex_unlock(&m_packetQueueMutex);
-}
-    
-void Audio_Stream::convertedAudioCallback(AudioBufferList outputBufferList, AudioStreamPacketDescription description)
-{
-    pthread_mutex_lock(&m_streamStateMutex);
-    m_audioQueueConsumedPackets = true;
-    pthread_mutex_unlock(&m_streamStateMutex);
-    
-    audioQueue()->handleAudioPackets(outputBufferList.mBuffers[0].mDataByteSize,
-                                     outputBufferList.mNumberBuffers,
-                                     outputBufferList.mBuffers[0].mData,
-                                     &description);
 }
     
 OSStatus Audio_Stream::encoderDataCallback(AudioConverterRef inAudioConverter, UInt32 *ioNumberDataPackets, AudioBufferList *ioData, AudioStreamPacketDescription **outDataPacketDescription, void *inUserData)
