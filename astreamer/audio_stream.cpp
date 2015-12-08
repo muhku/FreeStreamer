@@ -115,7 +115,6 @@ Audio_Stream::Audio_Stream() :
     m_packetDuration(0),
     m_bitrateBufferIndex(0),
     m_outputVolume(1.0),
-    m_queueCanAcceptPackets(true),
     m_converterRunOutOfData(false),
     m_decoderShouldRun(false),
     m_decoderFailed(false),
@@ -849,20 +848,6 @@ void Audio_Stream::audioQueueBuffersEmpty()
     }
 }
     
-void Audio_Stream::audioQueueOverflow()
-{
-    pthread_mutex_lock(&m_streamStateMutex);
-    m_queueCanAcceptPackets = false;
-    pthread_mutex_unlock(&m_streamStateMutex);
-}
-    
-void Audio_Stream::audioQueueUnderflow()
-{
-    pthread_mutex_lock(&m_streamStateMutex);
-    m_queueCanAcceptPackets = true;
-    pthread_mutex_unlock(&m_streamStateMutex);
-}
-    
 void Audio_Stream::audioQueueInitializationFailed()
 {
     if (m_inputStreamRunning) {
@@ -1139,10 +1124,6 @@ Audio_Queue* Audio_Stream::audioQueue()
         m_audioQueue->m_streamDesc = m_dstFormat;
         
         m_audioQueue->m_initialOutputVolume = m_outputVolume;
-        
-        pthread_mutex_lock(&m_streamStateMutex);
-        m_queueCanAcceptPackets = true;
-        pthread_mutex_unlock(&m_streamStateMutex);
     }
     return m_audioQueue;
 }
@@ -1336,7 +1317,6 @@ bool Audio_Stream::decoderShouldRun()
     if (m_preloading ||
         !m_decoderShouldRun ||
         m_converterRunOutOfData ||
-        !m_queueCanAcceptPackets ||
         m_decoderFailed ||
         state == PAUSED ||
         state == STOPPED ||
@@ -1572,33 +1552,18 @@ int Audio_Stream::playbackDataCount()
     
 int Audio_Stream::audioQueueNumberOfBuffersInUse()
 {
-    int count = 0;
-    if (m_audioQueue) {
-        count = audioQueue()->numberOfBuffersInUse();
-    }
-    return count;
+    // TODO
+    return 0;
 }
     
 int Audio_Stream::audioQueuePacketCount()
 {
-    int count = 0;
-    if (m_audioQueue) {
-        count = audioQueue()->packetCount();
-    }
-    return count;
+    // TODO
+    return 0;
 }
     
 void Audio_Stream::enqueueCachedData()
 {
-    pthread_mutex_lock(&m_streamStateMutex);
-    if (!m_queueCanAcceptPackets) {
-        AS_TRACE("Queue cannot accept packets, return\n");
-        pthread_mutex_unlock(&m_streamStateMutex);
-        return;
-    } else {
-        pthread_mutex_unlock(&m_streamStateMutex);
-    }
-    
     if (state() == PAUSED || state() == SEEKING) {
         return;
     }

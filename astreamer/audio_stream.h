@@ -110,8 +110,6 @@ public:
     /* Audio_Queue_Delegate */
     void audioQueueStateChanged(Audio_Queue::State state);
     void audioQueueBuffersEmpty();
-    void audioQueueOverflow();
-    void audioQueueUnderflow();
     void audioQueueInitializationFailed();
     void audioQueueFinishedPlayingPacket();
     
@@ -188,7 +186,6 @@ private:
     
     float m_outputVolume;
     
-    bool m_queueCanAcceptPackets;
     bool m_converterRunOutOfData;
     bool m_decoderShouldRun;
     bool m_decoderFailed;

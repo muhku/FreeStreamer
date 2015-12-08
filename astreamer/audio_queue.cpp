@@ -5,12 +5,6 @@
  *
  * https://github.com/muhku/FreeStreamer
  *
- * Part of the code in this file has been rewritten from
- * the AudioFileStreamExample / afsclient.cpp
- * example, Copyright © 2007 Apple Inc.
- *
- * The threadless playback has been adapted from
- * Alex Crichton's AudioStreamer.
  */
 
 #include "audio_queue.h"
@@ -40,12 +34,6 @@
 
 namespace astreamer {
     
-typedef struct queued_packet {
-    AudioStreamPacketDescription desc;
-    struct queued_packet *next;
-    char data[];
-} queued_packet_t;
-    
 /* public */    
     
 Audio_Queue::Audio_Queue()
@@ -57,9 +45,6 @@ Audio_Queue::Audio_Queue()
     m_packetsFilled(0),
     m_buffersUsed(0),
     m_audioQueueStarted(false),
-    m_waitingOnBuffer(false),
-    m_queuedHead(0),
-    m_queuedTail(0),
     m_lastError(noErr),
     m_initialOutputVolume(1.0)
 {
@@ -76,6 +61,14 @@ Audio_Queue::Audio_Queue()
     if (pthread_mutex_init(&m_mutex, NULL) != 0) {
         AQ_TRACE("m_mutex init failed!\n");
     }
+    
+    if (pthread_mutex_init(&m_bufferInUseMutex, NULL) != 0) {
+        AQ_TRACE("m_bufferInUseMutex init failed!\n");
+    }
+    
+    if (pthread_cond_init(&m_bufferFreeCondition, NULL) != 0) {
+        AQ_TRACE("m_bufferFreeCondition init failed!\n");
+    }
 }
     
 Audio_Queue::~Audio_Queue()
@@ -89,6 +82,8 @@ Audio_Queue::~Audio_Queue()
     delete [] m_bufferInUse;
     
     pthread_mutex_destroy(&m_mutex);
+    pthread_mutex_destroy(&m_bufferInUseMutex);
+    pthread_cond_destroy(&m_bufferFreeCondition);
 }
     
 bool Audio_Queue::initialized()
@@ -183,6 +178,10 @@ void Audio_Queue::stop(bool stopImmediately)
     }
     m_audioQueueStarted = false;
     
+    pthread_mutex_lock(&m_bufferInUseMutex);
+    pthread_cond_signal(&m_bufferFreeCondition);
+    pthread_mutex_unlock(&m_bufferInUseMutex);
+    
     AQ_TRACE("%s: enter\n", __PRETTY_FUNCTION__);
 
     if (AudioQueueFlush(m_outAQ) != 0) {
@@ -220,43 +219,6 @@ AudioTimeStamp Audio_Queue::currentTime()
     }
     
     return queueTime;
-}
-    
-int Audio_Queue::numberOfBuffersInUse()
-{
-    Stream_Configuration *config = Stream_Configuration::configuration();
-    int count = 0;
-    
-    AQ_LOCK_TRACE("lock: numberOfBuffersInUse\n");
-    pthread_mutex_lock(&m_mutex);
-    
-    for (size_t i=0; i < config->bufferCount; i++) {
-        if (m_bufferInUse[i]) {
-            count++;
-        }
-    }
-    AQ_LOCK_TRACE("unlock: numberOfBuffersInUse\n");
-    pthread_mutex_unlock(&m_mutex);
-    
-    return count;
-}
-    
-int Audio_Queue::packetCount()
-{
-    int count = 0;
-    
-    AQ_LOCK_TRACE("lock: packetCount\n");
-    pthread_mutex_lock(&m_mutex);
-    
-    queued_packet_t *cur = m_queuedHead;
-    while (cur) {
-        cur = cur->next;
-        count++;
-    }
-    AQ_LOCK_TRACE("unlock: packetCount\n");
-    pthread_mutex_unlock(&m_mutex);
-    
-    return count;
 }
 
 void Audio_Queue::init()
@@ -334,102 +296,58 @@ void Audio_Queue::handleAudioPackets(UInt32 inNumberBytes, UInt32 inNumberPacket
     UInt32 i;
     
     for (i = 0; i < inNumberPackets; i++) {
-        AQ_LOCK_TRACE("handleAudioPackets: lock 1\n");
-        pthread_mutex_lock(&m_mutex);
-        
-        if (m_waitingOnBuffer || m_queuedHead != NULL) {
-            AQ_LOCK_TRACE("handleAudioPackets: unlock 1\n");
-            pthread_mutex_unlock(&m_mutex);
-            break;
-        }
-        
         AudioStreamPacketDescription *desc = &inPacketDescriptions[i];
-        int ret = handlePacket((const char*)inInputData + desc->mStartOffset, desc);
         
-        AQ_LOCK_TRACE("handleAudioPackets: unlock 2\n");
-        pthread_mutex_unlock(&m_mutex);
+        const void *data = (const char*)inInputData + desc->mStartOffset;
         
-        if (!ret) break;
-    }
-    if (i == inNumberPackets) {
-        return;
-    }
-    
-    for (; i < inNumberPackets; i++) {
-        /* Allocate the packet */
-        UInt32 size = inPacketDescriptions[i].mDataByteSize;
-        queued_packet_t *packet = (queued_packet_t *)malloc(sizeof(queued_packet_t) + size);
+        if (!initialized()) {
+            AQ_TRACE("%s: warning: attempt to handle audio packets with uninitialized audio queue. return.\n", __PRETTY_FUNCTION__);
+            
+            return;
+        }
         
-        /* Prepare the packet */
-        packet->next = NULL;
-        packet->desc = inPacketDescriptions[i];
-        packet->desc.mStartOffset = 0;
-        memcpy(packet->data, (const char *)inInputData + inPacketDescriptions[i].mStartOffset,
-               size);
+        Stream_Configuration *config = Stream_Configuration::configuration();
         
-        AQ_LOCK_TRACE("handleAudioPackets: lock 2\n");
-        pthread_mutex_lock(&m_mutex);
-        if (m_queuedHead == NULL) {
-            m_queuedHead = m_queuedTail = packet;
+        AQ_TRACE("%s: enter\n", __PRETTY_FUNCTION__);
+        
+        UInt32 packetSize = desc->mDataByteSize;
+        
+        /* This shouldn't happen because most of the time we read the packet buffer
+         size from the file stream, but if we restored to guessing it we could
+         come up too small here */
+        if (packetSize > config->bufferSize) {
+            AQ_TRACE("%s: packetSize %u > AQ_BUFSIZ %li\n", __PRETTY_FUNCTION__, (unsigned int)packetSize, config->bufferSize);
+            return;
+        }
+        
+        // if the space remaining in the buffer is not enough for this packet, then
+        // enqueue the buffer and wait for another to become available.
+        if (config->bufferSize - m_bytesFilled < packetSize) {
+            enqueueBuffer();
+            
+            if (!m_audioQueueStarted) {
+                return;
+            }
         } else {
-            m_queuedTail->next = packet;
-            m_queuedTail = packet;
+            AQ_TRACE("%s: skipped enqueueBuffer AQ_BUFSIZ - m_bytesFilled %lu, packetSize %u\n", __PRETTY_FUNCTION__, (config->bufferSize - m_bytesFilled), (unsigned int)packetSize);
         }
-        AQ_LOCK_TRACE("handleAudioPackets: unlock 3\n");
-        pthread_mutex_unlock(&m_mutex);
-    }
-}
-    
-int Audio_Queue::handlePacket(const void *data, AudioStreamPacketDescription *desc)
-{
-    if (!initialized()) {
-        AQ_TRACE("%s: warning: attempt to handle audio packets with uninitialized audio queue. return.\n", __PRETTY_FUNCTION__);
         
-        return -1;
-    }
-    
-    Stream_Configuration *config = Stream_Configuration::configuration();
-    
-    AQ_TRACE("%s: enter\n", __PRETTY_FUNCTION__);
-    
-    UInt32 packetSize = desc->mDataByteSize;
-    
-    /* This shouldn't happen because most of the time we read the packet buffer
-     size from the file stream, but if we restored to guessing it we could
-     come up too small here */
-    if (packetSize > config->bufferSize) {
-        AQ_TRACE("%s: packetSize %u > AQ_BUFSIZ %li\n", __PRETTY_FUNCTION__, (unsigned int)packetSize, config->bufferSize);
-        return -1;
-    }
-    
-    // if the space remaining in the buffer is not enough for this packet, then
-    // enqueue the buffer and wait for another to become available.
-    if (config->bufferSize - m_bytesFilled < packetSize) {
-        int hasFreeBuffer = enqueueBuffer();
-        if (hasFreeBuffer <= 0) {
-            return hasFreeBuffer;
+        // copy data to the audio queue buffer
+        AudioQueueBufferRef buf = m_audioQueueBuffer[m_fillBufferIndex];
+        memcpy((char*)buf->mAudioData, data, packetSize);
+        
+        // fill out packet description to pass to enqueue() later on
+        m_packetDescs[m_packetsFilled] = *desc;
+        // Make sure the offset is relative to the start of the audio buffer
+        m_packetDescs[m_packetsFilled].mStartOffset = m_bytesFilled;
+        // keep track of bytes filled and packets filled
+        m_bytesFilled += packetSize;
+        m_packetsFilled++;
+        
+        /* If filled our buffer with packets, then commit it to the system */
+        if (m_packetsFilled >= config->maxPacketDescs) {
+            enqueueBuffer();
         }
-    } else {
-        AQ_TRACE("%s: skipped enqueueBuffer AQ_BUFSIZ - m_bytesFilled %lu, packetSize %u\n", __PRETTY_FUNCTION__, (config->bufferSize - m_bytesFilled), (unsigned int)packetSize);
-    }
-    
-    // copy data to the audio queue buffer
-    AudioQueueBufferRef buf = m_audioQueueBuffer[m_fillBufferIndex];
-    memcpy((char*)buf->mAudioData, data, packetSize);
-    
-    // fill out packet description to pass to enqueue() later on
-    m_packetDescs[m_packetsFilled] = *desc;
-    // Make sure the offset is relative to the start of the audio buffer
-    m_packetDescs[m_packetsFilled].mStartOffset = m_bytesFilled;
-    // keep track of bytes filled and packets filled
-    m_bytesFilled += packetSize;
-    m_packetsFilled++;
-    
-    /* If filled our buffer with packets, then commit it to the system */
-    if (m_packetsFilled >= config->maxPacketDescs) {
-        return enqueueBuffer();
-    } else {
-        return 1;
     }
 }
 
@@ -468,15 +386,6 @@ void Audio_Queue::cleanup()
         m_bufferInUse[i] = false;
     }
     
-    queued_packet_t *cur = m_queuedHead;
-    while (cur) {
-        queued_packet_t *tmp = cur->next;
-        free(cur);
-        cur = tmp;
-    }
-    m_queuedHead = m_queuedTail = 0;
-    
-    m_waitingOnBuffer = false;
     m_lastError = noErr;
 }
     
@@ -494,7 +403,7 @@ void Audio_Queue::setState(State state)
     }
 }
 
-int Audio_Queue::enqueueBuffer()
+void Audio_Queue::enqueueBuffer()
 {
     AQ_ASSERT(!m_bufferInUse[m_fillBufferIndex]);
     
@@ -502,12 +411,16 @@ int Audio_Queue::enqueueBuffer()
     
     AQ_TRACE("%s: enter\n", __PRETTY_FUNCTION__);
     
+    pthread_mutex_lock(&m_bufferInUseMutex);
+    
     m_bufferInUse[m_fillBufferIndex] = true;
     m_buffersUsed++;
     
     // enqueue buffer
     AudioQueueBufferRef fillBuf = m_audioQueueBuffer[m_fillBufferIndex];
     fillBuf->mAudioDataByteSize = m_bytesFilled;
+    
+    pthread_mutex_unlock(&m_bufferInUseMutex);
     
     AQ_ASSERT(m_packetsFilled > 0);
     OSStatus err = AudioQueueEnqueueBuffer(m_outAQ, fillBuf, m_packetsFilled, m_packetDescs);
@@ -520,9 +433,10 @@ int Audio_Queue::enqueueBuffer()
            running */
         AQ_TRACE("%s: error in AudioQueueEnqueueBuffer\n", __PRETTY_FUNCTION__);
         m_lastError = err;
-        return 1;
+        return;
     }
     
+    pthread_mutex_lock(&m_bufferInUseMutex);
     // go to next buffer
     if (++m_fillBufferIndex >= config->bufferCount) {
         m_fillBufferIndex = 0; 
@@ -533,68 +447,13 @@ int Audio_Queue::enqueueBuffer()
     m_packetsFilled = 0;
     
     // wait until next buffer is not in use
-    if (m_bufferInUse[m_fillBufferIndex]) {
+    
+    while (m_bufferInUse[m_fillBufferIndex]) {
         AQ_TRACE("waiting for buffer %u\n", (unsigned int)m_fillBufferIndex);
         
-        if (m_delegate) {
-            m_delegate->audioQueueOverflow();
-        }
-        m_waitingOnBuffer = true;
-        
-        return 0;
+        pthread_cond_wait(&m_bufferFreeCondition, &m_bufferInUseMutex);
     }
-    
-    return 1;
-}
-    
-int Audio_Queue::findQueueBuffer(AudioQueueBufferRef inBuffer)
-{
-    Stream_Configuration *config = Stream_Configuration::configuration();
-    
-    for (unsigned int i = 0; i < config->bufferCount; ++i) {
-        if (inBuffer == m_audioQueueBuffer[i]) {
-            AQ_TRACE("findQueueBuffer %i\n", i);
-            return i;
-        }
-    }
-    return -1;
-}
-    
-void Audio_Queue::enqueueCachedData()
-{
-    AQ_LOCK_TRACE("enqueueCachedData: lock\n");
-    pthread_mutex_lock(&m_mutex);
-    
-    AQ_ASSERT(!m_waitingOnBuffer);
-    AQ_ASSERT(!m_bufferInUse[m_fillBufferIndex]);
-    
-    /* Queue up as many packets as possible into the buffers */
-    queued_packet_t *cur = m_queuedHead;
-    while (cur) {
-        int ret = handlePacket(cur->data, &cur->desc);
-        if (ret == 0) {
-           break; 
-        }
-        queued_packet_t *next = cur->next;
-        free(cur);
-        cur = next;
-    }
-    m_queuedHead = cur;
-    
-    /* If we finished queueing all our saved packets, we can re-schedule the
-     * stream to run */
-    if (cur == NULL) {
-        m_queuedTail = NULL;
-        
-        AQ_LOCK_TRACE("enqueueCachedData: unlock 1\n");
-        pthread_mutex_unlock(&m_mutex);
-        if (m_delegate) {
-            m_delegate->audioQueueUnderflow();
-        }
-    } else {
-        AQ_LOCK_TRACE("enqueueCachedData: unlock 2\n");
-        pthread_mutex_unlock(&m_mutex);
-    }
+    pthread_mutex_unlock(&m_bufferInUseMutex);
 }
     
 // this is called by the audio queue when it has finished decoding our data. 
@@ -603,40 +462,46 @@ void Audio_Queue::audioQueueOutputCallback(void *inClientData, AudioQueueRef inA
 {
     Audio_Queue *audioQueue = static_cast<Audio_Queue*>(inClientData);
     
-    AQ_LOCK_TRACE("audioQueueOutputCallback: lock\n");
-    pthread_mutex_lock(&audioQueue->m_mutex);
+    Stream_Configuration *config = Stream_Configuration::configuration();
     
-    unsigned int bufIndex = audioQueue->findQueueBuffer(inBuffer);
+    int bufIndex = -1;
+    
+    for (unsigned int i = 0; i < config->bufferCount; ++i) {
+        if (inBuffer == audioQueue->m_audioQueueBuffer[i]) {
+            AQ_TRACE("findQueueBuffer %i\n", i);
+            bufIndex = i;
+            break;
+        }
+    }
+    
+    if (bufIndex == -1) {
+        return;
+    }
+    
+    pthread_mutex_lock(&audioQueue->m_bufferInUseMutex);
     
     AQ_ASSERT(audioQueue->m_bufferInUse[bufIndex]);
     
     audioQueue->m_bufferInUse[bufIndex] = false;
     audioQueue->m_buffersUsed--;
     
+    AQ_TRACE("signaling buffer free for inuse %i....\n", bufIndex);
+    pthread_cond_signal(&audioQueue->m_bufferFreeCondition);
+    AQ_TRACE("signal sent!\n");
+    
+    if (audioQueue->m_buffersUsed == 0 && audioQueue->m_delegate) {
+        AQ_LOCK_TRACE("audioQueueOutputCallback: unlock 2\n");
+        pthread_mutex_unlock(&audioQueue->m_bufferInUseMutex);
+        
+        audioQueue->m_delegate->audioQueueBuffersEmpty();
+    } else {
+        pthread_mutex_unlock(&audioQueue->m_bufferInUseMutex);
+    }
+    
     AQ_LOCK_TRACE("audioQueueOutputCallback: unlock\n");
-    pthread_mutex_unlock(&audioQueue->m_mutex);
     
     if (audioQueue->m_delegate) {
         audioQueue->m_delegate->audioQueueFinishedPlayingPacket();
-    }
-    
-    AQ_LOCK_TRACE("audioQueueOutputCallback: lock 2\n");
-    pthread_mutex_lock(&audioQueue->m_mutex);
-    
-    if (audioQueue->m_buffersUsed == 0 && !audioQueue->m_queuedHead && audioQueue->m_delegate) {
-        AQ_LOCK_TRACE("audioQueueOutputCallback: unlock 2\n");
-        pthread_mutex_unlock(&audioQueue->m_mutex);
-        
-        audioQueue->m_delegate->audioQueueBuffersEmpty();
-    } else if (audioQueue->m_waitingOnBuffer) {
-        audioQueue->m_waitingOnBuffer = false;
-        
-        AQ_LOCK_TRACE("audioQueueOutputCallback: unlock 3\n");
-        pthread_mutex_unlock(&audioQueue->m_mutex);
-        audioQueue->enqueueCachedData();
-    } else {
-        AQ_LOCK_TRACE("audioQueueOutputCallback: unlock 4\n");
-        pthread_mutex_unlock(&audioQueue->m_mutex);
     }
 }
 
