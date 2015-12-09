@@ -496,13 +496,13 @@ void Audio_Queue::audioQueueOutputCallback(void *inClientData, AudioQueueRef inA
         audioQueue->m_delegate->audioQueueBuffersEmpty();
     } else {
         pthread_mutex_unlock(&audioQueue->m_bufferInUseMutex);
+        
+        if (audioQueue->m_delegate) {
+            audioQueue->m_delegate->audioQueueFinishedPlayingPacket();
+        }
     }
     
     AQ_LOCK_TRACE("audioQueueOutputCallback: unlock\n");
-    
-    if (audioQueue->m_delegate) {
-        audioQueue->m_delegate->audioQueueFinishedPlayingPacket();
-    }
 }
 
 void Audio_Queue::audioQueueIsRunningCallback(void *inClientData, AudioQueueRef inAQ, AudioQueuePropertyID inID)
