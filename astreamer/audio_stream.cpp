@@ -1426,7 +1426,14 @@ void Audio_Stream::decodeSinglePacket(CFRunLoopTimerRef timer, void *info)
         
         pthread_mutex_lock(&THIS->m_packetQueueMutex);
         
-        if (THIS->m_cachedDataSize >= config->maxPrebufferedByteCount || continuous) {
+        /* The only reason we keep the already converted packets in memory
+         * is seeking from the cache. If in-memory seeking is disabled we
+         * can just cleanup the cache immediately. The same applies for
+         * continuous streams. They are never seeked backwards.
+         */
+        if (!config->seekingFromCacheEnabled ||
+            continuous ||
+            THIS->m_cachedDataSize >= config->maxPrebufferedByteCount) {
             pthread_mutex_unlock(&THIS->m_packetQueueMutex);
             
             THIS->cleanupCachedData();
