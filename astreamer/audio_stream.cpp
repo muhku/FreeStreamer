@@ -617,7 +617,9 @@ void Audio_Stream::setDefaultContentLength(UInt64 defaultContentLength)
     
 void Audio_Stream::setContentLength(UInt64 contentLength)
 {
+    pthread_mutex_lock(&m_streamStateMutex);
     m_contentLength = contentLength;
+    pthread_mutex_unlock(&m_streamStateMutex);
 }
     
 void Audio_Stream::setPreloading(bool preloading)
@@ -1151,6 +1153,7 @@ UInt64 Audio_Stream::defaultContentLength()
     
 UInt64 Audio_Stream::contentLength()
 {
+    pthread_mutex_lock(&m_streamStateMutex);
     if (m_contentLength == 0) {
         if (m_inputStream) {
             m_contentLength = m_inputStream->contentLength();
@@ -1159,6 +1162,7 @@ UInt64 Audio_Stream::contentLength()
             }
         }
     }
+    pthread_mutex_unlock(&m_streamStateMutex);
     return m_contentLength;
 }
 
@@ -1418,8 +1422,11 @@ void Audio_Stream::decodeSinglePacket(CFRunLoopTimerRef timer, void *info)
         
         Stream_Configuration *config = Stream_Configuration::configuration();
         
+        const bool continuous = (!(THIS->contentLength() > 0));
+        
         pthread_mutex_lock(&THIS->m_packetQueueMutex);
-        if (THIS->m_cachedDataSize >= config->maxPrebufferedByteCount) {
+        
+        if (THIS->m_cachedDataSize >= config->maxPrebufferedByteCount || continuous) {
             pthread_mutex_unlock(&THIS->m_packetQueueMutex);
             
             THIS->cleanupCachedData();
