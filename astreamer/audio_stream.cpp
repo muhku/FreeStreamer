@@ -312,6 +312,8 @@ void Audio_Stream::close(bool closeParser)
     /*
      * Free any remaining queud packets for encoding.
      */
+    pthread_mutex_lock(&m_packetQueueMutex);
+    
     queued_packet_t *cur = m_queuedHead;
     while (cur) {
         queued_packet_t *tmp = cur->next;
@@ -320,6 +322,8 @@ void Audio_Stream::close(bool closeParser)
     }
     m_queuedHead = m_queuedTail = 0, m_playPacket = 0;
     m_cachedDataSize = 0;
+    
+    pthread_mutex_unlock(&m_packetQueueMutex);
     
     AS_TRACE("%s: leave\n", __PRETTY_FUNCTION__);
 }
@@ -496,7 +500,9 @@ void Audio_Stream::seekToOffset(float offset)
         
         // Found the packet from the cache, let's use the cache directly.
         
+        pthread_mutex_lock(&m_packetQueueMutex);
         m_playPacket    = seekPacket;
+        pthread_mutex_unlock(&m_packetQueueMutex);
         m_discontinuity = true;
         
         setSeekOffset(offset);
@@ -783,7 +789,9 @@ void Audio_Stream::audioQueueBuffersEmpty()
     if (count == 0 && m_inputStreamRunning && FAILED != state()) {
         Stream_Configuration *config = Stream_Configuration::configuration();
         
+        pthread_mutex_lock(&m_packetQueueMutex);
         m_playPacket = m_queuedHead;
+        pthread_mutex_unlock(&m_packetQueueMutex);
         
         // Always make sure we are scheduled to receive data if we start buffering
         m_inputStream->setScheduledInRunLoop(true);
@@ -839,9 +847,13 @@ void Audio_Stream::audioQueueBuffersEmpty()
     
     // Keep enqueuing the packets in the queue until we have them
     
+    pthread_mutex_lock(&m_packetQueueMutex);
     if (m_playPacket && count > 0) {
+        pthread_mutex_unlock(&m_packetQueueMutex);
         enqueueCachedData();
     } else {
+        pthread_mutex_unlock(&m_packetQueueMutex);
+        
         AS_TRACE("%s: closing the audio queue\n", __PRETTY_FUNCTION__);
         
         setState(PLAYBACK_COMPLETED);
