@@ -1633,6 +1633,8 @@ void Audio_Stream::enqueueCachedData()
     pthread_mutex_unlock(&m_streamStateMutex);
     
     if (!audioQueueConsumedPackets && contentLength() > 0) {
+        Stream_Configuration *config = Stream_Configuration::configuration();
+        
         const UInt64 seekLength = contentLength() * m_seekOffset;
         
         AS_TRACE("seek length %llu\n", seekLength);
@@ -1641,7 +1643,8 @@ void Audio_Stream::enqueueCachedData()
         
         AS_TRACE("audio queue not consumed packets, content length %llu, required bytes to be buffered %llu\n", contentLength(), numBytesRequiredToBeBuffered);
         
-        if (m_bytesReceived >= numBytesRequiredToBeBuffered) {
+        if (m_bytesReceived >= numBytesRequiredToBeBuffered ||
+            m_bytesReceived >= config->maxPrebufferedByteCount * 0.9) {
             m_initialBufferingCompleted = true;
             pthread_mutex_lock(&m_streamStateMutex);
             m_decoderShouldRun = true;
