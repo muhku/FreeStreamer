@@ -313,6 +313,13 @@ NSString*             freeStreamerReleaseVersion();
 - (void)pause;
 
 /**
+ * Rewinds the stream. Only possible for continuous streams.
+ *
+ * @param seconds Seconds to rewind the stream.
+ */
+- (void)rewind:(unsigned)seconds;
+
+/**
  * Seeks the stream to a given position. Requires a non-continuous stream
  * (a stream with a known duration).
  *

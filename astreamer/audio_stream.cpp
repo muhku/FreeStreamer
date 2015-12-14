@@ -108,6 +108,7 @@ Audio_Stream::Audio_Stream() :
     m_queuedTail(0),
     m_playPacket(0),
     m_cachedDataSize(0),
+    m_numPacketsToRewind(0),
     m_audioDataByteCount(0),
     m_audioDataPacketCount(0),
     m_bitRate(0),
@@ -211,6 +212,10 @@ void Audio_Stream::open(Input_Stream_Position *position)
     m_decoderShouldRun = false;
     m_decoderFailed    = false;
     pthread_mutex_unlock(&m_streamStateMutex);
+    
+    pthread_mutex_lock(&m_packetQueueMutex);
+    m_numPacketsToRewind = 0;
+    pthread_mutex_unlock(&m_packetQueueMutex);
     
     invalidateWatchdogTimer();
     
@@ -322,6 +327,7 @@ void Audio_Stream::close(bool closeParser)
     }
     m_queuedHead = m_queuedTail = 0, m_playPacket = 0;
     m_cachedDataSize = 0;
+    m_numPacketsToRewind = 0;
     
     pthread_mutex_unlock(&m_packetQueueMutex);
     
@@ -331,6 +337,35 @@ void Audio_Stream::close(bool closeParser)
 void Audio_Stream::pause()
 {
     audioQueue()->pause();
+}
+    
+void Audio_Stream::rewind(unsigned seconds)
+{
+    const bool continuous = (!(contentLength() > 0));
+    
+    if (!continuous) {
+        return;
+    }
+    
+    const int packetCount = cachedDataCount();
+    
+    if (packetCount == 0) {
+        return;
+    }
+    
+    const Float64 averagePacketSize = (Float64)cachedDataSize() / (Float64)packetCount;
+    const Float64 bufferSizeForSecond = bitrate() / 8.0;
+    const Float64 totalAudioRequiredInBytes = seconds * bufferSizeForSecond;
+    
+    const int packetsToRewind = totalAudioRequiredInBytes / averagePacketSize;
+    
+    if (packetCount - packetsToRewind >= 16) {
+        // Leave some safety margin so that the stream doesn't immediately start buffering
+        
+        pthread_mutex_lock(&m_packetQueueMutex);
+        m_numPacketsToRewind = packetsToRewind;
+        pthread_mutex_unlock(&m_packetQueueMutex);
+    }
 }
     
 void Audio_Stream::startCachedDataPlayback()
@@ -401,6 +436,10 @@ void Audio_Stream::seekToOffset(float offset)
     pthread_mutex_lock(&m_streamStateMutex);
     m_decoderShouldRun = false;
     pthread_mutex_unlock(&m_streamStateMutex);
+    
+    pthread_mutex_lock(&m_packetQueueMutex);
+    m_numPacketsToRewind = 0;
+    pthread_mutex_unlock(&m_packetQueueMutex);
     
     m_inputStream->setScheduledInRunLoop(false);
     
@@ -1407,6 +1446,25 @@ void Audio_Stream::decodeSinglePacket(CFRunLoopTimerRef timer, void *info)
     UInt32 ioOutputDataPackets = THIS->m_outputBufferSize / THIS->m_dstFormat.mBytesPerPacket;
     
     AS_TRACE("calling AudioConverterFillComplexBuffer\n");
+    
+    pthread_mutex_lock(&THIS->m_packetQueueMutex);
+    
+    if (THIS->m_numPacketsToRewind > 0) {
+        AS_TRACE("Rewinding %i packets\n", THIS->m_numPacketsToRewind);
+        
+        queued_packet_t *front = THIS->m_playPacket;
+        
+        while (front && THIS->m_numPacketsToRewind-- > 0) {
+            queued_packet_t *tmp = front->next;
+            
+            front = tmp;
+        }
+        
+        THIS->m_playPacket = front;
+        THIS->m_numPacketsToRewind = 0;
+    }
+    
+    pthread_mutex_unlock(&THIS->m_packetQueueMutex);
     
     OSStatus err = AudioConverterFillComplexBuffer(THIS->m_audioConverter,
                                                    &encoderDataCallback,

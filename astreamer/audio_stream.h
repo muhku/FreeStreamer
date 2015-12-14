@@ -65,6 +65,7 @@ public:
     void open(Input_Stream_Position *position);
     void close(bool closeParser);
     void pause();
+    void rewind(unsigned seconds);
     
     void startCachedDataPlayback();
     
@@ -172,6 +173,8 @@ private:
     queued_packet_t *m_playPacket;
     
     std::list <queued_packet_t*> m_processedPackets;
+    
+    unsigned m_numPacketsToRewind;
     
     size_t m_cachedDataSize;
     

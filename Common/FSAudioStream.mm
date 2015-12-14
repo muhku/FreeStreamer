@@ -272,6 +272,7 @@ public:
 - (void)stop;
 - (BOOL)isPlaying;
 - (void)pause;
+- (void)rewind:(unsigned)seconds;
 - (void)seekToOffset:(float)offset;
 - (float)currentVolume;
 - (unsigned long long)totalCachedObjectsSize;
@@ -997,6 +998,26 @@ public:
     _audioStream->pause();
 }
 
+- (void)rewind:(unsigned int)seconds
+{
+    if (([self durationInSeconds] > 0)) {
+        // Rewinding only possible for continuous streams
+        return;
+    }
+    
+    const float originalVolume = [self currentVolume];
+    
+    // Set volume to 0 to avoid glitches
+    _audioStream->setVolume(0);
+    
+    _audioStream->rewind(seconds);
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+        // Return the original volume back
+        _audioStream->setVolume(originalVolume);
+    });
+}
+
 - (void)seekToOffset:(float)offset
 {
     _audioStream->seekToOffset(offset);
@@ -1344,6 +1365,13 @@ public:
     NSAssert([NSThread isMainThread], @"FSAudioStream.pause needs to be called in the main thread");
     
     [_private pause];
+}
+
+- (void)rewind:(unsigned int)seconds
+{
+    NSAssert([NSThread isMainThread], @"FSAudioStream.rewind needs to be called in the main thread");
+    
+    [_private rewind:seconds];
 }
 
 - (void)seekToPosition:(FSStreamPosition)position
