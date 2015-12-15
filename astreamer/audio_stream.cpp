@@ -374,7 +374,7 @@ void Audio_Stream::startCachedDataPlayback()
     m_preloading = false;
     pthread_mutex_unlock(&m_streamStateMutex);
     
-    enqueueCachedData();
+    determineBufferingLimits();
 }
     
 AS_Playback_Position Audio_Stream::playbackPosition()
@@ -889,7 +889,7 @@ void Audio_Stream::audioQueueBuffersEmpty()
     pthread_mutex_lock(&m_packetQueueMutex);
     if (m_playPacket && count > 0) {
         pthread_mutex_unlock(&m_packetQueueMutex);
-        enqueueCachedData();
+        determineBufferingLimits();
     } else {
         pthread_mutex_unlock(&m_packetQueueMutex);
         
@@ -930,7 +930,7 @@ void Audio_Stream::audioQueueFinishedPlayingPacket()
     int count = playbackDataCount();
     
     if (count > 0) {
-        enqueueCachedData();
+        determineBufferingLimits();
     }
 }
     
@@ -1359,7 +1359,7 @@ void Audio_Stream::audioQueueTimerCallback(CFRunLoopTimerRef timer, void *info)
     int count = THIS->playbackDataCount();
     
     if (count > 0) {
-        THIS->enqueueCachedData();
+        THIS->determineBufferingLimits();
     }
 }
     
@@ -1652,7 +1652,7 @@ int Audio_Stream::audioQueuePacketCount()
     return 0;
 }
     
-void Audio_Stream::enqueueCachedData()
+void Audio_Stream::determineBufferingLimits()
 {
     if (state() == PAUSED || state() == SEEKING) {
         return;
@@ -1995,7 +1995,7 @@ void Audio_Stream::streamDataCallback(void *inClientData, UInt32 inNumberBytes, 
         pthread_mutex_unlock(&THIS->m_packetQueueMutex);
     }
     
-    THIS->enqueueCachedData();
+    THIS->determineBufferingLimits();
 }
 
 } // namespace astreamer

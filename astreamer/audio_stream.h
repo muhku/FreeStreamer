@@ -213,7 +213,7 @@ private:
     void invalidateWatchdogTimer();
     
     int cachedDataCount();
-    void enqueueCachedData();
+    void determineBufferingLimits();
     void cleanupCachedData();
     
     static void watchdogTimerCallback(CFRunLoopTimerRef timer, void *info);

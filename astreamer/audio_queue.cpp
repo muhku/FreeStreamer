@@ -493,7 +493,9 @@ void Audio_Queue::audioQueueOutputCallback(void *inClientData, AudioQueueRef inA
         AQ_LOCK_TRACE("audioQueueOutputCallback: unlock 2\n");
         pthread_mutex_unlock(&audioQueue->m_bufferInUseMutex);
         
-        audioQueue->m_delegate->audioQueueBuffersEmpty();
+        if (audioQueue->m_delegate) {
+            audioQueue->m_delegate->audioQueueBuffersEmpty();
+        }
     } else {
         pthread_mutex_unlock(&audioQueue->m_bufferInUseMutex);
         
