@@ -45,18 +45,57 @@ extern NSString* const FSAudioStreamNotificationKey_MetaData;
  * The audio stream state.
  */
 typedef NS_ENUM(NSInteger, FSAudioStreamState) {
+    /**
+     * Retrieving URL.
+     */
     kFsAudioStreamRetrievingURL,
+    /**
+     * Stopped.
+     */
     kFsAudioStreamStopped,
+    /**
+     * Buffering.
+     */
     kFsAudioStreamBuffering,
+    /**
+     * Playing.
+     */
     kFsAudioStreamPlaying,
+    /**
+     * Paused.
+     */
     kFsAudioStreamPaused,
+    /**
+     * Seeking.
+     */
     kFsAudioStreamSeeking,
+    /**
+     * The stream has received all the data for a file.
+     */
     kFSAudioStreamEndOfFile,
+    /**
+     * Failed.
+     */
     kFsAudioStreamFailed,
+    /**
+     * Started retrying.
+     */
     kFsAudioStreamRetryingStarted,
+    /**
+     * Retrying succeeded.
+     */
     kFsAudioStreamRetryingSucceeded,
+    /**
+     * Retrying failed.
+     */
     kFsAudioStreamRetryingFailed,
+    /**
+     * Playback completed.
+     */
     kFsAudioStreamPlaybackCompleted,
+    /**
+     * Unknown state.
+     */
     kFsAudioStreamUnknownState
 };
 
@@ -64,12 +103,33 @@ typedef NS_ENUM(NSInteger, FSAudioStreamState) {
  * The audio stream errors.
  */
 typedef NS_ENUM(NSInteger, FSAudioStreamError) {
+    /**
+     * No error.
+     */
     kFsAudioStreamErrorNone = 0,
+    /**
+     * Error opening the stream.
+     */
     kFsAudioStreamErrorOpen = 1,
+    /**
+     * Error parsing the stream.
+     */
     kFsAudioStreamErrorStreamParse = 2,
+    /**
+     * Network error.
+     */
     kFsAudioStreamErrorNetwork = 3,
+    /**
+     * Unsupported format.
+     */
     kFsAudioStreamErrorUnsupportedFormat = 4,
+    /**
+     * Stream buffered too often.
+     */
     kFsAudioStreamErrorStreamBouncing = 5,
+    /**
+     * Stream playback was terminated by the operating system.
+     */
     kFsAudioStreamErrorTerminated = 6
 };
 

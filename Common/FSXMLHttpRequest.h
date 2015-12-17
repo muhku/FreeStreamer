@@ -13,12 +13,24 @@
 /**
  * XML HTTP request error status.
  */
-typedef enum {
+typedef NS_ENUM(NSInteger, FSXMLHttpRequestError) {
+    /**
+     * No error.
+     */
     FSXMLHttpRequestError_NoError = 0,
+    /**
+     * Connection failed.
+     */
     FSXMLHttpRequestError_Connection_Failed,
+    /**
+     * Invalid HTTP status.
+     */
     FSXMLHttpRequestError_Invalid_Http_Status,
+    /**
+     * XML parser failed.
+     */
     FSXMLHttpRequestError_XML_Parser_Failed
-} FSXMLHttpRequestError;
+};
 
 /**
  * FSXMLHttpRequest is a class for retrieving data in the XML

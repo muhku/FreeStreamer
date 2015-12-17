@@ -11,11 +11,20 @@
 /**
  * The playlist format.
  */
-typedef enum {
+typedef NS_ENUM(NSInteger, FSPlaylistFormat) {
+    /**
+     * Unknown playlist format.
+     */
     kFSPlaylistFormatNone,
+    /**
+     * M3U playlist.
+     */
     kFSPlaylistFormatM3U,
+    /**
+     * PLS playlist.
+     */
     kFSPlaylistFormatPLS
-} FSPlaylistFormat;
+};
 
 /**
  * FSParsePlaylistRequest is a class for parsing a playlist. It supports

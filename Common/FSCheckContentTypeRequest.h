@@ -11,34 +11,64 @@
 /**
  * Content type format.
  */
-typedef enum {
+typedef NS_ENUM(NSInteger, FSFileFormat) {
+    /**
+     * Unknown format.
+     */
     kFSFileFormatUnknown = 0,
     
     /**
-     * Playlist.
+     * M3U playlist.
      */
     kFSFileFormatM3UPlaylist,
+    /**
+     * PLS playlist.
+     */
     kFSFileFormatPLSPlaylist,
     
     /**
-     * XML.
+     * XML file.
      */
     kFSFileFormatXML,
     
     /**
-     * Audio file.
+     * MP3 file.
      */
     kFSFileFormatMP3,
+    /**
+     * WAVE file.
+     */
     kFSFileFormatWAVE,
+    /**
+     * AIFC file.
+     */
     kFSFileFormatAIFC,
+    /**
+     * AIFF file.
+     */
     kFSFileFormatAIFF,
+    /**
+     * M4A file.
+     */
     kFSFileFormatM4A,
+    /**
+     * MPEG4 file.
+     */
     kFSFileFormatMPEG4,
+    /**
+     * CAF file.
+     */
     kFSFileFormatCAF,
+    /**
+     * AAC_ADTS file.
+     */
     kFSFileFormatAAC_ADTS,
     
+    /**
+     * Total number of formats.
+     */
     kFSFileFormatCount
-} FSFileFormat;
+};
 
 /**
  * FSCheckContentTypeRequest is a class for checking the content type
