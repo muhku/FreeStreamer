@@ -105,8 +105,8 @@ public:
     UInt64 defaultContentLength();
     UInt64 contentLength();
     int playbackDataCount();
-    int audioQueueNumberOfBuffersInUse();
-    int audioQueuePacketCount();
+    
+    AudioQueueLevelMeterState levels();
     
     /* Audio_Queue_Delegate */
     void audioQueueStateChanged(Audio_Queue::State state);

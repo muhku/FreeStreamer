@@ -44,7 +44,7 @@ extern NSString* const FSAudioStreamNotificationKey_MetaData;
 /**
  * The audio stream state.
  */
-typedef enum {
+typedef NS_ENUM(NSInteger, FSAudioStreamState) {
     kFsAudioStreamRetrievingURL,
     kFsAudioStreamStopped,
     kFsAudioStreamBuffering,
@@ -58,12 +58,12 @@ typedef enum {
     kFsAudioStreamRetryingFailed,
     kFsAudioStreamPlaybackCompleted,
     kFsAudioStreamUnknownState
-} FSAudioStreamState;
+};
 
 /**
  * The audio stream errors.
  */
-typedef enum {
+typedef NS_ENUM(NSInteger, FSAudioStreamError) {
     kFsAudioStreamErrorNone = 0,
     kFsAudioStreamErrorOpen = 1,
     kFsAudioStreamErrorStreamParse = 2,
@@ -71,7 +71,7 @@ typedef enum {
     kFsAudioStreamErrorUnsupportedFormat = 4,
     kFsAudioStreamErrorStreamBouncing = 5,
     kFsAudioStreamErrorTerminated = 6
-} FSAudioStreamError;
+};
 
 @protocol FSPCMAudioStreamDelegate;
 @class FSAudioStreamPrivate;
@@ -107,6 +107,14 @@ typedef struct {
      */
     float position;
 } FSSeekByteOffset;
+
+/**
+ * Audio levels.
+ */
+typedef struct {
+    Float32 averagePower;
+    Float32 peakPower;
+} FSLevelMeterState;
 
 /**
  * The low-level stream configuration.
@@ -442,6 +450,10 @@ NSString*             freeStreamerReleaseVersion();
  * in case of failure.
  */
 @property (nonatomic,readonly) NSUInteger retryCount;
+/**
+ * The property determines the current audio levels.
+ */
+@property (nonatomic,readonly) FSLevelMeterState levels;
 /**
  * This property holds the current statistics for the stream state.
  */

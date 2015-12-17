@@ -232,6 +232,7 @@ public:
 @property (nonatomic,assign) NSUInteger maxRetryCount;
 @property (nonatomic,assign) NSUInteger retryCount;
 @property (readonly) FSStreamStatistics *statistics;
+@property (readonly) FSLevelMeterState levels;
 @property (readonly) size_t prebufferedByteCount;
 @property (readonly) FSSeekByteOffset currentSeekByteOffset;
 @property (readonly) float bitRate;
@@ -576,10 +577,20 @@ public:
     
     stats.snapshotTime                  = [[NSDate alloc] init];
     stats.audioStreamPacketCount        = _audioStream->playbackDataCount();
-    stats.audioQueueUsedBufferCount     = _audioStream->audioQueueNumberOfBuffersInUse();
-    stats.audioQueuePCMPacketQueueCount = _audioStream->audioQueuePacketCount();
     
     return stats;
+}
+
+- (FSLevelMeterState)levels
+{
+    AudioQueueLevelMeterState aqLevels = _audioStream->levels();
+    
+    FSLevelMeterState l;
+    
+    l.averagePower = aqLevels.mAveragePower;
+    l.peakPower    = aqLevels.mPeakPower;
+    
+    return l;
 }
 
 - (size_t)prebufferedByteCount
@@ -1420,6 +1431,11 @@ public:
 - (FSStreamStatistics *)statistics
 {
     return _private.statistics;
+}
+
+- (FSLevelMeterState)levels
+{
+    return _private.levels;
 }
 
 - (FSStreamPosition)currentTimePlayed

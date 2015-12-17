@@ -45,6 +45,7 @@ Audio_Queue::Audio_Queue()
     m_packetsFilled(0),
     m_buffersUsed(0),
     m_audioQueueStarted(false),
+    m_levelMeteringEnabled(false),
     m_lastError(noErr),
     m_initialOutputVolume(1.0)
 {
@@ -101,6 +102,7 @@ void Audio_Queue::start()
     OSStatus err = AudioQueueStart(m_outAQ, NULL);
     if (!err) {
         m_audioQueueStarted = true;
+        m_levelMeteringEnabled = false;
         m_lastError = noErr;
     } else {
         AQ_TRACE("%s: AudioQueueStart failed!\n", __PRETTY_FUNCTION__);
@@ -177,6 +179,7 @@ void Audio_Queue::stop(bool stopImmediately)
         return;
     }
     m_audioQueueStarted = false;
+    m_levelMeteringEnabled = false;
     
     pthread_mutex_lock(&m_bufferInUseMutex);
     pthread_cond_signal(&m_bufferFreeCondition);
@@ -221,6 +224,24 @@ AudioTimeStamp Audio_Queue::currentTime()
     return queueTime;
 }
 
+AudioQueueLevelMeterState Audio_Queue::levels()
+{
+    if (!m_levelMeteringEnabled) {
+        UInt32 enabledLevelMeter = true;
+        AudioQueueSetProperty(m_outAQ,
+                              kAudioQueueProperty_EnableLevelMetering,
+                              &enabledLevelMeter,
+                              sizeof(UInt32));
+        
+        m_levelMeteringEnabled = true;
+    }
+    
+    AudioQueueLevelMeterState levelMeter;
+    UInt32 levelMeterSize = sizeof(AudioQueueLevelMeterState);
+    AudioQueueGetProperty(m_outAQ, kAudioQueueProperty_CurrentLevelMeterDB, &levelMeter, &levelMeterSize);
+    return levelMeter;
+}
+    
 void Audio_Queue::init()
 {
     OSStatus err = noErr;

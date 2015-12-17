@@ -1639,17 +1639,10 @@ int Audio_Stream::playbackDataCount()
     
     return count;
 }
-    
-int Audio_Stream::audioQueueNumberOfBuffersInUse()
+
+AudioQueueLevelMeterState Audio_Stream::levels()
 {
-    // TODO
-    return 0;
-}
-    
-int Audio_Stream::audioQueuePacketCount()
-{
-    // TODO
-    return 0;
+    return audioQueue()->levels();
 }
     
 void Audio_Stream::determineBufferingLimits()
