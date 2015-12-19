@@ -136,6 +136,7 @@ private:
     
     UInt64 m_defaultContentLength;
     UInt64 m_contentLength;
+    UInt64 m_originalContentLength;
     UInt64 m_bytesReceived;
     
     State m_state;
@@ -144,6 +145,7 @@ private:
     
     CFRunLoopTimerRef m_watchdogTimer;
     CFRunLoopTimerRef m_audioQueueTimer;
+    CFRunLoopTimerRef m_seekTimer;
     
     AudioFileStreamID m_audioFileStream;	// the audio file stream parser
     AudioConverterRef m_audioConverter;
@@ -192,6 +194,7 @@ private:
     bool m_converterRunOutOfData;
     bool m_decoderShouldRun;
     bool m_decoderFailed;
+    bool m_decoderActive;
     
     pthread_mutex_t m_packetQueueMutex;
     pthread_mutex_t m_streamStateMutex;
@@ -218,6 +221,7 @@ private:
     
     static void watchdogTimerCallback(CFRunLoopTimerRef timer, void *info);
     static void audioQueueTimerCallback(CFRunLoopTimerRef timer, void *info);
+    static void seekTimerCallback(CFRunLoopTimerRef timer, void *info);
     
     bool decoderShouldRun();
     static void decodeSinglePacket(CFRunLoopTimerRef timer, void *info);

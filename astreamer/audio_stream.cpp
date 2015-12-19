@@ -84,6 +84,7 @@ Audio_Stream::Audio_Stream() :
     m_audioQueue(0),
     m_watchdogTimer(0),
     m_audioQueueTimer(0),
+    m_seekTimer(0),
     m_audioFileStream(0),
     m_audioConverter(0),
     m_initializationError(noErr),
@@ -119,6 +120,7 @@ Audio_Stream::Audio_Stream() :
     m_converterRunOutOfData(false),
     m_decoderShouldRun(false),
     m_decoderFailed(false),
+    m_decoderActive(false),
     m_decodeRunLoop(NULL)
 {
     memset(&m_srcFormat, 0, sizeof m_srcFormat);
@@ -282,6 +284,11 @@ void Audio_Stream::close(bool closeParser)
         CFRelease(m_audioQueueTimer), m_audioQueueTimer = 0;
     }
     
+    if (m_seekTimer) {
+        CFRunLoopTimerInvalidate(m_seekTimer);
+        CFRelease(m_seekTimer), m_seekTimer = 0;
+    }
+    
     /* Close the HTTP stream first so that the audio stream parser
        isn't fed with more data to parse */
     if (m_inputStreamRunning) {
@@ -433,6 +440,10 @@ void Audio_Stream::seekToOffset(float offset)
         return;
     }
     
+    setState(SEEKING);
+    
+    m_originalContentLength = contentLength();
+    
     pthread_mutex_lock(&m_streamStateMutex);
     m_decoderShouldRun = false;
     pthread_mutex_unlock(&m_streamStateMutex);
@@ -443,115 +454,24 @@ void Audio_Stream::seekToOffset(float offset)
     
     m_inputStream->setScheduledInRunLoop(false);
     
-    // Close the audio queue so that it won't ask any more data
-    closeAudioQueue();
+    setSeekOffset(offset);
     
-    setState(SEEKING);
-    
-    Input_Stream_Position position = streamPositionForOffset(offset);
-    
-    if (position.start == 0 && position.end == 0) {
-        closeAndSignalError(AS_ERR_NETWORK, CFSTR("Failed to retrieve seeking position"));
-        return;
+    if (m_seekTimer) {
+        CFRunLoopTimerInvalidate(m_seekTimer);
+        CFRelease(m_seekTimer), m_seekTimer = 0;
     }
     
-    UInt64 originalContentLength = m_contentLength;
+    CFRunLoopTimerContext ctx = {0, this, NULL, NULL, NULL};
     
-    const float duration = durationInSeconds();
-    const double packetDuration = m_srcFormat.mFramesPerPacket / m_srcFormat.mSampleRate;
+    m_seekTimer = CFRunLoopTimerCreate(NULL,
+                                       CFAbsoluteTimeGetCurrent(),
+                                       0.050, // 50 ms
+                                       0,
+                                       0,
+                                       seekTimerCallback,
+                                       &ctx);
     
-    if (packetDuration > 0) {
-        UInt32 ioFlags = 0;
-        SInt64 packetAlignedByteOffset;
-        SInt64 seekPacket = floor((duration * offset) / packetDuration);
-        
-        m_packetIdentifier = seekPacket;
-        
-        OSStatus err = AudioFileStreamSeek(m_audioFileStream, seekPacket, &packetAlignedByteOffset, &ioFlags);
-        if (!err) {
-            position.start = packetAlignedByteOffset + m_dataOffset;
-        } else {
-            closeAndSignalError(AS_ERR_NETWORK, CFSTR("Failed to calculate seeking position"));
-            return;
-        }
-    } else {
-        closeAndSignalError(AS_ERR_NETWORK, CFSTR("Failed to calculate seeking position"));
-        return;
-    }
-    
-    Stream_Configuration *config = Stream_Configuration::configuration();
-    
-    // Do a cache lookup if we can find the seeked packet from the cache and no need to
-    // open the stream from the new position
-    bool foundCachedPacket = false;
-    queued_packet_t *seekPacket = 0;
-    
-    if (config->seekingFromCacheEnabled) {
-        AS_LOCK_TRACE("lock: seekToOffset\n");
-        pthread_mutex_lock(&m_packetQueueMutex);
-        
-        queued_packet_t *cur = m_queuedHead;
-        while (cur) {
-            if (cur->identifier == m_packetIdentifier) {
-                foundCachedPacket = true;
-                seekPacket = cur;
-                break;
-            }
-            
-            queued_packet_t *tmp = cur->next;
-            cur = tmp;
-        }
-        
-        AS_LOCK_TRACE("unlock: seekToOffset\n");
-        pthread_mutex_unlock(&m_packetQueueMutex);
-    } else {
-        AS_TRACE("Seeking from cache disabled\n");
-    }
-    
-    if (!foundCachedPacket) {
-        AS_TRACE("Seeked packet not found from cache, reopening the input stream\n");
-        
-        // Close but keep the stream parser running
-        close(false);
-        
-        m_bytesReceived = 0;
-        m_bounceCount = 0;
-        m_firstBufferingTime = 0;
-        m_bitrateBufferIndex = 0;
-        m_initializationError = noErr;
-        m_converterRunOutOfData = false;
-        m_discontinuity = true;
-
-        bool success = m_inputStream->open(position);
-        
-        if (success) {
-            setSeekOffset(offset);
-            setContentLength(originalContentLength);
-            
-            m_inputStreamRunning = true;
-
-        } else {
-            closeAndSignalError(AS_ERR_OPEN, CFSTR("Input stream open error"));
-            return;
-        }
-    } else {
-        AS_TRACE("Seeked packet found from cache!\n");
-        
-        // Found the packet from the cache, let's use the cache directly.
-        
-        pthread_mutex_lock(&m_packetQueueMutex);
-        m_playPacket    = seekPacket;
-        pthread_mutex_unlock(&m_packetQueueMutex);
-        m_discontinuity = true;
-        
-        setSeekOffset(offset);
-    }
-    
-    audioQueue()->init();
-    
-    setState(BUFFERING);
-    
-    m_inputStream->setScheduledInRunLoop(true);
+    CFRunLoopAddTimer(CFRunLoopGetCurrent(), m_seekTimer, kCFRunLoopCommonModes);
 }
     
 Input_Stream_Position Audio_Stream::streamPositionForOffset(float offset)
@@ -927,11 +847,6 @@ void Audio_Stream::audioQueueInitializationFailed()
     
 void Audio_Stream::audioQueueFinishedPlayingPacket()
 {
-    int count = playbackDataCount();
-    
-    if (count > 0) {
-        determineBufferingLimits();
-    }
 }
     
 void Audio_Stream::streamIsReadyRead()
@@ -1363,6 +1278,139 @@ void Audio_Stream::audioQueueTimerCallback(CFRunLoopTimerRef timer, void *info)
     }
 }
     
+void Audio_Stream::seekTimerCallback(CFRunLoopTimerRef timer, void *info)
+{
+    Audio_Stream *THIS = (Audio_Stream *)info;
+    
+    if (THIS->state() != SEEKING) {
+        return;
+    }
+    
+    pthread_mutex_lock(&THIS->m_streamStateMutex);
+    
+    if (THIS->m_decoderActive) {
+        AS_TRACE("decoder still active, postponing seeking!\n");
+        pthread_mutex_unlock(&THIS->m_streamStateMutex);
+        return;
+    } else {
+        AS_TRACE("decoder free, seeking\n");
+        
+        if (THIS->m_seekTimer) {
+            CFRunLoopTimerInvalidate(THIS->m_seekTimer);
+            CFRelease(THIS->m_seekTimer), THIS->m_seekTimer = 0;
+        }
+        
+        pthread_mutex_unlock(&THIS->m_streamStateMutex);
+    }
+    
+    // Close the audio queue so that it won't ask any more data
+    THIS->closeAudioQueue();
+    
+    Input_Stream_Position position = THIS->streamPositionForOffset(THIS->m_seekOffset);
+    
+    if (position.start == 0 && position.end == 0) {
+        THIS->closeAndSignalError(AS_ERR_NETWORK, CFSTR("Failed to retrieve seeking position"));
+        return;
+    }
+    
+    const float duration = THIS->durationInSeconds();
+    const double packetDuration = THIS->m_srcFormat.mFramesPerPacket / THIS->m_srcFormat.mSampleRate;
+    
+    if (packetDuration > 0) {
+        UInt32 ioFlags = 0;
+        SInt64 packetAlignedByteOffset;
+        SInt64 seekPacket = floor((duration * THIS->m_seekOffset) / packetDuration);
+        
+        THIS->m_packetIdentifier = seekPacket;
+        
+        OSStatus err = AudioFileStreamSeek(THIS->m_audioFileStream, seekPacket, &packetAlignedByteOffset, &ioFlags);
+        if (!err) {
+            position.start = packetAlignedByteOffset + THIS->m_dataOffset;
+        } else {
+            THIS->closeAndSignalError(AS_ERR_NETWORK, CFSTR("Failed to calculate seeking position"));
+            return;
+        }
+    } else {
+        THIS->closeAndSignalError(AS_ERR_NETWORK, CFSTR("Failed to calculate seeking position"));
+        return;
+    }
+    
+    Stream_Configuration *config = Stream_Configuration::configuration();
+    
+    // Do a cache lookup if we can find the seeked packet from the cache and no need to
+    // open the stream from the new position
+    bool foundCachedPacket = false;
+    queued_packet_t *seekPacket = 0;
+    
+    if (config->seekingFromCacheEnabled) {
+        AS_LOCK_TRACE("lock: seekToOffset\n");
+        pthread_mutex_lock(&THIS->m_packetQueueMutex);
+        
+        queued_packet_t *cur = THIS->m_queuedHead;
+        while (cur) {
+            if (cur->identifier == THIS->m_packetIdentifier) {
+                foundCachedPacket = true;
+                seekPacket = cur;
+                break;
+            }
+            
+            queued_packet_t *tmp = cur->next;
+            cur = tmp;
+        }
+        
+        AS_LOCK_TRACE("unlock: seekToOffset\n");
+        pthread_mutex_unlock(&THIS->m_packetQueueMutex);
+    } else {
+        AS_TRACE("Seeking from cache disabled\n");
+    }
+    
+    if (!foundCachedPacket) {
+        AS_TRACE("Seeked packet not found from cache, reopening the input stream\n");
+        
+        // Close but keep the stream parser running
+        THIS->close(false);
+        
+        THIS->m_bytesReceived = 0;
+        THIS->m_bounceCount = 0;
+        THIS->m_firstBufferingTime = 0;
+        THIS->m_bitrateBufferIndex = 0;
+        THIS->m_initializationError = noErr;
+        THIS->m_converterRunOutOfData = false;
+        THIS->m_discontinuity = true;
+        
+        bool success = THIS->m_inputStream->open(position);
+        
+        if (success) {
+            THIS->setContentLength(THIS->m_originalContentLength);
+            
+            THIS->m_inputStreamRunning = true;
+            
+        } else {
+            THIS->closeAndSignalError(AS_ERR_OPEN, CFSTR("Input stream open error"));
+            return;
+        }
+    } else {
+        AS_TRACE("Seeked packet found from cache!\n");
+        
+        // Found the packet from the cache, let's use the cache directly.
+        
+        pthread_mutex_lock(&THIS->m_packetQueueMutex);
+        THIS->m_playPacket    = seekPacket;
+        pthread_mutex_unlock(&THIS->m_packetQueueMutex);
+        THIS->m_discontinuity = true;
+    }
+    
+    THIS->audioQueue()->init();
+    
+    THIS->setState(BUFFERING);
+    
+    THIS->m_inputStream->setScheduledInRunLoop(true);
+    
+    pthread_mutex_lock(&THIS->m_streamStateMutex);
+    THIS->m_decoderShouldRun = true;
+    pthread_mutex_unlock(&THIS->m_streamStateMutex);
+}
+    
 bool Audio_Stream::decoderShouldRun()
 {
     pthread_mutex_lock(&m_streamStateMutex);
@@ -1392,6 +1440,8 @@ void Audio_Stream::decodeSinglePacket(CFRunLoopTimerRef timer, void *info)
     Audio_Stream *THIS = (Audio_Stream *)info;
     
     pthread_mutex_lock(&THIS->m_streamStateMutex);
+    
+    THIS->m_decoderActive = true;
     
     if (THIS->m_decoderShouldRun && THIS->m_converterRunOutOfData) {
         pthread_mutex_unlock(&THIS->m_streamStateMutex);
@@ -1429,6 +1479,9 @@ void Audio_Stream::decodeSinglePacket(CFRunLoopTimerRef timer, void *info)
     }
     
     if (!THIS->decoderShouldRun()) {
+        pthread_mutex_lock(&THIS->m_streamStateMutex);
+        THIS->m_decoderActive = false;
+        pthread_mutex_unlock(&THIS->m_streamStateMutex);
         return;
     }
     
@@ -1520,6 +1573,12 @@ void Audio_Stream::decodeSinglePacket(CFRunLoopTimerRef timer, void *info)
         
         pthread_mutex_unlock(&THIS->m_streamStateMutex);
     } else {
+        pthread_mutex_unlock(&THIS->m_streamStateMutex);
+    }
+    
+    if (!THIS->decoderShouldRun()) {
+        pthread_mutex_lock(&THIS->m_streamStateMutex);
+        THIS->m_decoderActive = false;
         pthread_mutex_unlock(&THIS->m_streamStateMutex);
     }
 }
