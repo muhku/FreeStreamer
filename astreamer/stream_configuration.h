@@ -34,6 +34,7 @@ struct Stream_Configuration {
     bool cacheEnabled;
     bool seekingFromCacheEnabled;
     bool automaticAudioSessionHandlingEnabled;
+    bool enableTimeAndPitchConversion;
     int maxDiskCacheSize;
     
     static Stream_Configuration *configuration();

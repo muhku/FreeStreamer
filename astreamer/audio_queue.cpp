@@ -155,19 +155,25 @@ void Audio_Queue::setVolume(float volume)
     
 void Audio_Queue::setPlayRate(float playRate)
 {
+    Stream_Configuration *configuration = Stream_Configuration::configuration();
+    
+    if (!configuration->enableTimeAndPitchConversion) {
+#if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
+        printf("*** FreeStreamer notification: Trying to set play rate for audio queue but enableTimeAndPitchConversion is disabled from configuration. Play rate settign will not work.\n");
+#endif
+        return;
+    }
+    
     if (!m_outAQ) {
         return;
     }
-    UInt32 enableTimePitchConversion = (playRate != 1.0);
-    
+
     if (playRate < 0.5) {
         playRate = 0.5;
     }
     if (playRate > 2.0) {
         playRate = 2.0;
     }
-
-    AudioQueueSetProperty (m_outAQ, kAudioQueueProperty_EnableTimePitch, &enableTimePitchConversion, sizeof(enableTimePitchConversion));
     
     AudioQueueSetParameter(m_outAQ, kAudioQueueParam_PlayRate, playRate);
 }
@@ -294,6 +300,15 @@ void Audio_Queue::init()
         AQ_TRACE("%s: error in AudioQueueAddPropertyListener\n", __PRETTY_FUNCTION__);
         m_lastError = err;
         return;
+    }
+    
+    if (configuration->enableTimeAndPitchConversion) {
+        UInt32 enableTimePitchConversion = 1;
+        
+        err = AudioQueueSetProperty (m_outAQ, kAudioQueueProperty_EnableTimePitch, &enableTimePitchConversion, sizeof(enableTimePitchConversion));
+        if (err != noErr) {
+            AQ_TRACE("Failed to enable time and pitch conversion. Play rate setting will fail\n");
+        }
     }
     
     if (m_initialOutputVolume != 1.0) {

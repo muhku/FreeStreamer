@@ -266,6 +266,11 @@ typedef struct {
  */
 @property (nonatomic,assign) BOOL automaticAudioSessionHandlingEnabled;
 /**
+ * The property enables time and pitch conversion for the audio queue. Put it on
+ * if you want to use the play rate setting.
+ */
+@property (nonatomic,assign) BOOL enableTimeAndPitchConversion;
+/**
  * The maximum size of the disk cache in bytes.
  */
 @property (nonatomic,assign) int maxDiskCacheSize;
