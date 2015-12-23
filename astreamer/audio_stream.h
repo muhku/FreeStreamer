@@ -144,7 +144,6 @@ private:
     Audio_Queue *m_audioQueue;
     
     CFRunLoopTimerRef m_watchdogTimer;
-    CFRunLoopTimerRef m_audioQueueTimer;
     CFRunLoopTimerRef m_seekTimer;
     
     AudioFileStreamID m_audioFileStream;	// the audio file stream parser
@@ -220,7 +219,6 @@ private:
     void cleanupCachedData();
     
     static void watchdogTimerCallback(CFRunLoopTimerRef timer, void *info);
-    static void audioQueueTimerCallback(CFRunLoopTimerRef timer, void *info);
     static void seekTimerCallback(CFRunLoopTimerRef timer, void *info);
     
     bool decoderShouldRun();
