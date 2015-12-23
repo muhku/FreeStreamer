@@ -1002,7 +1002,10 @@ public:
 
 - (BOOL)isPlaying
 {
-    return (_audioStream->state() == astreamer::Audio_Stream::PLAYING);
+    const astreamer::Audio_Stream::State currentState = _audioStream->state();
+    
+    return (currentState == astreamer::Audio_Stream::PLAYING ||
+            currentState == astreamer::Audio_Stream::END_OF_FILE);
 }
 
 - (void)pause

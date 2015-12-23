@@ -434,7 +434,9 @@ float Audio_Stream::durationInSeconds()
     
 void Audio_Stream::seekToOffset(float offset)
 {
-    if (state() != PLAYING) {
+    const State currentState = this->state();
+    
+    if (!(currentState == PLAYING || currentState == END_OF_FILE)) {
         // Do not allow seeking if we are not currently playing the stream
         // This allows a previous seek to be completed
         return;
@@ -620,7 +622,11 @@ CFURLRef Audio_Stream::outputFile()
     
 Audio_Stream::State Audio_Stream::state()
 {
-    return m_state;
+    pthread_mutex_lock(&m_streamStateMutex);
+    const State currentState = m_state;
+    pthread_mutex_unlock(&m_streamStateMutex);
+    
+    return currentState;
 }
     
 CFStringRef Audio_Stream::sourceFormatDescription()
@@ -1146,7 +1152,11 @@ void Audio_Stream::closeAndSignalError(int errorCode, CFStringRef errorDescripti
     
 void Audio_Stream::setState(State state)
 {
+    pthread_mutex_lock(&m_streamStateMutex);
+    
     if (m_state == state) {
+        pthread_mutex_unlock(&m_streamStateMutex);
+        
         return;
     }
     
@@ -1181,6 +1191,8 @@ void Audio_Stream::setState(State state)
 #endif
     
     m_state = state;
+    
+    pthread_mutex_unlock(&m_streamStateMutex);
     
     if (m_delegate) {
         m_delegate->audioStreamStateChanged(m_state);
@@ -1240,7 +1252,11 @@ void Audio_Stream::watchdogTimerCallback(CFRunLoopTimerRef timer, void *info)
 {
     Audio_Stream *THIS = (Audio_Stream *)info;
     
-    if (PLAYING != THIS->state()) {
+    pthread_mutex_lock(&THIS->m_streamStateMutex);
+    
+    if (!THIS->m_audioQueueConsumedPackets) {
+        pthread_mutex_unlock(&THIS->m_streamStateMutex);
+        
         Stream_Configuration *config = Stream_Configuration::configuration();
         
         CFStringRef errorDescription = CFStringCreateWithFormat(NULL, NULL, CFSTR("The stream startup watchdog activated: stream didn't start to play in %d seconds"), config->startupWatchdogPeriod);
@@ -1249,6 +1265,8 @@ void Audio_Stream::watchdogTimerCallback(CFRunLoopTimerRef timer, void *info)
         if (errorDescription) {
             CFRelease(errorDescription);
         }
+    } else {
+        pthread_mutex_unlock(&THIS->m_streamStateMutex);
     }
 }
     
@@ -1413,9 +1431,9 @@ void Audio_Stream::seekTimerCallback(CFRunLoopTimerRef timer, void *info)
     
 bool Audio_Stream::decoderShouldRun()
 {
-    pthread_mutex_lock(&m_streamStateMutex);
-    
     const Audio_Stream::State state = this->state();
+    
+    pthread_mutex_lock(&m_streamStateMutex);
     
     if (m_preloading ||
         !m_decoderShouldRun ||
