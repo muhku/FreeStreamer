@@ -1,13 +1,9 @@
 /*
  * This file is part of the FreeStreamer project,
- * (C)Copyright 2011-2015 Matias Muhonen <mmu@iki.fi>
+ * (C)Copyright 2011-2016 Matias Muhonen <mmu@iki.fi> 穆马帝
  * See the file ''LICENSE'' for using the code.
  *
  * https://github.com/muhku/FreeStreamer
- *
- * Part of the code in this file has been rewritten from
- * the AudioFileStreamExample / afsclient.cpp
- * example, Copyright © 2007 Apple Inc.
  */
 
 #ifndef ASTREAMER_AUDIO_QUEUE_H
