@@ -1347,6 +1347,8 @@ void Audio_Stream::seekTimerCallback(CFRunLoopTimerRef timer, void *info)
         if (success) {
             THIS->setContentLength(THIS->m_originalContentLength);
             
+            THIS->setState(BUFFERING);
+            
             THIS->m_inputStreamRunning = true;
             
         } else {
@@ -1362,11 +1364,11 @@ void Audio_Stream::seekTimerCallback(CFRunLoopTimerRef timer, void *info)
         THIS->m_playPacket    = seekPacket;
         pthread_mutex_unlock(&THIS->m_packetQueueMutex);
         THIS->m_discontinuity = true;
+        
+        THIS->setState(PLAYING);
     }
     
     THIS->audioQueue()->init();
-    
-    THIS->setState(BUFFERING);
     
     THIS->m_inputStream->setScheduledInRunLoop(true);
     
