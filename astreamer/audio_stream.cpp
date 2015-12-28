@@ -1575,6 +1575,8 @@ void *Audio_Stream::decodeLoop(void *data)
     
     CFRunLoopTimerInvalidate(timer);
     
+    CFRelease(timer);
+    
     if (THIS->m_audioConverter) {
         AudioConverterDispose(THIS->m_audioConverter), THIS->m_audioConverter = 0;
     }
