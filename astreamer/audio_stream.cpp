@@ -84,6 +84,7 @@ Audio_Stream::Audio_Stream() :
     m_audioQueue(0),
     m_watchdogTimer(0),
     m_seekTimer(0),
+    m_inputStreamTimer(0),
     m_audioFileStream(0),
     m_audioConverter(0),
     m_initializationError(noErr),
@@ -278,6 +279,11 @@ void Audio_Stream::close(bool closeParser)
         CFRelease(m_seekTimer), m_seekTimer = 0;
     }
     
+    if (m_inputStreamTimer) {
+        CFRunLoopTimerInvalidate(m_inputStreamTimer);
+        CFRelease(m_inputStreamTimer), m_inputStreamTimer = 0;
+    }
+    
     /* Close the HTTP stream first so that the audio stream parser
        isn't fed with more data to parse */
     if (m_inputStreamRunning) {
@@ -370,7 +376,12 @@ void Audio_Stream::startCachedDataPlayback()
     m_preloading = false;
     pthread_mutex_unlock(&m_streamStateMutex);
     
-    determineBufferingLimits();
+    if (!m_inputStreamRunning) {
+        // Already reached EOF, restart
+        open();
+    } else {
+        determineBufferingLimits();
+    }
 }
     
 AS_Playback_Position Audio_Stream::playbackPosition()
@@ -916,6 +927,37 @@ void Audio_Stream::streamHasBytesAvailable(UInt8 *data, UInt32 numBytes)
         return;
     }
     
+    pthread_mutex_lock(&m_packetQueueMutex);
+    
+    Stream_Configuration *config = Stream_Configuration::configuration();
+    
+    if (m_cachedDataSize >= config->maxPrebufferedByteCount) {
+        pthread_mutex_unlock(&m_packetQueueMutex);
+        
+        // If we got a cache overflow, disable the input stream so that we don't get more data
+        m_inputStream->setScheduledInRunLoop(false);
+        
+        // Schedule a timer to watch when we can enable the input stream again
+        if (m_inputStreamTimer) {
+            CFRunLoopTimerInvalidate(m_inputStreamTimer);
+            CFRelease(m_inputStreamTimer), m_inputStreamTimer = 0;
+        }
+        
+        CFRunLoopTimerContext ctx = {0, this, NULL, NULL, NULL};
+        
+        m_inputStreamTimer = CFRunLoopTimerCreate(NULL,
+                                           CFAbsoluteTimeGetCurrent(),
+                                           0.1, // 100 ms
+                                           0,
+                                           0,
+                                           inputStreamTimerCallback,
+                                           &ctx);
+        
+        CFRunLoopAddTimer(CFRunLoopGetCurrent(), m_inputStreamTimer, kCFRunLoopCommonModes);
+    } else {
+        pthread_mutex_unlock(&m_packetQueueMutex);
+    }
+    
     bool decoderFailed = false;
     
     pthread_mutex_lock(&m_streamStateMutex);
@@ -1375,6 +1417,32 @@ void Audio_Stream::seekTimerCallback(CFRunLoopTimerRef timer, void *info)
     pthread_mutex_lock(&THIS->m_streamStateMutex);
     THIS->m_decoderShouldRun = true;
     pthread_mutex_unlock(&THIS->m_streamStateMutex);
+}
+    
+void Audio_Stream::inputStreamTimerCallback(CFRunLoopTimerRef timer, void *info)
+{
+    Audio_Stream *THIS = (Audio_Stream *)info;
+    
+    if (!THIS->m_inputStreamRunning) {
+        if (THIS->m_inputStreamTimer) {
+            CFRunLoopTimerInvalidate(THIS->m_inputStreamTimer);
+            CFRelease(THIS->m_inputStreamTimer), THIS->m_inputStreamTimer = 0;
+        }
+        
+        return;
+    }
+    
+    pthread_mutex_lock(&THIS->m_packetQueueMutex);
+    
+    Stream_Configuration *config = Stream_Configuration::configuration();
+    
+    if (THIS->m_cachedDataSize < config->maxPrebufferedByteCount) {
+        pthread_mutex_unlock(&THIS->m_packetQueueMutex);
+        
+        THIS->m_inputStream->setScheduledInRunLoop(true);
+    } else {
+        pthread_mutex_unlock(&THIS->m_packetQueueMutex);
+    }
 }
     
 bool Audio_Stream::decoderShouldRun()
