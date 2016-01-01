@@ -174,6 +174,7 @@
         _parsePlaylistRequest = nil;
         _readyToPlay = NO;
         _playlistItems = [[NSMutableArray alloc] init];
+        _streams = [[NSMutableArray alloc] init];
         self.preloadNextPlaylistItemAutomatically = YES;
         self.enableDebugOutput = NO;
         self.configuration = [[FSStreamConfiguration alloc] init];
