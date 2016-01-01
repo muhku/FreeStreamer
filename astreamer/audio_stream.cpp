@@ -316,6 +316,23 @@ void Audio_Stream::close(bool closeParser)
         setState(STOPPED);
     }
     
+    bool decoderActive = false;
+    int maxWait = 20; // 20ms
+    
+    do {
+        pthread_mutex_lock(&m_streamStateMutex);
+        decoderActive = m_decoderActive;
+        pthread_mutex_unlock(&m_streamStateMutex);
+        
+        usleep(1000);
+        maxWait--;
+        
+        if (maxWait <= 0) {
+            AS_TRACE("Warning: maximum wait time for decoder shut down exceeded!\n");
+            break;
+        }
+    } while (decoderActive);
+    
     /*
      * Free any remaining queud packets for encoding.
      */
