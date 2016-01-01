@@ -29,6 +29,7 @@
 @property (nonatomic,strong) NSMutableArray *playlistItems;
 @property (nonatomic,strong) NSMutableArray *streams;
 @property (nonatomic,assign) BOOL needToSetVolume;
+@property (nonatomic,assign) BOOL songSwitchInProgress;
 @property (nonatomic,assign) float outputVolume;
 
 - (void)audioStreamStateDidChange:(NSNotification *)notification;
@@ -104,43 +105,6 @@
         if (self.audioController.needToSetVolume) {
             _audioStream.volume = self.audioController.outputVolume;
         }
-        
-        __weak FSAudioStreamProxy *weakSelf = self;
-        
-        _audioStream.onCompletion = ^() {
-            if (weakSelf.audioController.enableDebugOutput) {
-                NSLog(@"[FSAudioController.m:%i] onCompletion(): %@", __LINE__, weakSelf.url);
-            }
-            
-            if ([weakSelf.audioController.playlistItems count] > 0) {
-                if (weakSelf.audioController.currentPlaylistItemIndex > 0) {
-                    // Release the previous stream
-                    FSAudioStreamProxy *prevStream = [weakSelf.audioController.streams objectAtIndex:weakSelf.audioController.currentPlaylistItemIndex - 1];
-                    
-                    if (weakSelf.audioController.enableDebugOutput) {
-                        NSLog(@"[FSAudioController.m:%i] deactivating the previous stream: %@", __LINE__, prevStream.url);
-                    }
-                    
-                    [prevStream deactivate];
-                }
-                
-                if (weakSelf.audioController.currentPlaylistItemIndex + 1 < [weakSelf.audioController.playlistItems count]) {
-                    weakSelf.audioController.currentPlaylistItemIndex = weakSelf.audioController.currentPlaylistItemIndex + 1;
-                    
-                    if (weakSelf.audioController.onStateChange) {
-                        weakSelf.audioController.audioStream.onStateChange = weakSelf.audioController.onStateChange;
-                    }
-                    if (weakSelf.audioController.onMetaDataAvailable) {
-                        weakSelf.audioController.audioStream.onMetaDataAvailable = weakSelf.audioController.onMetaDataAvailable;
-                    }
-                    if (weakSelf.audioController.onFailure) {
-                        weakSelf.audioController.audioStream.onFailure = weakSelf.audioController.onFailure;
-                    }
-                    
-                    [weakSelf.audioController play];
-                }
-            }
-        };
         
         if (self.url) {
             _audioStream.url = self.url;
@@ -221,6 +185,11 @@
 
 - (void)audioStreamStateDidChange:(NSNotification *)notification
 {
+    if (notification.object == self) {
+        // URL retrieving notification from ourselves, ignore
+        return;
+    }
+    
     if (!(notification.object == self.audioStream)) {
         // This doesn't concern us, return
         return;
@@ -269,9 +238,9 @@
                 [self.delegate audioController:self preloadStartedForStream:nextStream];
             }
         }
-    } else if (state == kFsAudioStreamStopped || state == kFsAudioStreamFailed) {
+    } else if (state == kFsAudioStreamStopped && !self.songSwitchInProgress) {
         if (self.enableDebugOutput) {
-            NSLog(@"Stream stopped or failed. Deactivating audio session");
+            NSLog(@"Stream %@ stopped. No next playlist items. Deactivating audio session", self.audioStream.url);
         }
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 60000)
         [[AVAudioSession sharedInstance] setActive:NO withOptions:AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation error:nil];
@@ -280,10 +249,29 @@
         [[AVAudioSession sharedInstance] setActive:NO error:nil];
     #endif
 #endif
+    } else if (state == kFsAudioStreamPlaybackCompleted && [self hasNextItem]) {
+        self.currentPlaylistItemIndex = self.currentPlaylistItemIndex + 1;
+        self.songSwitchInProgress = YES;
+        
+        [self play];
+    } else if (state == kFsAudioStreamFailed) {
+        if (self.enableDebugOutput) {
+            NSLog(@"Stream %@ failed. Deactivating audio session", self.audioStream.url);
+        }
+#if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 60000)
+        [[AVAudioSession sharedInstance] setActive:NO withOptions:AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation error:nil];
+#else
+#if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
+        [[AVAudioSession sharedInstance] setActive:NO error:nil];
+#endif
+#endif
     } else if (state == kFsAudioStreamBuffering) {
         if (self.enableDebugOutput) {
             NSLog(@"Stream buffering. Activating audio session");
         }
+        
+        self.songSwitchInProgress = NO;
+        
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 60000)
         [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
         
@@ -447,16 +435,14 @@
         [self.checkContentTypeRequest start];
         
         NSDictionary *userInfo = @{FSAudioStreamNotificationKey_State: @(kFsAudioStreamRetrievingURL)};
-        NSNotification *notification = [NSNotification notificationWithName:FSAudioStreamStateChangeNotification object:nil userInfo:userInfo];
+        NSNotification *notification = [NSNotification notificationWithName:FSAudioStreamStateChangeNotification object:self userInfo:userInfo];
         [[NSNotificationCenter defaultCenter] postNotification:notification];
         
-        if (self.audioStream.onStateChange) {
-            [NSTimer scheduledTimerWithTimeInterval:0
-                                             target:self
-                                           selector:@selector(notifyRetrievingURL)
-                                           userInfo:nil
-                                            repeats:NO];
-        }
+        [NSTimer scheduledTimerWithTimeInterval:0
+                                         target:self
+                                       selector:@selector(notifyRetrievingURL)
+                                       userInfo:nil
+                                        repeats:NO];
         
         return;
     }
@@ -467,6 +453,8 @@
         } else {
             self.audioStream.url = self.currentPlaylistItem.url;
         }
+    } else {
+        self.audioStream.url = self.url;
     }
     
     if (self.onStateChange) {
@@ -479,7 +467,13 @@
         self.audioStream.onFailure = self.onFailure;
     }
     
-    [self.audioStream play];
+    FSAudioStream *stream = self.audioStream;
+    
+    if (self.enableDebugOutput) {
+        NSLog(@"Playing %@", stream);
+    }
+    
+    [stream play];
 }
 
 - (void)playFromURL:(NSURL*)url
@@ -503,6 +497,11 @@
 - (void)playFromPlaylist:(NSArray *)playlist itemIndex:(NSUInteger)index
 {
     [self stop];
+    
+    self.playlistItems = [[NSMutableArray alloc] init];
+    _streams = [[NSMutableArray alloc] init];
+    
+    self.currentPlaylistItemIndex = 0;
     
     [self.playlistItems addObjectsFromArray:playlist];
     
@@ -634,16 +633,14 @@
 
 - (void)stop
 {
-    [self.audioStream stop];
+    if ([_streams count] > 0) {
+        // Avoid creating an instance if we don't have it
+        [self.audioStream stop];
+    }
     
     [_checkContentTypeRequest cancel];
     [_parsePlaylistRequest cancel];
     [_parseRssPodcastFeedRequest cancel];
-    
-    self.playlistItems = [[NSMutableArray alloc] init];
-    _streams = [[NSMutableArray alloc] init];
-    
-    self.currentPlaylistItemIndex = 0;
     
     self.readyToPlay = NO;
 }
@@ -711,12 +708,14 @@
     self.outputVolume = volume;
     self.needToSetVolume = YES;
     
-    self.audioStream.volume = self.outputVolume;
+    if ([_streams count] > 0) {
+        self.audioStream.volume = self.outputVolume;
+    }
 }
 
 - (float)volume
 {
-    return self.audioStream.volume;
+    return self.outputVolume;
 }
 
 - (void)setUrl:(NSURL *)url
@@ -726,8 +725,6 @@
     if (url) {
         NSURL *copyOfURL = [url copy];
         _url = copyOfURL;
-        
-        self.audioStream.url = _url;
     
         self.checkContentTypeRequest.url = _url;
         self.parsePlaylistRequest.url = _url;
@@ -756,7 +753,10 @@
 
 - (FSAudioStream *)activeStream
 {
-    return self.audioStream;
+    if ([_streams count] > 0) {
+        return self.audioStream;
+    }
+    return nil;
 }
 
 - (FSPlaylistItem *)currentPlaylistItem
@@ -789,21 +789,27 @@
 {
     _onStateChangeBlock = newOnStateValue;
     
-    self.audioStream.onStateChange = _onStateChangeBlock;
+    if ([_streams count] > 0) {
+        self.audioStream.onStateChange = _onStateChangeBlock;
+    }
 }
 
 - (void)setOnMetaDataAvailable:(void (^)(NSDictionary *))newOnMetaDataAvailableValue
 {
     _onMetaDataAvailableBlock = newOnMetaDataAvailableValue;
     
-    self.audioStream.onMetaDataAvailable = _onMetaDataAvailableBlock;
+    if ([_streams count] > 0) {
+        self.audioStream.onMetaDataAvailable = _onMetaDataAvailableBlock;
+    }
 }
 
 - (void)setOnFailure:(void (^)(FSAudioStreamError error, NSString *errorDescription))newOnFailureValue
 {
     _onFailureBlock = newOnFailureValue;
     
-    self.audioStream.onFailure = _onFailureBlock;
+    if ([_streams count] > 0) {
+        self.audioStream.onFailure = _onFailureBlock;
+    }
 }
 
 @end
