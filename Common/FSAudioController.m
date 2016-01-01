@@ -34,6 +34,7 @@
 
 - (void)audioStreamStateDidChange:(NSNotification *)notification;
 - (void)deactivateInactivateStreams:(NSUInteger)currentActiveStream;
+- (void)setAudioSessionActive:(BOOL)active;
 
 @end
 
@@ -174,13 +175,8 @@
         
         [proxy deactivate];
     }
-#if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 60000)
-    [[AVAudioSession sharedInstance] setActive:NO withOptions:AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation error:nil];
-#else
-    #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
-        [[AVAudioSession sharedInstance] setActive:NO error:nil];
-    #endif
-#endif
+    
+    [self setAudioSessionActive:NO];
 }
 
 - (void)audioStreamStateDidChange:(NSNotification *)notification
@@ -242,13 +238,8 @@
         if (self.enableDebugOutput) {
             NSLog(@"Stream %@ stopped. No next playlist items. Deactivating audio session", self.audioStream.url);
         }
-#if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 60000)
-        [[AVAudioSession sharedInstance] setActive:NO withOptions:AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation error:nil];
-#else
-    #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
-        [[AVAudioSession sharedInstance] setActive:NO error:nil];
-    #endif
-#endif
+        
+        [self setAudioSessionActive:NO];
     } else if (state == kFsAudioStreamPlaybackCompleted && [self hasNextItem]) {
         self.currentPlaylistItemIndex = self.currentPlaylistItemIndex + 1;
         self.songSwitchInProgress = YES;
@@ -258,13 +249,8 @@
         if (self.enableDebugOutput) {
             NSLog(@"Stream %@ failed. Deactivating audio session", self.audioStream.url);
         }
-#if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 60000)
-        [[AVAudioSession sharedInstance] setActive:NO withOptions:AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation error:nil];
-#else
-#if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
-        [[AVAudioSession sharedInstance] setActive:NO error:nil];
-#endif
-#endif
+        
+        [self setAudioSessionActive:NO];
     } else if (state == kFsAudioStreamBuffering) {
         if (self.enableDebugOutput) {
             NSLog(@"Stream buffering. Activating audio session");
@@ -274,13 +260,8 @@
         
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 60000)
         [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
-        
-        [[AVAudioSession sharedInstance] setActive:YES withOptions:AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation error:nil];
-#else
-#if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
-        [[AVAudioSession sharedInstance] setActive:YES error:nil];
 #endif
-#endif
+        [self setAudioSessionActive:YES];
     }
 }
 
@@ -298,6 +279,17 @@
         }
         streamIndex++;
     }
+}
+
+- (void)setAudioSessionActive:(BOOL)active
+{
+#if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 60000)
+    [[AVAudioSession sharedInstance] setActive:active withOptions:AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation error:nil];
+#else
+#if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
+    [[AVAudioSession sharedInstance] setActive:active error:nil];
+#endif
+#endif
 }
 
 /*
