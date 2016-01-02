@@ -175,24 +175,31 @@
 
 - (void)processorMainLoop
 {
+    BOOL dispatchLevels = NO;
     do {
-        if (_bufferModified) {
-             _busy = YES;
-            
-            [self processSamples:_sampleBuffer];
-
-             _busy = NO;
-             _bufferModified = NO;
-
-             if ([self.delegate respondsToSelector:@selector(frequenceAnalyzer:levelsAvailable:count:)]) {
-                 dispatch_async(dispatch_get_main_queue(), ^{
-                     // Execute on the main thread
-                     [self.delegate frequenceAnalyzer:self levelsAvailable:_levels.overall count:kSFrequencyDomainAnalyzerLevelCount];
-                 });
-             }
-        } else {
-            [NSThread sleepForTimeInterval:.01];
+        @synchronized (self) {
+            if (_bufferModified) {
+                _busy = YES;
+                
+                [self processSamples:_sampleBuffer];
+                
+                _busy = NO;
+                _bufferModified = NO;
+                
+                dispatchLevels = YES;
+            }
         }
+        
+        if (dispatchLevels && [self.delegate respondsToSelector:@selector(frequenceAnalyzer:levelsAvailable:count:)]) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                // Execute on the main thread
+                [self.delegate frequenceAnalyzer:self levelsAvailable:_levels.overall count:kSFrequencyDomainAnalyzerLevelCount];
+            });
+            
+            dispatchLevels = NO;
+        }
+        
+        [NSThread sleepForTimeInterval:.01];
     } while (!self.shouldExit);
 }
 
