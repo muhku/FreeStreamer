@@ -41,7 +41,6 @@
     FFTSetup _fft;
 
     BOOL _bufferModified;
-    BOOL _busy;
 
     int16_t _sampleBuffer[kSFrequencyDomainAnalyzerSampleCount];
 
@@ -120,16 +119,6 @@
            [_worker start];
        }
 
-       if (_busy) {
-           /*
-            * The analyzer is still busy; skip this sample.
-            */
-           return;
-       }
-
-      /*
-       * The analyzer is free. Copy the data to the buffer to be analyzed.
-       */
        const size_t bufferSize = sizeof(int16_t) * MIN(kSFrequencyDomainAnalyzerSampleCount, count);
        
        memcpy(_sampleBuffer, samples, bufferSize);
@@ -155,19 +144,23 @@
 
 - (void)setEnabled:(BOOL)enabled
 {
-    if (enabled == _enabled) {
-        return;
+    @synchronized (self) {
+        if (enabled == _enabled) {
+            return;
+        }
+        
+        _enabled = enabled;
     }
-    
-    _enabled = enabled;
 }
 
 - (BOOL)enabled
 {
-    return _enabled;
+    @synchronized (self) {
+        return _enabled;
+    }
 }
 
-/* 
+/*
  * ================================================================
  * PRIVATE
  * ================================================================
@@ -175,24 +168,29 @@
 
 - (void)processorMainLoop
 {
+    BOOL dispatchLevels = NO;
     do {
-        if (_bufferModified) {
-             _busy = YES;
-            
-            [self processSamples:_sampleBuffer];
-
-             _busy = NO;
-             _bufferModified = NO;
-
-             if ([self.delegate respondsToSelector:@selector(frequenceAnalyzer:levelsAvailable:count:)]) {
-                 dispatch_async(dispatch_get_main_queue(), ^{
-                     // Execute on the main thread
-                     [self.delegate frequenceAnalyzer:self levelsAvailable:_levels.overall count:kSFrequencyDomainAnalyzerLevelCount];
-                 });
-             }
-        } else {
-            [NSThread sleepForTimeInterval:.01];
+        @synchronized (self) {
+            if (_bufferModified) {
+                
+                [self processSamples:_sampleBuffer];
+                
+                _bufferModified = NO;
+                
+                dispatchLevels = YES;
+            }
         }
+        
+        if (dispatchLevels && [self.delegate respondsToSelector:@selector(frequenceAnalyzer:levelsAvailable:count:)]) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                // Execute on the main thread
+                [self.delegate frequenceAnalyzer:self levelsAvailable:_levels.overall count:kSFrequencyDomainAnalyzerLevelCount];
+            });
+            
+            dispatchLevels = NO;
+        }
+        
+        [NSThread sleepForTimeInterval:.01];
     } while (!self.shouldExit);
 }
 

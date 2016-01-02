@@ -18,7 +18,7 @@
  * Uses a table view. The table view items are retrieved using the
  * FSParsePlaylistFeedRequest class.
  */
-@interface FSPlaylistViewController : UIViewController<UITableViewDataSource,UITableViewDelegate,UIAlertViewDelegate> {
+@interface FSPlaylistViewController : UIViewController<UITableViewDataSource,UITableViewDelegate> {
     FSParseRssPodcastFeedRequest *_request;
     FSStreamConfiguration *_configuration;
     BOOL _diskCachingAllowed;

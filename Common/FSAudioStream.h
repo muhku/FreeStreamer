@@ -562,6 +562,9 @@ NSString*             freeStreamerReleaseVersion();
  * when you receive the data. Instead, copy the data and process it so that the
  * main event loop doesn't block. Failing to do so may cause glitches to the audio playback.
  *
+ * Notice that the delegate callback may occur from other than the main thread so make
+ * sure your delegate code is thread safe.
+ *
  * @param audioStream The audio stream the samples are from.
  * @param samples The PCM audio samples.
  * @param count The number of samples available.

@@ -1806,9 +1806,7 @@ void AudioStreamStateObserver::samplesAvailable(AudioBufferList samples, AudioSt
         int16_t *buffer = (int16_t *)samples.mBuffers[0].mData;
         NSUInteger count = description.mDataByteSize / sizeof(int16_t);
         
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [priv.delegate audioStream:priv.stream samplesAvailable:buffer count:count];
-        });
+        [priv.delegate audioStream:priv.stream samplesAvailable:buffer count:count];
     }
 }
 

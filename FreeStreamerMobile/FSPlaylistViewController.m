@@ -119,13 +119,40 @@
  */
 - (IBAction)addPlaylistItem:(id)sender
 {
-    UIAlertView * alert = [[UIAlertView alloc]
-                           initWithTitle:@"Add Playlist Item"
-                           message:@"URL:"
-                           delegate:self
-                           cancelButtonTitle:@"Cancel" otherButtonTitles:@"Ok", nil];
-    alert.alertViewStyle = UIAlertViewStylePlainTextInput;
-    [alert show];
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Add Playlist Item"
+                                          message:@"URL:"
+                                          preferredStyle:UIAlertControllerStyleAlert];
+    
+    [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {}];
+    
+
+    [alert addAction:[UIAlertAction actionWithTitle:@"Cancel"
+                                style:UIAlertActionStyleCancel
+                                handler:^(UIAlertAction *action) {}]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"OK"
+                                style:UIAlertActionStyleDefault
+                                handler:^(UIAlertAction *action) {
+                                    UITextField *urlTextField = alert.textFields.firstObject;
+                                    
+                                    NSString *url = [urlTextField text];
+                                    
+                                    FSPlaylistItem *item = [[FSPlaylistItem alloc] init];
+                                    item.title = url;
+                                    item.url = [NSURL URLWithString:url];
+                                    
+                                    for (FSPlaylistItem *existingItem in self.userPlaylistItems) {
+                                        if ([existingItem isEqual:item]) {
+                                            return;
+                                        }
+                                    }
+                                    
+                                    [self.userPlaylistItems addObject:item];
+                                    
+                                    [self addUserPlaylistItems];
+                                    [self.tableView reloadData];
+                                }]];
+    
+    [self presentViewController:alert animated:YES completion:nil];
 }
 
 - (IBAction)switchDiskCache:(id)sender
@@ -146,12 +173,14 @@
             break;
     }
     
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Cache setting"
-                                                    message:message
-                                                   delegate:nil
-                                          cancelButtonTitle:@"OK"
-                                          otherButtonTitles:nil];
-    [alert show];
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Cache setting"
+                                                                   message:message
+                                                            preferredStyle:UIAlertControllerStyleAlert];
+
+    [alert addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault
+                                            handler:^(UIAlertAction * action) {}]];
+
+    [self presentViewController:alert animated:YES completion:nil];
 }
 
 - (IBAction)selectBufferSize:(id)sender
@@ -185,36 +214,6 @@
             _configuration.usePrebufferSizeCalculationInSeconds = YES;
             break;
     }
-}
-
-/*
- * =======================================
- * Alert view delegate
- * =======================================
- */
-
-- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
-{
-    if (buttonIndex == 0) {
-        return;
-    }
-    
-    NSString *url = [[alertView textFieldAtIndex:0] text];
-    
-    FSPlaylistItem *item = [[FSPlaylistItem alloc] init];
-    item.title = url;
-    item.url = [NSURL URLWithString:url];
-    
-    for (FSPlaylistItem *existingItem in self.userPlaylistItems) {
-        if ([existingItem isEqual:item]) {
-            return;
-        }
-    }
-    
-    [self.userPlaylistItems addObject:item];
-    
-    [self addUserPlaylistItems];
-    [self.tableView reloadData];
 }
 
 /*
