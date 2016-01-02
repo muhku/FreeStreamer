@@ -41,7 +41,6 @@
     FFTSetup _fft;
 
     BOOL _bufferModified;
-    BOOL _busy;
 
     int16_t _sampleBuffer[kSFrequencyDomainAnalyzerSampleCount];
 
@@ -120,16 +119,6 @@
            [_worker start];
        }
 
-       if (_busy) {
-           /*
-            * The analyzer is still busy; skip this sample.
-            */
-           return;
-       }
-
-      /*
-       * The analyzer is free. Copy the data to the buffer to be analyzed.
-       */
        const size_t bufferSize = sizeof(int16_t) * MIN(kSFrequencyDomainAnalyzerSampleCount, count);
        
        memcpy(_sampleBuffer, samples, bufferSize);
@@ -179,11 +168,9 @@
     do {
         @synchronized (self) {
             if (_bufferModified) {
-                _busy = YES;
                 
                 [self processSamples:_sampleBuffer];
                 
-                _busy = NO;
                 _bufferModified = NO;
                 
                 dispatchLevels = YES;
