@@ -115,14 +115,6 @@
           _bufferStatLogger.logName);
 #endif
     
-#if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 70000)
-    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent
-                                                animated:NO];
-#else
-    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleBlackOpaque
-                                                animated:NO];
-#endif
-    
     FSAppDelegate *delegate = [UIApplication sharedApplication].delegate;
     [delegate resetBackground];
     
