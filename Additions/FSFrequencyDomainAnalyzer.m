@@ -144,19 +144,23 @@
 
 - (void)setEnabled:(BOOL)enabled
 {
-    if (enabled == _enabled) {
-        return;
+    @synchronized (self) {
+        if (enabled == _enabled) {
+            return;
+        }
+        
+        _enabled = enabled;
     }
-    
-    _enabled = enabled;
 }
 
 - (BOOL)enabled
 {
-    return _enabled;
+    @synchronized (self) {
+        return _enabled;
+    }
 }
 
-/* 
+/*
  * ================================================================
  * PRIVATE
  * ================================================================
