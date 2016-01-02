@@ -34,8 +34,8 @@ typedef NS_ENUM(NSInteger, FSPlaylistFormat) {
  * the url property. Then, define the onCompletion and onFailure handlers.
  * To start the request, use the start method.
  */
-@interface FSParsePlaylistRequest : NSObject<NSURLConnectionDelegate> {
-    NSURLConnection *_connection;
+@interface FSParsePlaylistRequest : NSObject<NSURLSessionDelegate> {
+    NSURLSessionTask *_task;
     NSInteger _httpStatus;
     NSMutableData *_receivedData;
     NSMutableArray *_playlistItems;
