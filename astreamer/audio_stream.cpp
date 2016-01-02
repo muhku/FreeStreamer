@@ -155,9 +155,7 @@ Audio_Stream::~Audio_Stream()
     m_decoderShouldRun = false;
     pthread_mutex_unlock(&m_streamStateMutex);
     
-    if (m_decodeRunLoop) {
-        CFRunLoopStop(m_decodeRunLoop);
-    }
+    CFRunLoopStop(m_decodeRunLoop);
     
     if (m_defaultContentType) {
         CFRelease(m_defaultContentType), m_defaultContentType = NULL;
@@ -268,10 +266,6 @@ void Audio_Stream::close(bool closeParser)
 {
     AS_TRACE("%s: enter\n", __PRETTY_FUNCTION__);
     
-    pthread_mutex_lock(&m_streamStateMutex);
-    m_decoderShouldRun = false;
-    pthread_mutex_unlock(&m_streamStateMutex);
-    
     invalidateWatchdogTimer();
     
     if (m_seekTimer) {
@@ -303,6 +297,14 @@ void Audio_Stream::close(bool closeParser)
         m_audioStreamParserRunning = false;
     }
     
+    pthread_mutex_lock(&m_streamStateMutex);
+    m_decoderShouldRun = false;
+    pthread_mutex_unlock(&m_streamStateMutex);
+    
+    pthread_mutex_lock(&m_packetQueueMutex);
+    m_playPacket = 0;
+    pthread_mutex_unlock(&m_packetQueueMutex);
+    
     closeAudioQueue();
     
     const State currentState = state();
@@ -316,22 +318,9 @@ void Audio_Stream::close(bool closeParser)
         setState(STOPPED);
     }
     
-    bool decoderActive = false;
-    int maxWait = 20; // 20ms
-    
-    do {
-        pthread_mutex_lock(&m_streamStateMutex);
-        decoderActive = m_decoderActive;
-        pthread_mutex_unlock(&m_streamStateMutex);
-        
-        usleep(1000);
-        maxWait--;
-        
-        if (maxWait <= 0) {
-            AS_TRACE("Warning: maximum wait time for decoder shut down exceeded!\n");
-            break;
-        }
-    } while (decoderActive);
+    if (m_audioConverter) {
+        AudioConverterDispose(m_audioConverter), m_audioConverter = 0;
+    }
     
     /*
      * Free any remaining queud packets for encoding.
@@ -344,7 +333,8 @@ void Audio_Stream::close(bool closeParser)
         free(cur);
         cur = tmp;
     }
-    m_queuedHead = m_queuedTail = 0, m_playPacket = 0;
+    m_queuedHead = 0;
+    m_queuedTail = 0;
     m_cachedDataSize = 0;
     m_numPacketsToRewind = 0;
     
@@ -1664,13 +1654,7 @@ void *Audio_Stream::decodeLoop(void *data)
     
     CFRelease(timer);
     
-    if (THIS->m_audioConverter) {
-        AudioConverterDispose(THIS->m_audioConverter), THIS->m_audioConverter = 0;
-    }
-    
     AS_TRACE("returning from decodeLoop, bye\n");
-    
-    THIS->m_decodeRunLoop = NULL;
     
     return 0;
 }
