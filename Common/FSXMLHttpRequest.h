@@ -45,10 +45,8 @@ typedef NS_ENUM(NSInteger, FSXMLHttpRequestError) {
  * 2. Define the onCompletion and onFailure handlers.
  * 3. Call the start method.
  */
-@interface FSXMLHttpRequest : NSObject<NSURLConnectionDelegate> {
-    NSURLConnection *_connection;
-    NSInteger _httpStatus;
-    NSMutableData *_receivedData;
+@interface FSXMLHttpRequest : NSObject {
+    NSURLSessionTask *_task;
     xmlDocPtr _xmlDocument;
     NSDateFormatter *_dateFormatter;
 }

@@ -79,8 +79,8 @@ typedef NS_ENUM(NSInteger, FSFileFormat) {
  * the url property. Then, define the onCompletion and onFailure handlers.
  * To start the request, use the start method.
  */
-@interface FSCheckContentTypeRequest : NSObject<NSURLConnectionDelegate> {
-    NSURLConnection *_connection;
+@interface FSCheckContentTypeRequest : NSObject <NSURLSessionDelegate> {
+    NSURLSessionTask *_task;
     FSFileFormat _format;
     NSString *_contentType;
     BOOL _playlist;

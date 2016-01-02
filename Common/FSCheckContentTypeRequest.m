@@ -27,7 +27,7 @@
 
 - (void)start
 {
-    if (_connection) {
+    if (_task) {
         return;
     }
     
@@ -40,11 +40,16 @@
                                                        timeoutInterval:10.0];
     [request setHTTPMethod:@"HEAD"];
     
-    @synchronized (self) {
-        _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
-    }
+    NSURLSession *session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]
+                                                          delegate:self
+                                                     delegateQueue:[NSOperationQueue mainQueue]];
     
-    if (!_connection) {
+    @synchronized (self) {
+        _task = [session dataTaskWithRequest:request];
+    }
+    [_task resume];
+    
+    if (!_task) {
 #if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
         NSLog(@"FSCheckContentTypeRequest: Unable to open connection for URL: %@", _url);
 #endif
@@ -56,12 +61,12 @@
 
 - (void)cancel
 {
-    if (!_connection) {
+    if (!_task) {
         return;
     }
     @synchronized (self) {
-        [_connection cancel];
-        _connection = nil;
+        [_task cancel];
+        _task = nil;
     }
 }
 
@@ -93,12 +98,14 @@
 
 /*
  * =======================================
- * NSURLConnectionDelegate
+ * NSURLSessionDelegate
  * =======================================
  */
 
-- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response
-{
+- (void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask
+didReceiveResponse:(NSURLResponse *)response
+ completionHandler:(void (^)(NSURLSessionResponseDisposition disposition))completionHandler {
+    
     _contentType = response.MIMEType;
     
     _format = kFSFileFormatUnknown;
@@ -151,21 +158,17 @@
         [self guessContentTypeByUrl:response];
     }
     
-    [_connection cancel];
-    _connection = nil;
+    _task = nil;
     
     self.onCompletion();
 }
 
-- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
-{
-    // Do nothing
-}
 
-- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
-{
+- (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task
+didCompleteWithError:(nullable NSError *)error {
+    
     @synchronized (self) {
-        _connection = nil;
+        _task = nil;
         _format = kFSFileFormatUnknown;
         _playlist = NO;
     }
@@ -180,11 +183,6 @@
         
         self.onFailure();
     }
-}
-
-- (void)connectionDidFinishLoading:(NSURLConnection *)connection
-{
-    // Do nothing
 }
 
 /*

@@ -31,14 +31,10 @@
     return self;
 }
 
-- (void)dealloc
-{
-    _receivedData = nil;
-}
-
 - (void)start
 {
-    if (_connection) {
+    
+    if (_task) {
         return;
     }
     
@@ -48,111 +44,79 @@
                                              cachePolicy:NSURLRequestUseProtocolCachePolicy
                                          timeoutInterval:10.0];
     
+    NSURLSession *session = [NSURLSession sharedSession];
+
     @synchronized (self) {
-        _receivedData = [NSMutableData data];
-        _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
-    }
-    
-    if (!_connection) {
+        _task = [session dataTaskWithRequest:request
+                           completionHandler:
+                 ^(NSData *data, NSURLResponse *response, NSError *error) {
+                     NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *) response;
+                     if(error) {
+                         _lastError = FSXMLHttpRequestError_Connection_Failed;
+                         
 #if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
-        NSLog(@"FSXMLHttpRequest: Unable to open connection for URL: %@", _url);
+                         NSLog(@"FSXMLHttpRequest: Request failed for URL: %@, error %@", _url, [error localizedDescription]);
 #endif
-        
-        self.onFailure();
-        return;
+                         dispatch_async(dispatch_get_main_queue(), ^(){
+                             self.onFailure();
+                         });
+                     } else {
+                         if (httpResponse.statusCode != 200) {
+                             _lastError = FSXMLHttpRequestError_Invalid_Http_Status;
+                             
+#if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
+                             NSLog(@"FSXMLHttpRequest: Unable to receive content for URL: %@", _url);
+#endif
+                             dispatch_async(dispatch_get_main_queue(), ^(){
+                                 self.onFailure();
+                             });
+                             return;
+                         }
+                         
+                         const char *encoding = [self detectEncoding:data];
+                         
+                         _xmlDocument = xmlReadMemory([data bytes],
+                                                      (int)[data length],
+                                                      "",
+                                                      encoding,
+                                                      0);
+                         
+                         if (!_xmlDocument) {
+                             _lastError = FSXMLHttpRequestError_XML_Parser_Failed;
+                             
+#if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
+                             NSLog(@"FSXMLHttpRequest: Unable to parse the content for URL: %@", _url);
+#endif
+                             
+                             dispatch_async(dispatch_get_main_queue(), ^(){
+                                 self.onFailure();
+                             });
+                             return;
+                         }
+                         
+                         [self parseResponseData];
+                         
+                         xmlFreeDoc(_xmlDocument), _xmlDocument = nil;
+                         
+                         dispatch_async(dispatch_get_main_queue(), ^(){
+                             self.onCompletion();
+                         });
+                     }
+                 }];
     }
+    [_task resume];
+    
 }
 
 - (void)cancel
 {
-    if (!_connection) {
+    if (!_task) {
         return;
     }
     @synchronized (self) {
-        [_connection cancel];
-        _connection = nil;
+        [_task cancel];
+        _task = nil;
     }
-}
-
-/*
- * =======================================
- * NSURLConnectionDelegate
- * =======================================
- */
-
-- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response
-{
-    NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
-    _httpStatus = [httpResponse statusCode];
-    
-    [_receivedData setLength:0];
-}
-
-- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
-{
-    [_receivedData appendData:data];
-}
-
-- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
-{
-    @synchronized (self) {
-        assert(_connection == connection);
-        _connection = nil;
-        _receivedData = nil;
-    }
-    
-    _lastError = FSXMLHttpRequestError_Connection_Failed;
- 
-#if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
-    NSLog(@"FSXMLHttpRequest: Request failed for URL: %@, error %@", _url, [error localizedDescription]);
-#endif
-    
-    self.onFailure();
-}
-
-- (void)connectionDidFinishLoading:(NSURLConnection *)connection
-{
-    assert(_connection == connection);
-    
-    @synchronized (self) {
-        _connection = nil;
-    }
-    
-    if (_httpStatus != 200) {
-        _lastError = FSXMLHttpRequestError_Invalid_Http_Status;
-        
-#if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
-        NSLog(@"FSXMLHttpRequest: Unable to receive content for URL: %@", _url);
-#endif
-        
-        self.onFailure();
-        return;
-    }
-    
-    const char *encoding = [self detectEncoding];
-    
-    _xmlDocument = xmlReadMemory([_receivedData bytes],
-                                 (int)[_receivedData length],
-                                 "",
-                                 encoding,
-                                 0);
-    
-    if (!_xmlDocument) {
-        _lastError = FSXMLHttpRequestError_XML_Parser_Failed;
-        
-#if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
-        NSLog(@"FSXMLHttpRequest: Unable to parse the content for URL: %@", _url);
-#endif
-        
-        self.onFailure();
-        return;
-    }
-    
-    [self parseResponseData];
-    
-    xmlFreeDoc(_xmlDocument), _xmlDocument = nil;
-    
-    self.onCompletion();
 }
 
 /*
@@ -164,27 +128,27 @@
 - (NSArray *)performXPathQuery:(NSString *)query
 {
     NSMutableArray *resultNodes = [NSMutableArray array];
-    xmlXPathContextPtr xpathCtx = NULL; 
+    xmlXPathContextPtr xpathCtx = NULL;
     xmlXPathObjectPtr xpathObj = NULL;
     
     xpathCtx = xmlXPathNewContext(_xmlDocument);
     if (xpathCtx == NULL) {
-		goto cleanup;
+        goto cleanup;
     }
     
     xpathObj = xmlXPathEvalExpression((xmlChar *)[query cStringUsingEncoding:NSUTF8StringEncoding], xpathCtx);
     if (xpathObj == NULL) {
-		goto cleanup;
+        goto cleanup;
     }
-	
-	xmlNodeSetPtr nodes = xpathObj->nodesetval;
-	if (!nodes) {
-		goto cleanup;
-	}
-	
-	for (size_t i = 0; i < nodes->nodeNr; i++) {
+    
+    xmlNodeSetPtr nodes = xpathObj->nodesetval;
+    if (!nodes) {
+        goto cleanup;
+    }
+    
+    for (size_t i = 0; i < nodes->nodeNr; i++) {
         [self parseXMLNode:nodes->nodeTab[i] xPathQuery:query];
-	}
+    }
     
 cleanup:
     if (xpathObj) {
@@ -234,10 +198,10 @@ cleanup:
  * =======================================
  */
 
-- (const char *)detectEncoding
+- (const char *)detectEncoding:(NSData *)receivedData
 {
     const char *encoding = 0;
-    const char *header = strndup([_receivedData bytes], 60);
+    const char *header = strndup([receivedData bytes], 60);
     
     if (strstr(header, "utf-8") || strstr(header, "UTF-8")) {
         encoding = "UTF-8";
