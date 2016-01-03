@@ -845,5 +845,70 @@ wait_for_playing:
     }
     XCTAssertFalse(timedOut, @"Timed out - the stream did not start playing");
 }
+
+- (void)testPlaylistIteration
+{
+    __weak FreeStreamerMobileTests *weakSelf = self;
+    
+    const int playlistSize = 50;
+    NSMutableArray *playlist = [[NSMutableArray alloc] init];
+    
+    for (int i=0; i < playlistSize; i++) {
+        FSPlaylistItem *item = [[FSPlaylistItem alloc] init];
+        item.url = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"test" ofType:@"mp3"]];
+        [playlist addObject:item];
+    }
+    
+    _controller.onStateChange = ^(FSAudioStreamState state) {
+        NSLog(@"FSAudioStreamStateChangeNotification received!");
+        
+        if (state == kFsAudioStreamPlaying) {
+            weakSelf.checkStreamState = YES;
+        }
+    };
+    
+    [_controller playFromPlaylist:playlist];
+    
+    NSTimeInterval timeout = 15.0;
+    NSTimeInterval idle = 0.1;
+    BOOL timedOut;
+    NSDate *timeoutDate;
+    int loopCount = 1;
+    NSUInteger tickCounter = 0;
+    
+wait_for_playing:
+    
+    tickCounter = 0;
+    _checkStreamState = NO;
+    
+    NSLog(@"Playlist item try %i", loopCount);
+    
+    timedOut = NO;
+    timeoutDate = [[NSDate alloc] initWithTimeIntervalSinceNow:timeout];
+    while (!timedOut && _keepRunning) {
+        NSDate *tick = [[NSDate alloc] initWithTimeIntervalSinceNow:idle];
+        [[NSRunLoop currentRunLoop] runUntilDate:tick];
+        timedOut = ([tick compare:timeoutDate] == NSOrderedDescending);
+        
+        if (_checkStreamState) {
+            if (tickCounter > 3) {
+                NSLog(@"0.3 seconds passed since the stream started playing, checking the state");
+                
+                if (![_controller hasNextItem]) {
+                    XCTAssertTrue((loopCount == playlistSize), @"Last playlist item not reached");
+                    return;
+                }
+                [_controller playNextItem];
+                
+                loopCount++;
+                
+                goto wait_for_playing;
+            } else {
+                tickCounter++;
+            }
+        }
+    }
+    XCTAssertFalse(timedOut, @"Timed out - the stream did not start playing");
+}
  
 @end
