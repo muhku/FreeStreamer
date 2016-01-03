@@ -31,35 +31,35 @@
 
 - (void)start
 {
-    if (_connection) {
+    if (_task) {
         return;
     }
     
     NSURLRequest *request = [NSURLRequest requestWithURL:self.url
                                              cachePolicy:NSURLRequestUseProtocolCachePolicy
                                          timeoutInterval:10.0];
+    NSURLSession *session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]
+                                                          delegate:self
+                                                     delegateQueue:[NSOperationQueue mainQueue]];
     
     @synchronized (self) {
         _receivedData = [NSMutableData data];
-        _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self];
+        _task = [session dataTaskWithRequest:request];
         _playlistItems = [[NSMutableArray alloc] init];
         _format = kFSPlaylistFormatNone;
     }
     
-    if (!_connection) {
-        self.onFailure();
-        return;
-    }
+    [_task resume];
 }
 
 - (void)cancel
 {
-    if (!_connection) {
+    if (!_task) {
         return;
     }
     @synchronized (self) {
-        [_connection cancel];
-        _connection = nil;
+        [_task cancel];
+        _task = nil;
     }
 }
 
@@ -229,12 +229,14 @@
 
 /*
  * =======================================
- * NSURLConnectionDelegate
+ * NSURLSessionDelegate
  * =======================================
  */
 
-- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response
-{
+- (void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask
+didReceiveResponse:(NSURLResponse *)response
+ completionHandler:(void (^)(NSURLSessionResponseDisposition disposition))completionHandler {
+
     NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
     _httpStatus = [httpResponse statusCode];
     
@@ -261,57 +263,63 @@
     }
     
     if (_format == kFSPlaylistFormatNone) {
-        [_connection cancel];
-
+        
 #if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
         NSLog(@"FSParsePlaylistRequest: Unable to determine the type of the playlist for URL: %@", _url);
 #endif
         
         self.onFailure();
+        
+    } else {
+        completionHandler(NSURLSessionResponseAllow);
     }
-
+    
     [_receivedData setLength:0];
 }
 
-- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
+- (void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask didBecomeDownloadTask:(NSURLSessionDownloadTask *)downloadTask
 {
+    // Resume the Download Task manually because apparently iOS does not do it automatically?!
+    [downloadTask resume];
+}
+
+- (void)URLSession:(NSURLSession *)session
+          dataTask:(NSURLSessionDataTask *)dataTask
+    didReceiveData:(NSData *)data {
     [_receivedData appendData:data];
 }
 
-- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error
-{
-    @synchronized (self) {
-        _connection = nil;
-        _receivedData = nil;
-    }
-    
+- (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task
+didCompleteWithError:(nullable NSError *)error {
+    if(error) {
+        @synchronized (self) {
+            _task = nil;
+            _receivedData = nil;
+        }
+        
 #if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
-    NSLog(@"FSParsePlaylistRequest: Connection failed for URL: %@, error %@", _url, [error localizedDescription]);
-#endif
-    
-    self.onFailure();
-}
-
-- (void)connectionDidFinishLoading:(NSURLConnection *)connection
-{
-    assert(_connection == connection);
-    
-    @synchronized (self) {
-        _connection = nil;
-    }
-    
-    if (_httpStatus != 200) {
-#if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
-        NSLog(@"FSParsePlaylistRequest: Unable to receive playlist from URL: %@", _url);
+        NSLog(@"FSParsePlaylistRequest: Connection failed for URL: %@, error %@", _url, [error localizedDescription]);
 #endif
         
         self.onFailure();
-        return;
+    } else {
+        @synchronized (self) {
+            _task = nil;
+        }
+        
+        if (_httpStatus != 200) {
+#if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
+            NSLog(@"FSParsePlaylistRequest: Unable to receive playlist from URL: %@", _url);
+#endif
+            
+            self.onFailure();
+            return;
+        }
+        
+        [self parsePlaylistFromData:_receivedData];
+        
+        self.onCompletion();
     }
-    
-    [self parsePlaylistFromData:_receivedData];
-    
-    self.onCompletion();
 }
 
 @end
