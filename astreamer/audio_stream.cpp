@@ -1827,8 +1827,8 @@ void Audio_Stream::cleanupCachedData()
     
     if (!m_decoderShouldRun) {
         AS_TRACE("cleanupCachedData: decoder should not run, bailing out!\n");
-        return;
         pthread_mutex_unlock(&m_streamStateMutex);
+        return;
     } else {
         pthread_mutex_unlock(&m_streamStateMutex);
     }
