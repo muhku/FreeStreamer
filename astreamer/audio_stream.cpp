@@ -153,9 +153,12 @@ Audio_Stream::~Audio_Stream()
 {
     pthread_mutex_lock(&m_streamStateMutex);
     m_decoderShouldRun = false;
-    pthread_mutex_unlock(&m_streamStateMutex);
     
-    CFRunLoopStop(m_decodeRunLoop);
+    if (m_decodeRunLoop) {
+        CFRunLoopStop(m_decodeRunLoop), m_decodeRunLoop = NULL;
+    }
+    
+    pthread_mutex_unlock(&m_streamStateMutex);
     
     if (m_defaultContentType) {
         CFRelease(m_defaultContentType), m_defaultContentType = NULL;
@@ -1628,7 +1631,11 @@ void *Audio_Stream::decodeLoop(void *data)
 {
     Audio_Stream *THIS = (Audio_Stream *)data;
     
+    pthread_mutex_lock(&THIS->m_streamStateMutex);
+    
     THIS->m_decodeRunLoop = CFRunLoopGetCurrent();
+    
+    pthread_mutex_unlock(&THIS->m_streamStateMutex);
     
     // Set up a timer ticking once every 40ms to
     // run the decoder
