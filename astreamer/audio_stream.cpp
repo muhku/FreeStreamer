@@ -1823,6 +1823,16 @@ void Audio_Stream::determineBufferingLimits()
     
 void Audio_Stream::cleanupCachedData()
 {
+    pthread_mutex_lock(&m_streamStateMutex);
+    
+    if (!m_decoderShouldRun) {
+        AS_TRACE("cleanupCachedData: decoder should not run, bailing out!\n");
+        return;
+        pthread_mutex_unlock(&m_streamStateMutex);
+    } else {
+        pthread_mutex_unlock(&m_streamStateMutex);
+    }
+    
     AS_LOCK_TRACE("cleanupCachedData: lock\n");
     pthread_mutex_lock(&m_packetQueueMutex);
     
