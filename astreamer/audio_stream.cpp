@@ -1399,6 +1399,22 @@ void Audio_Stream::seekTimerCallback(CFRunLoopTimerRef timer, void *info)
         if (success) {
             THIS->setContentLength(THIS->m_originalContentLength);
             
+            pthread_mutex_lock(&THIS->m_streamStateMutex);
+            
+            if (THIS->m_audioConverter) {
+                AudioConverterDispose(THIS->m_audioConverter);
+            }
+            OSStatus err = AudioConverterNew(&(THIS->m_srcFormat),
+                                             &(THIS->m_dstFormat),
+                                             &(THIS->m_audioConverter));
+            if (err) {
+                THIS->closeAndSignalError(AS_ERR_OPEN, CFSTR("Error in creating an audio converter"));
+                pthread_mutex_unlock(&THIS->m_streamStateMutex);
+                return;
+            }
+            
+            pthread_mutex_unlock(&THIS->m_streamStateMutex);
+            
             THIS->setState(BUFFERING);
             
             THIS->m_inputStreamRunning = true;
