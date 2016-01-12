@@ -78,7 +78,7 @@ static NSInteger sortCacheObjects(id co1, id co2, void *keyForSorting)
         [systemVersion appendString:@"OS X"];
 #endif
         
-        self.bufferCount    = 32;
+        self.bufferCount    = 64;
         self.bufferSize     = 8192;
         self.maxPacketDescs = 512;
         self.httpConnectionBufferSize = 1024;
@@ -130,7 +130,7 @@ static NSInteger sortCacheObjects(id co1, id co2, void *keyForSorting)
 #else
             /* OS X */
             
-            // Default configuration is OK
+            self.requiredPrebufferSizeInSeconds = 3;
         
             // No need to be so concervative with the cache sizes
             self.maxPrebufferedByteCount = 16000000; // 16 MB
@@ -1091,13 +1091,9 @@ public:
         return;
     }
     
-    const Float64 audioQueueBufferSizeInSeconds = (Float64)(self.configuration.bufferSize * self.configuration.bufferCount) / (Float64)(176400);
-    
-    const Float64 totalBufferingTimeInSeconds = self.configuration.requiredPrebufferSizeInSeconds + audioQueueBufferSizeInSeconds;
-    
     const Float64 bufferSizeForSecond = bitrate / 8.0;
     
-    int bufferSize = (bufferSizeForSecond * totalBufferingTimeInSeconds);
+    int bufferSize = (bufferSizeForSecond * self.configuration.requiredPrebufferSizeInSeconds);
     
     // Check that we still got somewhat sane buffer size
     if (bufferSize < 50000) {
