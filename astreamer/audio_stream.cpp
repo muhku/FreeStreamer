@@ -1653,8 +1653,6 @@ void *Audio_Stream::decodeLoop(void *data)
     
     pthread_mutex_unlock(&THIS->m_streamStateMutex);
     
-    // Set up a timer ticking once every 40ms to
-    // run the decoder
     CFRunLoopTimerContext ctx;
     ctx.version = 0;
     ctx.info = data;
@@ -1663,8 +1661,8 @@ void *Audio_Stream::decodeLoop(void *data)
     ctx.copyDescription = NULL;
     CFRunLoopTimerRef timer =
     CFRunLoopTimerCreate (NULL,
-                          CFAbsoluteTimeGetCurrent() + 0.04,
-                          0.04,
+                          CFAbsoluteTimeGetCurrent() + 0.02, // 20ms
+                          0.02,
                           0,
                           0,
                           decodeSinglePacket,
