@@ -1777,6 +1777,24 @@ void Audio_Stream::determineBufferingLimits()
         
         AS_TRACE("initial buffering not completed, checking if enough data\n");
         
+        if (config->usePrebufferSizeCalculationInPackets) {
+            const int packetCount = cachedDataCount();
+            
+            if (packetCount >= config->requiredInitialPrebufferedPacketCount) {
+                AS_TRACE("More than %i packets prebuffered, required %i packets. Playback can be started\n",
+                         packetCount,
+                         config->requiredInitialPrebufferedPacketCount);
+                
+                m_initialBufferingCompleted = true;
+                
+                pthread_mutex_lock(&m_streamStateMutex);
+                m_decoderShouldRun = true;
+                pthread_mutex_unlock(&m_streamStateMutex);
+                
+                return;
+            }
+        }
+        
         int lim;
         
         if (continuous) {

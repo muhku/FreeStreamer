@@ -227,6 +227,10 @@ typedef struct {
  */
 @property (nonatomic,assign) BOOL     usePrebufferSizeCalculationInSeconds;
 /**
+ * Calculate prebuffer sizes using the packet counts.
+ */
+@property (nonatomic,assign) BOOL     usePrebufferSizeCalculationInPackets;
+/**
  * Require buffering of this many bytes before the playback can start for a continuous stream.
  */
 @property (nonatomic,assign) float      requiredPrebufferSizeInSeconds;
@@ -238,6 +242,10 @@ typedef struct {
  * Require buffering of this many bytes before the playback can start a non-continuous stream.
  */
 @property (nonatomic,assign) int      requiredInitialPrebufferedByteCountForNonContinuousStream;
+/**
+ * Require buffering of this many packets before the playback can start.
+ */
+@property (nonatomic,assign) int      requiredInitialPrebufferedPacketCount;
 /**
  * The HTTP user agent used for stream operations.
  */

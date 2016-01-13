@@ -25,9 +25,11 @@ struct Stream_Configuration {
     int startupWatchdogPeriod;
     int maxPrebufferedByteCount;
     bool usePrebufferSizeCalculationInSeconds;
+    bool usePrebufferSizeCalculationInPackets;
     int requiredInitialPrebufferedByteCountForContinuousStream;
     int requiredInitialPrebufferedByteCountForNonContinuousStream;
     int requiredPrebufferSizeInSeconds;
+    int requiredInitialPrebufferedPacketCount;
     CFStringRef userAgent;
     CFStringRef cacheDirectory;
     CFDictionaryRef predefinedHttpHeaderValues;
