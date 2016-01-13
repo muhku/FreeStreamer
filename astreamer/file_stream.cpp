@@ -7,6 +7,7 @@
  */
 
 #include "file_stream.h"
+#include "stream_configuration.h"
 
 namespace astreamer {
     
@@ -299,10 +300,12 @@ void File_Stream::readCallBack(CFReadStreamRef stream, CFStreamEventType eventTy
 {
     File_Stream *THIS = static_cast<File_Stream*>(clientCallBackInfo);
     
+    Stream_Configuration *config = Stream_Configuration::configuration();
+    
     switch (eventType) {
         case kCFStreamEventHasBytesAvailable: {
             if (!THIS->m_fileReadBuffer) {
-                THIS->m_fileReadBuffer = new UInt8[1024];
+                THIS->m_fileReadBuffer = new UInt8[config->httpConnectionBufferSize];
             }
             
             while (CFReadStreamHasBytesAvailable(stream)) {
@@ -317,7 +320,7 @@ void File_Stream::readCallBack(CFReadStreamRef stream, CFStreamEventType eventTy
                     break;
                 }
                 
-                CFIndex bytesRead = CFReadStreamRead(stream, THIS->m_fileReadBuffer, 1024);
+                CFIndex bytesRead = CFReadStreamRead(stream, THIS->m_fileReadBuffer, config->httpConnectionBufferSize);
                 
                 if (CFReadStreamGetStatus(stream) == kCFStreamStatusError ||
                     bytesRead < 0) {

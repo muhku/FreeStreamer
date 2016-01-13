@@ -81,7 +81,7 @@ static NSInteger sortCacheObjects(id co1, id co2, void *keyForSorting)
         self.bufferCount    = 64;
         self.bufferSize     = 8192;
         self.maxPacketDescs = 512;
-        self.httpConnectionBufferSize = 1024;
+        self.httpConnectionBufferSize = 8192;
         self.outputSampleRate = 44100;
         self.outputNumChannels = 2;
         self.bounceInterval    = 10;
