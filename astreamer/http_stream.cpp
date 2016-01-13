@@ -358,6 +358,10 @@ CFReadStreamRef HTTP_Stream::createReadStream(CFURLRef url)
     }
     
     CFReadStreamSetProperty(readStream,
+                            kCFStreamNetworkServiceType,
+                            kCFStreamNetworkServiceTypeBackground);
+    
+    CFReadStreamSetProperty(readStream,
                             kCFStreamPropertyHTTPShouldAutoredirect,
                             kCFBooleanTrue);
     
