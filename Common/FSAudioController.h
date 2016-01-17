@@ -115,7 +115,7 @@
  * Adds an item to the playlist at a specific position.
  *
  * @param item The playlist item to be added.
- * @Param index The location in the playlist to place the new item
+ * @param index The location in the playlist to place the new item
  */
 - (void)insertItem:(FSPlaylistItem *)item atIndex:(NSInteger)index;
 
@@ -123,7 +123,7 @@
  * Moves an item already in the playlist to a different position in the playlist
  *
  * @param from The original index of the track to move
- * @Param to The destination of the the track at the index specified in `from`
+ * @param to The destination of the the track at the index specified in `from`
  */
 - (void)moveItemAtIndex:(NSUInteger)from toIndex:(NSUInteger)to;
 
