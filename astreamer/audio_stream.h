@@ -146,6 +146,7 @@ private:
     CFRunLoopTimerRef m_watchdogTimer;
     CFRunLoopTimerRef m_seekTimer;
     CFRunLoopTimerRef m_inputStreamTimer;
+    CFRunLoopTimerRef m_stateSetTimer;
     
     AudioFileStreamID m_audioFileStream;	// the audio file stream parser
     AudioConverterRef m_audioConverter;
@@ -202,6 +203,7 @@ private:
     pthread_t m_decodeThread;
     
     CFRunLoopRef m_decodeRunLoop;
+    CFRunLoopRef m_mainRunLoop;
     
     CFStringRef createHashForString(CFStringRef str);
     
@@ -222,6 +224,7 @@ private:
     static void watchdogTimerCallback(CFRunLoopTimerRef timer, void *info);
     static void seekTimerCallback(CFRunLoopTimerRef timer, void *info);
     static void inputStreamTimerCallback(CFRunLoopTimerRef timer, void *info);
+    static void stateSetTimerCallback(CFRunLoopTimerRef timer, void *info);
     
     bool decoderShouldRun();
     static void decodeSinglePacket(CFRunLoopTimerRef timer, void *info);
