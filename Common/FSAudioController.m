@@ -557,6 +557,38 @@
     [_streams addObject:proxy];
 }
 
+- (void)insertItem:(FSPlaylistItem *)item atIndex:(NSInteger)index
+{
+    if (!item) {
+        return;
+    }
+    
+    if (index > self.playlistItems.count) {
+        return;
+    }
+    
+    if(self.playlistItems.count == 0 && index == 0) {
+        [self addItem:item];
+    }
+    
+    [self.playlistItems insertObject:item
+                             atIndex:index];
+    
+    FSAudioStreamProxy *proxy = [[FSAudioStreamProxy alloc] initWithAudioController:self];
+    proxy.url = item.url;
+    
+    if (self.enableDebugOutput) {
+        NSLog(@"[FSAudioController.m:%i] insertItem:atIndex. Adding stream proxy for %@ at %ld", __LINE__, proxy.url, index);
+    }
+    
+    [_streams insertObject:proxy
+                   atIndex:index];
+
+    if(index <= self.currentPlaylistItemIndex) {
+        _currentPlaylistItemIndex++;
+    }
+}
+
 - (void)replaceItemAtIndex:(NSUInteger)index withItem:(FSPlaylistItem *)item
 {
     NSUInteger count = [self countOfItems];
@@ -580,6 +612,36 @@
     proxy.url = item.url;
     
     [_streams replaceObjectAtIndex:index withObject:proxy];
+}
+
+- (void)moveItemAtIndex:(NSUInteger)from toIndex:(NSUInteger)to {
+    NSUInteger count = [self countOfItems];
+    
+    if (count == 0) {
+        return;
+    }
+    
+    if (from >= count || to >= count) {
+        return;
+    }
+    
+    if(from == self.currentPlaylistItemIndex) {
+        _currentPlaylistItemIndex = to;
+    }
+    else if(from < self.currentPlaylistItemIndex && to > self.currentPlaylistItemIndex) {
+        _currentPlaylistItemIndex--;
+    }
+    else if(from > self.currentPlaylistItemIndex && to <= self.currentPlaylistItemIndex) {
+        _currentPlaylistItemIndex++;
+    }
+    
+    id object = [self.playlistItems objectAtIndex:from];
+    [self.playlistItems removeObjectAtIndex:from];
+    [self.playlistItems insertObject:object atIndex:to];
+    
+    id obj = [_streams objectAtIndex:from];
+    [_streams removeObjectAtIndex:from];
+    [_streams insertObject:obj atIndex:to];
 }
 
 - (void)removeItemAtIndex:(NSUInteger)index

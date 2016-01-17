@@ -1503,6 +1503,9 @@ public:
         pos.minute = m;
         pos.second = s;
     }
+
+    pos.playbackTimeInSeconds = durationInSeconds;
+
     return pos;
 }
 
