@@ -911,6 +911,13 @@ public:
 
 - (void)attemptRestart
 {
+    if (_audioStream->isPreloading()) {
+#if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
+        NSLog(@"FSAudioStream: Stream is preloading. Not attempting a restart");
+#endif
+        return;
+    }
+    
     if (_wasPaused) {
 #if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
         NSLog(@"FSAudioStream: Stream was paused. Not attempting a restart");
