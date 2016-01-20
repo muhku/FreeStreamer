@@ -1737,7 +1737,10 @@ void AudioStreamStateObserver::audioStreamErrorOccurred(int errorCode, CFStringR
         error == kFsAudioStreamErrorUnsupportedFormat ||
         error == kFsAudioStreamErrorOpen ||
         error == kFsAudioStreamErrorTerminated) {
-        [priv attemptRestart];
+        
+        if (!source->isPreloading()) {
+            [priv attemptRestart];
+        }
     }
 }
     
