@@ -576,6 +576,7 @@ NSString*             freeStreamerReleaseVersion();
  *
  * @param audioStream The audio stream the samples are from.
  * @param samples The samples as a buffer list.
+ * @param frames The number of frames.
  * @param description Description of the data provided.
  */
 - (void)audioStream:(FSAudioStream *)audioStream samplesAvailable:(AudioBufferList)samples frames:(UInt32)frames description: (AudioStreamPacketDescription)description;
