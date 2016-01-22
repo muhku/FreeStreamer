@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		32F6A2281A7A107C009352C8 /* button-next.png in Resources */ = {isa = PBXBuildFile; fileRef = 32F6A2261A7A107C009352C8 /* button-next.png */; };
 		32F6A2291A7A107C009352C8 /* button-previous.png in Resources */ = {isa = PBXBuildFile; fileRef = 32F6A2271A7A107C009352C8 /* button-previous.png */; };
+		602BCEB61C522FE8005C5205 /* FSPCMAudioSampleCapturer.m in Sources */ = {isa = PBXBuildFile; fileRef = 602BCEB51C522FE8005C5205 /* FSPCMAudioSampleCapturer.m */; };
 		60349C1319AD0D1C009E05F9 /* test.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 60349C1219AD0D1C009E05F9 /* test.mp3 */; };
 		60412CD218D0B150007A0277 /* button-pause.png in Resources */ = {isa = PBXBuildFile; fileRef = 60412CCC18D0B150007A0277 /* button-pause.png */; };
 		60412CD318D0B150007A0277 /* button-play.png in Resources */ = {isa = PBXBuildFile; fileRef = 60412CCD18D0B150007A0277 /* button-play.png */; };
@@ -74,6 +75,8 @@
 /* Begin PBXFileReference section */
 		32F6A2261A7A107C009352C8 /* button-next.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "button-next.png"; path = "Assets/Images/button-next.png"; sourceTree = "<group>"; };
 		32F6A2271A7A107C009352C8 /* button-previous.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "button-previous.png"; path = "Assets/Images/button-previous.png"; sourceTree = "<group>"; };
+		602BCEB41C522FE8005C5205 /* FSPCMAudioSampleCapturer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSPCMAudioSampleCapturer.h; sourceTree = "<group>"; };
+		602BCEB51C522FE8005C5205 /* FSPCMAudioSampleCapturer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSPCMAudioSampleCapturer.m; sourceTree = "<group>"; };
 		60349C1219AD0D1C009E05F9 /* test.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = test.mp3; sourceTree = "<group>"; };
 		60412CCC18D0B150007A0277 /* button-pause.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "button-pause.png"; path = "Assets/Images/button-pause.png"; sourceTree = "<group>"; };
 		60412CCD18D0B150007A0277 /* button-play.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "button-play.png"; path = "Assets/Images/button-play.png"; sourceTree = "<group>"; };
@@ -317,6 +320,8 @@
 		60CF8BDA18C5333B00C657A8 /* Additions */ = {
 			isa = PBXGroup;
 			children = (
+				602BCEB41C522FE8005C5205 /* FSPCMAudioSampleCapturer.h */,
+				602BCEB51C522FE8005C5205 /* FSPCMAudioSampleCapturer.m */,
 				60CF8BDB18C5333B00C657A8 /* FSFrequencyDomainAnalyzer.h */,
 				60CF8BDC18C5333B00C657A8 /* FSFrequencyDomainAnalyzer.m */,
 				60CF8BDD18C5333B00C657A8 /* FSFrequencyPlotView.h */,
@@ -479,6 +484,7 @@
 				60CF8BE018C5333B00C657A8 /* FSFrequencyPlotView.m in Sources */,
 				60CF8BD818C5332F00C657A8 /* http_stream.cpp in Sources */,
 				6052B2BB19ACA11F00EAA7C8 /* input_stream.cpp in Sources */,
+				602BCEB61C522FE8005C5205 /* FSPCMAudioSampleCapturer.m in Sources */,
 				60CF8BD918C5332F00C657A8 /* id3_parser.cpp in Sources */,
 				60BCF70918E49B16007B243E /* stream_configuration.cpp in Sources */,
 				60DB926519E4143A00326783 /* Reachability.m in Sources */,

@@ -7,6 +7,7 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <CoreAudio/CoreAudioTypes.h>
 
 /**
  * The major version of the current release.
@@ -574,8 +575,8 @@ NSString*             freeStreamerReleaseVersion();
  * sure your delegate code is thread safe.
  *
  * @param audioStream The audio stream the samples are from.
- * @param samples The PCM audio samples.
- * @param count The number of samples available.
+ * @param samples The samples as a buffer list.
+ * @param description Description of the data provided.
  */
-- (void)audioStream:(FSAudioStream *)audioStream samplesAvailable:(const int16_t *)samples count:(NSUInteger)count;
+- (void)audioStream:(FSAudioStream *)audioStream samplesAvailable:(AudioBufferList)samples description: (AudioStreamPacketDescription)description;
 @end
