@@ -101,7 +101,7 @@
     vDSP_destroy_fftsetup(_fft);
 }
 
-- (void)audioStream:(FSAudioStream *)audioStream samplesAvailable:(AudioBufferList)samples description: (AudioStreamPacketDescription)description
+- (void)audioStream:(FSAudioStream *)audioStream samplesAvailable:(AudioBufferList)samples frames:(UInt32)frames description: (AudioStreamPacketDescription)description
 {
    @synchronized (self) {
        if (!_enabled) {

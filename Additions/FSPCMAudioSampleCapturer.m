@@ -95,15 +95,11 @@
     }
 }
 
-- (void)audioStream:(FSAudioStream *)audioStream samplesAvailable:(AudioBufferList)samples description: (AudioStreamPacketDescription)description
+- (void)audioStream:(FSAudioStream *)audioStream samplesAvailable:(AudioBufferList)samples frames:(UInt32)frames description: (AudioStreamPacketDescription)description
 {
     @synchronized(self) {
         if (_initialized) {
-            
-            NSUInteger count = description.mDataByteSize / sizeof(int16_t);
-            UInt32 nFrames = (UInt32)count/ 2;
-            
-            ExtAudioFileWriteAsync(_audioFile, nFrames, &samples);
+            ExtAudioFileWriteAsync(_audioFile, frames, &samples);
         }
     }
 }

@@ -197,7 +197,7 @@ public:
     void audioStreamErrorOccurred(int errorCode, CFStringRef errorDescription);
     void audioStreamStateChanged(astreamer::Audio_Stream::State state);
     void audioStreamMetaDataAvailable(std::map<CFStringRef,CFStringRef> metaData);
-    void samplesAvailable(AudioBufferList samples, AudioStreamPacketDescription description);
+    void samplesAvailable(AudioBufferList samples, UInt32 frames, AudioStreamPacketDescription description);
     void bitrateAvailable();
 };
 
@@ -1817,10 +1817,10 @@ void AudioStreamStateObserver::audioStreamMetaDataAvailable(std::map<CFStringRef
     [[NSNotificationCenter defaultCenter] postNotification:notification];
 }
 
-void AudioStreamStateObserver::samplesAvailable(AudioBufferList samples, AudioStreamPacketDescription description)
+void AudioStreamStateObserver::samplesAvailable(AudioBufferList samples, UInt32 frames, AudioStreamPacketDescription description)
 {
-    if ([priv.delegate respondsToSelector:@selector(audioStream:samplesAvailable:description:)]) {
-        [priv.delegate audioStream:priv.stream samplesAvailable:samples description:description];
+    if ([priv.delegate respondsToSelector:@selector(audioStream:samplesAvailable:frames:description:)]) {
+        [priv.delegate audioStream:priv.stream samplesAvailable:samples frames:frames description:description];
     }
 }
 
