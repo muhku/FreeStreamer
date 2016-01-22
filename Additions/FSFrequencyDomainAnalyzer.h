@@ -18,7 +18,7 @@
 @property (nonatomic,assign) BOOL enabled;
 @property (nonatomic,assign) BOOL shouldExit;
 
-- (void)audioStream:(FSAudioStream *)audioStream samplesAvailable:(AudioBufferList)samples frames:(UInt32)frames description: (AudioStreamPacketDescription)description;
+- (void)audioStream:(FSAudioStream *)audioStream samplesAvailable:(AudioBufferList *)samples frames:(UInt32)frames description: (AudioStreamPacketDescription)description;
 
 @end
 

@@ -1640,7 +1640,7 @@ void Audio_Stream::decodeSinglePacket(CFRunLoopTimerRef timer, void *info)
         const UInt32 nFrames = outputBufferList.mBuffers[0].mDataByteSize / THIS->m_dstFormat.mBytesPerFrame;
         
         if (THIS->m_delegate) {
-            THIS->m_delegate->samplesAvailable(outputBufferList, nFrames, description);
+            THIS->m_delegate->samplesAvailable(&outputBufferList, nFrames, description);
         }
         
         Stream_Configuration *config = Stream_Configuration::configuration();

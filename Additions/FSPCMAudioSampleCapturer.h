@@ -17,6 +17,6 @@
 @property (nonatomic,assign) NSString *outputFile;
 @property (nonatomic,assign) AudioFileTypeID captureType;
 
-- (void)audioStream:(FSAudioStream *)audioStream samplesAvailable:(AudioBufferList)samples frames:(UInt32)frames description: (AudioStreamPacketDescription)description;
+- (void)audioStream:(FSAudioStream *)audioStream samplesAvailable:(AudioBufferList *)samples frames:(UInt32)frames description: (AudioStreamPacketDescription)description;
 
 @end

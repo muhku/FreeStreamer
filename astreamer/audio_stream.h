@@ -242,7 +242,7 @@ public:
     virtual void audioStreamStateChanged(Audio_Stream::State state) = 0;
     virtual void audioStreamErrorOccurred(int errorCode, CFStringRef errorDescription) = 0;
     virtual void audioStreamMetaDataAvailable(std::map<CFStringRef,CFStringRef> metaData) = 0;
-    virtual void samplesAvailable(AudioBufferList samples, UInt32 frames, AudioStreamPacketDescription description) = 0;
+    virtual void samplesAvailable(AudioBufferList *samples, UInt32 frames, AudioStreamPacketDescription description) = 0;
     virtual void bitrateAvailable() = 0;
 };    
 

@@ -95,11 +95,11 @@
     }
 }
 
-- (void)audioStream:(FSAudioStream *)audioStream samplesAvailable:(AudioBufferList)samples frames:(UInt32)frames description: (AudioStreamPacketDescription)description
+- (void)audioStream:(FSAudioStream *)audioStream samplesAvailable:(AudioBufferList *)samples frames:(UInt32)frames description: (AudioStreamPacketDescription)description
 {
     @synchronized(self) {
         if (_initialized) {
-            ExtAudioFileWriteAsync(_audioFile, frames, &samples);
+            ExtAudioFileWriteAsync(_audioFile, frames, samples);
         }
     }
 }
