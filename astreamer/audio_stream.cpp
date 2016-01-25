@@ -744,6 +744,7 @@ void Audio_Stream::audioQueueStateChanged(Audio_Queue::State state)
 {
     if (state == Audio_Queue::RUNNING) {
         invalidateWatchdogTimer();
+        setState(PLAYING);
         
         float currentVolume = m_audioQueue->volume();
         
