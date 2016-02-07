@@ -96,11 +96,7 @@ Audio_Stream::Audio_Stream() :
     m_seekOffset(0),
     m_bounceCount(0),
     m_firstBufferingTime(0),
-#if defined (AS_RELAX_CONTENT_TYPE_CHECK)
-    m_strictContentTypeChecking(false),
-#else
-    m_strictContentTypeChecking(true),
-#endif
+    m_strictContentTypeChecking(Stream_Configuration::configuration()->requireStrictContentTypeChecking),
     m_defaultContentType(CFSTR("audio/mpeg")),
     m_contentType(NULL),
     

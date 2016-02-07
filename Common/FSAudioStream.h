@@ -280,6 +280,10 @@ typedef struct {
  */
 @property (nonatomic,assign) BOOL enableTimeAndPitchConversion;
 /**
+ * Requires the content type given by the server to match an audio content type.
+ */
+@property (nonatomic,assign) BOOL requireStrictContentTypeChecking;
+/**
  * The maximum size of the disk cache in bytes.
  */
 @property (nonatomic,assign) int maxDiskCacheSize;

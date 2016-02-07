@@ -98,6 +98,7 @@ static NSInteger sortCacheObjects(id co1, id co2, void *keyForSorting)
         self.seekingFromCacheEnabled = YES;
         self.automaticAudioSessionHandlingEnabled = YES;
         self.enableTimeAndPitchConversion = NO;
+        self.requireStrictContentTypeChecking = YES;
         self.maxDiskCacheSize = 256000000; // 256 MB
         self.usePrebufferSizeCalculationInSeconds = YES;
         self.usePrebufferSizeCalculationInPackets = NO;
@@ -654,6 +655,7 @@ public:
     config.seekingFromCacheEnabled  = c->seekingFromCacheEnabled;
     config.automaticAudioSessionHandlingEnabled = c->automaticAudioSessionHandlingEnabled;
     config.enableTimeAndPitchConversion = c->enableTimeAndPitchConversion;
+    config.requireStrictContentTypeChecking = c->requireStrictContentTypeChecking;
     config.maxDiskCacheSize         = c->maxDiskCacheSize;
     
     if (c->userAgent) {
@@ -1134,7 +1136,7 @@ public:
 
 -(NSString *)description
 {
-    return [NSString stringWithFormat:@"[FreeStreamer %@] URL: %@\nbufferCount: %i\nbufferSize: %i\nmaxPacketDescs: %i\nhttpConnectionBufferSize: %i\noutputSampleRate: %f\noutputNumChannels: %ld\nbounceInterval: %i\nmaxBounceCount: %i\nstartupWatchdogPeriod: %i\nmaxPrebufferedByteCount: %i\nformat: %@\nbit rate: %f\nuserAgent: %@\ncacheDirectory: %@\npredefinedHttpHeaderValues: %@\ncacheEnabled: %@\nseekingFromCacheEnabled: %@\nautomaticAudioSessionHandlingEnabled: %@\nenableTimeAndPitchConversion: %@\nmaxDiskCacheSize: %i\nusePrebufferSizeCalculationInSeconds: %@\nusePrebufferSizeCalculationInPackets: %@\nrequiredPrebufferSizeInSeconds: %f\nrequiredInitialPrebufferedByteCountForContinuousStream: %i\nrequiredInitialPrebufferedByteCountForNonContinuousStream: %i\nrequiredInitialPrebufferedPacketCount: %i",
+    return [NSString stringWithFormat:@"[FreeStreamer %@] URL: %@\nbufferCount: %i\nbufferSize: %i\nmaxPacketDescs: %i\nhttpConnectionBufferSize: %i\noutputSampleRate: %f\noutputNumChannels: %ld\nbounceInterval: %i\nmaxBounceCount: %i\nstartupWatchdogPeriod: %i\nmaxPrebufferedByteCount: %i\nformat: %@\nbit rate: %f\nuserAgent: %@\ncacheDirectory: %@\npredefinedHttpHeaderValues: %@\ncacheEnabled: %@\nseekingFromCacheEnabled: %@\nautomaticAudioSessionHandlingEnabled: %@\nenableTimeAndPitchConversion: %@\nrequireStrictContentTypeChecking: %@\nmaxDiskCacheSize: %i\nusePrebufferSizeCalculationInSeconds: %@\nusePrebufferSizeCalculationInPackets: %@\nrequiredPrebufferSizeInSeconds: %f\nrequiredInitialPrebufferedByteCountForContinuousStream: %i\nrequiredInitialPrebufferedByteCountForNonContinuousStream: %i\nrequiredInitialPrebufferedPacketCount: %i",
             freeStreamerReleaseVersion(),
             self.url,
             self.configuration.bufferCount,
@@ -1156,6 +1158,7 @@ public:
             (self.configuration.seekingFromCacheEnabled ? @"YES" : @"NO"),
             (self.configuration.automaticAudioSessionHandlingEnabled ? @"YES" : @"NO"),
             (self.configuration.enableTimeAndPitchConversion ? @"YES" : @"NO"),
+            (self.configuration.requireStrictContentTypeChecking ? @"YES" : @"NO"),
             self.configuration.maxDiskCacheSize,
             (self.configuration.usePrebufferSizeCalculationInSeconds ? @"YES" : @"NO"),
             (self.configuration.usePrebufferSizeCalculationInPackets ? @"YES" : @"NO"),
@@ -1220,6 +1223,7 @@ public:
         c->seekingFromCacheEnabled  = configuration.seekingFromCacheEnabled;
         c->automaticAudioSessionHandlingEnabled = configuration.automaticAudioSessionHandlingEnabled;
         c->enableTimeAndPitchConversion = configuration.enableTimeAndPitchConversion;
+        c->requireStrictContentTypeChecking = configuration.requireStrictContentTypeChecking;
         c->maxDiskCacheSize         = configuration.maxDiskCacheSize;
         c->requiredInitialPrebufferedByteCountForContinuousStream = configuration.requiredInitialPrebufferedByteCountForContinuousStream;
         c->requiredInitialPrebufferedByteCountForNonContinuousStream = configuration.requiredInitialPrebufferedByteCountForNonContinuousStream;
