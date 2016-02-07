@@ -184,9 +184,13 @@
         }
         
         if (dispatchLevels && [self.delegate respondsToSelector:@selector(frequenceAnalyzer:levelsAvailable:count:)]) {
+            __weak FSFrequencyDomainAnalyzer *weakSelf = self;
+            
             dispatch_async(dispatch_get_main_queue(), ^{
+                FSFrequencyDomainAnalyzer *strongSelf = weakSelf;
+                
                 // Execute on the main thread
-                [self.delegate frequenceAnalyzer:self levelsAvailable:_levels.overall count:kSFrequencyDomainAnalyzerLevelCount];
+                [self.delegate frequenceAnalyzer:self levelsAvailable:strongSelf->_levels.overall count:kSFrequencyDomainAnalyzerLevelCount];
             });
             
             dispatchLevels = NO;

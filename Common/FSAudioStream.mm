@@ -1041,9 +1041,13 @@ public:
     
     _audioStream->rewind(seconds);
     
+    __weak FSAudioStreamPrivate *weakSelf = self;
+    
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 1 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+        FSAudioStreamPrivate *strongSelf = weakSelf;
+        
         // Return the original volume back
-        _audioStream->setVolume(originalVolume);
+        strongSelf->_audioStream->setVolume(originalVolume);
     });
 }
 
