@@ -614,6 +614,8 @@ playback_short_file:
             XCTAssertTrue((_controller.activeStream.duration.minute == 0), @"Invalid stream duration (minutes)");
             XCTAssertTrue((_controller.activeStream.duration.second == 31), @"Invalid stream duration (seconds)");
             
+            XCTAssertTrue(([_controller.activeStream strictContentTypeChecking] == YES), @"strict content type setting should be active");
+            
             return;
         }
     }
@@ -906,6 +908,46 @@ wait_for_playing:
             } else {
                 tickCounter++;
             }
+        }
+    }
+    XCTAssertFalse(timedOut, @"Timed out - the stream did not start playing");
+}
+
+- (void)testStrictContentTypeSetting
+{
+    [[NSNotificationCenter defaultCenter] addObserverForName:FSAudioStreamStateChangeNotification
+                                                      object:nil
+                                                       queue:nil
+                                                  usingBlock:^(NSNotification *notification) {
+                                                      
+                                                      NSLog(@"FSAudioStreamStateChangeNotification received!");
+                                                      
+                                                      int state = [[notification.userInfo valueForKey:FSAudioStreamNotificationKey_State] intValue];
+                                                      
+                                                      if (state == kFsAudioStreamPlaying) {
+                                                          _checkStreamState = YES;
+                                                      }
+                                                  }];
+    
+    _controller.url = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"test" ofType:@"mp3"]];
+    _controller.configuration.requireStrictContentTypeChecking = NO;
+    [_controller play];
+    
+    NSTimeInterval timeout = 15.0;
+    NSTimeInterval idle = 0.1;
+    BOOL timedOut = NO;
+    
+    NSDate *timeoutDate = [[NSDate alloc] initWithTimeIntervalSinceNow:timeout];
+    while (!timedOut && _keepRunning) {
+        NSDate *tick = [[NSDate alloc] initWithTimeIntervalSinceNow:idle];
+        [[NSRunLoop currentRunLoop] runUntilDate:tick];
+        timedOut = ([tick compare:timeoutDate] == NSOrderedDescending);
+        
+        if (_checkStreamState) {
+            // Stream started playing.
+            XCTAssertTrue(([_controller.activeStream strictContentTypeChecking] == NO), @"strict content type setting should not be active");
+            
+            return;
         }
     }
     XCTAssertFalse(timedOut, @"Timed out - the stream did not start playing");
