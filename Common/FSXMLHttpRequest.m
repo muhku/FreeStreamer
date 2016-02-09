@@ -62,7 +62,7 @@
                          NSLog(@"FSXMLHttpRequest: Request failed for URL: %@, error %@", strongSelf.url, [error localizedDescription]);
 #endif
                          dispatch_async(dispatch_get_main_queue(), ^(){
-                             self.onFailure();
+                             strongSelf.onFailure();
                          });
                      } else {
                          if (httpResponse.statusCode != 200) {
@@ -72,7 +72,7 @@
                              NSLog(@"FSXMLHttpRequest: Unable to receive content for URL: %@", strongSelf.url);
 #endif
                              dispatch_async(dispatch_get_main_queue(), ^(){
-                                 self.onFailure();
+                                 strongSelf.onFailure();
                              });
                              return;
                          }
@@ -93,17 +93,17 @@
 #endif
                              
                              dispatch_async(dispatch_get_main_queue(), ^(){
-                                 self.onFailure();
+                                 strongSelf.onFailure();
                              });
                              return;
                          }
                          
-                         [self parseResponseData];
+                         [strongSelf parseResponseData];
                          
                          xmlFreeDoc(strongSelf->_xmlDocument), strongSelf->_xmlDocument = nil;
                          
                          dispatch_async(dispatch_get_main_queue(), ^(){
-                             self.onCompletion();
+                             strongSelf.onCompletion();
                          });
                      }
                  }];
