@@ -252,6 +252,8 @@ public:
 
 - (AudioStreamStateObserver *)streamStateObserver;
 
+- (void)endBackgroundTask;
+
 - (void)reachabilityChanged:(NSNotification *)note;
 - (void)interruptionOccurred:(NSNotification *)notification;
 
@@ -415,6 +417,16 @@ public:
 #endif
             }
         }
+    }
+#endif
+}
+
+- (void)endBackgroundTask
+{
+#if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
+    if (_backgroundTask != UIBackgroundTaskInvalid) {
+        [[UIApplication sharedApplication] endBackgroundTask:_backgroundTask];
+        _backgroundTask = UIBackgroundTaskInvalid;
     }
 #endif
 }
@@ -990,6 +1002,14 @@ public:
         return;
     }
     
+#if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
+    [self endBackgroundTask];
+    
+    _backgroundTask = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
+        [self endBackgroundTask];
+    }];
+#endif
+    
     _audioStream->open();
 
     if (!_reachability) {
@@ -1003,12 +1023,7 @@ public:
 {
     _audioStream->close(true);
     
-#if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
-    if (_backgroundTask != UIBackgroundTaskInvalid) {
-        [[UIApplication sharedApplication] endBackgroundTask:_backgroundTask];
-        _backgroundTask = UIBackgroundTaskInvalid;
-    }
-#endif
+    [self endBackgroundTask];
     
     [_reachability stopNotifier], _reachability = nil;
 }
@@ -1771,6 +1786,8 @@ void AudioStreamStateObserver::audioStreamStateChanged(astreamer::Audio_Stream::
             notificationHandler = @selector(notifyPlaybackBuffering);
             break;
         case astreamer::Audio_Stream::PLAYING:
+            [priv endBackgroundTask];
+            
             notificationHandler = @selector(notifyPlaybackPlaying);
             break;
         case astreamer::Audio_Stream::PAUSED:
@@ -1783,6 +1800,8 @@ void AudioStreamStateObserver::audioStreamStateChanged(astreamer::Audio_Stream::
             notificationHandler = @selector(notifyPlaybackEndOfFile);
             break;
         case astreamer::Audio_Stream::FAILED:
+            [priv endBackgroundTask];
+            
             notificationHandler = @selector(notifyPlaybackFailed);
             break;
         case astreamer::Audio_Stream::PLAYBACK_COMPLETED:
