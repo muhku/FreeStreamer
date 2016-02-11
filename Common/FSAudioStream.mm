@@ -319,6 +319,8 @@ public:
                                                    object:nil];
 
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
+        _backgroundTask = UIBackgroundTaskInvalid;
+        
         @synchronized (self) {
             if (!fsAudioStreamPrivateActiveSessions) {
                 fsAudioStreamPrivateActiveSessions = [[NSMutableDictionary alloc] init];
