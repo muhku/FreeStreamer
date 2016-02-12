@@ -7,8 +7,7 @@
  */
 
 #import <UIKit/UIKit.h>
-
-#import "FSAudioController.h"
+#import <FreeStreamer/FreeStreamer.h>
 
 @class FSAudioStream;
 @class FSPlaylistItem;

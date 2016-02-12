@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 #import <AudioToolbox/AudioToolbox.h>
 
-#include "FSAudioStream.h"
+#import <FreeStreamer/FreeStreamer.h>
 
 @interface FSPCMAudioSampleCapturer : NSObject <FSPCMAudioStreamDelegate> {
 }

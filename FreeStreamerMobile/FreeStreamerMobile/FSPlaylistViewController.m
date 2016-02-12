@@ -7,11 +7,8 @@
  */
 
 #import "FSPlaylistViewController.h"
-#import "FSPlaylistItem.h"
 #import "FSPlayerViewController.h"
-#import "FSParseRssPodcastFeedRequest.h"
 #import "AJNotificationView.h"
-#include "FSAudioController.h"
 
 @interface FSPlaylistViewController (PrivateMethods)
 

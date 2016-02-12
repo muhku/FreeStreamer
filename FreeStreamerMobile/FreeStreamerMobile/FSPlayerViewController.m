@@ -10,9 +10,6 @@
 
 #import <MediaPlayer/MediaPlayer.h>
 
-#import "FSAudioStream.h"
-#import "FSAudioController.h"
-#import "FSPlaylistItem.h"
 #import "FSFrequencyDomainAnalyzer.h"
 #import "FSFrequencyPlotView.h"
 #import "AJNotificationView.h"

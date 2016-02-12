@@ -6,6 +6,9 @@
  * https://github.com/muhku/FreeStreamer
  */
 
+#import <libxml/parser.h>
+#import <libxml/xpath.h>
+
 #import "FSParseRssPodcastFeedRequest.h"
 #import "FSPlaylistItem.h"
 

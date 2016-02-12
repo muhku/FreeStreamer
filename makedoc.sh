@@ -23,4 +23,4 @@ $appledoc --project-name "FreeStreamer" \
 --ignore "*.mm" \
 --create-html \
 --no-create-docset \
---output "$helpdir" "Common" "FreeStreamerMobile" "FreeStreamerDesktop"
+--output "$helpdir" "FreeStreamer/FreeStreamer"

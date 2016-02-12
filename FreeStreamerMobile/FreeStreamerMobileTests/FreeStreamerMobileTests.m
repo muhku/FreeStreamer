@@ -7,10 +7,7 @@
  */
 
 #import <XCTest/XCTest.h>
-#import "FSAudioStream.h"
-#import "FSAudioController.h"
-#import "FSParsePlaylistRequest.h"
-#import "FSPlaylistItem.h"
+#import <FreeStreamer/FreeStreamer.h>
 
 @interface FreeStreamerMobileTests : XCTestCase {
 }
@@ -327,7 +324,7 @@ playback_short_file:
         }
     };
     
-    _controller.url = [NSURL URLWithString:@"http://somafm.com/groovesalad56.pls"];
+    _controller.url = [NSURL URLWithString:@"http://somafm.com/groovesalad64.pls"];
     [_controller play];
     
     NSTimeInterval timeout = 15.0;
@@ -350,12 +347,10 @@ playback_short_file:
             
             XCTAssertTrue((_controller.activeStream.volume == 0), @"Invalid stream volume");
             
-            XCTAssertTrue(([_controller.activeStream.contentType isEqualToString:@"audio/mpeg"]), @"Invalid content type");
-            XCTAssertTrue(([_controller.activeStream.suggestedFileExtension isEqualToString:@"mp3"]), @"Invalid file extension");
+            XCTAssertTrue(([_controller.activeStream.contentType isEqualToString:@"audio/aacp"]), @"Invalid content type");
+            XCTAssertTrue(([_controller.activeStream.suggestedFileExtension isEqualToString:@"aac"]), @"Invalid file extension");
             
             XCTAssertTrue((_controller.activeStream.prebufferedByteCount > 0), @"No cached bytes");
-            
-            XCTAssertTrue(((unsigned)_controller.activeStream.bitRate == 56000), @"Invalid bit rate");
             
             XCTAssertTrue((_stream.totalCachedObjectsSize == 0), @"System has cached objects");
             

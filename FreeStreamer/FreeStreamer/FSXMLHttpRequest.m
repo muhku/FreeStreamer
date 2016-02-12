@@ -8,6 +8,7 @@
 
 #import "FSXMLHttpRequest.h"
 
+#import <libxml/parser.h>
 #import <libxml/xpath.h>
 
 #define DATE_COMPONENTS (NSYearCalendarUnit| NSMonthCalendarUnit | NSDayCalendarUnit | NSWeekCalendarUnit |  NSHourCalendarUnit | NSMinuteCalendarUnit | NSSecondCalendarUnit | NSWeekdayCalendarUnit | NSWeekdayOrdinalCalendarUnit)

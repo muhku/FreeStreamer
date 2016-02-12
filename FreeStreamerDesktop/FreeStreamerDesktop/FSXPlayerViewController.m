@@ -7,7 +7,6 @@
  */
 
 #import "FSXPlayerViewController.h"
-#import "FSAudioStream.h"
 
 @interface FSXPlayerViewController ()
 

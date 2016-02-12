@@ -3,8 +3,8 @@
   <channel>
     <title>Playlist Feed</title>
     <item>
-       <title>soma.fm GrooveSalad MP3 56</title>
-       <link>http://somafm.com/groovesalad56.pls</link>
+       <title>soma.fm GrooveSalad AAC 64</title>
+       <link>http://somafm.com/groovesalad64.pls</link>
     </item>
     <item>
        <title>BassDrive AAC</title>
@@ -33,10 +33,6 @@
     <item>
         <title>Local 2 seconds MP3 file</title>
         <link>file://test-2sec.mp3</link>
-    </item>
-    <item>
-        <title>M3U playlist test</title>
-        <link>https://raw.githubusercontent.com/muhku/FreeStreamer/master/Extra/test-playlist.m3u</link>
     </item>
     <item>
         <title>Isaac Asimov Foundations Series BBC</title>

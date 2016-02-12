@@ -8,7 +8,11 @@
 
 #import <Foundation/Foundation.h>
 
-#include <libxml/parser.h>
+typedef struct _xmlDoc xmlDoc;
+typedef xmlDoc *xmlDocPtr;
+
+typedef struct _xmlNode xmlNode;
+typedef xmlNode *xmlNodePtr;
 
 /**
  * XML HTTP request error status.

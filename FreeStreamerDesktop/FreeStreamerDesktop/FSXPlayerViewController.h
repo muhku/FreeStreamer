@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import <Cocoa/Cocoa.h>
-#import "FSAudioController.h"
+#include "FSAudioController.h"
 
 /**
  * The player view controller of the OS X example application.

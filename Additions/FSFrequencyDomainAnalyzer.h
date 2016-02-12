@@ -6,7 +6,7 @@
  * https://github.com/muhku/FreeStreamer
  */
 
-#include "FSAudioStream.h"
+#import <FreeStreamer/FreeStreamer.h>
 
 @protocol FSFrequencyDomainAnalyzerDelegate;
 

@@ -2,3 +2,7 @@
 
 *.xcodeproj/project.xcworkspace/
 *.xcodeproj/xcuserdata/
+
+FreeStreamer/FreeStreamer.xcodeproj/xcuserdata/
+FreeStreamerMobile/FreeStreamerMobile.xcodeproj/project.xcworkspace/
+FreeStreamerMobile/FreeStreamerMobile.xcodeproj/xcuserdata/

@@ -7,7 +7,6 @@
  */
 
 #import "FSAppDelegate.h"
-#import "FSAudioController.h"
 
 @implementation FSAppDelegate
 
