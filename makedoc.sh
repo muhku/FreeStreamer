@@ -21,6 +21,7 @@ $appledoc --project-name "FreeStreamer" \
 --company-id "net.muhonen" \
 --ignore "*.m" \
 --ignore "*.mm" \
+--ignore "FreeStreamer/FreeStreamer/Reachability.h" \
 --create-html \
 --no-create-docset \
 --output "$helpdir" "FreeStreamer/FreeStreamer"
