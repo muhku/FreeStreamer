@@ -33,4 +33,4 @@ For code contributions and other questions, it is preferrable to create a Github
 License
 ====================
 
-See LICENSE.txt for the license.
+See [LICENSE.txt](https://github.com/muhku/FreeStreamer/blob/master/LICENSE.txt) for the license.
