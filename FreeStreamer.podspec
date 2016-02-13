@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
 	s.name                  = 'FreeStreamer'
-	s.version               = '3.5.0'
+	s.version               = '3.5.1'
 	s.license               = 'BSD'
 	s.summary               = 'A low-memory footprint streaming audio client for iOS and OS X.'
 	s.homepage              = 'http://muhku.github.io/FreeStreamer/'
@@ -40,6 +40,13 @@ Pod::Spec.new do |s|
 	                          'FreeStreamer/FreeStreamer/input_stream.h',
 	                          'FreeStreamer/FreeStreamer/stream_configuration.cpp',
 	                          'FreeStreamer/FreeStreamer/stream_configuration.h'
+	s.public_header_files   = 'FreeStreamer/FreeStreamer/FSAudioController.h',
+	                          'FreeStreamer/FreeStreamer/FSAudioStream.h',
+	                          'FreeStreamer/FreeStreamer/FSCheckContentTypeRequest.h',
+	                          'FreeStreamer/FreeStreamer/FSParsePlaylistRequest.h',
+	                          'FreeStreamer/FreeStreamer/FSParseRssPodcastFeedRequest.h',
+	                          'FreeStreamer/FreeStreamer/FSPlaylistItem.h',
+	                          'FreeStreamer/FreeStreamer/FSXMLHttpRequest.h'
 	s.ios.frameworks        = 'CFNetwork', 'AudioToolbox', 'AVFoundation', 'MediaPlayer'
 	s.osx.frameworks        = 'CFNetwork', 'AudioToolbox', 'AVFoundation'
 	s.libraries	        = 'xml2', 'stdc++'
