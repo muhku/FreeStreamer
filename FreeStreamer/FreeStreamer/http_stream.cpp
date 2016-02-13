@@ -44,6 +44,7 @@ HTTP_Stream::HTTP_Stream() :
     m_httpHeadersParsed(false),
     m_contentType(0),
     m_contentLength(0),
+    m_bytesRead(0),
     
     m_icyStream(false),
     m_icyHeaderCR(false),
@@ -161,6 +162,7 @@ bool HTTP_Stream::open(const Input_Stream_Position& position)
     m_icyMetaDataInterval = 0;
     m_dataByteReadCount = 0;
     m_metaDataBytesRemaining = 0;
+    m_bytesRead = 0;
     
     if (!m_url) {
         goto out;
@@ -757,6 +759,22 @@ void HTTP_Stream::readCallBack(CFReadStreamRef stream, CFStreamEventType eventTy
                 
                 if (CFReadStreamGetStatus(stream) == kCFStreamStatusError ||
                     bytesRead < 0) {
+                    if (THIS->contentLength() > 0) {
+                        /*
+                         * Try to recover gracefully if we have a non-continuous stream
+                         */
+                        Input_Stream_Position currentPosition = THIS->position();
+                        
+                        Input_Stream_Position recoveryPosition;
+                        recoveryPosition.start = currentPosition.start + THIS->m_bytesRead;
+                        recoveryPosition.end = THIS->contentLength();
+                        
+                        HS_TRACE("Recovering HTTP stream, start %llu\n", recoveryPosition.start);
+                        
+                        THIS->open(recoveryPosition);
+                        
+                        break;
+                    }
                     
                     CFErrorRef streamError = CFReadStreamCopyError(stream);
                     
@@ -783,7 +801,9 @@ void HTTP_Stream::readCallBack(CFReadStreamRef stream, CFStreamEventType eventTy
                 }
                 
                 if (bytesRead > 0) {
-                    HS_TRACE("Read %li bytes\n", bytesRead);
+                    THIS->m_bytesRead += bytesRead;
+                    
+                    HS_TRACE("Read %li bytes, total %llu\n", bytesRead, THIS->m_bytesRead);
                     
                     THIS->parseHttpHeadersIfNeeded(THIS->m_httpReadBuffer, bytesRead);
                     

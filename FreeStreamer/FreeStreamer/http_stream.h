@@ -39,6 +39,7 @@ private:
     bool m_httpHeadersParsed;
     CFStringRef m_contentType;
     size_t m_contentLength;
+    UInt64 m_bytesRead;
     
     /* ICY protocol */
     bool m_icyStream;
