@@ -1681,6 +1681,20 @@ public:
     return [_private description];
 }
 
+-(NSUInteger)maxRetryCount
+{
+    NSAssert([NSThread isMainThread], @"FSAudioStream.maxRetryCount needs to be called in the main thread");
+    
+    return [_private maxRetryCount];
+}
+
+-(void)setMaxRetryCount:(NSUInteger)maxRetryCount
+{
+    NSAssert([NSThread isMainThread], @"FSAudioStream.setMaxRetryCount needs to be called in the main thread");
+    
+    [_private setMaxRetryCount:maxRetryCount];
+}
+
 @end
 
 /*
