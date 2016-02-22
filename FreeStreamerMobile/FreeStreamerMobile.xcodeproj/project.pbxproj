@@ -35,6 +35,8 @@
 		60CF8BE818C5335200C657A8 /* FSMainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 60CF8BE118C5335200C657A8 /* FSMainWindow.xib */; };
 		60CF8BEA18C5335200C657A8 /* FSPlayerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 60CF8BE518C5335200C657A8 /* FSPlayerViewController.m */; };
 		60CF8BEB18C5335200C657A8 /* FSPlaylistViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 60CF8BE718C5335200C657A8 /* FSPlaylistViewController.m */; };
+		60F5599E1C7B2D09000B1A99 /* FreeStreamer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96F167B11C6DE5AC00D33231 /* FreeStreamer.framework */; };
+		60F5599F1C7B2D09000B1A99 /* FreeStreamer.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 96F167B11C6DE5AC00D33231 /* FreeStreamer.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		96EDA4A51C6DEFA600B793E9 /* FSFrequencyDomainAnalyzer.m in Sources */ = {isa = PBXBuildFile; fileRef = 96EDA4A01C6DEFA600B793E9 /* FSFrequencyDomainAnalyzer.m */; };
 		96EDA4A61C6DEFA600B793E9 /* FSFrequencyPlotView.m in Sources */ = {isa = PBXBuildFile; fileRef = 96EDA4A21C6DEFA600B793E9 /* FSFrequencyPlotView.m */; };
 		96EDA4A71C6DEFA600B793E9 /* FSPCMAudioSampleCapturer.m in Sources */ = {isa = PBXBuildFile; fileRef = 96EDA4A41C6DEFA600B793E9 /* FSPCMAudioSampleCapturer.m */; };
@@ -56,6 +58,13 @@
 			remoteGlobalIDString = 60B813D118C532F8001CC5A7;
 			remoteInfo = FreeStreamerMobile;
 		};
+		60F559A01C7B2D09000B1A99 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 96F167AC1C6DE5AC00D33231 /* FreeStreamer.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 969D3AA01C6DE48F00DF5410;
+			remoteInfo = FreeStreamer;
+		};
 		96F167B01C6DE5AC00D33231 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 96F167AC1C6DE5AC00D33231 /* FreeStreamer.xcodeproj */;
@@ -64,6 +73,20 @@
 			remoteInfo = FreeStreamer;
 		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		60F559A31C7B2D09000B1A99 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				60F5599F1C7B2D09000B1A99 /* FreeStreamer.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		32F6A2261A7A107C009352C8 /* button-next.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "button-next.png"; path = "Assets/Images/button-next.png"; sourceTree = "<group>"; };
@@ -125,6 +148,7 @@
 				6071286D1C6DFC5800B8E625 /* FreeStreamer.framework in Frameworks */,
 				60B813D818C532F8001CC5A7 /* CoreGraphics.framework in Frameworks */,
 				60B813DA18C532F8001CC5A7 /* UIKit.framework in Frameworks */,
+				60F5599E1C7B2D09000B1A99 /* FreeStreamer.framework in Frameworks */,
 				60B813D618C532F8001CC5A7 /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -287,10 +311,12 @@
 				60B813CE18C532F8001CC5A7 /* Sources */,
 				60B813CF18C532F8001CC5A7 /* Frameworks */,
 				60B813D018C532F8001CC5A7 /* Resources */,
+				60F559A31C7B2D09000B1A99 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				60F559A11C7B2D09000B1A99 /* PBXTargetDependency */,
 			);
 			name = FreeStreamerMobile;
 			productName = FreeStreamerMobile;
@@ -440,6 +466,11 @@
 			target = 60B813D118C532F8001CC5A7 /* FreeStreamerMobile */;
 			targetProxy = 60B813F218C532F8001CC5A7 /* PBXContainerItemProxy */;
 		};
+		60F559A11C7B2D09000B1A99 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = FreeStreamer;
+			targetProxy = 60F559A01C7B2D09000B1A99 /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
@@ -550,6 +581,7 @@
 				);
 				INFOPLIST_FILE = "FreeStreamerMobile/FreeStreamerMobile-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "net.muhonen.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
@@ -571,6 +603,7 @@
 				);
 				INFOPLIST_FILE = "FreeStreamerMobile/FreeStreamerMobile-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "net.muhonen.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
