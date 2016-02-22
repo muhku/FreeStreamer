@@ -529,6 +529,12 @@ NSString*             freeStreamerReleaseVersion();
  */
 @property (nonatomic,readonly) NSUInteger retryCount;
 /**
+ * Holds the maximum amount of playback retries that will be 
+ * performed before entering kFsAudioStreamRetryingFailed state.
+ * Default is 3.
+ */
+@property (nonatomic,assign) NSUInteger maxRetryCount;
+/**
  * The property determines the current audio levels.
  */
 @property (nonatomic,readonly) FSLevelMeterState levels;
