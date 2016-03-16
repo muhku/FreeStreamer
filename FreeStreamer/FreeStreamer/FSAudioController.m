@@ -723,9 +723,9 @@
         }
         [self.audioStream stop];
         
-        self.currentPlaylistItemIndex = self.currentPlaylistItemIndex + 1;
-        
         [self deactivateInactivateStreams:self.currentPlaylistItemIndex];
+        
+        self.currentPlaylistItemIndex = self.currentPlaylistItemIndex + 1;
         
         [self play];
     }
