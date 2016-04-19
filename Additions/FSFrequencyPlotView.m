@@ -41,7 +41,7 @@
     
     _count = MIN(kFSFrequencyPlotViewMaxCount, count);
 
-    memcpy(_levels, levels, sizeof(levels) * _count);
+    memcpy(_levels, levels, sizeof(float) * _count);
     
     [self setNeedsDisplay];
 }
