@@ -34,3 +34,8 @@ License
 ====================
 
 See [LICENSE.txt](https://github.com/muhku/FreeStreamer/blob/master/LICENSE.txt) for the license.
+
+Donations
+====================
+
+It is possible to use [PayPal](http://muhku.github.io/FreeStreamer/donate.html) for donations.
