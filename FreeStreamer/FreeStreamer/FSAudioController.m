@@ -652,7 +652,7 @@
         return;
     }
     
-    if (self.currentPlaylistItemIndex == index) {
+    if (self.currentPlaylistItemIndex == index && self.isPlaying) {
         // If the item is currently playing, do not allow the removal
         return;
     }
