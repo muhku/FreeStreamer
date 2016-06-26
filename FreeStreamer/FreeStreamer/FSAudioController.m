@@ -570,15 +570,16 @@
     if(self.playlistItems.count == 0 && index == 0) {
         [self addItem:item];
     }
-    
-    [self.playlistItems insertObject:item
-                             atIndex:index];
-    
-    FSAudioStreamProxy *proxy = [[FSAudioStreamProxy alloc] initWithAudioController:self];
-    proxy.url = item.url;
-    
-    [_streams insertObject:proxy
-                   atIndex:index];
+    else {
+        [self.playlistItems insertObject:item
+                                 atIndex:index];
+        
+        FSAudioStreamProxy *proxy = [[FSAudioStreamProxy alloc] initWithAudioController:self];
+        proxy.url = item.url;
+        
+        [_streams insertObject:proxy
+                       atIndex:index];
+    }    
 
     if(index <= self.currentPlaylistItemIndex) {
         _currentPlaylistItemIndex++;
