@@ -258,9 +258,11 @@
         
         self.songSwitchInProgress = NO;
         
+        if (self.configuration.automaticAudioSessionHandlingEnabled) {
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 60000)
-        [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
+            [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
 #endif
+        }
         [self setAudioSessionActive:YES];
     }
 }
@@ -283,13 +285,15 @@
 
 - (void)setAudioSessionActive:(BOOL)active
 {
+    if (self.configuration.automaticAudioSessionHandlingEnabled) {
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 60000)
-    [[AVAudioSession sharedInstance] setActive:active withOptions:AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation error:nil];
+        [[AVAudioSession sharedInstance] setActive:active withOptions:AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation error:nil];
 #else
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 40000)
-    [[AVAudioSession sharedInstance] setActive:active error:nil];
+        [[AVAudioSession sharedInstance] setActive:active error:nil];
 #endif
 #endif
+    }
 }
 
 /*
