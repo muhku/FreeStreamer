@@ -191,21 +191,21 @@
         return;
     }
     
-    if (!self.preloadNextPlaylistItemAutomatically) {
-        // No preloading wanted, skip
-        if (self.enableDebugOutput) {
-            NSLog(@"[FSAudioController.m:%i] Preloading disabled, return.", __LINE__);
-        }
-        
-        return;
-    }
-    
     NSDictionary *dict = [notification userInfo];
     int state = [[dict valueForKey:FSAudioStreamNotificationKey_State] intValue];
     
     if (state == kFSAudioStreamEndOfFile) {
         if (self.enableDebugOutput) {
             NSLog(@"[FSAudioController.m:%i] EOF reached for %@", __LINE__, self.audioStream.url);
+        }
+        
+        if (!self.preloadNextPlaylistItemAutomatically) {
+            // No preloading wanted, skip
+            if (self.enableDebugOutput) {
+                NSLog(@"[FSAudioController.m:%i] Preloading disabled, return.", __LINE__);
+            }
+            
+            return;
         }
         
         // Reached EOF for this stream, do we have another item waiting in the playlist?
