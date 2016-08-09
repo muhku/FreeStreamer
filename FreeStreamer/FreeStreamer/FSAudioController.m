@@ -334,7 +334,6 @@
                 [weakSelf.parseRssPodcastFeedRequest start];
             } else {
                 // Not a playlist; try directly playing the URL
-                [weakSelf.playlistItems removeAllObjects];
                 weakSelf.readyToPlay = YES;
                 [weakSelf play];
             }
@@ -683,6 +682,8 @@
 
 - (void)stop
 {
+    [_playlistItems removeAllObjects];
+    
     if ([_streams count] > 0) {
         // Avoid creating an instance if we don't have it
         [self.audioStream stop];
