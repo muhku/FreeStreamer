@@ -478,6 +478,8 @@
         return;
     }
     
+    [_playlistItems removeAllObjects];
+    
     [self stop];
     
     self.url = url;
