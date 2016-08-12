@@ -98,7 +98,7 @@
             conf = [[FSStreamConfiguration alloc] init];
         }
         
-        // Disable audio session handling
+        // Disable audio session handling for the audio stream; audio controller handles it
         conf.automaticAudioSessionHandlingEnabled = NO;
         
         _audioStream = [[FSAudioStream alloc] initWithConfiguration:conf];
@@ -142,6 +142,7 @@
         _streams = [[NSMutableArray alloc] init];
         self.preloadNextPlaylistItemAutomatically = YES;
         self.enableDebugOutput = NO;
+        self.automaticAudioSessionHandlingEnabled = YES;
         self.configuration = [[FSStreamConfiguration alloc] init];
         
         [[NSNotificationCenter defaultCenter] addObserver:self
@@ -258,7 +259,7 @@
         
         self.songSwitchInProgress = NO;
         
-        if (self.configuration.automaticAudioSessionHandlingEnabled) {
+        if (self.automaticAudioSessionHandlingEnabled) {
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 60000)
             [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
 #endif
@@ -285,7 +286,7 @@
 
 - (void)setAudioSessionActive:(BOOL)active
 {
-    if (self.configuration.automaticAudioSessionHandlingEnabled) {
+    if (self.automaticAudioSessionHandlingEnabled) {
 #if (__IPHONE_OS_VERSION_MIN_REQUIRED >= 60000)
         [[AVAudioSession sharedInstance] setActive:active withOptions:AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation error:nil];
 #else

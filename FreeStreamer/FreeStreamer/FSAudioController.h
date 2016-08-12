@@ -216,6 +216,13 @@
  * by default
  */
 @property (nonatomic,assign) BOOL enableDebugOutput;
+
+/**
+ * This property determines if automatic audio session handling is enabled.
+ * This is YES by default.
+ */
+@property (nonatomic,assign) BOOL automaticAudioSessionHandlingEnabled;
+
 /**
  * This property holds the configuration used for the streaming.
  */
