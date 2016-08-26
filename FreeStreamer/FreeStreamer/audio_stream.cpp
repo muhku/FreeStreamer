@@ -773,6 +773,25 @@ void Audio_Stream::audioQueueBuffersEmpty()
         
         pthread_mutex_lock(&m_packetQueueMutex);
         m_playPacket = m_queuedHead;
+        if (m_processedPackets.size() > 0) {
+            /*
+             * We have audio packets in memory (only case with a non-continuous stream),
+             * so figure out the correct location to set the playback pointer so that we don't
+             * start decoding the packets from the beginning when
+             * buffering resumes.
+             */
+            queued_packet_t *firstPacket = m_processedPackets.front();
+            queued_packet_t *cur = m_queuedHead;
+            while (cur) {
+                if (cur->identifier == firstPacket->identifier) {
+                    break;
+                }
+                cur = cur->next;
+            }
+            if (cur) {
+                m_playPacket = cur;
+            }
+        }
         pthread_mutex_unlock(&m_packetQueueMutex);
         
         // Always make sure we are scheduled to receive data if we start buffering
