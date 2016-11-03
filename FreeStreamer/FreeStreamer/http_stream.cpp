@@ -40,6 +40,8 @@ HTTP_Stream::HTTP_Stream() :
     m_readStream(0),
     m_scheduledInRunLoop(false),
     m_readPending(false),
+    m_openTimer(0),
+    m_isReadedData(false),
     m_url(0),
     m_httpHeadersParsed(false),
     m_contentType(0),
@@ -193,9 +195,42 @@ bool HTTP_Stream::open(const Input_Stream_Position& position)
     }
     
     success = true;
+    if (success) {
+        if (m_openTimer) {
+            CFRunLoopTimerInvalidate(m_openTimer);
+            CFRelease(m_openTimer), m_openTimer = 0;
+        }
+        m_isReadedData = false;
+        CFRunLoopTimerContext ctx = {0, this, NULL, NULL, NULL};
+        
+        m_openTimer = CFRunLoopTimerCreate(NULL,
+                                           CFAbsoluteTimeGetCurrent()+3,
+                                           3, // 1s
+                                           0,
+                                           0,
+                                           openTimerCallback,
+                                           &ctx);
+        
+        CFRunLoopAddTimer(CFRunLoopGetCurrent(), m_openTimer, kCFRunLoopCommonModes);
+    }
 
 out:
     return success;
+}
+    
+void HTTP_Stream::openTimerCallback(CFRunLoopTimerRef timer, void *info)
+{
+    
+    HTTP_Stream *THIS = (HTTP_Stream *)info;
+    if (THIS->m_openTimer) {
+        CFRunLoopTimerInvalidate(THIS->m_openTimer);
+        CFRelease(THIS->m_openTimer), THIS->m_openTimer = 0;
+    }
+
+    if (!THIS->m_isReadedData) {
+        THIS->close();
+        THIS->open();
+    }
 }
 
 void HTTP_Stream::close()
@@ -209,6 +244,7 @@ void HTTP_Stream::close()
     setScheduledInRunLoop(false);
     CFReadStreamClose(m_readStream);
     CFRelease(m_readStream), m_readStream = 0;
+    m_isReadedData = false;
 }
     
 void HTTP_Stream::setScheduledInRunLoop(bool scheduledInRunLoop)
@@ -739,6 +775,7 @@ void HTTP_Stream::readCallBack(CFReadStreamRef stream, CFStreamEventType eventTy
     
     switch (eventType) {
         case kCFStreamEventHasBytesAvailable: {
+            THIS->m_isReadedData = true;
             if (!THIS->m_httpReadBuffer) {
                 THIS->m_httpReadBuffer = new UInt8[config->httpConnectionBufferSize];
             }
@@ -834,12 +871,22 @@ void HTTP_Stream::readCallBack(CFReadStreamRef stream, CFStreamEventType eventTy
             break;
         }
         case kCFStreamEventEndEncountered: {
+            if (THIS->m_openTimer) {
+                CFRunLoopTimerInvalidate(THIS->m_openTimer);
+                CFRelease(THIS->m_openTimer), THIS->m_openTimer = 0;
+            }
+
             if (THIS->m_delegate) {
                 THIS->m_delegate->streamEndEncountered();
             }
             break;
         }
         case kCFStreamEventErrorOccurred: {
+            if (THIS->m_openTimer) {
+                CFRunLoopTimerInvalidate(THIS->m_openTimer);
+                CFRelease(THIS->m_openTimer), THIS->m_openTimer = 0;
+            }
+            THIS->m_isReadedData = false;
             if (THIS->m_delegate) {
                 CFStringRef reportedNetworkError = NULL;
                 CFErrorRef streamError = CFReadStreamCopyError(stream);
