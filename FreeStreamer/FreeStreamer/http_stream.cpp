@@ -141,6 +141,8 @@ bool HTTP_Stream::open(const Input_Stream_Position& position)
     /* Reset state */
     m_position = position;
     
+    HS_TRACE("open position: %lld, %lld\n", position.start, position.end);
+    
     m_readPending = false;
     m_httpHeadersParsed = false;
     
@@ -233,7 +235,11 @@ void HTTP_Stream::openTimerCallback(CFRunLoopTimerRef timer, void *info)
     if (!THIS->m_isReadedData) {
         HS_TRACE("reopen debug: try reopen stream times %ld\n",THIS->m_reopenTimes);
         THIS->close();
-        THIS->open();
+        if ( THIS->m_position.end >= THIS->m_position.start) {
+            THIS->open(THIS->m_position);
+        } else {
+            THIS->open();
+        }
     }
 }
     
