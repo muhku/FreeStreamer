@@ -1517,7 +1517,14 @@ bool Audio_Stream::decoderShouldRun()
 {
     const Audio_Stream::State state = this->state();
     
+    /* if audio queue paused, decoder should not run */
+    bool isAudioQueuePaused = false;
+    if (m_audioQueue) {
+        isAudioQueuePaused = m_audioQueue->state() == m_audioQueue->PAUSED;
+    }
+    
     pthread_mutex_lock(&m_streamStateMutex);
+    
     
     if (m_preloading ||
         !m_decoderShouldRun ||
@@ -1528,7 +1535,8 @@ bool Audio_Stream::decoderShouldRun()
         state == SEEKING ||
         state == FAILED ||
         state == PLAYBACK_COMPLETED ||
-        m_dstFormat.mBytesPerPacket == 0) {
+        m_dstFormat.mBytesPerPacket == 0 ||
+        isAudioQueuePaused ) {
         pthread_mutex_unlock(&m_streamStateMutex);
         return false;
     } else {
