@@ -34,6 +34,7 @@ private:
     bool m_scheduledInRunLoop;
     bool m_readPending;
     CFRunLoopTimerRef m_openTimer;
+    size_t m_reopenTimes;
     bool m_isReadedData;
     Input_Stream_Position m_position;
     
@@ -71,6 +72,8 @@ private:
     
     static void readCallBack(CFReadStreamRef stream, CFStreamEventType eventType, void *clientCallBackInfo);
     static void openTimerCallback(CFRunLoopTimerRef timer, void *info);
+    
+    void resetOpenTimer(bool needResetReadedFlag);
     
 public:
     HTTP_Stream();
