@@ -139,6 +139,8 @@ private:
     UInt64 m_originalContentLength;
     UInt64 m_bytesReceived;
     
+    AS_Playback_Position m_currentPlaybackPosition; /* record where it has played to */
+    
     State m_state;
     Input_Stream *m_inputStream;
     Audio_Queue *m_audioQueue;

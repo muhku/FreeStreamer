@@ -121,6 +121,10 @@ Audio_Stream::Audio_Stream() :
     m_mainRunLoop(CFRunLoopGetCurrent()),
     m_decodeRunLoop(NULL)
 {
+    memset(&m_currentPlaybackPosition, 0, sizeof m_currentPlaybackPosition);
+    m_currentPlaybackPosition.offset = 0;
+    m_currentPlaybackPosition.timePlayed = 0;
+    
     memset(&m_srcFormat, 0, sizeof m_srcFormat);
     
     memset(&m_dstFormat, 0, sizeof m_dstFormat);
@@ -185,7 +189,23 @@ Audio_Stream::~Audio_Stream()
     
 void Audio_Stream::open()
 {
-    open(0);
+    if (m_currentPlaybackPosition.offset <= 0 /* if playback position exsit, open by that position */
+        || m_currentPlaybackPosition.timePlayed <= 0
+        || contentLength() <= 0) {
+        open(0);
+    } else {
+        Input_Stream_Position position;
+        position.start = m_currentPlaybackPosition.offset*contentLength();
+        position.end = contentLength();
+        open(&position);
+        float byteOffset = (position.start-m_dataOffset)*1.0/(position.end-m_dataOffset);
+        if (byteOffset <= 0) {
+            byteOffset = 0;
+        } else if (byteOffset >= 1) {
+            byteOffset = 1;
+        }
+        setSeekOffset(byteOffset);  /* do not forget to set offset */
+    }
 }
 
 void Audio_Stream::open(Input_Stream_Position *position)
@@ -889,6 +909,7 @@ void Audio_Stream::audioQueueInitializationFailed()
     
 void Audio_Stream::audioQueueFinishedPlayingPacket()
 {
+    m_currentPlaybackPosition = playbackPosition(); /* record played position */
 }
     
 void Audio_Stream::streamIsReadyRead()
@@ -1517,7 +1538,14 @@ bool Audio_Stream::decoderShouldRun()
 {
     const Audio_Stream::State state = this->state();
     
+    /* if audio queue paused, decoder should not run */
+    bool isAudioQueuePaused = false;
+    if (m_audioQueue) {
+        isAudioQueuePaused = m_audioQueue->state() == m_audioQueue->PAUSED;
+    }
+    
     pthread_mutex_lock(&m_streamStateMutex);
+    
     
     if (m_preloading ||
         !m_decoderShouldRun ||
@@ -1528,7 +1556,8 @@ bool Audio_Stream::decoderShouldRun()
         state == SEEKING ||
         state == FAILED ||
         state == PLAYBACK_COMPLETED ||
-        m_dstFormat.mBytesPerPacket == 0) {
+        m_dstFormat.mBytesPerPacket == 0 ||
+        isAudioQueuePaused ) {
         pthread_mutex_unlock(&m_streamStateMutex);
         return false;
     } else {
