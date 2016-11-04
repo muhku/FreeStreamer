@@ -41,8 +41,6 @@ public:
     void stop(bool stopImmediately);
     void stop();
     
-    State state();
-    
     float volume();
     
     void setVolume(float volume);
