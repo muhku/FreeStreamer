@@ -140,6 +140,7 @@ bool HTTP_Stream::open(const Input_Stream_Position& position)
     
     /* Reset state */
     m_position = position;
+    m_bytesRead = 0;       // Here should reset m_bytesRead. If not,may cause wrong recovery position.
     
     HS_TRACE("open position: %lld, %lld\n", position.start, position.end);
     
