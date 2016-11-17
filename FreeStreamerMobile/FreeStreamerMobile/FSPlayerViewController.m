@@ -254,6 +254,8 @@
                     weakSelf.rampUp = true;
                     weakSelf.postRampAction = @selector(finalizeSeeking);
                     
+                    [weakSelf.volumeRampTimer invalidate];
+                    weakSelf.volumeRampTimer = nil;
                     weakSelf.volumeRampTimer = [NSTimer scheduledTimerWithTimeInterval:0.05 // 50ms
                                                                         target:weakSelf
                                                                       selector:@selector(rampVolume)
@@ -861,7 +863,8 @@
         _rampStepCount = 5; // 50ms and 5 steps = 250ms ramp
         _rampUp = false;
         _postRampAction = @selector(doSeeking);
-        
+        [_volumeRampTimer invalidate];
+        _volumeRampTimer = nil;
         _volumeRampTimer = [NSTimer scheduledTimerWithTimeInterval:0.05 // 50ms
                                                             target:self
                                                           selector:@selector(rampVolume)
