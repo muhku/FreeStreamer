@@ -1459,9 +1459,11 @@ void Audio_Stream::seekTimerCallback(CFRunLoopTimerRef timer, void *info)
         // check if inputStream has error
         if (THIS->m_inputStream) {
             CFStringRef errString = THIS->m_inputStream->errorDescription();
-            THIS->m_inputStream->close();
-            THIS->closeAndSignalError(AS_ERR_NETWORK, errString);
-            return;
+            if (errString) {
+                THIS->m_inputStream->close();
+                THIS->closeAndSignalError(AS_ERR_NETWORK, errString);
+                return;
+            }
         }
         
         bool success = THIS->m_inputStream->open(position);
