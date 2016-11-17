@@ -135,6 +135,11 @@ size_t File_Stream::contentLength()
     return 0;
 }
     
+CFStringRef File_Stream::errorDescription()
+{
+    return NULL;
+}
+    
 bool File_Stream::open()
 {
     Input_Stream_Position position;

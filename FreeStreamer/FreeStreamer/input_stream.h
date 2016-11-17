@@ -32,6 +32,8 @@ public:
     virtual CFStringRef contentType() = 0;
     virtual size_t contentLength() = 0;
     
+    virtual CFStringRef errorDescription() = 0;  // access input stream error
+    
     virtual bool open() = 0;
     virtual bool open(const Input_Stream_Position& position) = 0;
     virtual void close() = 0;
@@ -46,6 +48,9 @@ public:
     virtual void streamIsReadyRead() = 0;
     virtual void streamHasBytesAvailable(UInt8 *data, UInt32 numBytes) = 0;
     virtual void streamEndEncountered() = 0;
+    
+    // check input stream delegte is able play or not
+    virtual bool streamHasDataCanPlay() = 0;
     virtual void streamErrorOccurred(CFStringRef errorDesc) = 0;
     virtual void streamMetaDataAvailable(std::map<CFStringRef,CFStringRef> metaData) = 0;
     virtual void streamMetaDataByteSizeAvailable(UInt32 sizeInBytes) = 0;

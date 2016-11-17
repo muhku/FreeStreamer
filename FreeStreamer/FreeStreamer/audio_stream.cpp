@@ -819,6 +819,16 @@ void Audio_Stream::audioQueueBuffersEmpty()
         
         AS_WARN("Audio queue run out data, starting buffering\n");
         
+        // check if inputStream has error
+        if (m_inputStream) {
+            CFStringRef inputStreamError = m_inputStream->errorDescription();
+            if (inputStreamError) {
+                m_inputStream->close();
+                streamErrorOccurred(inputStreamError);
+                return;
+            }
+        }
+        
         setState(BUFFERING);
         
         if (m_firstBufferingTime == 0) {
@@ -1094,6 +1104,11 @@ void Audio_Stream::streamEndEncountered()
         m_inputStream->close();
     }
     m_inputStreamRunning = false;
+}
+    
+bool Audio_Stream::streamHasDataCanPlay(){
+    bool canPlay = this->m_state == PLAYING || this->m_state == PAUSED;
+    return canPlay;
 }
 
 void Audio_Stream::streamErrorOccurred(CFStringRef errorDesc)
@@ -1440,6 +1455,14 @@ void Audio_Stream::seekTimerCallback(CFRunLoopTimerRef timer, void *info)
         THIS->m_initializationError = noErr;
         THIS->m_converterRunOutOfData = false;
         THIS->m_discontinuity = true;
+        
+        // check if inputStream has error
+        if (THIS->m_inputStream) {
+            CFStringRef errString = THIS->m_inputStream->errorDescription();
+            THIS->m_inputStream->close();
+            THIS->closeAndSignalError(AS_ERR_NETWORK, errString);
+            return;
+        }
         
         bool success = THIS->m_inputStream->open(position);
         

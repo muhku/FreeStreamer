@@ -118,6 +118,7 @@ public:
     void streamIsReadyRead();
     void streamHasBytesAvailable(UInt8 *data, UInt32 numBytes);
     void streamEndEncountered();
+    bool streamHasDataCanPlay();
     void streamErrorOccurred(CFStringRef errorDesc);
     void streamMetaDataAvailable(std::map<CFStringRef,CFStringRef> metaData);
     void streamMetaDataByteSizeAvailable(UInt32 sizeInBytes);
@@ -138,6 +139,7 @@ private:
     UInt64 m_contentLength;
     UInt64 m_originalContentLength;
     UInt64 m_bytesReceived;
+    Input_Stream_Position m_streamOpenPosition;
     
     AS_Playback_Position m_currentPlaybackPosition; /* record where it has played to */
     
@@ -212,6 +214,7 @@ private:
     Audio_Queue *audioQueue();
     void closeAudioQueue();
     
+    void inputStreamOccurredError();
     void closeAndSignalError(int error, CFStringRef errorDescription);
     void setState(State state);
     void setCookiesForStream(AudioFileStreamID inAudioFileStream);

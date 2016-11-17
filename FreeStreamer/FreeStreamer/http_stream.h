@@ -41,6 +41,7 @@ private:
     /* HTTP headers */
     bool m_httpHeadersParsed;
     CFStringRef m_contentType;
+    CFStringRef m_errorDescription; // record error
     size_t m_contentLength;
     UInt64 m_bytesRead;
     
@@ -73,7 +74,10 @@ private:
     static void readCallBack(CFReadStreamRef stream, CFStreamEventType eventType, void *clientCallBackInfo);
     static void openTimerCallback(CFRunLoopTimerRef timer, void *info);
     
-    void resetOpenTimer(bool needResetReadedFlag);
+    void startOpenTimer(CFTimeInterval interval);  //start open timer
+    void resetOpenTimer(bool needResetReadedFlag); //invalidate timer
+    void close(bool resetTimer);                   //close stream if need invalidate timer
+    void handleStreamError();                      //handle stream error
     
 public:
     HTTP_Stream();
@@ -83,6 +87,7 @@ public:
     
     CFStringRef contentType();
     size_t contentLength();
+    CFStringRef errorDescription();    // access error
     
     bool open();
     bool open(const Input_Stream_Position& position);

@@ -744,7 +744,13 @@ public:
 #if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
         NSLog(@"FSAudioStream: Internet connection available again.");
 #endif
-        [self attemptRestart];
+        /* 
+            If audio stream still has data can be play, error was not throwed.
+            Than do not attemp to restart. HTTP stream will try to reopen itself.
+        */
+        if (!_audioStream->streamHasDataCanPlay()) {
+            [self attemptRestart];
+        }
     }
 }
 

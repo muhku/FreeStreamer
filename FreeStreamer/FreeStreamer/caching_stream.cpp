@@ -151,7 +151,12 @@ size_t Caching_Stream::contentLength()
         return m_target->contentLength();
     }
 }
-
+    
+CFStringRef Caching_Stream::errorDescription()
+{
+    return NULL;
+}
+    
 bool Caching_Stream::open()
 {
     bool status;
@@ -404,6 +409,10 @@ void Caching_Stream::streamEndEncountered()
     if (m_delegate) {
         m_delegate->streamEndEncountered();
     }
+}
+    
+bool Caching_Stream::streamHasDataCanPlay(){
+    return m_delegate->streamHasDataCanPlay();
 }
     
 void Caching_Stream::streamErrorOccurred(CFStringRef errorDesc)

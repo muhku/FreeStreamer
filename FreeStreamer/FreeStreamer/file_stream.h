@@ -44,6 +44,8 @@ public:
     void setContentType(CFStringRef contentType);
     size_t contentLength();
     
+    CFStringRef errorDescription();  // record error
+    
     bool open();
     bool open(const Input_Stream_Position& position);
     void close();
