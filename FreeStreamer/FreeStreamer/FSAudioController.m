@@ -470,7 +470,21 @@
         NSLog(@"Playing %@", stream);
     }
     
-    [stream play];
+    float playFromPosition = self.currentPlaylistItem.playFromPosition;
+    float audioBytes = self.currentPlaylistItem.audioBytes;
+    if ( audioBytes > 0 && playFromPosition > 0.01 && playFromPosition < 0.99 )
+    {
+        FSSeekByteOffset offset;
+        offset.start = audioBytes * playFromPosition;
+        offset.end = audioBytes;
+        offset.position = playFromPosition;
+        
+        [stream playFromOffset:offset];
+    }
+    else
+    {
+        [stream play];
+    }
 }
 
 - (void)playFromURL:(NSURL*)url
