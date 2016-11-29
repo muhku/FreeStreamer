@@ -46,7 +46,8 @@ Audio_Queue::Audio_Queue()
     m_audioQueueStarted(false),
     m_levelMeteringEnabled(false),
     m_lastError(noErr),
-    m_initialOutputVolume(1.0)
+    m_initialOutputVolume(1.0),
+    m_initialOutputPlayRate(1.0)
 {
     Stream_Configuration *config = Stream_Configuration::configuration();
     
@@ -155,6 +156,17 @@ void Audio_Queue::setVolume(float volume)
         return;
     }
     AudioQueueSetParameter(m_outAQ, kAudioQueueParam_Volume, volume);
+}
+    
+float Audio_Queue::playRate()
+{
+    float playRate = 0;
+        
+    if (m_outAQ)
+    {
+        AudioQueueGetParameter(m_outAQ, kAudioQueueParam_PlayRate, &playRate);
+    }
+    return playRate;
 }
     
 void Audio_Queue::setPlayRate(float playRate)
@@ -317,6 +329,10 @@ void Audio_Queue::init()
     
     if (m_initialOutputVolume != 1.0) {
         setVolume(m_initialOutputVolume);
+    }
+    
+    if (m_initialOutputPlayRate != 1.0) {
+        setPlayRate(m_initialOutputPlayRate);
     }
 }
 

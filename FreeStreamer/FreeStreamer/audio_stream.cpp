@@ -114,6 +114,7 @@ Audio_Stream::Audio_Stream() :
     m_packetDuration(0),
     m_bitrateBufferIndex(0),
     m_outputVolume(1.0),
+    m_outputPlayRate(1.0),
     m_converterRunOutOfData(false),
     m_decoderShouldRun(false),
     m_decoderFailed(false),
@@ -533,8 +534,15 @@ void Audio_Stream::setVolume(float volume)
     }
 }
     
+float Audio_Stream::currentplayRate()
+{
+    return m_outputPlayRate;
+}
+    
 void Audio_Stream::setPlayRate(float playRate)
 {
+    m_outputPlayRate = playRate;
+    
     if (m_audioQueue) {
         m_audioQueue->setPlayRate(playRate);
     }
@@ -747,6 +755,13 @@ void Audio_Stream::audioQueueStateChanged(Audio_Queue::State state)
         if (currentVolume != m_outputVolume) {
             m_audioQueue->setVolume(m_outputVolume);
         }
+        
+        float currentPlayRate = m_audioQueue->playRate();
+        
+        if (currentPlayRate != m_outputPlayRate) {
+            m_audioQueue->setVolume(m_outputPlayRate);
+        }
+        
     } else if (state == Audio_Queue::IDLE) {
         setState(STOPPED);
     } else if (state == Audio_Queue::PAUSED) {
@@ -1148,6 +1163,7 @@ Audio_Queue* Audio_Stream::audioQueue()
         m_audioQueue->m_streamDesc = m_dstFormat;
         
         m_audioQueue->m_initialOutputVolume = m_outputVolume;
+        m_audioQueue->m_initialOutputPlayRate = m_outputPlayRate;
     }
     return m_audioQueue;
 }

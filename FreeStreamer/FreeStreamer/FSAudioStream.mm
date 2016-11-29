@@ -1125,6 +1125,11 @@ public:
     _audioStream->setPlayRate(playRate);
 }
 
+- (float)currentPlayRate
+{
+    return _audioStream->currentplayRate();
+}
+
 - (astreamer::AS_Playback_Position)playbackPosition
 {
     return _audioStream->playbackPosition();
@@ -1471,6 +1476,13 @@ public:
     NSAssert([NSThread isMainThread], @"FSAudioStream.setPlayRate needs to be called in the main thread");
     
     [_private setPlayRate:playRate];
+}
+
+- (float)playRate
+{
+    NSAssert([NSThread isMainThread], @"FSAudioStream.playRate needs to be called in the main thread");
+    
+    return [_private currentPlayRate];
 }
 
 - (BOOL)isPlaying
