@@ -501,20 +501,29 @@ public:
 
 - (void)playFromOffset:(FSSeekByteOffset)offset
 {
-    astreamer::Input_Stream_Position position;
-    position.start = offset.start;
-    position.end   = offset.end;
+    _wasPaused = NO;
     
-    _audioStream->open(&position);
+    if (_audioStream->isPreloading())
+    {
+        _audioStream->startCachedDataPlayback();
+    }
+    else
+    {
+        astreamer::Input_Stream_Position position;
+        position.start = offset.start;
+        position.end   = offset.end;
+        
+        _audioStream->open(&position);
+        
+        if (!_reachability) {
+            _reachability = [Reachability reachabilityForInternetConnection];
+            
+            [_reachability startNotifier];
+        }
+    }
     
     _audioStream->setSeekOffset(offset.position);
     _audioStream->setContentLength(offset.end);
-    
-    if (!_reachability) {
-        _reachability = [Reachability reachabilityForInternetConnection];
-        
-        [_reachability startNotifier];
-    }
 }
 
 - (void)setDefaultContentType:(NSString *)defaultContentType
