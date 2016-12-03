@@ -27,4 +27,15 @@
  */
 @property (nonatomic,copy) NSURL *originatingUrl;
 
+/**
+ * The number of bytes of audio data. Notice that this may differ
+ * from the number of bytes the server returns for the content length!
+ * For instance audio file meta data is excluded from the count.
+ * Effectively you can use this property for seeking calculations.
+ *
+ * The property is only available for non-continuous streams which
+ * have been in the "playing" state.
+ */
+@property (nonatomic,assign) UInt64 audioDataByteCount;
+
 @end

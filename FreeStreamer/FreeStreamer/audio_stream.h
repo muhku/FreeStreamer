@@ -70,6 +70,7 @@ public:
     void startCachedDataPlayback();
     
     AS_Playback_Position playbackPosition();
+    UInt64 audioDataByteCount();
     float durationInSeconds();
     void seekToOffset(float offset);
     

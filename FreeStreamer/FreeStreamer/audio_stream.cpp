@@ -422,6 +422,19 @@ AS_Playback_Position Audio_Stream::playbackPosition()
     return playbackPosition;
 }
     
+UInt64 Audio_Stream::audioDataByteCount()
+{
+    UInt64 audioDataBytes = 0;
+    
+    if (m_audioDataByteCount > 0) {
+        audioDataBytes = m_audioDataByteCount;
+    } else {
+        audioDataBytes = contentLength() - m_metaDataSizeInBytes;
+    }
+    
+    return audioDataBytes;
+}
+    
 float Audio_Stream::durationInSeconds()
 {
     if (m_audioDataPacketCount > 0 && m_srcFormat.mFramesPerPacket > 0) {
@@ -429,19 +442,13 @@ float Audio_Stream::durationInSeconds()
     }
     
     // Not enough data provided by the format, use bit rate based estimation
-    UInt64 audioFileLength = 0;
+    UInt64 audioDataBytes = audioDataByteCount();
     
-    if (m_audioDataByteCount > 0) {
-        audioFileLength = m_audioDataByteCount;
-    } else {
-        audioFileLength = contentLength() - m_metaDataSizeInBytes;
-    }
-    
-    if (audioFileLength > 0) {
+    if (audioDataBytes > 0) {
         float bitrate = this->bitrate();
         
         if (bitrate > 0) {
-            return audioFileLength / (bitrate * 0.125);
+            return audioDataBytes / (bitrate * 0.125);
         }
     }
     

@@ -477,6 +477,13 @@ NSString*             freeStreamerReleaseVersion();
  */
 @property (nonatomic,readonly) UInt64 contentLength;
 /**
+ * The number of bytes of audio data. Notice that this may differ
+ * from the number of bytes the server returns for the content length!
+ * For instance audio file meta data is excluded from the count.
+ * Effectively you can use this property for seeking calculations.
+ */
+@property (nonatomic,readonly) UInt64 audioDataByteCount;
+/**
  * This property has the current playback position, if the stream is non-continuous.
  * The current playback position cannot be determined for continuous streams.
  */

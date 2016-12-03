@@ -265,6 +265,8 @@
 #endif
         }
         [self setAudioSessionActive:YES];
+    } else if (state == kFsAudioStreamPlaying) {
+        self.currentPlaylistItem.audioDataByteCount = self.activeStream.audioDataByteCount;
     }
 }
 

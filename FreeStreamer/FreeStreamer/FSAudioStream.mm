@@ -300,6 +300,7 @@ public:
 - (void)setVolume:(float)volume;
 - (void)setPlayRate:(float)playRate;
 - (astreamer::AS_Playback_Position)playbackPosition;
+- (UInt64)audioDataByteCount;
 - (float)durationInSeconds;
 - (void)bitrateAvailable;
 @end
@@ -1128,6 +1129,11 @@ public:
     return _audioStream->playbackPosition();
 }
 
+- (UInt64)audioDataByteCount
+{
+    return _audioStream->audioDataByteCount();
+}
+
 - (float)durationInSeconds
 {
     return _audioStream->durationInSeconds();
@@ -1398,6 +1404,13 @@ public:
     NSAssert([NSThread isMainThread], @"FSAudioStream.contentLength needs to be called in the main thread");
     
     return [_private contentLength];
+}
+
+- (UInt64)audioDataByteCount
+{
+    NSAssert([NSThread isMainThread], @"FSAudioStream.audioDataByteCount needs to be called in the main thread");
+    
+    return [_private audioDataByteCount];
 }
 
 - (void)preload
