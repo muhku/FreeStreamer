@@ -22,4 +22,18 @@
     return NO;
 }
 
+- (void)setPlayFromPosition:(float)playFromPosition
+{
+    _playFromPosition = playFromPosition;
+    
+    if (_playFromPosition < 0)
+    {
+        _playFromPosition = 0;
+    }
+    else if (_playFromPosition > 1)
+    {
+        _playFromPosition = 1;
+    }
+}
+
 @end

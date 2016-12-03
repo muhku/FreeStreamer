@@ -77,6 +77,8 @@ public:
     
     float currentVolume();
     void setVolume(float volume);
+    
+    float currentplayRate();
     void setPlayRate(float playRate);
     
     void setUrl(CFURLRef url);
@@ -191,6 +193,7 @@ private:
     size_t m_bitrateBufferIndex;
     
     float m_outputVolume;
+    float m_outputPlayRate;
     
     bool m_converterRunOutOfData;
     bool m_decoderShouldRun;

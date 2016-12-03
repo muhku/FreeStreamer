@@ -26,5 +26,14 @@
  * The originating URL of the playlist item.
  */
 @property (nonatomic,copy) NSURL *originatingUrl;
+/**
+ * The audio bytes if you know beforehand
+ */
+@property (nonatomic,assign) long audioBytes;
+/**
+ * The position to play from when play called. [0, 1]
+ * WARN: might be wrong if audioBytes is incorrect
+ */
+@property (nonatomic,assign) float playFromPosition;
 
 @end

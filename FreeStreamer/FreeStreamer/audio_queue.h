@@ -44,8 +44,9 @@ public:
     State state();
     
     float volume();
-    
     void setVolume(float volume);
+    
+    float playRate();
     void setPlayRate(float playRate);
     
     AudioTimeStamp currentTime();
@@ -80,6 +81,7 @@ public:
     OSStatus m_lastError;
     AudioStreamBasicDescription m_streamDesc;
     float m_initialOutputVolume;
+    float m_initialOutputPlayRate;
 
 private:
     void cleanup();
