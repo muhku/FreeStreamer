@@ -501,6 +501,8 @@ public:
 
 - (void)playFromOffset:(FSSeekByteOffset)offset
 {
+    _wasPaused = NO;
+    
     astreamer::Input_Stream_Position position;
     position.start = offset.start;
     position.end   = offset.end;
