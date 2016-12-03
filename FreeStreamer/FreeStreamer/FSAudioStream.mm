@@ -503,14 +503,19 @@ public:
 {
     _wasPaused = NO;
     
-    astreamer::Input_Stream_Position position;
-    position.start = offset.start;
-    position.end   = offset.end;
-    
-    _audioStream->open(&position);
-    
-    _audioStream->setSeekOffset(offset.position);
-    _audioStream->setContentLength(offset.end);
+    if (_audioStream->isPreloading()) {
+        _audioStream->seekToOffset(offset.position);
+        _audioStream->setPreloading(false);
+    } else {
+        astreamer::Input_Stream_Position position;
+        position.start = offset.start;
+        position.end   = offset.end;
+        
+        _audioStream->open(&position);
+        
+        _audioStream->setSeekOffset(offset.position);
+        _audioStream->setContentLength(offset.end);
+    }
     
     if (!_reachability) {
         _reachability = [Reachability reachabilityForInternetConnection];
