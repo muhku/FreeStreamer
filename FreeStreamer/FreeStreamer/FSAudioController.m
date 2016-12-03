@@ -470,14 +470,19 @@
         NSLog(@"Playing %@", stream);
     }
     
-    float playFromPosition = self.currentPlaylistItem.playFromPosition;
-    float audioBytes = self.currentPlaylistItem.audioBytes;
-    if ( audioBytes > 0 && playFromPosition > 0.01 && playFromPosition < 0.99 )
+    if (!self.enableAutoSeek)
+    {
+        
+    }
+
+    if (self.enableAutoSeek
+        && self.currentPlaylistItem.audioBytes > 0
+        && self.currentPlaylistItem.playFromPosition > 0.01 && self.currentPlaylistItem.playFromPosition < 0.99 )
     {
         FSSeekByteOffset offset;
-        offset.start = audioBytes * playFromPosition;
-        offset.end = audioBytes;
-        offset.position = playFromPosition;
+        offset.start = self.currentPlaylistItem.audioBytes * self.currentPlaylistItem.playFromPosition;
+        offset.end = self.currentPlaylistItem.audioBytes;
+        offset.position = self.currentPlaylistItem.playFromPosition;
         
         [stream playFromOffset:offset];
     }

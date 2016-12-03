@@ -218,6 +218,12 @@
 @property (nonatomic,assign) BOOL enableDebugOutput;
 
 /**
+ * This property determines if the auto seek is enabled. Disabled
+ * by default
+ */
+@property (nonatomic,assign) BOOL enableAutoSeek;
+
+/**
  * This property determines if automatic audio session handling is enabled.
  * This is YES by default.
  */
