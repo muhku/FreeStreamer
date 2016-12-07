@@ -455,7 +455,7 @@ void Audio_Queue::setState(State state)
     pthread_mutex_unlock(&m_mutex);
     
     if (m_delegate) {
-        m_delegate->audioQueueStateChanged(m_state);
+        m_delegate->audioQueueStateChanged(state);
     }
 }
 

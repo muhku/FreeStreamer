@@ -1252,7 +1252,7 @@ void Audio_Stream::setState(State state)
     pthread_mutex_unlock(&m_streamStateMutex);
     
     if (m_delegate) {
-        m_delegate->audioStreamStateChanged(m_state);
+        m_delegate->audioStreamStateChanged(state);
     }
 }
     
