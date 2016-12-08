@@ -111,14 +111,12 @@ void Audio_Queue::start()
     
 void Audio_Queue::pause()
 {
-    const State state = currentState();
-    
-    if (state == RUNNING) {
+    if (m_state == RUNNING) {
         if (AudioQueuePause(m_outAQ) != 0) {
             AQ_TRACE("%s: AudioQueuePause failed!\n", __PRETTY_FUNCTION__);
         }
         setState(PAUSED);
-    } else if (state == PAUSED) {
+    } else if (m_state == PAUSED) {
         AudioQueueStart(m_outAQ, NULL);
         setState(RUNNING);
     }
@@ -316,17 +314,6 @@ void Audio_Queue::init()
         setVolume(m_initialOutputVolume);
     }
 }
-    
-Audio_Queue::State Audio_Queue::currentState()
-{
-    State s = UNKNOWN;
-    
-    pthread_mutex_lock(&m_mutex);
-    s = m_state;
-    pthread_mutex_unlock(&m_mutex);
-    
-    return s;
-}
 
 void Audio_Queue::handleAudioPackets(UInt32 inNumberBytes, UInt32 inNumberPackets, const void *inInputData, AudioStreamPacketDescription *inPacketDescriptions)
 {
@@ -411,9 +398,7 @@ void Audio_Queue::cleanup()
     
     Stream_Configuration *config = Stream_Configuration::configuration();
     
-    const State state = currentState();
-    
-    if (state != IDLE) {
+    if (m_state != IDLE) {
         AQ_TRACE("%s: attemping to cleanup the audio queue when it is still playing, force stopping\n",
                  __PRETTY_FUNCTION__);
         
@@ -441,18 +426,12 @@ void Audio_Queue::cleanup()
     
 void Audio_Queue::setState(State state)
 {
-    pthread_mutex_lock(&m_mutex);
-    
     if (m_state == state) {
-        pthread_mutex_unlock(&m_mutex);
-        
         /* We are already in this state! */
         return;
     }
     
     m_state = state;
-    
-    pthread_mutex_unlock(&m_mutex);
     
     if (m_delegate) {
         m_delegate->audioQueueStateChanged(state);

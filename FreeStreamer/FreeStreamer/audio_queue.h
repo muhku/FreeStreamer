@@ -23,8 +23,7 @@ public:
     enum State {
         IDLE,
         RUNNING,
-        PAUSED,
-        UNKNOWN
+        PAUSED
     };
     
     Audio_Queue();
@@ -33,8 +32,6 @@ public:
     bool initialized();
     
     void init();
-    
-    State currentState();
     
     // Notice: the queue blocks if it has no free buffers
     void handleAudioPackets(UInt32 inNumberBytes, UInt32 inNumberPackets, const void *inInputData, AudioStreamPacketDescription *inPacketDescriptions);
