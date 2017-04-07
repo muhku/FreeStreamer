@@ -92,6 +92,7 @@ Audio_Stream::Audio_Stream() :
     m_outputBufferSize(Stream_Configuration::configuration()->bufferSize),
     m_outputBuffer(new UInt8[m_outputBufferSize]),
     m_packetIdentifier(0),
+    m_playingPacketIdentifier(0),
     m_dataOffset(0),
     m_seekOffset(0),
     m_bounceCount(0),
@@ -1370,7 +1371,7 @@ void Audio_Stream::seekTimerCallback(CFRunLoopTimerRef timer, void *info)
         SInt64 packetAlignedByteOffset;
         SInt64 seekPacket = floor((duration * THIS->m_seekOffset) / packetDuration);
         
-        THIS->m_packetIdentifier = seekPacket;
+        THIS->m_playingPacketIdentifier = seekPacket;
         
         OSStatus err = AudioFileStreamSeek(THIS->m_audioFileStream, seekPacket, &packetAlignedByteOffset, &ioFlags);
         if (!err) {
@@ -1397,7 +1398,7 @@ void Audio_Stream::seekTimerCallback(CFRunLoopTimerRef timer, void *info)
         
         queued_packet_t *cur = THIS->m_queuedHead;
         while (cur) {
-            if (cur->identifier == THIS->m_packetIdentifier) {
+            if (cur->identifier == THIS->m_playingPacketIdentifier) {
                 foundCachedPacket = true;
                 seekPacket = cur;
                 break;
