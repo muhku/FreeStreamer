@@ -159,6 +159,7 @@ private:
     UInt8 *m_outputBuffer;
     
     UInt64 m_packetIdentifier;
+    UInt64 m_playingPacketIdentifier;
     UInt64 m_dataOffset;
     float m_seekOffset;
     size_t m_bounceCount;
