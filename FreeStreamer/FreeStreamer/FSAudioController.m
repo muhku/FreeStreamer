@@ -341,7 +341,6 @@
                 [weakSelf.parseRssPodcastFeedRequest start];
             } else {
                 // Not a playlist; try directly playing the URL
-                
                 weakSelf.readyToPlay = YES;
                 [weakSelf play];
             }
@@ -352,7 +351,6 @@
 #if defined(DEBUG) || (TARGET_IPHONE_SIMULATOR)
             NSLog(@"FSAudioController: Failed to check the format, trying to play anyway, URL: %@", weakSelf.audioStream.url);
 #endif
-            
             weakSelf.readyToPlay = YES;
             [weakSelf play];
         };
@@ -693,6 +691,8 @@
 
 - (void)stop
 {
+    [_playlistItems removeAllObjects];
+    
     if ([_streams count] > 0) {
         // Avoid creating an instance if we don't have it
         [self.audioStream stop];
