@@ -8,11 +8,11 @@
     </item>
     <item>
        <title>BassDrive AAC</title>
-       <link>http://www.bassdrive.com/v2/streams/BassDrive3.pls</link>
+       <link>http://bassdrive.com/bassdrive3.m3u</link>
     </item>
     <item>
        <title>BassDrive 128</title>
-       <link>http://www.bassdrive.com/v2/streams/BassDrive.pls</link>
+       <link>http://bassdrive.com/bassdrive.m3u</link>
     </item>
     <item>
     	<title>Radio Swiss Classic</title>
@@ -21,10 +21,6 @@
     <item>
     	<title>Radio Swiss Jazz</title>
     	<link>http://www.radioswissjazz.ch/live/mp3.m3u</link>
-    </item>
-    <item>
-        <title>Test MP3 file</title>
-        <link>https://dl.dropboxusercontent.com/u/995250/FreeStreamer/As%20long%20as%20the%20stars%20shine.mp3</link>
     </item>
     <item>
         <title>Local MP3 file</title>
