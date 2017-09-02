@@ -91,7 +91,7 @@ CFStringRef File_Stream::contentType()
             contentType = CFSTR("audio/mpeg");
         } else if (CFStringCompare(suffix, CFSTR(".m4a"), 0) == kCFCompareEqualTo) {
             contentType = CFSTR("audio/x-m4a");
-        } else if (CFStringCompare(suffix, CFSTR(".mp3"), 0) == kCFCompareEqualTo) {
+        } else if (CFStringCompare(suffix, CFSTR(".mp4"), 0) == kCFCompareEqualTo) {
             contentType = CFSTR("audio/mp4");
         } else if (CFStringCompare(suffix, CFSTR(".aac"), 0) == kCFCompareEqualTo) {
             contentType = CFSTR("audio/aac");
