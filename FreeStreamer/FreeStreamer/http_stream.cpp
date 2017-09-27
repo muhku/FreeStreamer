@@ -845,8 +845,7 @@ void HTTP_Stream::readCallBack(CFReadStreamRef stream, CFStreamEventType eventTy
             
             // This should concerns only non-continous streams
             if (THIS->m_bytesRead < THIS->contentLength()) {
-                UInt64 missingBytes = THIS->contentLength() - THIS->m_bytesRead;
-                HS_TRACE("End of stream, but we have read only %llu bytes on a total of %li. Missing: %llu\n", THIS->m_bytesRead, THIS->contentLength(), missingBytes);
+                HS_TRACE("End of stream, but we have read only %llu bytes on a total of %li. Missing: %llu\n", THIS->m_bytesRead, THIS->contentLength(), (THIS->contentLength() - THIS->m_bytesRead));
                 
                 Input_Stream_Position currentPosition = THIS->position();
                 
