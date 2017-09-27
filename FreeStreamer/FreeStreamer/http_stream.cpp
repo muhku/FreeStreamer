@@ -315,7 +315,15 @@ CFReadStreamRef HTTP_Stream::createReadStream(CFURLRef url)
         
         CFHTTPMessageSetHeaderFieldValue(request, httpRangeHeader, rangeHeaderValue);
         CFRelease(rangeHeaderValue);
+    } else if (m_position.start > 0 && m_position.end < m_position.start) {
+        CFStringRef rangeHeaderValue = CFStringCreateWithFormat(NULL,
+                                                                NULL,
+                                                                CFSTR("bytes=%llu-"),
+                                                                m_position.start);
+        CFHTTPMessageSetHeaderFieldValue(request, httpRangeHeader, rangeHeaderValue);
+        CFRelease(rangeHeaderValue);
     }
+    
     
     if (config->predefinedHttpHeaderValues) {
         const CFIndex numKeys = CFDictionaryGetCount(config->predefinedHttpHeaderValues);
@@ -834,6 +842,24 @@ void HTTP_Stream::readCallBack(CFReadStreamRef stream, CFStreamEventType eventTy
             break;
         }
         case kCFStreamEventEndEncountered: {
+            
+            // This should concerns only non-continous streams
+            if (THIS->m_bytesRead < THIS->contentLength()) {
+                UInt64 missingBytes = THIS->contentLength() - THIS->m_bytesRead;
+                HS_TRACE("End of stream, but we have read only %llu bytes on a total of %li. Missing: %llu\n", THIS->m_bytesRead, THIS->contentLength(), missingBytes);
+                
+                Input_Stream_Position currentPosition = THIS->position();
+                
+                Input_Stream_Position recoveryPosition;
+                recoveryPosition.start = currentPosition.start + THIS->m_bytesRead;
+                recoveryPosition.end = THIS->contentLength();
+                
+                HS_TRACE("Reopen for the end of the file from byte position: %llu\n", recoveryPosition.start);
+                THIS->close();
+                THIS->open(recoveryPosition);
+                break;
+            }
+            
             if (THIS->m_delegate) {
                 THIS->m_delegate->streamEndEncountered();
             }
