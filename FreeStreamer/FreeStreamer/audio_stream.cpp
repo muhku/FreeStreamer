@@ -746,7 +746,7 @@ out:
     
 void Audio_Stream::audioQueueStateChanged(Audio_Queue::State state)
 {
-    if (state == Audio_Queue::RUNNING) {
+    if (state == Audio_Queue::RUNNING && this->state() != SEEKING) {
         invalidateWatchdogTimer();
         setState(PLAYING);
         
