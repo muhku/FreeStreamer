@@ -744,9 +744,9 @@ out:
     return fileTypeHint;        
 }
     
-void Audio_Stream::audioQueueStateChanged(Audio_Queue::State state)
+void Audio_Stream::audioQueueStateChanged(Audio_Queue::State aqState)
 {
-    if (state == Audio_Queue::RUNNING) {
+    if (aqState == Audio_Queue::RUNNING && SEEKING != state()) {
         invalidateWatchdogTimer();
         setState(PLAYING);
         
@@ -755,9 +755,9 @@ void Audio_Stream::audioQueueStateChanged(Audio_Queue::State state)
         if (currentVolume != m_outputVolume) {
             m_audioQueue->setVolume(m_outputVolume);
         }
-    } else if (state == Audio_Queue::IDLE) {
+    } else if (aqState == Audio_Queue::IDLE) {
         setState(STOPPED);
-    } else if (state == Audio_Queue::PAUSED) {
+    } else if (aqState == Audio_Queue::PAUSED) {
         setState(PAUSED);
     }
 }
