@@ -61,12 +61,9 @@
          */
         [self.audioController pause];
         _paused = NO;
-    } else {
-        /*
-         * Not paused, just directly call play.
-         */
-        [self.audioController play];
     }
+    /* Resume play; fixes the "why do I have to click play twice?" bug */
+    [self.audioController play];
     
     [self.playButton setHidden:YES];
     [self.pauseButton setHidden:NO];
