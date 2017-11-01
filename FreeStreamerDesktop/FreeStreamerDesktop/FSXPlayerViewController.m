@@ -61,12 +61,9 @@
          */
         [self.audioController pause];
         _paused = NO;
-    } else {
-        /*
-         * Not paused, just directly call play.
-         */
-        [self.audioController play];
     }
+    
+    [self.audioController play];
     
     [self.playButton setHidden:YES];
     [self.pauseButton setHidden:NO];
