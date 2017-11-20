@@ -154,30 +154,36 @@ Audio_Stream::~Audio_Stream()
     m_decoderShouldRun = false;
     
     if (m_decodeRunLoop) {
-        CFRunLoopStop(m_decodeRunLoop), m_decodeRunLoop = NULL;
+        CFRunLoopStop(m_decodeRunLoop);
+        m_decodeRunLoop = NULL;
     }
     
     pthread_mutex_unlock(&m_streamStateMutex);
     
     if (m_defaultContentType) {
-        CFRelease(m_defaultContentType), m_defaultContentType = NULL;
+        CFRelease(m_defaultContentType);
+        m_defaultContentType = NULL;
     }
     
     if (m_contentType) {
-        CFRelease(m_contentType), m_contentType = NULL;
+        CFRelease(m_contentType);
+        m_contentType = NULL;
     }
     
     close(true);
     
-    delete [] m_outputBuffer, m_outputBuffer = 0;
+    delete [] m_outputBuffer;
+    m_outputBuffer = 0;
     
     if (m_inputStream) {
         m_inputStream->m_delegate = 0;
-        delete m_inputStream, m_inputStream = 0;
+        delete m_inputStream;
+        m_inputStream = 0;
     }
     
     if (m_fileOutput) {
-        delete m_fileOutput, m_fileOutput = 0;
+        delete m_fileOutput;
+        m_fileOutput = 0;
     }
     
     pthread_mutex_destroy(&m_packetQueueMutex);
@@ -224,7 +230,8 @@ void Audio_Stream::open(Input_Stream_Position *position)
     Stream_Configuration *config = Stream_Configuration::configuration();
     
     if (m_contentType) {
-        CFRelease(m_contentType), m_contentType = NULL;
+        CFRelease(m_contentType);
+        m_contentType = NULL;
     }
     
     bool success = false;
@@ -272,19 +279,22 @@ void Audio_Stream::close(bool closeParser)
     
     if (m_seekTimer) {
         CFRunLoopTimerInvalidate(m_seekTimer);
-        CFRelease(m_seekTimer), m_seekTimer = 0;
+        CFRelease(m_seekTimer);
+        m_seekTimer = 0;
     }
     
     if (m_inputStreamTimer) {
         CFRunLoopTimerInvalidate(m_inputStreamTimer);
-        CFRelease(m_inputStreamTimer), m_inputStreamTimer = 0;
+        CFRelease(m_inputStreamTimer);
+        m_inputStreamTimer = 0;
     }
     
     pthread_mutex_lock(&m_streamStateMutex);
     
     if (m_stateSetTimer) {
         CFRunLoopTimerInvalidate(m_stateSetTimer);
-        CFRelease(m_stateSetTimer), m_stateSetTimer = 0;
+        CFRelease(m_stateSetTimer);
+        m_stateSetTimer = 0;
     }
     
     pthread_mutex_unlock(&m_streamStateMutex);
@@ -330,7 +340,8 @@ void Audio_Stream::close(bool closeParser)
     }
     
     if (m_audioConverter) {
-        AudioConverterDispose(m_audioConverter), m_audioConverter = 0;
+        AudioConverterDispose(m_audioConverter);
+        m_audioConverter = 0;
     }
     
     /*
@@ -485,7 +496,8 @@ void Audio_Stream::seekToOffset(float offset)
     
     if (m_seekTimer) {
         CFRunLoopTimerInvalidate(m_seekTimer);
-        CFRelease(m_seekTimer), m_seekTimer = 0;
+        CFRelease(m_seekTimer);
+        m_seekTimer = 0;
     }
     
     CFRunLoopTimerContext ctx = {0, this, NULL, NULL, NULL};
@@ -551,7 +563,8 @@ void Audio_Stream::setPlayRate(float playRate)
 void Audio_Stream::setUrl(CFURLRef url)
 {
     if (m_inputStream) {
-        delete m_inputStream, m_inputStream = 0;
+        delete m_inputStream;
+        m_inputStream = 0;
     }
     
     if (HTTP_Stream::canHandleUrl(url)) {
@@ -590,7 +603,8 @@ void Audio_Stream::setStrictContentTypeChecking(bool strictChecking)
 void Audio_Stream::setDefaultContentType(CFStringRef defaultContentType)
 {
     if (m_defaultContentType) {
-        CFRelease(m_defaultContentType), m_defaultContentType = 0;
+        CFRelease(m_defaultContentType);
+        m_defaultContentType = 0;
     }
     if (defaultContentType) {
         m_defaultContentType = CFStringCreateCopy(kCFAllocatorDefault, defaultContentType);
@@ -632,7 +646,8 @@ bool Audio_Stream::isPreloading()
 void Audio_Stream::setOutputFile(CFURLRef url)
 {
     if (m_fileOutput) {
-        delete m_fileOutput, m_fileOutput = 0;
+        delete m_fileOutput;
+        m_fileOutput = 0;
     }
     if (url) {
         m_fileOutput = new File_Output(url);
@@ -917,7 +932,8 @@ void Audio_Stream::streamIsReadyRead()
     }
     
     if (m_contentType) {
-        CFRelease(m_contentType), m_contentType = 0;
+        CFRelease(m_contentType);
+        m_contentType = 0;
     }
     if (contentType) {
         m_contentType = CFStringCreateCopy(kCFAllocatorDefault, contentType);
@@ -984,7 +1000,8 @@ void Audio_Stream::streamHasBytesAvailable(UInt8 *data, UInt32 numBytes)
         // Schedule a timer to watch when we can enable the input stream again
         if (m_inputStreamTimer) {
             CFRunLoopTimerInvalidate(m_inputStreamTimer);
-            CFRelease(m_inputStreamTimer), m_inputStreamTimer = 0;
+            CFRelease(m_inputStreamTimer);
+            m_inputStreamTimer = 0;
         }
         
         CFRunLoopTimerContext ctx = {0, this, NULL, NULL, NULL};
@@ -1173,7 +1190,8 @@ void Audio_Stream::closeAudioQueue()
     pthread_mutex_unlock(&m_streamStateMutex);
     
     m_audioQueue->m_delegate = 0;
-    delete m_audioQueue, m_audioQueue = 0;
+    delete m_audioQueue;
+    m_audioQueue = 0;
 }
     
 UInt64 Audio_Stream::defaultContentLength()
@@ -1347,7 +1365,8 @@ void Audio_Stream::seekTimerCallback(CFRunLoopTimerRef timer, void *info)
         
         if (THIS->m_seekTimer) {
             CFRunLoopTimerInvalidate(THIS->m_seekTimer);
-            CFRelease(THIS->m_seekTimer), THIS->m_seekTimer = 0;
+            CFRelease(THIS->m_seekTimer);
+            THIS->m_seekTimer = 0;
         }
         
         pthread_mutex_unlock(&THIS->m_streamStateMutex);
@@ -1486,7 +1505,8 @@ void Audio_Stream::inputStreamTimerCallback(CFRunLoopTimerRef timer, void *info)
     if (!THIS->m_inputStreamRunning) {
         if (THIS->m_inputStreamTimer) {
             CFRunLoopTimerInvalidate(THIS->m_inputStreamTimer);
-            CFRelease(THIS->m_inputStreamTimer), THIS->m_inputStreamTimer = 0;
+            CFRelease(THIS->m_inputStreamTimer);
+            THIS->m_inputStreamTimer = 0;
         }
         
         return;
@@ -1513,7 +1533,8 @@ void Audio_Stream::stateSetTimerCallback(CFRunLoopTimerRef timer, void *info)
     
     if (THIS->m_stateSetTimer) {
         // Timer is automatically invalidated as it fires only once
-        CFRelease(THIS->m_stateSetTimer), THIS->m_stateSetTimer = 0;
+        CFRelease(THIS->m_stateSetTimer);
+        THIS->m_stateSetTimer = 0;
     }
     
     pthread_mutex_unlock(&THIS->m_streamStateMutex);
@@ -1779,7 +1800,8 @@ void Audio_Stream::invalidateWatchdogTimer()
 {
     if (m_watchdogTimer) {
         CFRunLoopTimerInvalidate(m_watchdogTimer);
-        CFRelease(m_watchdogTimer), m_watchdogTimer = 0;
+        CFRelease(m_watchdogTimer);
+        m_watchdogTimer = 0;
         
         AS_TRACE("Watchdog invalidated\n");
     }

@@ -44,22 +44,28 @@ Caching_Stream::Caching_Stream(Input_Stream *target) :
 Caching_Stream::~Caching_Stream()
 {
     if (m_target) {
-        delete m_target, m_target = 0;
+        delete m_target;
+        m_target = 0;
     }
     if (m_fileOutput) {
-        delete m_fileOutput, m_fileOutput = 0;
+        delete m_fileOutput;
+        m_fileOutput = 0;
     }
     if (m_fileStream) {
-        delete m_fileStream, m_fileStream = 0;
+        delete m_fileStream;
+        m_fileStream = 0;
     }
     if (m_cacheIdentifier) {
-        CFRelease(m_cacheIdentifier), m_cacheIdentifier = 0;
+        CFRelease(m_cacheIdentifier);
+        m_cacheIdentifier = 0;
     }
     if (m_fileUrl) {
-        CFRelease(m_fileUrl), m_fileUrl = 0;
+        CFRelease(m_fileUrl);
+        m_fileUrl = 0;
     }
     if (m_metaDataUrl) {
-        CFRelease(m_metaDataUrl), m_fileUrl = 0;
+        CFRelease(m_metaDataUrl);
+        m_fileUrl = 0;
     }
 }
     

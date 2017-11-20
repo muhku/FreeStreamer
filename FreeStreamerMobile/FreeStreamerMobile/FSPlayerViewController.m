@@ -112,7 +112,7 @@
           _bufferStatLogger.logName);
 #endif
     
-    FSAppDelegate *delegate = [UIApplication sharedApplication].delegate;
+    FSAppDelegate *delegate = (FSAppDelegate *)[UIApplication sharedApplication].delegate;
     [delegate resetBackground];
     
     self.navigationController.navigationBar.barStyle = UIBarStyleBlack;
@@ -387,13 +387,11 @@
         }
         
         if (metaData[@"CoverArt"]) {
-            FSAppDelegate *delegate = [UIApplication sharedApplication].delegate;
-            
             NSData *data = [[NSData alloc] initWithBase64EncodedString:metaData[@"CoverArt"] options:0];
             
             UIImage *coverArt = [UIImage imageWithData:data];
             
-            delegate.window.backgroundColor = [UIColor colorWithPatternImage:coverArt];
+            [UIApplication sharedApplication].delegate.window.backgroundColor = [UIColor colorWithPatternImage:coverArt];
         }
         
         [weakSelf.statusLabel setHidden:NO];
@@ -517,7 +515,8 @@
     }
     
     if (_progressUpdateTimer) {
-        [_progressUpdateTimer invalidate], _progressUpdateTimer = nil;
+        [_progressUpdateTimer invalidate];
+        _progressUpdateTimer = nil;
     }
 }
 
@@ -614,9 +613,11 @@
     
     [_stateLogger logMessageWithTimestamp:@"Seek requested"];
     
-    [_progressUpdateTimer invalidate], _progressUpdateTimer = nil;
+    [_progressUpdateTimer invalidate];
+    _progressUpdateTimer = nil;
     
-    [_playbackSeekTimer invalidate], _playbackSeekTimer = [NSTimer scheduledTimerWithTimeInterval:1.0
+    [_playbackSeekTimer invalidate];
+    _playbackSeekTimer = [NSTimer scheduledTimerWithTimeInterval:1.0
                                                                                            target:self
                                                                                          selector:@selector(seekToNewTime)
                                                                                            userInfo:nil
@@ -831,7 +832,8 @@
 - (void)rampVolume
 {
     if (_rampStep > _rampStepCount) {
-        [_volumeRampTimer invalidate], _volumeRampTimer = nil;
+        [_volumeRampTimer invalidate];
+        _volumeRampTimer = nil;
         
         if (_postRampAction) {
             [self performSelector:_postRampAction withObject:nil afterDelay:0];

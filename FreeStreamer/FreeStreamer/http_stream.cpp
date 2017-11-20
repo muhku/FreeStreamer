@@ -76,24 +76,30 @@ HTTP_Stream::~HTTP_Stream()
     m_icyHeaderLines.clear();
     
     if (m_contentType) {
-        CFRelease(m_contentType), m_contentType = 0;
+        CFRelease(m_contentType);
+        m_contentType = 0;
     }
     
     if (m_icyName) {
-        CFRelease(m_icyName), m_icyName = 0;
+        CFRelease(m_icyName);
+        m_icyName = 0;
     }
     
     if (m_httpReadBuffer) {
-        delete [] m_httpReadBuffer, m_httpReadBuffer = 0;
+        delete [] m_httpReadBuffer;
+        m_httpReadBuffer = 0;
     }
     if (m_icyReadBuffer) {
-        delete [] m_icyReadBuffer, m_icyReadBuffer = 0;
+        delete [] m_icyReadBuffer;
+        m_icyReadBuffer = 0;
     }
     if (m_url) {
-        CFRelease(m_url), m_url = 0;
+        CFRelease(m_url);
+        m_url = 0;
     }
     
-    delete m_id3Parser, m_id3Parser = 0;
+    delete m_id3Parser;
+    m_id3Parser = 0;
 }
     
 Input_Stream_Position HTTP_Stream::position()
@@ -142,7 +148,8 @@ bool HTTP_Stream::open(const Input_Stream_Position& position)
     m_httpHeadersParsed = false;
     
     if (m_contentType) {
-        CFRelease(m_contentType), m_contentType = NULL;
+        CFRelease(m_contentType);
+        m_contentType = NULL;
     }
     
     m_icyStream = false;
@@ -151,7 +158,8 @@ bool HTTP_Stream::open(const Input_Stream_Position& position)
     m_icyHeadersParsed = false;
     
     if (m_icyName) {
-        CFRelease(m_icyName), m_icyName = 0;
+        CFRelease(m_icyName);
+        m_icyName = 0;
     }
     
     for (std::vector<CFStringRef>::iterator h = m_icyHeaderLines.begin(); h != m_icyHeaderLines.end(); ++h) {
@@ -176,7 +184,8 @@ bool HTTP_Stream::open(const Input_Stream_Position& position)
     if (!CFReadStreamSetClient(m_readStream, kCFStreamEventHasBytesAvailable |
 	                                         kCFStreamEventEndEncountered |
 	                                         kCFStreamEventErrorOccurred, readCallBack, &CTX)) {
-        CFRelease(m_readStream), m_readStream = 0;
+        CFRelease(m_readStream);
+        m_readStream = 0;
         goto out;
     }
     
@@ -187,7 +196,8 @@ bool HTTP_Stream::open(const Input_Stream_Position& position)
         CFReadStreamSetClient(m_readStream, 0, NULL, NULL);
         setScheduledInRunLoop(false);
         if (m_readStream) {
-            CFRelease(m_readStream), m_readStream = 0;
+            CFRelease(m_readStream);
+            m_readStream = 0;
         }
         goto out;
     }
@@ -208,7 +218,8 @@ void HTTP_Stream::close()
     CFReadStreamSetClient(m_readStream, 0, NULL, NULL);
     setScheduledInRunLoop(false);
     CFReadStreamClose(m_readStream);
-    CFRelease(m_readStream), m_readStream = 0;
+    CFRelease(m_readStream);
+    m_readStream = 0;
 }
     
 void HTTP_Stream::setScheduledInRunLoop(bool scheduledInRunLoop)
@@ -553,7 +564,8 @@ void HTTP_Stream::parseICYStream(const UInt8 *buf, const CFIndex bufSize)
                                            CFRangeMake(0, icyContenTypeHeaderLength),
                                            0) == kCFCompareEqualTo) {
                 if (m_contentType) {
-                    CFRelease(m_contentType), m_contentType = 0;
+                    CFRelease(m_contentType);
+                    m_contentType = 0;
                 }
                 m_contentType = CFStringCreateWithSubstring(kCFAllocatorDefault,
                                                             line,
@@ -836,7 +848,8 @@ void HTTP_Stream::readCallBack(CFReadStreamRef stream, CFStreamEventType eventTy
             }
             
             if (reportedNetworkError) {
-                CFRelease(reportedNetworkError), reportedNetworkError = NULL;
+                CFRelease(reportedNetworkError);
+                reportedNetworkError = NULL;
             }
             
             break;

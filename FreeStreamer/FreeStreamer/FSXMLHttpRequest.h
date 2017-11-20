@@ -62,11 +62,11 @@ typedef NS_ENUM(NSInteger, FSXMLHttpRequestError) {
 /**
  * Called upon completion of the request.
  */
-@property (copy) void (^onCompletion)();
+@property (copy) void (^onCompletion)(void);
 /**
  * Called upon a failure.
  */
-@property (copy) void (^onFailure)();
+@property (copy) void (^onFailure)(void);
 /**
  * If the request fails, contains the latest error status.
  */
