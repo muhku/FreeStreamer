@@ -8,6 +8,7 @@
 
 #import "FSFrequencyDomainAnalyzer.h"
 
+#import <AVFoundation/AVFoundation.h>
 #include <Accelerate/Accelerate.h>
 
 // Note: code has been adapted from https://github.com/douban/DOUAudioStreamer/blob/master/src/DOUAudioAnalyzer.m
