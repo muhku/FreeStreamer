@@ -185,8 +185,11 @@
         
         if (dispatchLevels && [self.delegate respondsToSelector:@selector(frequenceAnalyzer:levelsAvailable:count:)]) {
             __weak FSFrequencyDomainAnalyzer *weakSelf = self;
-            
-            dispatch_async(dispatch_get_main_queue(), ^{
+
+            //respect hardware io buffer duration time
+            double bufferDuration = [[AVAudioSession sharedInstance] IOBufferDuration];
+
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, bufferDuration * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
                 FSFrequencyDomainAnalyzer *strongSelf = weakSelf;
                 
                 // Execute on the main thread
