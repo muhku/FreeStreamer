@@ -814,7 +814,8 @@ void HTTP_Stream::readCallBack(CFReadStreamRef stream, CFStreamEventType eventTy
                         THIS->m_delegate->streamErrorOccurred(reportedNetworkError);
                         
                         if (reportedNetworkError) {
-                            CFRelease(reportedNetworkError), reportedNetworkError = NULL;
+                            CFRelease(reportedNetworkError);
+                            reportedNetworkError = NULL;
                         }
                     }
                     break;

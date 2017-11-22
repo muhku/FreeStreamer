@@ -245,7 +245,8 @@ void Caching_Stream::setCacheIdentifier(CFStringRef cacheIdentifier)
     m_cacheIdentifier = CFStringCreateCopy(kCFAllocatorDefault, cacheIdentifier);
     
     if (m_fileOutput) {
-        delete m_fileOutput, m_fileOutput = 0;
+        delete m_fileOutput;
+        m_fileOutput = 0;
     }
     
     Stream_Configuration *config = Stream_Configuration::configuration();
@@ -254,10 +255,12 @@ void Caching_Stream::setCacheIdentifier(CFStringRef cacheIdentifier)
     CFStringRef metaDataPath = CFStringCreateWithFormat(NULL, NULL, CFSTR("file://%@/%@.metadata"), config->cacheDirectory, m_cacheIdentifier);
     
     if (m_fileUrl) {
-        CFRelease(m_fileUrl), m_fileUrl = 0;
+        CFRelease(m_fileUrl);
+        m_fileUrl = 0;
     }
     if (m_metaDataUrl) {
-        CFRelease(m_metaDataUrl), m_metaDataUrl = 0;
+        CFRelease(m_metaDataUrl);
+        m_metaDataUrl = 0;
     }
 
     m_fileUrl = createFileURLWithPath(filePath);

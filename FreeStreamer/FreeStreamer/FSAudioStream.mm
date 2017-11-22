@@ -367,8 +367,10 @@ public:
     
     _delegate = nil;
     
-    delete _audioStream, _audioStream = nil;
-    delete _observer, _observer = nil;
+    delete _audioStream;
+    _audioStream = nil;
+    delete _observer;
+    _observer = nil;
     
     // Clean up the disk cache.
     
@@ -1049,7 +1051,8 @@ public:
     
     [self endBackgroundTask];
     
-    [_reachability stopNotifier], _reachability = nil;
+    [_reachability stopNotifier];
+    _reachability = nil;
 }
 
 - (BOOL)isPlaying
@@ -1536,7 +1539,8 @@ public:
         unsigned u = pos.playbackTimeInSeconds;
         unsigned s,m;
     
-        s = u % 60, u /= 60;
+        s = u % 60;
+        u /= 60;
         m = u;
     
         pos.minute = m;
@@ -1563,7 +1567,8 @@ public:
     
         unsigned s,m;
     
-        s = u % 60, u /= 60;
+        s = u % 60;
+        u /= 60;
         m = u;
         
         pos.minute = m;
