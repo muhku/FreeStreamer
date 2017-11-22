@@ -357,7 +357,8 @@ void Caching_Stream::streamHasBytesAvailable(UInt8 *data, UInt32 numBytes)
 void Caching_Stream::streamEndEncountered()
 {
     if (m_fileOutput) {
-        delete m_fileOutput, m_fileOutput = 0;
+        delete m_fileOutput;
+        m_fileOutput = 0;
     }
     
     if (m_cacheable) {
