@@ -935,13 +935,18 @@ void Audio_Stream::streamIsReadyRead()
         CFRelease(m_contentType);
         m_contentType = 0;
     }
+    
     if (contentType) {
         m_contentType = CFStringCreateCopy(kCFAllocatorDefault, contentType);
         
-        if (kCFCompareEqualTo == CFStringCompareWithOptions(contentType, audioContentType, CFRangeMake(0, CFStringGetLength(audioContentType)),0)) {
-            matchesAudioContentType = true;
-        } else if (kCFCompareEqualTo == CFStringCompareWithOptions(contentType, videoContentType, CFRangeMake(0, CFStringGetLength(videoContentType)),0)) {
-            matchesAudioContentType = true;
+        if (CFStringGetLength(contentType) >= CFStringGetLength(audioContentType)) {
+            if (kCFCompareEqualTo == CFStringCompareWithOptions(contentType, audioContentType, CFRangeMake(0, CFStringGetLength(audioContentType)),0)) {
+                matchesAudioContentType = true;
+            }
+        } else if (CFStringGetLength(contentType) >= CFStringGetLength(videoContentType)) {
+            if (kCFCompareEqualTo == CFStringCompareWithOptions(contentType, videoContentType, CFRangeMake(0, CFStringGetLength(videoContentType)),0)) {
+                matchesAudioContentType = true;
+            }
         }
     }
     
