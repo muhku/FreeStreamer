@@ -935,6 +935,7 @@ void Audio_Stream::streamIsReadyRead()
         CFRelease(m_contentType);
         m_contentType = 0;
     }
+    
     if (contentType) {
         m_contentType = CFStringCreateCopy(kCFAllocatorDefault, contentType);
         
