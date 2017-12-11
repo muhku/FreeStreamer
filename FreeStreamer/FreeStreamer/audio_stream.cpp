@@ -923,6 +923,8 @@ void Audio_Stream::streamIsReadyRead()
     
     CFStringRef audioContentType = CFSTR("audio/");
     CFStringRef videoContentType = CFSTR("video/");
+    const CFIndex audioContentTypeLen = CFStringGetLength(audioContentType);
+    const CFIndex videoContentTypeLen = CFStringGetLength(videoContentType);
     bool matchesAudioContentType = false;
     
     CFStringRef contentType = 0;
@@ -937,10 +939,13 @@ void Audio_Stream::streamIsReadyRead()
     }
     if (contentType) {
         m_contentType = CFStringCreateCopy(kCFAllocatorDefault, contentType);
+        const CFIndex contentTypeLen = CFStringGetLength(contentType);
         
-        if (kCFCompareEqualTo == CFStringCompareWithOptions(contentType, audioContentType, CFRangeMake(0, CFStringGetLength(audioContentType)),0)) {
+        if (contentTypeLen >= audioContentTypeLen &&
+            (kCFCompareEqualTo == CFStringCompareWithOptions(contentType, audioContentType, CFRangeMake(0, audioContentTypeLen),0))) {
             matchesAudioContentType = true;
-        } else if (kCFCompareEqualTo == CFStringCompareWithOptions(contentType, videoContentType, CFRangeMake(0, CFStringGetLength(videoContentType)),0)) {
+        } else if (contentTypeLen >= videoContentTypeLen &&
+            (kCFCompareEqualTo == CFStringCompareWithOptions(contentType, videoContentType, CFRangeMake(0, videoContentTypeLen),0))) {
             matchesAudioContentType = true;
         }
     }
