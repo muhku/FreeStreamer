@@ -22,7 +22,7 @@
 /**
  * The reversion of the current release
  */
-#define FREESTREAMER_VERSION_REVISION       0
+#define FREESTREAMER_VERSION_REVISION       2
 
 /**
  * Follow this notification for the audio stream state changes.
@@ -319,7 +319,7 @@ typedef struct {
 
 @end
 
-NSString*             freeStreamerReleaseVersion();
+NSString*             freeStreamerReleaseVersion(void);
 
 /**
  * FSAudioStream is a class for streaming audio files from an URL.
@@ -553,7 +553,7 @@ NSString*             freeStreamerReleaseVersion();
  * Called upon completion of the stream. Note that for continuous
  * streams this is never called.
  */
-@property (copy) void (^onCompletion)();
+@property (copy) void (^onCompletion)(void);
 /**
  * Called upon a state change.
  */

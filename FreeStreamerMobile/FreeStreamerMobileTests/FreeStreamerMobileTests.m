@@ -377,11 +377,11 @@ playback_short_file:
                                                   }];
     
     FSSeekByteOffset offset;
-    offset.start = 4089672;
-    offset.end   = 8227656;
-    offset.position = 0.497128189;
+    offset.start = 238169;
+    offset.end   = 510783;
+    offset.position = 0.465815216;
     
-    _stream.url = [NSURL URLWithString:@"https://dl.dropboxusercontent.com/u/995250/FreeStreamer/As%20long%20as%20the%20stars%20shine.mp3"];
+    _stream.url = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"test" ofType:@"mp3"]];
     [_stream playFromOffset:offset];
     
     NSTimeInterval timeout = 15.0;
@@ -399,8 +399,8 @@ playback_short_file:
             
             FSStreamPosition pos = _stream.currentTimePlayed;
             
-            XCTAssertTrue((pos.minute == 2), @"Invalid seek minute");
-            XCTAssertTrue((pos.second == 7), @"Invalid seek second");
+            XCTAssertTrue((pos.minute == 0), @"Invalid seek minute");
+            XCTAssertTrue((pos.second == 14), @"Invalid seek second");
             
             return;
         }
@@ -432,7 +432,7 @@ playback_short_file:
                                                       }
                                                   }];
     
-    _controller.url = [NSURL URLWithString:@"http://www.radioswissjazz.ch/live/mp3.m3u"];
+    _controller.url = [NSURL URLWithString:@"http://somafm.com/groovesalad64.pls"];
     [_controller play];
     
     NSTimeInterval timeout = 15.0;
@@ -477,9 +477,9 @@ playback_short_file:
         NSURL *url;
         
         if (i % 2 == 0) {
-            url = [NSURL URLWithString:@"https://dl.dropboxusercontent.com/u/995250/FreeStreamer/As%20long%20as%20the%20stars%20shine.mp3"];
+            url = [NSURL URLWithString:@"https://archive.org/download/kahvi029/kahvi029a_badloop_lumme.mp3"];
         } else {
-            url = [NSURL URLWithString:@"https://dl.dropboxusercontent.com/u/995250/FreeStreamer/5sec.mp3"];
+            url = [NSURL URLWithString:@"https://archive.org/download/kahvi029/kahvi029b_badloop_favorite_things.mp3"];
         }
         
         [_stream stop];
@@ -506,7 +506,7 @@ playback_short_file:
                                                       }
                                                   }];
     
-    _stream.url = [NSURL URLWithString:@"https://dl.dropboxusercontent.com/u/995250/FreeStreamer/As%20long%20as%20the%20stars%20shine.mp3"];
+    _stream.url = [NSURL URLWithString:@"https://archive.org/download/kahvi029/kahvi029a_badloop_lumme.mp3"];
     [_stream play];
     
     NSTimeInterval timeout = 15.0;
@@ -526,9 +526,9 @@ playback_short_file:
                 
                 XCTAssertFalse((_stream.continuous), @"Stream must be non-continuous");
                 
-                XCTAssertTrue((_stream.duration.minute == 4), @"Invalid stream duration (minutes)");
-                XCTAssertTrue((_stream.duration.second == 17), @"Invalid stream duration (seconds)");
-                XCTAssertTrue((_stream.contentLength == 9473902), @"Invalid content length");
+                XCTAssertTrue((_stream.duration.minute == 6), @"Invalid stream duration (minutes)");
+                XCTAssertTrue((_stream.duration.second == 45), @"Invalid stream duration (seconds)");
+                XCTAssertTrue((_stream.contentLength == 9720186), @"Invalid content length");
                 
                 // Checks done, we are done.
                 _keepRunning = NO;
@@ -540,36 +540,6 @@ playback_short_file:
         }
     }
     XCTAssertFalse(timedOut, @"Timed out - the stream did not start playing");
-}
-
-- (void)testShortFilePlayback
-{
-    __weak FreeStreamerMobileTests *weakSelf = self;
-    
-    _stream.url = [NSURL URLWithString:@"https://dl.dropboxusercontent.com/u/995250/FreeStreamer/5sec.mp3"];
-    
-    _stream.onCompletion = ^() {
-        weakSelf.checkStreamState = YES;
-    };
-    
-    [_stream play];
-    
-    NSTimeInterval timeout = 10.0;
-    NSTimeInterval idle = 0.1;
-    BOOL timedOut = NO;
-    
-    NSDate *timeoutDate = [[NSDate alloc] initWithTimeIntervalSinceNow:timeout];
-    while (!timedOut && _keepRunning) {
-        NSDate *tick = [[NSDate alloc] initWithTimeIntervalSinceNow:idle];
-        [[NSRunLoop currentRunLoop] runUntilDate:tick];
-        timedOut = ([tick compare:timeoutDate] == NSOrderedDescending);
-        
-        if (_checkStreamState) {
-            // Stream playback finished
-            return;
-        }
-    }
-    XCTAssertFalse(timedOut, @"Timed out - the stream did not complete playing");
 }
 
 - (void)testLocalFilePlayback
@@ -704,7 +674,7 @@ playback_short_file:
         }
     };
     
-    _controller.url = [NSURL URLWithString:@"https://dl.dropboxusercontent.com/u/995250/FreeStreamer/As%20long%20as%20the%20stars%20shine.mp3"];
+    _controller.url = [NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"test" ofType:@"mp3"]];
     [_controller play];
     
     NSTimeInterval timeout = 15.0;

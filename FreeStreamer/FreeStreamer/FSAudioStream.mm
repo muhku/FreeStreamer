@@ -78,22 +78,8 @@ static NSInteger sortCacheObjects(id co1, id co2, void *keyForSorting)
         [systemVersion appendString:@"OS X"];
 #endif
 
-#if (TARGET_OS_SIMULATOR)
-        /* Seems that audio doesn't run properly with lower latency buffers on the simulator
-           with later Xcode / iOS Simulator versions */
-        self.bufferCount    = 8;
-        self.bufferSize     = 32768;
-        
-    #if (DEBUG)
-        static dispatch_once_t once;
-        dispatch_once(&once, ^{
-            NSLog(@"Notice: FreeStreamer running on simulator, low latency audio not available!");
-        });
-    #endif
-#else
         self.bufferCount    = 64;
         self.bufferSize     = 8192;
-#endif
         self.maxPacketDescs = 512;
         self.httpConnectionBufferSize = 8192;
         self.outputSampleRate = 44100;
@@ -367,8 +353,10 @@ public:
     
     _delegate = nil;
     
-    delete _audioStream, _audioStream = nil;
-    delete _observer, _observer = nil;
+    delete _audioStream;
+    _audioStream = nil;
+    delete _observer;
+    _observer = nil;
     
     // Clean up the disk cache.
     
@@ -1049,7 +1037,8 @@ public:
     
     [self endBackgroundTask];
     
-    [_reachability stopNotifier], _reachability = nil;
+    [_reachability stopNotifier];
+    _reachability = nil;
 }
 
 - (BOOL)isPlaying
@@ -1536,7 +1525,8 @@ public:
         unsigned u = pos.playbackTimeInSeconds;
         unsigned s,m;
     
-        s = u % 60, u /= 60;
+        s = u % 60;
+        u /= 60;
         m = u;
     
         pos.minute = m;
@@ -1563,7 +1553,8 @@ public:
     
         unsigned s,m;
     
-        s = u % 60, u /= 60;
+        s = u % 60;
+        u /= 60;
         m = u;
         
         pos.minute = m;
