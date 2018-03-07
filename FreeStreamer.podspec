@@ -49,6 +49,7 @@ Pod::Spec.new do |s|
 	                          'FreeStreamer/FreeStreamer/FSPlaylistItem.h',
 	                          'FreeStreamer/FreeStreamer/FSXMLHttpRequest.h'
 	s.ios.frameworks        = 'CFNetwork', 'AudioToolbox', 'AVFoundation', 'MediaPlayer'
+	s.tvos.frameworks       = 'CFNetwork', 'AudioToolbox', 'AVFoundation', 'MediaPlayer'
 	s.osx.frameworks        = 'CFNetwork', 'AudioToolbox', 'AVFoundation'
 	s.libraries	        = 'xml2', 'stdc++'
 	s.xcconfig              = { 'HEADER_SEARCH_PATHS' => '$(SDKROOT)/usr/include/libxml2' }
