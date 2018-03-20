@@ -143,6 +143,13 @@ Audio_Stream::Audio_Stream() :
     if (pthread_mutex_init(&m_streamStateMutex, NULL) != 0) {
         AS_TRACE("m_streamStateMutex init failed!\n");
     }
+    if (pthread_mutex_init(&m_decodeThreadMutex, NULL) != 0) {
+        AS_TRACE("m_decodeThreadMutex init failed!\n");
+    }
+    
+    if (pthread_cond_init(&m_decodeThreadExitCondition, NULL) != 0) {
+        AS_TRACE("m_decodeThreadExitCondition init failed!\n");
+    }
     
     pthread_create(&m_decodeThread, NULL, decodeLoop, this);
     pthread_detach(m_decodeThread);
@@ -152,13 +159,14 @@ Audio_Stream::~Audio_Stream()
 {
     pthread_mutex_lock(&m_streamStateMutex);
     m_decoderShouldRun = false;
+    pthread_mutex_unlock(&m_streamStateMutex);
     
     if (m_decodeRunLoop) {
         CFRunLoopStop(m_decodeRunLoop);
         m_decodeRunLoop = NULL;
     }
     
-    pthread_mutex_unlock(&m_streamStateMutex);
+    pthread_cond_wait(&m_decodeThreadExitCondition, &m_decodeThreadMutex);
     
     if (m_defaultContentType) {
         CFRelease(m_defaultContentType);
@@ -188,6 +196,8 @@ Audio_Stream::~Audio_Stream()
     
     pthread_mutex_destroy(&m_packetQueueMutex);
     pthread_mutex_destroy(&m_streamStateMutex);
+    pthread_mutex_destroy(&m_decodeThreadMutex);
+    pthread_cond_destroy(&m_decodeThreadExitCondition);
 }
     
 void Audio_Stream::open()
@@ -1764,6 +1774,10 @@ void *Audio_Stream::decodeLoop(void *data)
     CFRunLoopTimerInvalidate(timer);
     
     CFRelease(timer);
+    
+    pthread_mutex_lock(&THIS->m_decodeThreadMutex);
+    pthread_cond_signal(&THIS->m_decodeThreadExitCondition);
+    pthread_mutex_unlock(&THIS->m_decodeThreadMutex);
     
     AS_TRACE("returning from decodeLoop, bye\n");
     

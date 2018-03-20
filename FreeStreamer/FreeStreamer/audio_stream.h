@@ -201,8 +201,10 @@ private:
     
     pthread_mutex_t m_packetQueueMutex;
     pthread_mutex_t m_streamStateMutex;
+    pthread_mutex_t m_decodeThreadMutex;
     
     pthread_t m_decodeThread;
+    pthread_cond_t m_decodeThreadExitCondition;
     
     CFRunLoopRef m_decodeRunLoop;
     CFRunLoopRef m_mainRunLoop;
