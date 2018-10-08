@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
 	s.name                  = 'FreeStreamer'
-	s.version               = '3.8.3'
+	s.version               = '3.8.4'
 	s.license               = 'BSD'
 	s.summary               = 'A low-memory footprint streaming audio client for iOS and OS X.'
 	s.homepage              = 'https://github.com/muhku/FreeStreamer/'
@@ -49,7 +49,7 @@ Pod::Spec.new do |s|
 	                          'FreeStreamer/FreeStreamer/FSXMLHttpRequest.h'
 	s.ios.frameworks        = 'CFNetwork', 'AudioToolbox', 'AVFoundation', 'MediaPlayer'
 	s.osx.frameworks        = 'CFNetwork', 'AudioToolbox', 'AVFoundation'
-	s.libraries	        = 'xml2', 'stdc++'
+	s.libraries	        = 'xml2', 'c++'
 	s.xcconfig              = { 'HEADER_SEARCH_PATHS' => '$(SDKROOT)/usr/include/libxml2' }
 	s.requires_arc          = true
         s.dependency 'Reachability', '~> 3.0'
