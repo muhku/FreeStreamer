@@ -8,6 +8,7 @@ Pod::Spec.new do |s|
 	s.source                = { :git => 'https://github.com/muhku/FreeStreamer.git', :tag => s.version.to_s }
 	s.ios.deployment_target = '6.0'
 	s.osx.deployment_target = '10.7'
+	s.tvos.deployment_target = '9.0'
 	s.source_files          = 'FreeStreamer/FreeStreamer/FSAudioController.h',
 	                          'FreeStreamer/FreeStreamer/FSAudioController.m',
 	                          'FreeStreamer/FreeStreamer/FSAudioStream.h',
@@ -48,6 +49,7 @@ Pod::Spec.new do |s|
 	                          'FreeStreamer/FreeStreamer/FSPlaylistItem.h',
 	                          'FreeStreamer/FreeStreamer/FSXMLHttpRequest.h'
 	s.ios.frameworks        = 'CFNetwork', 'AudioToolbox', 'AVFoundation', 'MediaPlayer'
+	s.tvos.frameworks       = 'CFNetwork', 'AudioToolbox', 'AVFoundation', 'MediaPlayer'
 	s.osx.frameworks        = 'CFNetwork', 'AudioToolbox', 'AVFoundation'
 	s.libraries	        = 'xml2', 'c++'
 	s.xcconfig              = { 'HEADER_SEARCH_PATHS' => '$(SDKROOT)/usr/include/libxml2' }
