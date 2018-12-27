@@ -119,6 +119,7 @@ Audio_Stream::Audio_Stream() :
     m_decoderShouldRun(false),
     m_decoderFailed(false),
     m_decoderActive(false),
+    m_decoderThreadCreated(false),
     m_mainRunLoop(CFRunLoopGetCurrent()),
     m_decodeRunLoop(NULL)
 {
@@ -144,21 +145,24 @@ Audio_Stream::Audio_Stream() :
         AS_TRACE("m_streamStateMutex init failed!\n");
     }
     
-    pthread_create(&m_decodeThread, NULL, decodeLoop, this);
-    pthread_detach(m_decodeThread);
+    m_decoderThreadCreated = (pthread_create(&m_decodeThread, NULL, decodeLoop, this) == 0);
 }
 
 Audio_Stream::~Audio_Stream()
 {
     pthread_mutex_lock(&m_streamStateMutex);
     m_decoderShouldRun = false;
-    
-    if (m_decodeRunLoop) {
-        CFRunLoopStop(m_decodeRunLoop);
-        m_decodeRunLoop = NULL;
-    }
-    
     pthread_mutex_unlock(&m_streamStateMutex);
+    
+    if (m_decoderThreadCreated) {
+        while (m_decodeRunLoop == NULL || !CFRunLoopIsWaiting(m_decodeRunLoop)) {
+            usleep(0);
+        }
+        CFRunLoopStop(m_decodeRunLoop);
+        pthread_join(m_decodeThread, NULL);
+        m_decodeRunLoop = NULL;
+        m_decoderThreadCreated = false;
+    }
     
     if (m_defaultContentType) {
         CFRelease(m_defaultContentType);

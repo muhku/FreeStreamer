@@ -198,6 +198,7 @@ private:
     bool m_decoderShouldRun;
     bool m_decoderFailed;
     bool m_decoderActive;
+    bool m_decoderThreadCreated;
     
     pthread_mutex_t m_packetQueueMutex;
     pthread_mutex_t m_streamStateMutex;
