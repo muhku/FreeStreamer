@@ -1972,30 +1972,29 @@ void Audio_Stream::cleanupCachedData()
         return;
     }
     
-    queued_packet_t *lastPacket = m_processedPackets.back();
-    
-    bool keepCleaning = true;
     queued_packet_t *cur = m_queuedHead;
-    while (cur && keepCleaning) {
-        if (cur->identifier == lastPacket->identifier) {
-            AS_TRACE("Found the last packet to be cleaned up\n");
-            keepCleaning  = false;
+    /* Incoming (not yet processed) packets are added at the end (tail)
+       of the queue. Hence the processed packets reside in the front
+       of the queue. Clean the packets until we found the last packet
+       which is still needed.
+     */
+    for (;;) {
+        if (cur && m_playPacket && cur->identifier == m_playPacket->identifier) {
+            break;
         }
-        
-        queued_packet_t *tmp = cur->next;
-        
-        m_cachedDataSize -= cur->desc.mDataByteSize;
-        
-        free(cur);
-        cur = tmp;
-        if (cur == m_playPacket){
-            keepCleaning = false;
-            AS_TRACE("Found m_playPacket\n");
+        if (cur && cur->identifier == m_processedPackets.back()->identifier) {
+            queued_packet_t *nextPacket = cur->next;
+            
+            m_cachedDataSize -= cur->desc.mDataByteSize;
+            
+            free(cur);
+            cur = nextPacket;
+            m_processedPackets.pop_back();
+        } else {
+            break;
         }
     }
     m_queuedHead = cur;
-    
-    m_processedPackets.clear();
     
     AS_LOCK_TRACE("cleanupCachedData: unlock\n");
     pthread_mutex_unlock(&m_packetQueueMutex);
