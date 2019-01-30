@@ -1963,15 +1963,6 @@ void Audio_Stream::cleanupCachedData()
     AS_LOCK_TRACE("cleanupCachedData: lock\n");
     pthread_mutex_lock(&m_packetQueueMutex);
     
-    if (m_processedPackets.size() == 0) {
-        AS_LOCK_TRACE("cleanupCachedData: unlock\n");
-        pthread_mutex_unlock(&m_packetQueueMutex);
-        
-        // Nothing can be cleaned yet, sorry
-        AS_TRACE("Cache cleanup called but no free packets\n");
-        return;
-    }
-    
     queued_packet_t *cur = m_queuedHead;
     /* Incoming (not yet processed) packets are added at the end (tail)
        of the queue. Hence the processed packets reside in the front
@@ -1982,7 +1973,8 @@ void Audio_Stream::cleanupCachedData()
         if (cur && m_playPacket && cur->identifier == m_playPacket->identifier) {
             break;
         }
-        if (cur && cur->identifier == m_processedPackets.back()->identifier) {
+        if (cur && !m_processedPackets.empty() &&
+            cur->identifier == m_processedPackets.back()->identifier) {
             queued_packet_t *nextPacket = cur->next;
             
             m_cachedDataSize -= cur->desc.mDataByteSize;
