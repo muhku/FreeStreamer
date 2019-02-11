@@ -1753,7 +1753,7 @@ void *Audio_Stream::decodeLoop(void *data)
     ctx.retain = NULL;
     ctx.release = NULL;
     ctx.copyDescription = NULL;
-    CFRunLoopTimerRef timer =
+    CFRunLoopTimerRef decodeTimer =
     CFRunLoopTimerCreate (NULL,
                           CFAbsoluteTimeGetCurrent() + 0.02, // 20ms
                           0.02,
@@ -1761,13 +1761,13 @@ void *Audio_Stream::decodeLoop(void *data)
                           0,
                           decodeSinglePacket,
                           &ctx);
-    CFRunLoopAddTimer(CFRunLoopGetCurrent(), timer, kCFRunLoopCommonModes);
+    CFRunLoopAddTimer(CFRunLoopGetCurrent(), decodeTimer, kCFRunLoopCommonModes);
     
     CFRunLoopRun();
     
-    CFRunLoopTimerInvalidate(timer);
+    CFRunLoopRemoveTimer(CFRunLoopGetCurrent(), decodeTimer, kCFRunLoopCommonModes);
     
-    CFRelease(timer);
+    CFRelease(decodeTimer);
     
     AS_TRACE("returning from decodeLoop, bye\n");
     
