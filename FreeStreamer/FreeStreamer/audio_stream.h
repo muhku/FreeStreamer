@@ -77,6 +77,7 @@ public:
     Input_Stream_Position streamPositionForOffset(float offset);
     
     float currentVolume();
+    void setDecoderRunState(bool decoderShouldRun);
     void setVolume(float volume);
     void setPlayRate(float playRate);
     
@@ -148,6 +149,7 @@ private:
     CFRunLoopTimerRef m_seekTimer;
     CFRunLoopTimerRef m_inputStreamTimer;
     CFRunLoopTimerRef m_stateSetTimer;
+    CFRunLoopTimerRef m_decodeTimer;
     
     AudioFileStreamID m_audioFileStream;	// the audio file stream parser
     AudioConverterRef m_audioConverter;
@@ -197,7 +199,6 @@ private:
     bool m_converterRunOutOfData;
     bool m_decoderShouldRun;
     bool m_decoderFailed;
-    bool m_decoderActive;
     bool m_decoderThreadCreated;
     
     pthread_mutex_t m_packetQueueMutex;
