@@ -1058,7 +1058,7 @@ public:
 
 - (void)pause
 {
-    _wasPaused = YES;
+    _wasPaused = !_wasPaused;
     _audioStream->pause();
 }
 
